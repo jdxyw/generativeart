@@ -5,17 +5,8 @@ import "math"
 func ConvertCartesianToPixel(x, y, xaixs, yaixs float64, h, w int) (int, int) {
 	xr, yr := x/xaixs, y/yaixs
 	var i, j int
-	if xr > 0 {
-		i = w/2 + int(float64(w)/2*xr)
-	} else {
-		i = w/2 + int(float64(w)/2*xr)
-	}
-
-	if yr > 0 {
-		j = h/2 + int(float64(h)/2*yr)
-	} else {
-		j = h/2 + int(float64(h)/2*yr)
-	}
+	i = w/2 + int(float64(w)/2*xr)
+	j = h/2 + int(float64(h)/2*yr)
 
 	return i, j
 }
@@ -37,17 +28,8 @@ func ConvertPolarToPixel(r, theta, xaixs, yaixs float64, h, w int) (int, int) {
 
 	xr, yr := x/xaixs, y/yaixs
 	var i, j int
-	if xr > 0 {
-		i = w/2 + int(float64(w)/2*xr)
-	} else {
-		i = w/2 + int(float64(w)/2*xr)
-	}
-
-	if yr > 0 {
-		j = h/2 + int(float64(h)/2*yr)
-	} else {
-		j = h/2 + int(float64(h)/2*yr)
-	}
+	i = w/2 + int(float64(w)/2*xr)
+	j = h/2 + int(float64(h)/2*yr)
 
 	return i, j
 }
