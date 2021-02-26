@@ -11,10 +11,12 @@ type wave struct {
 	fn Formula
 }
 
+// NewWave returns a wave generator.
 func NewWave(fn Formula) *wave {
 	return &wave{fn: fn}
 }
 
+// GenerativePolar draws the image in polar coordinator system.
 func (w *wave) GenerativePolar(c *canva, rgba color.RGBA) {
 	for x := -math.Pi; x <= math.Pi; x += 0.01 {
 		for y := -math.Pi; y <= math.Pi; y += 0.01 {
@@ -28,6 +30,7 @@ func (w *wave) GenerativePolar(c *canva, rgba color.RGBA) {
 	}
 }
 
+// Generative draws the image in cartesian coordinator system.
 func (w *wave) Generative(c *canva, rgba color.RGBA) {
 	for x := -math.Pi; x <= math.Pi; x += 0.008 {
 		for y := -math.Pi; y <= math.Pi; y += 0.008 {
