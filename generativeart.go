@@ -19,6 +19,7 @@ type canva struct {
 	img           *image.RGBA
 }
 
+// NewCanva returns a canva.
 func NewCanva(h, w int, x, y float64) *canva {
 	return &canva{
 		height: h,
@@ -29,6 +30,7 @@ func NewCanva(h, w int, x, y float64) *canva {
 	}
 }
 
+// FillBackgroud fills the backgroud of the canva.
 func (c *canva) FillBackgroud(rgba color.RGBA) {
 	draw.Draw(c.img, c.img.Bounds(), &image.Uniform{rgba}, image.ZP, draw.Src)
 }
