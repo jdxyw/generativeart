@@ -32,8 +32,8 @@ func (w *wave) GenerativePolar(c *canva, rgba color.RGBA) {
 
 // Generative draws the image in cartesian coordinate system.
 func (w *wave) Generative(c *canva, rgba color.RGBA) {
-	for x := -math.Pi; x <= math.Pi; x += 0.008 {
-		for y := -math.Pi; y <= math.Pi; y += 0.008 {
+	for x := -math.Pi; x <= math.Pi; x += 0.002 {
+		for y := -math.Pi; y <= math.Pi; y += 0.002 {
 			xi, yi := w.fn(x, y)
 			i, j := ConvertCartesianToPixel(xi, yi, c.xaixs, c.yaixs, c.height, c.width)
 			if i < 0 || i > c.width-1 || j < 0 || j > c.height-1 {
