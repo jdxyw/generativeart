@@ -11,9 +11,9 @@ func formula1(x, y float64) (float64, float64) {
 }
 
 func main() {
-	c := generativeart.NewCanva(1600, 1600, 4, 4)
-	c.FillBackgroud(generativeart.Tomato)
+	c := generativeart.NewCanva(1600, 1600, 2, 2)
+	c.FillBackgroud(generativeart.White)
 	g := generativeart.NewWave(formula1)
-	g.GenerativePolar(c, generativeart.Black)
+	g.GenerativePolar(c, generativeart.DarkSalmon)
 	c.ToPng("g1.png")
 }
