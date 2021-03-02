@@ -34,7 +34,7 @@ func (s *sileSmoke) Generative(c *canva) {
 	cn := rand.Intn(s.maxCircle) + int(s.maxCircle/3)
 	circles := newCircleSlice(cn, c.width, c.height, s.minSteps, s.maxSteps, s.minRadius, s.maxRadius)
 
-	for i :=0; i<s.maxStepsPerCircle; i++ {
+	for i := 0; i < s.maxStepsPerCircle; i++ {
 		ctex.SetRGBA255(0, 0, 0, 5)
 		ctex.DrawRectangle(0, 0, float64(c.width), float64(c.height))
 		ctex.Fill()
