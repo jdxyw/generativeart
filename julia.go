@@ -12,13 +12,13 @@ type julia struct {
 
 func NewJulia(formula GenFunc, maxz float64) *julia {
 	return &julia{
-		fn: formula,
+		fn:   formula,
 		maxz: maxz,
 	}
 }
 
 // Generative draws a julia set.
-func (j *julia)Generative(c *canva) {
+func (j *julia) Generative(c *canva) {
 	n := len(c.opts.colorSchema)
 	if n > 255 {
 		n = 255
