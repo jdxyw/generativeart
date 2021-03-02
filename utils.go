@@ -33,3 +33,7 @@ func ConvertPolarToPixel(r, theta, xaixs, yaixs float64, h, w int) (int, int) {
 
 	return i, j
 }
+
+func Distance(x1, y1, x2, y2 float64) float64 {
+	return math.Sqrt(math.Pow(x1-x2, 2.0) + math.Pow(y1-y2, 2.0))
+}
