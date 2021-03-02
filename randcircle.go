@@ -34,15 +34,15 @@ func NewRandCicle(mc, msp int, minStep, maxStep, minr, maxr float64, isRandColor
 	}
 }
 
-func (r *randCircle) newCircleSlice(cn, w, h int) []circle {
+func newCircleSlice(cn, w, h int, minStep, maxStep, minRadius, maxRadius float64) []circle {
 	var circles []circle
 
 	for i := 0; i < cn; i++ {
 		x := rand.Intn(w) + 1
 		y := rand.Intn(h) + 1
-		radius := float64(rand.Intn(int(r.minRadius))) + r.maxRadius - r.minRadius
+		radius := float64(rand.Intn(int(minRadius))) + maxRadius - minRadius
 		angle := rand.Float64() * math.Pi * 2.0
-		step := r.minSteps + rand.Float64()*(r.maxSteps-r.minSteps)
+		step := minStep + rand.Float64()*(maxStep-minStep)
 		circles = append(circles, circle{
 			x:      float64(x),
 			y:      float64(y),
@@ -55,7 +55,7 @@ func (r *randCircle) newCircleSlice(cn, w, h int) []circle {
 	return circles
 }
 
-func (r *randCircle) circleSliceUpdate(cs []circle, w, h int) []circle {
+func circleSliceUpdate(cs []circle, w, h int) []circle {
 	var circles []circle
 
 	for _, c := range cs {
@@ -94,7 +94,7 @@ func (r *randCircle) Generative(c *canva) {
 
 	for j := 0; j < c.opts.nIters; j++ {
 		cn := rand.Intn(r.maxCircle) + int(r.maxCircle/3)
-		circles := r.newCircleSlice(cn, c.width, c.height)
+		circles := newCircleSlice(cn, c.width, c.height, r.minSteps, r.maxSteps, r.minRadius, r.maxRadius)
 
 		for i := 0; i < r.maxStepsPerCircle; i++ {
 			for _, c1 := range circles {
@@ -123,7 +123,7 @@ func (r *randCircle) Generative(c *canva) {
 				}
 			}
 
-			circles = r.circleSliceUpdate(circles, c.width, c.height)
+			circles = circleSliceUpdate(circles, c.width, c.height)
 		}
 	}
 }
