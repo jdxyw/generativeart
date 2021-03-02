@@ -19,7 +19,7 @@ type randCircle struct {
 	maxSteps          float64
 	minRadius         float64
 	maxRadius         float64
-	isRandColor	bool
+	isRandColor       bool
 }
 
 func NewRandCicle(mc, msp int, minStep, maxStep, minr, maxr float64, isRandColor bool) *randCircle {
@@ -30,7 +30,7 @@ func NewRandCicle(mc, msp int, minStep, maxStep, minr, maxr float64, isRandColor
 		maxSteps:          maxStep,
 		minRadius:         minr,
 		maxRadius:         maxr,
-		isRandColor: isRandColor,
+		isRandColor:       isRandColor,
 	}
 }
 
@@ -59,8 +59,8 @@ func (r *randCircle) circleSliceUpdate(cs []circle, w, h int) []circle {
 	var circles []circle
 
 	for _, c := range cs {
-		 c.x += c.dx
-		 c.y += c.dy
+		c.x += c.dx
+		c.y += c.dy
 
 		if c.x <= 0 {
 			c.x = 0
@@ -92,8 +92,7 @@ func (r *randCircle) circleSliceUpdate(cs []circle, w, h int) []circle {
 func (r *randCircle) Generative(c *canva) {
 	ctex := gg.NewContextForRGBA(c.img)
 
-
-	for j := 0; j<c.opts.nIters; j++ {
+	for j := 0; j < c.opts.nIters; j++ {
 		cn := rand.Intn(r.maxCircle) + int(r.maxCircle/3)
 		circles := r.newCircleSlice(cn, c.width, c.height)
 
