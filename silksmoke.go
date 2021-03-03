@@ -57,7 +57,7 @@ func (s *sileSmoke) Generative(c *canva) {
 					cx := (c1.x + c2.x) / 2
 					cy := (c1.y + c2.y) / 2
 
-					ctex.SetRGBA255(int(cl.R), int(cl.G), int(cl.B), 30)
+					ctex.SetRGBA255(int(cl.R), int(cl.G), int(cl.B), c.opts.alpha)
 					ctex.SetLineWidth(c.opts.lineWidth)
 
 					ctex.LineTo(c1.x, c1.y)

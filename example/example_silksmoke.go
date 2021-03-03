@@ -2,7 +2,6 @@ package main
 
 import (
 	"generativeart"
-	"image/color"
 	"math/rand"
 	"time"
 )
@@ -12,12 +11,8 @@ func main() {
 	c := generativeart.NewCanva(500, 500, 2, 2)
 	c.SetBackground(generativeart.Black)
 	c.SetLineWidth(1.0)
-	c.SetLineColor(color.RGBA{
-		R: 255,
-		G: 255,
-		B: 255,
-		A: 30,
-	})
+	c.SetLineColor(generativeart.MediumAquamarine)
+	c.SetAlpha(30)
 	c.SetColorSchema(generativeart.Plasma)
 	c.SetIterations(4)
 	c.FillBackground()

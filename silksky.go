@@ -22,7 +22,7 @@ func NewSilkSky(circleNum int, sunRadius float64) *silkSky {
 func (s *silkSky) Generative(c *canva) {
 	ctex := gg.NewContextForRGBA(c.img)
 	xm := float64(rand.Intn(c.width/5)) + float64(c.width*4/5-c.width/5)
-	ym := float64(rand.Intn(c.height/5))+ float64(c.height*4/5-c.height/5)
+	ym := float64(rand.Intn(c.height/5)) + float64(c.height*4/5-c.height/5)
 
 	mh := s.circleNum*2 + 2
 	ms := s.circleNum*2 + 50
