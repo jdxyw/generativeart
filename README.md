@@ -4,7 +4,7 @@
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/jdxyw/generativeart/master/LICENSE)
 
 
-generativeart is a Go package to generate many kinds of generative art. Currently, it supports the following type.
+generativeart is a `Go` package to generate many kinds of generative art. The code is collecting some excellent generative art (implemented in `R` or `Processing`), and implement them in `Go` again. Currently, it supports the following type.
 
 - Maze
 - Julia Set
@@ -37,4 +37,6 @@ Thanks for the following sites and repos, I got lots of ideas, inspiration, code
 - https://github.com/aschinchon/cyclic-cellular-automata
 - https://github.com/armdz/ProcessingSketchs
 - https://github.com/Mr-Slesser/Generative-Art-And-Fractals
+- https://github.com/cdr6934/Generative-Processing-Experiments
+- https://github.com/pkd2512/inktober2017
 - http://blog.dragonlab.de/2015/03/generative-art-week-1
