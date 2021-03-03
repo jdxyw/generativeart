@@ -21,11 +21,11 @@ func (cl *circleLoop) Generative(c *canva) {
 
 	r := cl.radius
 	var theta float64 = 0
-	for i:=0; i<c.opts.nIters; i++ {
+	for i := 0; i < c.opts.nIters; i++ {
 		ctex.Push()
 		ctex.Translate(float64(c.width/2), float64(c.height/2))
-		x := cl.radius*math.Cos(gg.Radians(theta))
-		y := cl.radius*math.Sin(gg.Radians(theta*2))
+		x := cl.radius * math.Cos(gg.Radians(theta))
+		y := cl.radius * math.Sin(gg.Radians(theta*2))
 
 		ctex.SetLineWidth(c.opts.lineWidth)
 		ctex.SetColor(c.opts.lineColor)
@@ -33,7 +33,7 @@ func (cl *circleLoop) Generative(c *canva) {
 		ctex.DrawEllipse(x, y, r/2, r/2)
 		ctex.Stroke()
 		ctex.Pop()
-		r+=math.Cos((theta))*math.Sin((theta/2))+math.Sin((theta))*math.Cos((theta/2))
-		theta += math.Pi/2
+		r += math.Cos((theta))*math.Sin((theta/2)) + math.Sin((theta))*math.Cos((theta/2))
+		theta += math.Pi / 2
 	}
 }
