@@ -1,7 +1,7 @@
 package main
 
 import (
-	"generativeart"
+	"github.com/jdxyw/generativeart"
 	"math/rand"
 	"time"
 )
