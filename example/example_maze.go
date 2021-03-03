@@ -8,9 +8,10 @@ import (
 
 func main() {
 	rand.Seed(time.Now().Unix())
-	c := generativeart.NewCanva(800, 800, 2, 2)
+	c := generativeart.NewCanva(600, 600, 2, 2)
 	c.SetBackground(generativeart.Azure)
-	c.SetForeground(generativeart.Tomato)
+	c.SetLineWidth(3)
+	c.SetLineColor(generativeart.Orange)
 	c.FillBackground()
 	c.Draw(generativeart.NewMaze())
 	c.ToPNG("maze.png")
