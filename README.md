@@ -4,7 +4,7 @@
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/jdxyw/generativeart/master/LICENSE)
 
 
-generativeart is a `Go` package to generate many kinds of generative art. The code is collecting some excellent generative art (implemented in `R` or `Processing`), and implement them in `Go` again. Currently, it supports the following type.
+`generativeart` is a `Go` package to generate many kinds of generative art. The goal is to collect some excellent generative art (implemented in `R` or `Processing`), and rewrite them in `Go` again. I would paste the original link at the end of this README(If I remember. You can also submit a PR if you found I miss something.). Currently, it supports the following type.
 
 - Maze
 - Julia Set
@@ -15,6 +15,7 @@ generativeart is a `Go` package to generate many kinds of generative art. The co
 - Circle Line
 - Circle Loop
 - Silk Sky
+- Dot Line
 
 For these kinds of art, the package provides as many as parameters to control the appearance. 
 
@@ -114,6 +115,24 @@ func main() {
 ```
 
 ![](images/circleloop.png)
+
+### Dot Line
+
+```go
+func main() {
+	rand.Seed(time.Now().Unix())
+	c := generativeart.NewCanva(2080, 2080)
+	c.SetBackground(color.RGBA{230, 230, 230, 255})
+	c.SetLineWidth(10)
+	c.SetIterations(4000)
+	c.SetColorSchema(generativeart.Plasma)
+	c.FillBackground()
+	c.Draw(generativeart.NewDotLine(100, 20, 50, false))
+	c.ToPNG("dotline.png")
+}
+```
+
+![](images/dotline.png)
 
 ### Julia Set
 
@@ -226,3 +245,4 @@ Thanks for the following sites and repos, I got lots of ideas, inspiration, code
 - https://github.com/cdr6934/Generative-Processing-Experiments
 - https://github.com/pkd2512/inktober2017
 - http://blog.dragonlab.de/2015/03/generative-art-week-1
+- https://editor.p5js.org/kenekk1/sketches/Ly-5XYvKX

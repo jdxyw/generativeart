@@ -3,6 +3,7 @@ package generativeart
 import (
 	"image/color"
 	"math"
+	"math/rand"
 )
 
 type HSV struct {
@@ -112,4 +113,8 @@ func ConvertPolarToPixel(r, theta, xaixs, yaixs float64, h, w int) (int, int) {
 
 func Distance(x1, y1, x2, y2 float64) float64 {
 	return math.Sqrt(math.Pow(x1-x2, 2.0) + math.Pow(y1-y2, 2.0))
+}
+
+func RandomRangeInt(min, max int) int {
+	return rand.Intn(max-min) + min
 }
