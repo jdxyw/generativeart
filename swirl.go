@@ -40,6 +40,7 @@ func (s *swirl) Generative(c *canva) {
 	}
 
 	s.removeNoisy(c)
+	s.removeNoisy(c)
 }
 
 func (s *swirl) swirlTransform(p point) point {
