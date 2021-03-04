@@ -1,6 +1,6 @@
 module github.com/jdxyw/generativeart
 
-go 1.14
+go 1.16
 
 require (
 	github.com/fogleman/gg v1.3.0
