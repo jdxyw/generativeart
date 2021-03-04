@@ -16,6 +16,7 @@
 - Circle Loop
 - Silk Sky
 - Dot Line
+- Swirl
 
 For these kinds of art, the package provides as many as parameters to control the appearance. 
 
@@ -37,6 +38,8 @@ NewRandCicle(mc, msp int, minStep, maxStep, minr, maxr float64, isRandColor bool
 NewSilkSky(circleNum int, sunRadius float64)
 NewSilkSmoke(mc, msp int, minStep, maxStep, minRadius, maxRadius float64, isRandColor bool)
 NewSpiralSquare(squareNum int, rectSide, decay float64, randColor bool)
+NewSwirl(a, b, c, d, xaixs, yaixs float64)
+NewDotLine(n int, ras, canv float64, randColor bool)
 ```
 
 ## General Options
@@ -157,6 +160,23 @@ func main() {
 
 ![](images/julia.png)
 
+### Swirl
+
+```go
+func main() {
+	rand.Seed(time.Now().Unix())
+	c := generativeart.NewCanva(1600, 1600)
+	c.SetBackground(generativeart.Azure)
+	c.FillBackground()
+	c.SetForeground(color.RGBA{113, 3, 0, 180})
+	c.SetIterations(8000000)
+	c.Draw(generativeart.NewSwirl(0.970, -1.899, -1.381, -1.506, 2.0, 2.0))
+	c.ToPNG("swirl.png")
+}
+```
+
+![](images/swirl.png)
+
 ### Circle Line
 
 ```go
@@ -246,3 +266,4 @@ Thanks for the following sites and repos, I got lots of ideas, inspiration, code
 - https://github.com/pkd2512/inktober2017
 - http://blog.dragonlab.de/2015/03/generative-art-week-1
 - https://editor.p5js.org/kenekk1/sketches/Ly-5XYvKX
+- http://paulbourke.net/fractals/peterdejong/

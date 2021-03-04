@@ -45,7 +45,7 @@ func (d *dotLine) Generative(c *canva) {
 				newx = oldx
 				newy = oldy
 			}
-			if newx == oldx && rand.Intn(3) > 1 {
+			if newx == oldx && rand.Intn(6) > 4 {
 				ctex.DrawEllipse(float64(oldx)*d.ras+d.canv, float64(oldy)*d.ras+d.canv, c.opts.lineWidth, c.opts.lineWidth)
 				ctex.Fill()
 				continue
