@@ -161,6 +161,37 @@ func main() {
 
 ![](images/julia.png)
 
+### Silk Sky
+
+```go
+func main() {
+	rand.Seed(time.Now().Unix())
+	c := generativeart.NewCanva(600, 600)
+	c.SetAlpha(10)
+	c.Draw(generativeart.NewSilkSky(15, 5))
+	c.ToPNG("silksky.png")
+}
+```
+
+![](images/silksky.png)
+
+### Point Ribbon
+
+```go
+func main() {
+	rand.Seed(time.Now().Unix())
+	c := generativeart.NewCanva(500, 500)
+	c.SetBackground(generativeart.Lavender)
+	c.SetLineWidth(2)
+	c.SetIterations(150000)
+	c.FillBackground()
+	c.Draw(generativeart.NewPointRibbon(50))
+	c.ToPNG("pointribbon.png")
+}
+```
+
+![](images/pointribbon.png)
+
 ### Swirl
 
 ```go
@@ -194,20 +225,6 @@ func main() {
 ```
 
 ![](images/circleline.png)
-
-### Silk Sky
-
-```go
-func main() {
-	rand.Seed(time.Now().Unix())
-	c := generativeart.NewCanva(600, 600)
-	c.SetAlpha(10)
-	c.Draw(generativeart.NewSilkSky(15, 5))
-	c.ToPNG("silksky.png")
-}
-```
-
-![](images/silksky.png)
 
 ### Maze
 
@@ -268,3 +285,4 @@ Thanks for the following sites and repos, I got lots of ideas, inspiration, code
 - http://blog.dragonlab.de/2015/03/generative-art-week-1
 - https://editor.p5js.org/kenekk1/sketches/Ly-5XYvKX
 - http://paulbourke.net/fractals/peterdejong/
+- https://editor.p5js.org/kenekk1/sketches/O44Dln5oo
