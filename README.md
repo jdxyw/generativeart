@@ -18,6 +18,7 @@
 - Silk Sky
 - Dot Line
 - Swirl
+- Point Ribbon
 
 For these kinds of art, the package provides as many as parameters to control the appearance. 
 
@@ -41,6 +42,7 @@ NewSilkSmoke(mc, msp int, minStep, maxStep, minRadius, maxRadius float64, isRand
 NewSpiralSquare(squareNum int, rectSide, decay float64, randColor bool)
 NewSwirl(a, b, c, d, xaixs, yaixs float64)
 NewDotLine(n int, ras, canv float64, randColor bool)
+NewPointRibbon(r float64)
 ```
 
 ## General Options
