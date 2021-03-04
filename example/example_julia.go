@@ -16,10 +16,10 @@ func julia1(z complex128) complex128 {
 
 func main() {
 	rand.Seed(time.Now().Unix())
-	c := generativeart.NewCanva(500, 500, 1.5, 1.5)
+	c := generativeart.NewCanva(500, 500)
 	c.SetIterations(800)
 	c.SetColorSchema(generativeart.Viridis)
 	c.FillBackground()
-	c.Draw(generativeart.NewJulia(julia1, 40))
+	c.Draw(generativeart.NewJulia(julia1, 40, 1.5, 1.5))
 	c.ToPNG("julia.png")
 }
