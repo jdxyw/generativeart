@@ -9,7 +9,7 @@ import (
 
 func main() {
 	rand.Seed(time.Now().Unix())
-	c := generativeart.NewCanva(500, 500, 2, 2)
+	c := generativeart.NewCanva(500, 500)
 	c.SetBackground(generativeart.MistyRose)
 	c.SetLineWidth(1.0)
 	c.SetLineColor(color.RGBA{

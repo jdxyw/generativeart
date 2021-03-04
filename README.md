@@ -20,6 +20,8 @@ For these kinds of art, the package provides as many as parameters to control th
 
 ## Install
 
+The go version I used is go 1.16.
+
 ```bash
 go get github.com/jdxyw/generativeart
 ```
@@ -27,15 +29,32 @@ go get github.com/jdxyw/generativeart
 ## Art Type
 
 ```go
-NewCircleLine(step float64, lineNum int, radius float64)
+NewCircleLine(step float64, lineNum int, radius, xaixs, yaixs float64)
 NewCircleLoop(radius float64)
-NewMaze()
+NewMaze(step int)
 NewRandCicle(mc, msp int, minStep, maxStep, minr, maxr float64, isRandColor bool)
 NewSilkSky(circleNum int, sunRadius float64)
 NewSilkSmoke(mc, msp int, minStep, maxStep, minRadius, maxRadius float64, isRandColor bool)
 NewSpiralSquare(squareNum int, rectSide, decay float64, randColor bool)
 ```
 
+## General Options
+
+```go
+type Options struct {
+	background  color.RGBA
+	foreground  color.RGBA
+	lineColor   color.RGBA
+	lineWidth   float64
+	colorSchema []color.RGBA
+	nIters      int
+	alpha       int
+}
+```
+
+The `Options` is a global option for the whole `canva`. It includes those general parameters used by different kinds of types, such as `background`, `lineColor`, and `colorScheme`.
+
+For those parameters specified for different kinds of art type, they have their own `struct`.
 ## Usage and example
 
 ### Silk Smoke
@@ -43,7 +62,7 @@ NewSpiralSquare(squareNum int, rectSide, decay float64, randColor bool)
 ```go
 func main() {
 	rand.Seed(time.Now().Unix())
-	c := generativeart.NewCanva(500, 500, 2, 2)
+	c := generativeart.NewCanva(500, 500)
 	c.SetBackground(generativeart.Black)
 	c.SetLineWidth(1.0)
 	c.SetLineColor(generativeart.MediumAquamarine)
@@ -63,11 +82,11 @@ func main() {
 ```go
 func main() {
 	rand.Seed(time.Now().Unix())
-	c := generativeart.NewCanva(500, 500, 2, 2)
+	c := generativeart.NewCanva(500, 500)
 	c.SetBackground(generativeart.MistyRose)
 	c.SetLineWidth(10)
 	c.SetLineColor(generativeart.Orange)
-	c.SetColorSchema(generativeart.Viridis)
+	c.SetColorSchema(generativeart.Plasma)
 	c.SetForeground(generativeart.Tomato)
 	c.FillBackground()
 	c.Draw(generativeart.NewSpiralSquare(40, 400, 0.05, true))
@@ -82,7 +101,7 @@ func main() {
 ```go
 func main() {
 	rand.Seed(time.Now().Unix())
-	c := generativeart.NewCanva(500, 500, 2, 2)
+	c := generativeart.NewCanva(500, 500)
 	c.SetBackground(generativeart.Black)
 	c.SetLineWidth(1)
 	c.SetLineColor(generativeart.Orange)
@@ -101,7 +120,6 @@ func main() {
 ```go
 func julia1(z complex128) complex128 {
 	c := complex(-0.1, 0.651)
-
 	z = z*z + c
 
 	return z
@@ -109,11 +127,11 @@ func julia1(z complex128) complex128 {
 
 func main() {
 	rand.Seed(time.Now().Unix())
-	c := generativeart.NewCanva(500, 500, 1.5, 1.5)
+	c := generativeart.NewCanva(500, 500)
 	c.SetIterations(800)
 	c.SetColorSchema(generativeart.Viridis)
 	c.FillBackground()
-	c.Draw(generativeart.NewJulia(julia1, 40))
+	c.Draw(generativeart.NewJulia(julia1, 40, 1.5, 1.5))
 	c.ToPNG("julia.png")
 }
 ```
@@ -125,12 +143,12 @@ func main() {
 ```go
 func main() {
 	rand.Seed(time.Now().Unix())
-	c := generativeart.NewCanva(600, 600, 2, 2)
+	c := generativeart.NewCanva(600, 600)
 	c.SetBackground(generativeart.Tan)
 	c.SetLineWidth(1.0)
 	c.SetLineColor(generativeart.LightPink)
 	c.FillBackground()
-	c.Draw(generativeart.NewCircleLine(0.02, 600, 1.5))
+	c.Draw(generativeart.NewCircleLine(0.02, 600, 1.5, 2, 2))
 	c.ToPNG("circleline.png")
 }
 ```
@@ -142,7 +160,7 @@ func main() {
 ```go
 func main() {
 	rand.Seed(time.Now().Unix())
-	c := generativeart.NewCanva(600, 600, 1, 1)
+	c := generativeart.NewCanva(600, 600)
 	c.SetAlpha(10)
 	c.Draw(generativeart.NewSilkSky(15, 5))
 	c.ToPNG("silksky.png")
@@ -156,12 +174,12 @@ func main() {
 ```go
 func main() {
 	rand.Seed(time.Now().Unix())
-	c := generativeart.NewCanva(600, 600, 2, 2)
+	c := generativeart.NewCanva(600, 600)
 	c.SetBackground(generativeart.Azure)
 	c.SetLineWidth(3)
 	c.SetLineColor(generativeart.Orange)
 	c.FillBackground()
-	c.Draw(generativeart.NewMaze())
+	c.Draw(generativeart.NewMaze(20))
 	c.ToPNG("maze.png")
 }
 ```
@@ -173,7 +191,7 @@ func main() {
 ```go
 func main() {
 	rand.Seed(time.Now().Unix())
-	c := generativeart.NewCanva(500, 500, 2, 2)
+	c := generativeart.NewCanva(500, 500)
 	c.SetBackground(generativeart.MistyRose)
 	c.SetLineWidth(1.0)
 	c.SetLineColor(color.RGBA{

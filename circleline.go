@@ -11,17 +11,20 @@ type point struct {
 }
 
 type circleLine struct {
-	step    float64
-	lineNum int
-	radius  float64
+	step         float64
+	lineNum      int
+	radius       float64
+	xaixs, yaixs float64
 }
 
 // NewCircleLine returns a circleLine object.
-func NewCircleLine(step float64, lineNum int, radius float64) *circleLine {
+func NewCircleLine(step float64, lineNum int, radius, xaixs, yaixs float64) *circleLine {
 	return &circleLine{
 		step:    step,
 		lineNum: lineNum,
 		radius:  radius,
+		xaixs:   xaixs,
+		yaixs:   yaixs,
 	}
 }
 
@@ -34,7 +37,7 @@ func (cl *circleLine) Generative(c *canva) {
 	for theta := -math.Pi; theta <= math.Pi; theta += cl.step {
 		x := cl.radius * math.Cos(theta)
 		y := cl.radius * math.Sin(theta)
-		xi, yi := ConvertCartesianToPixel(x, y, c.xaixs, c.yaixs, c.width, c.height)
+		xi, yi := ConvertCartesianToPixel(x, y, cl.xaixs, cl.yaixs, c.width, c.height)
 		points = append(points, point{
 			x: float64(xi),
 			y: float64(yi),

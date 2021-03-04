@@ -15,48 +15,35 @@ type Engine interface {
 
 type canva struct {
 	height, width int
-	xaixs, yaixs  float64
 	img           *image.RGBA
 	opts          Options
 }
 
 type Options struct {
-	background       color.RGBA
-	foreground       color.RGBA
-	lineColor        color.RGBA
-	lineWidth        float64
-	colorSchema      []color.RGBA
-	isPolarCoodinate bool
-	step             int
-	nIters           int
-	alpha            int
-	rectLenSide      int
-	radius           float64
-	decay            float64
+	background  color.RGBA
+	foreground  color.RGBA
+	lineColor   color.RGBA
+	lineWidth   float64
+	colorSchema []color.RGBA
+	nIters      int
+	alpha       int
 }
 
 // NewCanva returns a canva.
-func NewCanva(h, w int, x, y float64) *canva {
+func NewCanva(h, w int) *canva {
 	return &canva{
 		height: h,
 		width:  w,
-		xaixs:  x,
-		yaixs:  y,
 		img:    image.NewRGBA(image.Rect(0, 0, h, w)),
 		// Set some defaults value
 		opts: Options{
-			background:       Azure,
-			foreground:       MistyRose,
-			lineColor:        Tomato,
-			lineWidth:        3,
-			colorSchema:      Plasma,
-			isPolarCoodinate: false,
-			step:             24,
-			nIters:           20,
-			alpha:            30,
-			rectLenSide:      10,
-			radius:           1.0,
-			decay:            0.2,
+			background:  Azure,
+			foreground:  MistyRose,
+			lineColor:   Tomato,
+			lineWidth:   3,
+			colorSchema: Plasma,
+			nIters:      20,
+			alpha:       255,
 		},
 	}
 }
@@ -85,32 +72,12 @@ func (c *canva) SetLineWidth(lw float64) {
 	c.opts.lineWidth = lw
 }
 
-func (c *canva) SetPolarCoodinate() {
-	c.opts.isPolarCoodinate = true
-}
-
-func (c *canva) SetStep(step int) {
-	c.opts.step = step
-}
-
 func (c *canva) SetIterations(nIters int) {
 	c.opts.nIters = nIters
 }
 
 func (c *canva) SetAlpha(alpha int) {
 	c.opts.alpha = alpha
-}
-
-func (c *canva) SetRectLenSide(l int) {
-	c.opts.rectLenSide = l
-}
-
-func (c *canva) SetRadius(r float64) {
-	c.opts.radius = r
-}
-
-func (c *canva) SetDecay(d float64) {
-	c.opts.decay = d
 }
 
 func (c *canva) Draw(e Engine) {

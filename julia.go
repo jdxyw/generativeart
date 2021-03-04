@@ -6,14 +6,17 @@ import "math/cmplx"
 type GenFunc func(complex128) complex128
 
 type julia struct {
-	fn   GenFunc
-	maxz float64
+	fn           GenFunc
+	maxz         float64
+	xaixs, yaixs float64
 }
 
-func NewJulia(formula GenFunc, maxz float64) *julia {
+func NewJulia(formula GenFunc, maxz, xaixs, yaixs float64) *julia {
 	return &julia{
-		fn:   formula,
-		maxz: maxz,
+		fn:    formula,
+		maxz:  maxz,
+		xaixs: xaixs,
+		yaixs: yaixs,
 	}
 }
 
@@ -27,7 +30,7 @@ func (j *julia) Generative(c *canva) {
 	for i := 0; i <= c.width; i++ {
 		for k := 0; k <= c.height; k++ {
 			nit := 0
-			z := complex(float64(i)/float64(c.width)*2.0*c.yaixs-c.yaixs, float64(k)/float64(c.height)*2.0*c.yaixs-c.yaixs)
+			z := complex(float64(i)/float64(c.width)*2.0*j.yaixs-j.yaixs, float64(k)/float64(c.height)*2.0*j.yaixs-j.yaixs)
 
 			for cmplx.Abs(z) <= j.maxz && nit < c.opts.nIters {
 				z = j.fn(z)

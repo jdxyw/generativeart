@@ -8,7 +8,7 @@ import (
 
 func main() {
 	rand.Seed(time.Now().Unix())
-	c := generativeart.NewCanva(500, 500, 2, 2)
+	c := generativeart.NewCanva(500, 500)
 	c.SetBackground(generativeart.Black)
 	c.SetLineWidth(1)
 	c.SetLineColor(generativeart.Orange)
