@@ -1,4 +1,4 @@
-module generativeart
+module github.com/jdxyw/generativeart
 
 go 1.14
 
