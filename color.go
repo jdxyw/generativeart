@@ -22,6 +22,7 @@ var (
 	Orange           = color.RGBA{0xFF, 0xA5, 0x00, 0xFF}
 	Black            = color.RGBA{0x00, 0x00, 0x00, 0xFF}
 	White            = color.RGBA{0xFF, 0xFF, 0xFF, 0xFF}
+	LightGray        = color.RGBA{200, 200, 200, 255}
 	Outdoors         = []color.RGBA{
 		{67, 110, 165, 255},
 		{47, 76, 114, 255},
