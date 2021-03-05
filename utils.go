@@ -118,3 +118,7 @@ func Distance(x1, y1, x2, y2 float64) float64 {
 func RandomRangeInt(min, max int) int {
 	return rand.Intn(max-min) + min
 }
+
+func RandomRangeFloat64(min, max float64) float64 {
+	return min + rand.Float64()*(max-min)
+}
