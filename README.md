@@ -7,6 +7,8 @@
 
 `generativeart` is a `Go` package to generate many kinds of generative art. The goal is to collect some excellent generative art (implemented in `R` or `Processing`), and rewrite them in `Go` again. I would paste the original link at the end of this README(If I remember. You can also submit a PR if you found I miss something.). Currently, it supports the following type.
 
+This package is still working in progress, more types would be added. Welcome anyone interested in this filed to submit your PR.
+
 - Maze
 - Julia Set
 - Random Circle Trails
@@ -22,7 +24,7 @@
 - Janus
 - Random Shapes
 
-For these kinds of art, the package provides as many as parameters to control the appearance. 
+For these kinds of art, the package provides as many as parameters to control the appearance.
 
 ## Install
 
