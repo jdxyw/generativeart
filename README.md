@@ -7,7 +7,7 @@
 
 `generativeart` is a `Go` package to generate many kinds of generative art. The goal is to collect some excellent generative art (implemented in `R` or `Processing`), and rewrite them in `Go` again. I would paste the original link at the end of this README(If I remember. You can also submit a PR if you found I miss something.). Currently, it supports the following type.
 
-This package is still working in progress, more types would be added. Welcome anyone interested in this filed to submit your PR.
+This package is still working in progress, more types would be added. Welcome anyone interested in this field to submit your PR.
 
 - Maze
 - Julia Set
@@ -23,6 +23,7 @@ This package is still working in progress, more types would be added. Welcome an
 - Point Ribbon
 - Janus
 - Random Shapes
+- Color Circle
 
 For these kinds of art, the package provides as many as parameters to control the appearance.
 
@@ -49,6 +50,7 @@ NewDotLine(n int, ras, canv float64, randColor bool)
 NewPointRibbon(r float64)
 NewJanus(n int, decay float64)
 NewRandomShape(shapeNum int)
+NewColorCircle(circleNum int)
 ```
 
 ## General Options
@@ -70,25 +72,22 @@ The `Options` is a global option for the whole `canva`. It includes those genera
 For those parameters specified for different kinds of art type, they have their own `struct`.
 ## Usage and example
 
-### Silk Smoke
+### Junas
 
 ```go
 func main() {
 	rand.Seed(time.Now().Unix())
 	c := generativeart.NewCanva(500, 500)
 	c.SetBackground(generativeart.Black)
-	c.SetLineWidth(1.0)
-	c.SetLineColor(generativeart.MediumAquamarine)
-	c.SetAlpha(30)
-	c.SetColorSchema(generativeart.Plasma)
-	c.SetIterations(4)
 	c.FillBackground()
-	c.Draw(generativeart.NewSilkSmoke(400, 20, 0.2, 2, 10, 30, false))
-	c.ToPNG("silksmoke.png")
+	c.SetColorSchema(generativeart.DarkRed)
+	c.SetForeground(generativeart.LightPink)
+	c.Draw(generativeart.NewJanus(10, 0.2))
+	c.ToPNG("janus.png")
 }
 ```
 
-![](images/silksmoke.png)
+![](images/janus.png)
 
 ### Random Shapes
 
@@ -111,6 +110,52 @@ func main() {
 ```
 
 ![](images/randomshape.png)
+
+### Color Circle
+
+```go
+func main() {
+	rand.Seed(time.Now().Unix())
+	colors := []color.RGBA{
+		{0xFF, 0xC6, 0x18, 0xFF},
+		{0xF4, 0x25, 0x39, 0xFF},
+		{0x41, 0x78, 0xF4, 0xFF},
+		{0xFE, 0x84, 0xFE, 0xFF},
+		{0xFF, 0x81, 0x19, 0xFF},
+		{0x56, 0xAC, 0x51, 0xFF},
+		{0x98, 0x19, 0xFA, 0xFF},
+		{0xFF, 0xFF, 0xFF, 0xFF},
+	}
+	c := generativeart.NewCanva(1000, 1000)
+	c.SetBackground(generativeart.White)
+	c.FillBackground()
+	c.SetColorSchema(colors)
+	c.Draw(generativeart.NewColorCircle(500))
+	c.ToPNG("colorcircle.png")
+}
+```
+
+![](images/colorcircle.png)
+
+### Silk Smoke
+
+```go
+func main() {
+	rand.Seed(time.Now().Unix())
+	c := generativeart.NewCanva(500, 500)
+	c.SetBackground(generativeart.Black)
+	c.SetLineWidth(1.0)
+	c.SetLineColor(generativeart.MediumAquamarine)
+	c.SetAlpha(30)
+	c.SetColorSchema(generativeart.Plasma)
+	c.SetIterations(4)
+	c.FillBackground()
+	c.Draw(generativeart.NewSilkSmoke(400, 20, 0.2, 2, 10, 30, false))
+	c.ToPNG("silksmoke.png")
+}
+```
+
+![](images/silksmoke.png)
 
 ### Spiral Square
 
@@ -168,24 +213,6 @@ func main() {
 
 ![](images/dotline.png)
 
-### Junas
-
-```go
-func main() {
-	rand.Seed(time.Now().Unix())
-	c := generativeart.NewCanva(500, 500)
-	c.SetBackground(generativeart.Black)
-	c.FillBackground()
-	c.SetColorSchema(generativeart.DarkRed)
-	c.SetForeground(generativeart.LightPink)
-	c.Draw(generativeart.NewJanus(10, 0.2))
-	c.ToPNG("janus.png")
-}
-```
-
-![](images/janus.png)
-
-
 ### Julia Set
 
 ```go
@@ -222,23 +249,6 @@ func main() {
 ```
 
 ![](images/silksky.png)
-
-### Point Ribbon
-
-```go
-func main() {
-	rand.Seed(time.Now().Unix())
-	c := generativeart.NewCanva(500, 500)
-	c.SetBackground(generativeart.Lavender)
-	c.SetLineWidth(2)
-	c.SetIterations(150000)
-	c.FillBackground()
-	c.Draw(generativeart.NewPointRibbon(50))
-	c.ToPNG("pointribbon.png")
-}
-```
-
-![](images/pointribbon.png)
 
 ### Maze
 
