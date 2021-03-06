@@ -122,3 +122,7 @@ func RandomRangeInt(min, max int) int {
 func RandomRangeFloat64(min, max float64) float64 {
 	return min + rand.Float64()*(max-min)
 }
+
+func RandomGaussian(mean, std float64) float64 {
+	return rand.NormFloat64()*std + mean
+}

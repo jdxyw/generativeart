@@ -20,6 +20,7 @@
 - Swirl
 - Point Ribbon
 - Janus
+- Random Shapes
 
 For these kinds of art, the package provides as many as parameters to control the appearance. 
 
@@ -45,6 +46,7 @@ NewSwirl(a, b, c, d, xaixs, yaixs float64)
 NewDotLine(n int, ras, canv float64, randColor bool)
 NewPointRibbon(r float64)
 NewJanus(n int, decay float64)
+NewRandomShape(shapeNum int)
 ```
 
 ## General Options
@@ -85,6 +87,28 @@ func main() {
 ```
 
 ![](images/silksmoke.png)
+
+### Random Shapes
+
+```go
+func main() {
+	rand.Seed(time.Now().Unix())
+	c := generativeart.NewCanva(500, 500)
+	c.SetBackground(generativeart.White)
+	c.FillBackground()
+	c.SetColorSchema([]color.RGBA{
+		{0xCF, 0x2B, 0x34, 0xFF},
+		{0xF0, 0x8F, 0x46, 0xFF},
+		{0xF0, 0xC1, 0x29, 0xFF},
+		{0x19, 0x6E, 0x94, 0xFF},
+		{0x35, 0x3A, 0x57, 0xFF},
+	})
+	c.Draw(generativeart.NewRandomShape(150))
+	c.ToPNG("randomshape.png")
+}
+```
+
+![](images/randomshape.png)
 
 ### Spiral Square
 
@@ -140,6 +164,8 @@ func main() {
 }
 ```
 
+![](images/dotline.png)
+
 ### Junas
 
 ```go
@@ -157,7 +183,6 @@ func main() {
 
 ![](images/janus.png)
 
-![](images/dotline.png)
 
 ### Julia Set
 
@@ -212,23 +237,6 @@ func main() {
 ```
 
 ![](images/pointribbon.png)
-
-### Circle Line
-
-```go
-func main() {
-	rand.Seed(time.Now().Unix())
-	c := generativeart.NewCanva(600, 600)
-	c.SetBackground(generativeart.Tan)
-	c.SetLineWidth(1.0)
-	c.SetLineColor(generativeart.LightPink)
-	c.FillBackground()
-	c.Draw(generativeart.NewCircleLine(0.02, 600, 1.5, 2, 2))
-	c.ToPNG("circleline.png")
-}
-```
-
-![](images/circleline.png)
 
 ### Maze
 
@@ -291,3 +299,4 @@ Thanks for the following sites and repos, I got lots of ideas, inspiration, code
 - http://paulbourke.net/fractals/peterdejong/
 - https://editor.p5js.org/kenekk1/sketches/O44Dln5oo
 - https://openprocessing.org/sketch/1071233
+- https://twitter.com/okazz_
