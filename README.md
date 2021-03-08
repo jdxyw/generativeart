@@ -25,6 +25,7 @@ This package is still working in progress, more types would be added. Welcome an
 - Random Shapes
 - Color Circle
 - Color Circle2
+- Circle Grid
 
 For these kinds of art, the package provides as many as parameters to control the appearance.
 
@@ -53,6 +54,7 @@ NewJanus(n int, decay float64)
 NewRandomShape(shapeNum int)
 NewColorCircle(circleNum int)
 NewColorCircle2(circleNum int)
+NewCircleGrid(circleNumMin, circleNumMax int)
 ```
 
 ## General Options
@@ -135,6 +137,31 @@ func main() {
 ```
 
 ![](images/colorcircle2.png)
+
+### Circle Grid
+
+```go
+func main() {
+	rand.Seed(time.Now().Unix())
+	colors := []color.RGBA{
+		{0xED, 0x34, 0x41, 0xFF},
+		{0xFF, 0xD6, 0x30, 0xFF},
+		{0x32, 0x9F, 0xE3, 0xFF},
+		{0x15, 0x42, 0x96, 0xFF},
+		{0x00, 0x00, 0x00, 0xFF},
+		{0xFF, 0xFF, 0xFF, 0xFF},
+	}
+	c := generativeart.NewCanva(500, 500)
+	c.SetBackground(color.RGBA{0xDF, 0xEB, 0xF5, 0xFF})
+	c.FillBackground()
+	c.SetColorSchema(colors)
+	c.SetLineWidth(2.0)
+	c.Draw(generativeart.NewCircleGrid(4, 6))
+	c.ToPNG("circlegrid.png")
+}
+```
+
+![](images/circlegrid.png)
 
 ### Silk Smoke
 
