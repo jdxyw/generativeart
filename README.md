@@ -24,6 +24,7 @@ This package is still working in progress, more types would be added. Welcome an
 - Janus
 - Random Shapes
 - Color Circle
+- Color Circle2
 
 For these kinds of art, the package provides as many as parameters to control the appearance.
 
@@ -51,6 +52,7 @@ NewPointRibbon(r float64)
 NewJanus(n int, decay float64)
 NewRandomShape(shapeNum int)
 NewColorCircle(circleNum int)
+NewColorCircle2(circleNum int)
 ```
 
 ## General Options
@@ -117,25 +119,22 @@ func main() {
 func main() {
 	rand.Seed(time.Now().Unix())
 	colors := []color.RGBA{
-		{0xFF, 0xC6, 0x18, 0xFF},
-		{0xF4, 0x25, 0x39, 0xFF},
-		{0x41, 0x78, 0xF4, 0xFF},
-		{0xFE, 0x84, 0xFE, 0xFF},
-		{0xFF, 0x81, 0x19, 0xFF},
-		{0x56, 0xAC, 0x51, 0xFF},
-		{0x98, 0x19, 0xFA, 0xFF},
-		{0xFF, 0xFF, 0xFF, 0xFF},
+		{0x11, 0x60, 0xC6, 0xFF},
+		{0xFD, 0xD9, 0x00, 0xFF},
+		{0xF5, 0xB4, 0xF8, 0xFF},
+		{0xEF, 0x13, 0x55, 0xFF},
+		{0xF4, 0x9F, 0x0A, 0xFF},
 	}
-	c := generativeart.NewCanva(1000, 1000)
+	c := generativeart.NewCanva(800, 800)
 	c.SetBackground(generativeart.White)
 	c.FillBackground()
 	c.SetColorSchema(colors)
-	c.Draw(generativeart.NewColorCircle(500))
-	c.ToPNG("colorcircle.png")
+	c.Draw(generativeart.NewColorCircle2(30))
+	c.ToPNG("colorcircle2.png")
 }
 ```
 
-![](images/colorcircle.png)
+![](images/colorcircle2.png)
 
 ### Silk Smoke
 
