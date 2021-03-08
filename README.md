@@ -31,7 +31,7 @@ For these kinds of art, the package provides as many as parameters to control th
 
 ## Install
 
-The go version I used is go 1.16.
+The go version I used is `Go 1.16`.
 
 ```bash
 go get github.com/jdxyw/generativeart
@@ -57,6 +57,13 @@ NewColorCircle2(circleNum int)
 NewCircleGrid(circleNumMin, circleNumMax int)
 ```
 
+## Docs
+
+You could find the docs in the [doc](./docs).
+
+## Examples
+
+You could find examples for all types under [example](./example).
 ## General Options
 
 ```go
@@ -73,7 +80,7 @@ type Options struct {
 
 The `Options` is a global option for the whole `canva`. It includes those general parameters used by different kinds of types, such as `background`, `lineColor`, and `colorScheme`.
 
-For those parameters specified for different kinds of art type, they have their own `struct`.
+For those parameters specified for different kinds of art types, they have their own `struct`.
 ## Usage and example
 
 ### Junas
@@ -115,7 +122,7 @@ func main() {
 
 ![](images/randomshape.png)
 
-### Color Circle
+### Color Circle2
 
 ```go
 func main() {
