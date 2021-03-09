@@ -26,6 +26,7 @@ This package is still working in progress, more types would be added. Welcome an
 - Color Circle
 - Color Circle2
 - Circle Grid
+- Contour Line
 
 For these kinds of art, the package provides as many as parameters to control the appearance.
 
@@ -55,6 +56,7 @@ NewRandomShape(shapeNum int)
 NewColorCircle(circleNum int)
 NewColorCircle2(circleNum int)
 NewCircleGrid(circleNumMin, circleNumMax int)
+NewContourLine(lineNum int)
 ```
 
 ## Docs
@@ -190,24 +192,28 @@ func main() {
 
 ![](images/silksmoke.png)
 
-### Spiral Square
+### Contour Line
 
 ```go
 func main() {
 	rand.Seed(time.Now().Unix())
-	c := generativeart.NewCanva(500, 500)
-	c.SetBackground(generativeart.MistyRose)
-	c.SetLineWidth(10)
-	c.SetLineColor(generativeart.Orange)
-	c.SetColorSchema(generativeart.Plasma)
-	c.SetForeground(generativeart.Tomato)
+	colors := []color.RGBA{
+		{0x58, 0x18, 0x45, 0xFF},
+		{0x90, 0x0C, 0x3F, 0xFF},
+		{0xC7, 0x00, 0x39, 0xFF},
+		{0xFF, 0x57, 0x33, 0xFF},
+		{0xFF, 0xC3, 0x0F, 0xFF},
+	}
+	c := generativeart.NewCanva(1600, 1600)
+	c.SetBackground(color.RGBA{0x1a, 0x06, 0x33, 0xFF})
 	c.FillBackground()
-	c.Draw(generativeart.NewSpiralSquare(40, 400, 0.05, true))
-	c.ToPNG("spiralsquare.png")
+	c.SetColorSchema(colors)
+	c.Draw(generativeart.NewContourLine(500))
+	c.ToPNG("contourline.png")
 }
 ```
 
-![](images/spiralsquare.png)
+![](images/contourline.png)
 
 ### Circle Loop
 
@@ -345,3 +351,4 @@ Thanks for the following sites and repos, I got lots of ideas, inspiration, code
 - https://editor.p5js.org/kenekk1/sketches/O44Dln5oo
 - https://openprocessing.org/sketch/1071233
 - https://twitter.com/okazz_
+- https://openprocessing.org/sketch/738638
