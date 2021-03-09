@@ -2,6 +2,7 @@ package generativeart
 
 import (
 	"github.com/fogleman/gg"
+	"github.com/jdxyw/generativeart/common"
 	"math"
 )
 
@@ -34,7 +35,7 @@ func (s *swirl) Generative(c *canva) {
 
 	for i := 0; i < c.opts.nIters; i++ {
 		next := s.swirlTransform(start)
-		x, y := ConvertCartesianToPixel(next.x, next.y, s.xaixs, s.yaixs, c.height, c.width)
+		x, y := common.ConvertCartesianToPixel(next.x, next.y, s.xaixs, s.yaixs, c.height, c.width)
 		c.img.Set(x, y, cl)
 		start = next
 	}

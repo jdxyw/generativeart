@@ -2,6 +2,7 @@ package generativeart
 
 import (
 	"github.com/fogleman/gg"
+	"github.com/jdxyw/generativeart/common"
 	"math/rand"
 )
 
@@ -35,13 +36,13 @@ func (d *dotLine) Generative(c *canva) {
 		if d.randColor {
 			ctex.SetColor(c.opts.colorSchema[rand.Intn(len(c.opts.colorSchema))])
 		} else {
-			ctex.SetRGBA255(RandomRangeInt(222, 255), RandomRangeInt(20, 222), 0, 255)
+			ctex.SetRGBA255(common.RandomRangeInt(222, 255), common.RandomRangeInt(20, 222), 0, 255)
 		}
 		for j := 0; j < n; j++ {
 			newx := oldx + dir[rand.Intn(2)]
 			newy := oldy + dir[rand.Intn(2)]
 
-			if Distance(float64(newx), float64(newy), float64(d.n/2), float64(d.n/2)) > float64(d.n/2-10) {
+			if common.Distance(float64(newx), float64(newy), float64(d.n/2), float64(d.n/2)) > float64(d.n/2-10) {
 				newx = oldx
 				newy = oldy
 			}

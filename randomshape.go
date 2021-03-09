@@ -2,6 +2,7 @@ package generativeart
 
 import (
 	"github.com/fogleman/gg"
+	"github.com/jdxyw/generativeart/common"
 	"math"
 	"math/rand"
 )
@@ -21,15 +22,15 @@ func (r *randomShape) Generative(c *canva) {
 	ctex := gg.NewContextForRGBA(c.img)
 
 	ctex.Translate(float64(c.width/2), float64(c.height/2))
-	ctex.Rotate(RandomRangeFloat64(-1, 1) * math.Pi * 0.25)
+	ctex.Rotate(common.RandomRangeFloat64(-1, 1) * math.Pi * 0.25)
 	ctex.Translate(-float64(c.width/2), -float64(c.height/2))
 
 	for i := 0; i < r.shapeNum; i++ {
-		x := RandomGaussian(0.5, 0.2) * float64(c.width)
-		y := RandomGaussian(0.5, 0.2) * float64(c.height)
+		x := common.RandomGaussian(0.5, 0.2) * float64(c.width)
+		y := common.RandomGaussian(0.5, 0.2) * float64(c.height)
 
-		w := RandomRangeFloat64(0, float64(c.width)/3)*RandomRangeFloat64(0, rand.Float64()) + 5.0
-		h := w + RandomRangeFloat64(-1, 1)*3.0
+		w := common.RandomRangeFloat64(0, float64(c.width)/3)*common.RandomRangeFloat64(0, rand.Float64()) + 5.0
+		h := w + common.RandomRangeFloat64(-1, 1)*3.0
 
 		rnd := rand.Intn(4)
 		theta := math.Pi * 2.0 * float64(rand.Intn(4)) / 4
@@ -50,7 +51,7 @@ func (r *randomShape) Generative(c *canva) {
 				ctex.DrawRectangle(0, 0, w, h)
 			}
 		case 3:
-			ctex.DrawRectangle(0, 0, w*2, RandomRangeFloat64(2, 10))
+			ctex.DrawRectangle(0, 0, w*2, common.RandomRangeFloat64(2, 10))
 		}
 		ctex.Fill()
 		ctex.Pop()

@@ -2,6 +2,7 @@ package generativeart
 
 import (
 	"github.com/fogleman/gg"
+	"github.com/jdxyw/generativeart/common"
 	"math"
 	"math/rand"
 )
@@ -37,7 +38,7 @@ func (cl *circleLine) Generative(c *canva) {
 	for theta := -math.Pi; theta <= math.Pi; theta += cl.step {
 		x := cl.radius * math.Cos(theta)
 		y := cl.radius * math.Sin(theta)
-		xi, yi := ConvertCartesianToPixel(x, y, cl.xaixs, cl.yaixs, c.width, c.height)
+		xi, yi := common.ConvertCartesianToPixel(x, y, cl.xaixs, cl.yaixs, c.width, c.height)
 		points = append(points, point{
 			x: float64(xi),
 			y: float64(yi),
