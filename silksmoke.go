@@ -2,6 +2,7 @@ package generativeart
 
 import (
 	"github.com/fogleman/gg"
+	"github.com/jdxyw/generativeart/common"
 	"math/rand"
 )
 
@@ -51,7 +52,7 @@ func (s *sileSmoke) Generative(c *canva) {
 					continue
 				}
 
-				distance := Distance(c1.x, c1.y, c2.x, c2.y)
+				distance := common.Distance(c1.x, c1.y, c2.x, c2.y)
 
 				if distance <= c1.radius+c2.radius {
 					cx := (c1.x + c2.x) / 2

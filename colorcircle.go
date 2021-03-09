@@ -2,6 +2,7 @@ package generativeart
 
 import (
 	"github.com/fogleman/gg"
+	"github.com/jdxyw/generativeart/common"
 	"math"
 	"math/rand"
 )
@@ -22,9 +23,9 @@ func (cc *colorCircle) Generative(c *canva) {
 
 	for i := 0; i < cc.circleNum; i++ {
 		rnd := rand.Intn(3)
-		x := RandomRangeFloat64(-0.1, 1.1) * float64(c.width)
-		y := RandomRangeFloat64(-0.1, 1.1) * float64(c.height)
-		s := RandomRangeFloat64(0, RandomRangeFloat64(0, float64(c.width/2))) + 10
+		x := common.RandomRangeFloat64(-0.1, 1.1) * float64(c.width)
+		y := common.RandomRangeFloat64(-0.1, 1.1) * float64(c.height)
+		s := common.RandomRangeFloat64(0, common.RandomRangeFloat64(0, float64(c.width/2))) + 10
 		if rnd == 2 {
 			rnd = rand.Intn(3)
 		}
@@ -32,9 +33,9 @@ func (cc *colorCircle) Generative(c *canva) {
 		case 0:
 			cc.drawCircleV1(ctex, c, x, y, s)
 		case 1:
-			ctex.SetLineWidth(RandomRangeFloat64(0, 1))
+			ctex.SetLineWidth(common.RandomRangeFloat64(0, 1))
 			ctex.SetColor(c.opts.colorSchema[rand.Intn(len(c.opts.colorSchema))])
-			ctex.DrawCircle(x, y, RandomRangeFloat64(0, s)/2)
+			ctex.DrawCircle(x, y, common.RandomRangeFloat64(0, s)/2)
 			ctex.Stroke()
 		case 2:
 			cc.drawCircleV2(ctex, c, x, y, s)
@@ -43,8 +44,8 @@ func (cc *colorCircle) Generative(c *canva) {
 }
 
 func (cc *colorCircle) drawCircleV1(ctex *gg.Context, c *canva, x, y, s float64) {
-	n := RandomRangeInt(4, 30)
-	cs := RandomRangeFloat64(2, 8)
+	n := common.RandomRangeInt(4, 30)
+	cs := common.RandomRangeFloat64(2, 8)
 	ctex.SetColor(c.opts.colorSchema[rand.Intn(len(c.opts.colorSchema))])
 	ctex.Push()
 	ctex.Translate(x, y)
@@ -58,7 +59,7 @@ func (cc *colorCircle) drawCircleV1(ctex *gg.Context, c *canva, x, y, s float64)
 func (cc *colorCircle) drawCircleV2(ctex *gg.Context, c *canva, x, y, s float64) {
 	cl := c.opts.colorSchema[rand.Intn(len(c.opts.colorSchema))]
 	ctex.SetLineWidth(1.0)
-	sx := s * RandomRangeFloat64(0.1, 0.55)
+	sx := s * common.RandomRangeFloat64(0.1, 0.55)
 	for j := 0.0001; j < sx; j++ {
 		dd := s + j*2.0
 		alpha := int(255 * sx / j)
@@ -75,7 +76,7 @@ func (cc *colorCircle) drawCircleV2(ctex *gg.Context, c *canva, x, y, s float64)
 		ctex.SetColor(cl)
 
 		for i := 0; i < 200; i++ {
-			theta := RandomRangeFloat64(0, math.Pi*2)
+			theta := common.RandomRangeFloat64(0, math.Pi*2)
 			xx := x + dd*0.3*math.Cos(theta)
 			yy := y + dd*0.3*math.Sin(theta)
 			//ctex.DrawLine(xx, yy, xx, yy)

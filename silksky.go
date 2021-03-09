@@ -2,6 +2,7 @@ package generativeart
 
 import (
 	"github.com/fogleman/gg"
+	"github.com/jdxyw/generativeart/common"
 	"math/rand"
 )
 
@@ -30,7 +31,7 @@ func (s *silkSky) Generative(c *canva) {
 
 	for i := 0; i < s.circleNum; i++ {
 		for j := 0; j < s.circleNum; j++ {
-			hsv := HSV{
+			hsv := common.HSV{
 				H: s.circleNum + j,
 				S: i + 50,
 				V: 70,
@@ -39,7 +40,7 @@ func (s *silkSky) Generative(c *canva) {
 			xn := (float64(i) + 0.5) * float64(c.width) / float64(s.circleNum)
 			yn := (float64(j) + 0.5) * float64(c.height) / float64(s.circleNum)
 			ctex.SetRGBA255(int(rgba.R), int(rgba.G), int(rgba.B), c.opts.alpha)
-			r := Distance(xn, yn, xm, ym)
+			r := common.Distance(xn, yn, xm, ym)
 			ctex.DrawEllipse(xn, yn, r-s.sunRadius/2, r-s.sunRadius/2)
 			ctex.Fill()
 		}

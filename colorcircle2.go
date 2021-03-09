@@ -2,6 +2,7 @@ package generativeart
 
 import (
 	"github.com/fogleman/gg"
+	"github.com/jdxyw/generativeart/common"
 	"math"
 	"math/rand"
 )
@@ -22,11 +23,11 @@ func (cc *colorCircle2) Generative(c *canva) {
 	ctex := gg.NewContextForRGBA(c.img)
 
 	for i := 0; i < cc.circleNum; i++ {
-		x := RandomRangeFloat64(0, float64(c.width))
-		y := RandomRangeFloat64(0, float64(c.height))
+		x := common.RandomRangeFloat64(0, float64(c.width))
+		y := common.RandomRangeFloat64(0, float64(c.height))
 
-		r1 := RandomRangeFloat64(50.0, float64(c.width)/4)
-		r2 := RandomRangeFloat64(10.0, float64(c.width)/3)
+		r1 := common.RandomRangeFloat64(50.0, float64(c.width)/4)
+		r2 := common.RandomRangeFloat64(10.0, float64(c.width)/3)
 
 		cc.circle(ctex, c, x, y, r1, r2)
 		if rand.Float64() < 0.3 {
@@ -51,7 +52,7 @@ func (cc *colorCircle2) circle(ctex *gg.Context, c *canva, x, y, d, dx float64) 
 
 		ctex.SetColor(col)
 		for i := 0; i < 150; i++ {
-			theta := RandomRangeFloat64(0, math.Pi*2)
+			theta := common.RandomRangeFloat64(0, math.Pi*2)
 			xx := x + dd*0.5*math.Cos(theta)
 			yy := y + dd*0.5*math.Sin(theta)
 			ctex.DrawPoint(xx, yy, 0.51)

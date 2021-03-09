@@ -1,4 +1,4 @@
-package generativeart
+package common
 
 import (
 	"math"

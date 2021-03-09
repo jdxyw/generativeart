@@ -2,6 +2,7 @@ package generativeart
 
 import (
 	"github.com/fogleman/gg"
+	"github.com/jdxyw/generativeart/common"
 	"math"
 )
 
@@ -33,11 +34,11 @@ func (j *janus) Generative(c *canva) {
 		ctex.Translate(float64(c.width/2), float64(c.height/2))
 
 		//theta += rand.Float64()*math.Pi/2
-		theta := RandomRangeFloat64(math.Pi/4, 3*math.Pi/4)
+		theta := common.RandomRangeFloat64(math.Pi/4, 3*math.Pi/4)
 		x1, y1 := math.Cos(theta)*r, math.Sin(theta)*r
 		x2, y2 := -x1, -y1
 
-		noise := RandomRangeFloat64(-math.Abs(y1), math.Abs(y1))
+		noise := common.RandomRangeFloat64(-math.Abs(y1), math.Abs(y1))
 		y1 += noise
 		y2 += noise
 
