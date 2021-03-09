@@ -1,10 +1,10 @@
 ## Color Circle 2
 
-`Color Circle2` is version 2 of `Color Circle`. It still draws circle and point cloud.
+`Color Circle2` is version 2 of `Color Circle`. It still draws the circle and point cloud.
 
 ### parameters
 
-- circleNum: The number of circle in this drawing.
+- circleNum: The number of the circle in this drawing.
 
 ```go
 cc := generativeart.NewColorCircle2(30)
@@ -14,13 +14,13 @@ cc := generativeart.NewColorCircle2(30)
 
 ## Dot Line
 
-`dot line` would draw images with short dot and short. The short lines would compose as a big circle.
+`dot line` would draw images with the short dot and short. The short lines would compose as a big circle.
 
 ### parameters
 
-- n: The number of element in this image.
+- n: The number of elements in this image.
 - ras/canv: Control the appearance of this image.
-- randColor: Use the the specified color or random colors.
+- randColor: Use the specified color or random colors.
 
 ```go
 dl := generativeart.NewDotLine(100, 20, 50, false)
@@ -52,7 +52,7 @@ rs := NewRandomShape(150)
 
 ## Contour Line
 
-`Contour Line` uses `perlin noise` to do some flow field.
+`Contour Line` uses the `perlin noise` to do some flow field.
 
 ### parameters
 
