@@ -21,7 +21,6 @@ func NewContourLine(lineNum int) *contourLine {
 // Generative draws a contour line image.
 func (cl *contourLine) Generative(c *canva) {
 	ctex := gg.NewContextForRGBA(c.img)
-	//noise := perlin.NewPerlin(2, 2, 3, rand.Int63())
 	noise := common.NewPerlinNoise()
 	for i := 0; i < cl.lineNum; i++ {
 		cl := c.opts.colorSchema[rand.Intn(len(c.opts.colorSchema))]
