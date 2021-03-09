@@ -44,15 +44,24 @@ rs := NewRandomShape(150)
 
 ## Janus
 
-`Janus` would draws a image with multiple circles split at its center with random noise in the horizontal direction.
+`Janus` would draw an image with multiple circles split at its center with random noise in the horizontal direction.
 
 ### TODO
 
 ### parameters
 
+## Contour Line
+
+`Contour Line` uses `perlin noise` to do some flow field.
+
+### parameters
+
+- lineNum: It indicates how many lines.
+
+![](../images/contourline.png)
 ## Silk Sky
 
-`Silk Sky` would draws a image with multiple circles converge to one point or circle. 
+`Silk Sky` would draw an image with multiple circles converge to one point or one circle. 
 
 ### parameters
 
@@ -73,7 +82,7 @@ silkSky := NewSilkSky(circleNum int, sunRadius float64)
 
 - fn: The custom julia set function.
 - maxz: The maximum modulus length of a complex number.
-- xaixs, yaixs: The range for the X-Y coordination used to mapping the julia set number to the real pixel of the image. These should be positive number. It only indicates the first quadrant range.
+- xaixs, yaixs: The range for the X-Y coordination used to mapping the julia set number to the real pixel of the image. These should be positive. It only indicates the first quadrant range.
 
 ```go
 func julia1(z complex128) complex128 {
