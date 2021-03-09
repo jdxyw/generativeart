@@ -94,3 +94,17 @@ julia := generativeart.NewJulia(julia1, 40, 1.5, 1.5)
 ```
 
 ![](../images/julia.png)
+
+## Noise Line
+
+`Noise Line` draws some random line and circles based on `perlin noise`.
+
+### parameters
+
+- n: The number of random line.
+
+```go
+nl := generativeart.NewNoiseLine(1000)
+```
+
+![](../images/noiseline.png)
