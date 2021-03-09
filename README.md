@@ -5,9 +5,9 @@
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/jdxyw/generativeart/master/LICENSE)
 
 
-`generativeart` is a `Go` package to generate many kinds of generative art. The goal is to collect some excellent generative art (implemented in `R` or `Processing`), and rewrite them in `Go` again. I would paste the original link at the end of this README(If I remember. You can also submit a PR if you found I miss something.). Currently, it supports the following type.
+`generativeart` is a `Go` package to generate many kinds of generative art. The goal is to collect some excellent generative art (implemented in `R` or `Processing`), and rewrite them in `Go` again. I would paste the original link at the end of this README(If I remember, you can also submit a PR if you found I missed something.). Currently, it supports the following type.
 
-This package is still working in progress, more types would be added. Welcome anyone interested in this field to submit your PR.
+This package is still working in progress. More types would be added. Welcome anyone interested in this field to submit your PR.
 
 - Maze
 - Julia Set
@@ -28,7 +28,7 @@ This package is still working in progress, more types would be added. Welcome an
 - Circle Grid
 - Contour Line
 
-For these kinds of art, the package provides as many as parameters to control the appearance.
+For these kinds of art, the package provides as many parameters to control the appearance.
 
 ## Install
 
