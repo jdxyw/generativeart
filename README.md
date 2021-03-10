@@ -7,6 +7,12 @@
 
 `generativeart` is a `Go` package to generate many kinds of generative art. The goal is to collect some excellent generative art (implemented in `R` or `Processing`), and rewrite them in `Go` again. I would paste the original link at the end of this README(If I remember, you can also submit a PR if you found I missed something.). Currently, it supports the following type.
 
+## Buy me a coffee
+
+If you found this package is useful, maybe you could buy me a coffee from [Paypal](https://www.paypal.me/jdxyw).
+
+## Types supported
+
 This package is still working in progress. More types would be added. Welcome anyone interested in this field to submit your PR.
 
 - Maze
@@ -30,10 +36,6 @@ This package is still working in progress. More types would be added. Welcome an
 - Noise Line
 
 For these kinds of art, the package provides as many parameters to control the appearance.
-
-## Buy me a coffee
-
-If you found this package is useful, maybe you could buy me a coffee from [Paypal](https://www.paypal.me/jdxyw).
 
 ## Install
 
