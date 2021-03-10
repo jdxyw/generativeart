@@ -34,6 +34,7 @@ This package is still working in progress. More types would be added. Welcome an
 - Circle Grid
 - Contour Line
 - Noise Line
+- Ocean Fish
 
 For these kinds of art, the package provides as many parameters to control the appearance.
 
@@ -245,6 +246,46 @@ func main() {
 ```
 
 ![](images/noiseline.png)
+
+### Dot Line
+
+```go
+func main() {
+	rand.Seed(time.Now().Unix())
+	c := generativeart.NewCanva(2080, 2080)
+	c.SetBackground(color.RGBA{230, 230, 230, 255})
+	c.SetLineWidth(10)
+	c.SetIterations(4000)
+	c.SetColorSchema(generativeart.Plasma)
+	c.FillBackground()
+	c.Draw(generativeart.NewDotLine(100, 20, 50, false))
+	c.ToPNG("dotline.png")
+}
+```
+
+![](images/dotline.png)
+
+### Ocean Fish
+
+```go
+func main() {
+	rand.Seed(time.Now().Unix())
+	colors := []color.RGBA{
+		{0xCF, 0x2B, 0x34, 0xFF},
+		{0xF0, 0x8F, 0x46, 0xFF},
+		{0xF0, 0xC1, 0x29, 0xFF},
+		{0x19, 0x6E, 0x94, 0xFF},
+		{0x35, 0x3A, 0x57, 0xFF},
+	}
+	c := generativeart.NewCanva(500, 500)
+	c.SetColorSchema(colors)
+	c.Draw(generativeart.NewOceanFish(100, 8))
+	c.ToPNG("oceanfish.png")
+}
+```
+
+![](images/oceanfish.png)
+
 ### Circle Loop
 
 ```go
@@ -264,23 +305,6 @@ func main() {
 
 ![](images/circleloop.png)
 
-### Dot Line
-
-```go
-func main() {
-	rand.Seed(time.Now().Unix())
-	c := generativeart.NewCanva(2080, 2080)
-	c.SetBackground(color.RGBA{230, 230, 230, 255})
-	c.SetLineWidth(10)
-	c.SetIterations(4000)
-	c.SetColorSchema(generativeart.Plasma)
-	c.FillBackground()
-	c.Draw(generativeart.NewDotLine(100, 20, 50, false))
-	c.ToPNG("dotline.png")
-}
-```
-
-![](images/dotline.png)
 
 ### Julia Set
 
@@ -382,3 +406,4 @@ Thanks for the following sites and repos, I got lots of ideas, inspiration, code
 - https://openprocessing.org/sketch/1071233
 - https://twitter.com/okazz_
 - https://openprocessing.org/sketch/738638
+- https://openprocessing.org/sketch/1102157
