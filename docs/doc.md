@@ -108,3 +108,18 @@ nl := generativeart.NewNoiseLine(1000)
 ```
 
 ![](../images/noiseline.png)
+
+## Ocean Fish
+
+`Ocean Fish` draws a ocean and some fishes in the center.
+
+### parameters
+
+- lineNum: The number of the line used to simulate the ocean wave.
+- fishNum: The number of fish.
+
+```go
+o := generativeart.NewOceanFish(100, 8)
+```
+
+![](../images/oceanfish.png)
