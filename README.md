@@ -31,6 +31,10 @@ This package is still working in progress. More types would be added. Welcome an
 
 For these kinds of art, the package provides as many parameters to control the appearance.
 
+## Buy me a coffee
+
+If you found this package is useful, maybe you could buy me a coffee from [Paypal](https://www.paypal.me/jdxyw).
+
 ## Install
 
 The go version I used is `Go 1.16`.
