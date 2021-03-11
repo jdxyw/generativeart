@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/common"
 	"math/rand"
 	"time"
 )
@@ -18,7 +19,7 @@ func main() {
 	rand.Seed(time.Now().Unix())
 	c := generativeart.NewCanva(500, 500)
 	c.SetIterations(800)
-	c.SetColorSchema(generativeart.Viridis)
+	c.SetColorSchema(common.Viridis)
 	c.FillBackground()
 	c.Draw(generativeart.NewJulia(julia1, 40, 1.5, 1.5))
 	c.ToPNG("julia.png")

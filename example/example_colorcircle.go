@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/common"
 	"image/color"
 	"math/rand"
 	"time"
@@ -20,7 +21,7 @@ func main() {
 		{0xFF, 0xFF, 0xFF, 0xFF},
 	}
 	c := generativeart.NewCanva(1000, 1000)
-	c.SetBackground(generativeart.White)
+	c.SetBackground(common.White)
 	c.FillBackground()
 	c.SetColorSchema(colors)
 	c.Draw(generativeart.NewColorCircle(500))

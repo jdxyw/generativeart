@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/common"
 	"image/color"
 	"math/rand"
 	"time"
@@ -10,7 +11,7 @@ import (
 func main() {
 	rand.Seed(time.Now().Unix())
 	c := generativeart.NewCanva(1600, 1600)
-	c.SetBackground(generativeart.Azure)
+	c.SetBackground(common.Azure)
 	c.FillBackground()
 	c.SetForeground(color.RGBA{113, 3, 0, 140})
 	c.SetIterations(4000000)

@@ -1,6 +1,7 @@
 package generativeart
 
 import (
+	"github.com/jdxyw/generativeart/common"
 	"image"
 	"image/color"
 	"image/draw"
@@ -37,11 +38,11 @@ func NewCanva(h, w int) *canva {
 		img:    image.NewRGBA(image.Rect(0, 0, h, w)),
 		// Set some defaults value
 		opts: Options{
-			background:  Azure,
-			foreground:  MistyRose,
-			lineColor:   Tomato,
+			background:  common.Azure,
+			foreground:  common.MistyRose,
+			lineColor:   common.Tomato,
 			lineWidth:   3,
-			colorSchema: Plasma,
+			colorSchema: common.Plasma,
 			nIters:      20,
 			alpha:       255,
 		},
