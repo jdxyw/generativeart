@@ -137,3 +137,17 @@ cl := generativeart.NewCircleLoop2(7)
 ```
 
 ![](../images/colorloop2.png)
+
+## Pixel Hole
+
+`Pixel Hole` draws a hole with colored dots.
+
+### parameters
+
+- dotN: The number of point in each iteration.
+
+```go
+ph := generativeart.NewPixelHole(60)
+```
+
+![](../images/pixelhole.png)

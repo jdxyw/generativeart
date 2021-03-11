@@ -23,7 +23,7 @@ func (nl *noiseLine) Generative(c *canva) {
 	ctex := gg.NewContextForRGBA(c.img)
 	noise := common.NewPerlinNoise()
 
-	ctex.SetColor(Black)
+	ctex.SetColor(common.Black)
 	for i := 0; i < 80; i++ {
 		x := rand.Float64() * float64(c.width)
 		y := rand.Float64() * float64(c.height)
