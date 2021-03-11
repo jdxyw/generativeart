@@ -35,6 +35,7 @@ This package is still working in progress. More types would be added. Welcome an
 - Contour Line
 - Noise Line
 - Ocean Fish
+- Circle Loop2
 
 For these kinds of art, the package provides as many parameters to control the appearance.
 
@@ -66,6 +67,7 @@ NewColorCircle2(circleNum int)
 NewCircleGrid(circleNumMin, circleNumMax int)
 NewContourLine(lineNum int)
 NewNoiseLine(n int)
+NewCircleLoop2(depth int)
 ```
 
 ## Docs
@@ -180,6 +182,29 @@ func main() {
 ```
 
 ![](images/circlegrid.png)
+
+## Circle Composes Circle
+
+```go
+func main() {
+	rand.Seed(time.Now().Unix())
+	colors := []color.RGBA{
+		{0xF9, 0xC8, 0x0E, 0xFF},
+		{0xF8, 0x66, 0x24, 0xFF},
+		{0xEA, 0x35, 0x46, 0xFF},
+		{0x66, 0x2E, 0x9B, 0xFF},
+		{0x43, 0xBC, 0xCD, 0xFF},
+	}
+	c := generativeart.NewCanva(500, 500)
+	c.SetBackground(color.RGBA{8, 10, 20, 255})
+	c.FillBackground()
+	c.SetColorSchema(colors)
+	c.Draw(generativeart.NewCircleLoop2(7))
+	c.ToPNG("colorloop2.png")
+}
+```
+
+![](images/colorloop2.png)
 
 ### Silk Smoke
 
@@ -390,7 +415,7 @@ func main() {
 
 ## Contribution
 
-Thanks for the following sites and repos, I got lots of ideas, inspiration, code and tricks from them. The list would be very long, sorry for forgetting some of them.
+Thanks for the following sites and repos, I got lots of ideas, inspiration, code, and tricks from them. The list would be very long; sorry for forgetting some of them.
 
 - https://inconvergent.net/
 - https://fronkonstin.com/
@@ -407,3 +432,4 @@ Thanks for the following sites and repos, I got lots of ideas, inspiration, code
 - https://twitter.com/okazz_
 - https://openprocessing.org/sketch/738638
 - https://openprocessing.org/sketch/1102157
+- https://openprocessing.org/sketch/1071233

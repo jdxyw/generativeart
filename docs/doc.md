@@ -111,7 +111,7 @@ nl := generativeart.NewNoiseLine(1000)
 
 ## Ocean Fish
 
-`Ocean Fish` draws a ocean and some fishes in the center.
+`Ocean Fish` draws an ocean and some fishes in the center.
 
 ### parameters
 
@@ -123,3 +123,17 @@ o := generativeart.NewOceanFish(100, 8)
 ```
 
 ![](../images/oceanfish.png)
+
+## Circle Loop2
+
+`Circle loop2` draws a circle composed by colored circles.
+
+### parameters
+
+- depth: Control the number of circles.
+
+```go
+cl := generativeart.NewCircleLoop2(7)
+```
+
+![](../images/colorloop2.png)

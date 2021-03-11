@@ -45,7 +45,7 @@ func (nl *noiseLine) Generative(c *canva) {
 		for j := 0; j < l; j++ {
 			var ns = 0.0005
 			w := math.Sin(math.Pi*float64(j)/float64(l-1)) * 5
-			theta := noise.Noise(x*ns, y*ns, t) * 100
+			theta := noise.Noise3D(x*ns, y*ns, t) * 100
 			ctex.SetColor(cl)
 			ctex.DrawCircle(x, y, w)
 			ctex.Fill()
