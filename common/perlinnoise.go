@@ -15,12 +15,12 @@ const (
 	perlinAmpFalloff = 0.5
 )
 
-type perlinNoise struct {
+type PerlinNoise struct {
 	perlin []float64
 }
 
-func NewPerlinNoise() *perlinNoise {
-	perlin := &perlinNoise{perlin: nil}
+func NewPerlinNoise() *PerlinNoise {
+	perlin := &PerlinNoise{perlin: nil}
 	perlin.perlin = make([]float64, perlinSize+1)
 
 	for i, _ := range perlin.perlin {
@@ -29,7 +29,19 @@ func NewPerlinNoise() *perlinNoise {
 	return perlin
 }
 
-func (p *perlinNoise) Noise(x, y, z float64) float64 {
+func (p *PerlinNoise) Noise1D(x float64) float64 {
+	return p.noise(x, 0, 0)
+}
+
+func (p *PerlinNoise) Noise2D(x, y float64) float64 {
+	return p.noise(x, y, 0)
+}
+
+func (p *PerlinNoise) Noise3D(x, y, z float64) float64 {
+	return p.noise(x, y, z)
+}
+
+func (p *PerlinNoise) noise(x, y, z float64) float64 {
 	if x < 0 {
 		x = -x
 	}

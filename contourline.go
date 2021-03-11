@@ -29,7 +29,7 @@ func (cl *contourLine) Generative(c *canva) {
 
 		for j := 0; j < 1500; j++ {
 
-			theta := noise.Noise(x/800.0, y/800.0, 0) * math.Pi * 2 * 800
+			theta := noise.Noise2D(x/800.0, y/800.0) * math.Pi * 2 * 800
 			x += math.Cos(theta) * 0.4
 			y += math.Sin(theta) * 0.4
 
