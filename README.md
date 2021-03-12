@@ -36,6 +36,7 @@ This package is still working in progress. More types would be added. Welcome an
 - Ocean Fish
 - Circle Loop2
 - Pixel Hole
+- Dots Wave
 
 For these kinds of art, the package provides as many parameters to control the appearance.
 
@@ -69,6 +70,7 @@ NewContourLine(lineNum int)
 NewNoiseLine(n int)
 NewCircleLoop2(depth int)
 NewPixelHole(dotN int)
+NewDotsWave(dotsN int)
 ```
 
 ## Docs
@@ -233,25 +235,28 @@ func main() {
 
 ![](images/pixelhole.png)
 
-### Silk Smoke
+### Dots Wave
 
 ```go
 func main() {
  rand.Seed(time.Now().Unix())
+ colors := []color.RGBA{
+  {0xFF, 0xBE, 0x0B, 0xFF},
+  {0xFB, 0x56, 0x07, 0xFF},
+  {0xFF, 0x00, 0x6E, 0xFF},
+  {0x83, 0x38, 0xEC, 0xFF},
+  {0x3A, 0x86, 0xFF, 0xFF},
+ }
  c := generativeart.NewCanva(500, 500)
- c.SetBackground(generativeart.Black)
- c.SetLineWidth(1.0)
- c.SetLineColor(generativeart.MediumAquamarine)
- c.SetAlpha(30)
- c.SetColorSchema(generativeart.Plasma)
- c.SetIterations(4)
+ c.SetBackground(common.Black)
  c.FillBackground()
- c.Draw(generativeart.NewSilkSmoke(400, 20, 0.2, 2, 10, 30, false))
- c.ToPNG("silksmoke.png")
+ c.SetColorSchema(colors)
+ c.Draw(generativeart.NewDotsWave(300))
+ c.ToPNG("dotswave.png")
 }
 ```
 
-![](images/silksmoke.png)
+![](images/dotswave.png)
 
 ### Contour Line
 
@@ -337,6 +342,26 @@ func main() {
 ```
 
 ![](images/oceanfish.png)
+
+### Silk Smoke
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(500, 500)
+ c.SetBackground(generativeart.Black)
+ c.SetLineWidth(1.0)
+ c.SetLineColor(generativeart.MediumAquamarine)
+ c.SetAlpha(30)
+ c.SetColorSchema(generativeart.Plasma)
+ c.SetIterations(4)
+ c.FillBackground()
+ c.Draw(generativeart.NewSilkSmoke(400, 20, 0.2, 2, 10, 30, false))
+ c.ToPNG("silksmoke.png")
+}
+```
+
+![](images/silksmoke.png)
 
 ### Circle Loop
 
