@@ -151,3 +151,15 @@ ph := generativeart.NewPixelHole(60)
 ```
 
 ![](../images/pixelhole.png)
+
+## Dots Wave
+
+### parameters
+
+- dotsN: The number of dots wave in the image.
+
+```go
+d := generativeart.NewDotsWave(300)
+```
+
+![](../images/dotswave.png)
