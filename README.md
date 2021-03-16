@@ -22,8 +22,8 @@
     - [Random Shapes](#random-shapes)
     - [Color Circle2](#color-circle2)
     - [Circle Grid](#circle-grid)
-  - [Circle Composes Circle](#circle-composes-circle)
-  - [Pixel Hole](#pixel-hole)
+    - [Circle Composes Circle](#circle-composes-circle)
+    - [Pixel Hole](#pixel-hole)
     - [Dots Wave](#dots-wave)
     - [Contour Line](#contour-line)
     - [Noise Line](#noise-line)
@@ -222,7 +222,7 @@ func main() {
 
 ![](images/circlegrid.png)
 
-## Circle Composes Circle
+### Circle Composes Circle
 
 ```go
 func main() {
@@ -245,7 +245,7 @@ func main() {
 
 ![](images/colorloop2.png)
 
-## Pixel Hole
+### Pixel Hole
 
 ```go
 func main() {
