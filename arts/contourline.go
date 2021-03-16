@@ -24,7 +24,7 @@ func (cl *contourLine) Generative(c *generativeart.Canva) {
 	ctex := gg.NewContextForRGBA(c.Img())
 	noise := common.NewPerlinNoise()
 	for i := 0; i < cl.lineNum; i++ {
-		cl := c.Opts().ColorSchema()[rand.Intn(len(c.Opts().ColorSchema()))]
+		cls := c.Opts().ColorSchema()[rand.Intn(len(c.Opts().ColorSchema()))]
 		x := rand.Float64() * float64(c.Width())
 		y := rand.Float64() * float64(c.Height())
 
@@ -34,7 +34,7 @@ func (cl *contourLine) Generative(c *generativeart.Canva) {
 			x += math.Cos(theta) * 0.4
 			y += math.Sin(theta) * 0.4
 
-			ctex.SetColor(cl)
+			ctex.SetColor(cls)
 			ctex.DrawEllipse(x, y, 2, 2)
 			ctex.Fill()
 

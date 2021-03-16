@@ -25,15 +25,15 @@ func (c *Canva) Opts() Options {
 }
 
 func (c *Canva) Img() *image.RGBA {
-	return c.Img()
+	return c.img
 }
 
 func (c *Canva) Width() int {
-	return c.Width()
+	return c.width
 }
 
 func (c *Canva) Height() int {
-	return c.Height()
+	return c.height
 }
 
 type Options struct {
@@ -86,7 +86,7 @@ func NewCanva(w, h int) *Canva {
 			foreground:  common.MistyRose,
 			lineColor:   common.Tomato,
 			lineWidth:   3,
-			colorSchema: common.Plasma,
+			colorSchema: common.Youthful,
 			nIters:      20,
 			alpha:       255,
 		},
