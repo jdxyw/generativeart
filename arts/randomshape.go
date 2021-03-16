@@ -1,7 +1,8 @@
-package generativeart
+package arts
 
 import (
 	"github.com/fogleman/gg"
+	"github.com/jdxyw/generativeart"
 	"github.com/jdxyw/generativeart/common"
 	"math"
 	"math/rand"
@@ -18,18 +19,18 @@ func NewRandomShape(shapeNum int) *randomShape {
 }
 
 // Generative draws a random shape image.
-func (r *randomShape) Generative(c *canva) {
-	ctex := gg.NewContextForRGBA(c.img)
+func (r *randomShape) Generative(c *generativeart.Canva) {
+	ctex := gg.NewContextForRGBA(c.Img())
 
-	ctex.Translate(float64(c.width/2), float64(c.height/2))
+	ctex.Translate(float64(c.Width()/2), float64(c.Height()/2))
 	ctex.Rotate(common.RandomRangeFloat64(-1, 1) * math.Pi * 0.25)
-	ctex.Translate(-float64(c.width/2), -float64(c.height/2))
+	ctex.Translate(-float64(c.Width()/2), -float64(c.Height()/2))
 
 	for i := 0; i < r.shapeNum; i++ {
-		x := common.RandomGaussian(0.5, 0.2) * float64(c.width)
-		y := common.RandomGaussian(0.5, 0.2) * float64(c.height)
+		x := common.RandomGaussian(0.5, 0.2) * float64(c.Width())
+		y := common.RandomGaussian(0.5, 0.2) * float64(c.Height())
 
-		w := common.RandomRangeFloat64(0, float64(c.width)/3)*common.RandomRangeFloat64(0, rand.Float64()) + 5.0
+		w := common.RandomRangeFloat64(0, float64(c.Width())/3)*common.RandomRangeFloat64(0, rand.Float64()) + 5.0
 		h := w + common.RandomRangeFloat64(-1, 1)*3.0
 
 		rnd := rand.Intn(4)
@@ -38,7 +39,7 @@ func (r *randomShape) Generative(c *canva) {
 		ctex.Push()
 		ctex.Translate(x, y)
 		ctex.Rotate(theta)
-		ctex.SetColor(c.opts.colorSchema[rand.Intn(len(c.opts.colorSchema))])
+		ctex.SetColor(c.Opts().ColorSchema()[rand.Intn(len(c.Opts().ColorSchema()))])
 		switch rnd {
 		case 0:
 			ctex.DrawCircle(0, 0, w/2)

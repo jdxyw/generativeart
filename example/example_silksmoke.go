@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
 	"github.com/jdxyw/generativeart/common"
 	"math/rand"
 	"time"
@@ -17,6 +18,6 @@ func main() {
 	c.SetColorSchema(common.Plasma)
 	c.SetIterations(4)
 	c.FillBackground()
-	c.Draw(generativeart.NewSilkSmoke(400, 20, 0.2, 2, 10, 30, false))
+	c.Draw(arts.NewSilkSmoke(400, 20, 0.2, 2, 10, 30, false))
 	c.ToPNG("silksmoke.png")
 }

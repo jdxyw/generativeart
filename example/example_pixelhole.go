@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
 	"github.com/jdxyw/generativeart/common"
 	"image/color"
 	"math/rand"
@@ -22,7 +23,7 @@ func main() {
 	c.FillBackground()
 	c.SetColorSchema(colors)
 	c.SetIterations(1200)
-	c.Draw(generativeart.NewPixelHole(60))
+	c.Draw(arts.NewPixelHole(60))
 	c.ToPNG("pixelhole.png")
 
 }

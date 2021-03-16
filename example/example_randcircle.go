@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
 	"github.com/jdxyw/generativeart/common"
 	"image/color"
 	"math/rand"
@@ -22,6 +23,6 @@ func main() {
 	c.SetColorSchema(common.Plasma)
 	c.SetIterations(4)
 	c.FillBackground()
-	c.Draw(generativeart.NewRandCicle(30, 80, 0.2, 2, 10, 30, true))
+	c.Draw(arts.NewRandCicle(30, 80, 0.2, 2, 10, 30, true))
 	c.ToPNG("randcircle.png")
 }

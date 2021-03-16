@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
 	"github.com/jdxyw/generativeart/common"
 	"image/color"
 	"math/rand"
@@ -14,6 +15,6 @@ func main() {
 	c.SetBackground(common.Black)
 	c.FillBackground()
 	c.SetLineColor(color.RGBA{255, 64, 8, 128})
-	c.Draw(generativeart.NewSolarFlare())
+	c.Draw(arts.NewSolarFlare())
 	c.ToPNG("solarflare.png")
 }

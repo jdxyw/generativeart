@@ -1,7 +1,8 @@
-package generativeart
+package arts
 
 import (
 	"github.com/fogleman/gg"
+	"github.com/jdxyw/generativeart"
 	"github.com/jdxyw/generativeart/common"
 	"image"
 	"image/color"
@@ -17,7 +18,7 @@ func NewSolarFlare() *solarFlare {
 }
 
 // Generative draws a solar flare images.
-func (o *solarFlare) Generative(c *canva) {
+func (o *solarFlare) Generative(c *generativeart.Canva) {
 	var xOffset, yOffset float64
 	var offsetInc = 0.006
 	var inc = 1.0
@@ -30,14 +31,14 @@ func (o *solarFlare) Generative(c *canva) {
 			nPoints := int(2 * math.Pi * r)
 			nPoints = common.MinInt(nPoints, 500)
 
-			img := image.NewRGBA(image.Rect(0, 0, c.width, c.height))
+			img := image.NewRGBA(image.Rect(0, 0, c.Width(), c.Height()))
 			draw.Draw(img, img.Bounds(), &image.Uniform{color.Black}, image.ZP, draw.Src)
 			ctex := gg.NewContextForRGBA(img)
 
 			ctex.Push()
-			ctex.Translate(float64(c.width/2), float64(c.height/2))
+			ctex.Translate(float64(c.Width()/2), float64(c.Height()/2))
 			ctex.SetLineWidth(1.0)
-			ctex.SetColor(c.opts.lineColor)
+			ctex.SetColor(c.Opts().LineColor())
 
 			for j := 0.0; j < float64(nPoints+1); j += 1.0 {
 				a := j / float64(nPoints) * math.Pi * 2
@@ -51,7 +52,7 @@ func (o *solarFlare) Generative(c *canva) {
 			ctex.Stroke()
 			ctex.Pop()
 
-			c.img = common.Blend(img, c.img, common.Add)
+			//c.Img() = common.Blend(img, c.Img(), common.Add)
 			xOffset += offsetInc
 			yOffset += offsetInc
 			r *= m

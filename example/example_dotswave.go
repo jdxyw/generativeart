@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
 	"github.com/jdxyw/generativeart/common"
 	"image/color"
 	"math/rand"
@@ -21,6 +22,6 @@ func main() {
 	c.SetBackground(common.Black)
 	c.FillBackground()
 	c.SetColorSchema(colors)
-	c.Draw(generativeart.NewDotsWave(300))
+	c.Draw(arts.NewDotsWave(300))
 	c.ToPNG("dotswave.png")
 }

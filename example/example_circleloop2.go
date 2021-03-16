@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
 	"image/color"
 	"math/rand"
 	"time"
@@ -20,6 +21,6 @@ func main() {
 	c.SetBackground(color.RGBA{8, 10, 20, 255})
 	c.FillBackground()
 	c.SetColorSchema(colors)
-	c.Draw(generativeart.NewCircleLoop2(7))
+	c.Draw(arts.NewCircleLoop2(7))
 	c.ToPNG("colorloop2.png")
 }

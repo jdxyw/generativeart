@@ -11,13 +11,29 @@ import (
 )
 
 type Engine interface {
-	Generative(c *canva)
+	Generative(c *Canva)
 }
 
-type canva struct {
+type Canva struct {
 	height, width int
 	img           *image.RGBA
 	opts          Options
+}
+
+func (c *Canva) Opts() Options {
+	return c.opts
+}
+
+func (c *Canva) Img() *image.RGBA {
+	return c.Img()
+}
+
+func (c *Canva) Width() int {
+	return c.Width()
+}
+
+func (c *Canva) Height() int {
+	return c.Height()
 }
 
 type Options struct {
@@ -30,9 +46,37 @@ type Options struct {
 	alpha       int
 }
 
-// NewCanva returns a canva.
-func NewCanva(w, h int) *canva {
-	return &canva{
+func (o Options) Alpha() int {
+	return o.alpha
+}
+
+func (o Options) NIters() int {
+	return o.nIters
+}
+
+func (o Options) ColorSchema() []color.RGBA {
+	return o.colorSchema
+}
+
+func (o Options) LineWidth() float64 {
+	return o.lineWidth
+}
+
+func (o Options) LineColor() color.RGBA {
+	return o.lineColor
+}
+
+func (o Options) Foreground() color.RGBA {
+	return o.foreground
+}
+
+func (o Options) Background() color.RGBA {
+	return o.background
+}
+
+// NewCanva returns a Canva.
+func NewCanva(w, h int) *Canva {
+	return &Canva{
 		height: h,
 		width:  w,
 		img:    image.NewRGBA(image.Rect(0, 0, w, h)),
@@ -49,54 +93,54 @@ func NewCanva(w, h int) *canva {
 	}
 }
 
-func (c *canva) SetOptions(opts Options) {
+func (c *Canva) SetOptions(opts Options) {
 	c.opts = opts
 }
 
-func (c *canva) SetBackground(rgba color.RGBA) {
+func (c *Canva) SetBackground(rgba color.RGBA) {
 	c.opts.background = rgba
 }
 
-func (c *canva) SetForeground(rgba color.RGBA) {
+func (c *Canva) SetForeground(rgba color.RGBA) {
 	c.opts.foreground = rgba
 }
 
-func (c *canva) SetColorSchema(rgbas []color.RGBA) {
+func (c *Canva) SetColorSchema(rgbas []color.RGBA) {
 	c.opts.colorSchema = rgbas
 }
 
-func (c *canva) SetLineColor(rgba color.RGBA) {
+func (c *Canva) SetLineColor(rgba color.RGBA) {
 	c.opts.lineColor = rgba
 }
 
-func (c *canva) SetLineWidth(lw float64) {
+func (c *Canva) SetLineWidth(lw float64) {
 	c.opts.lineWidth = lw
 }
 
-func (c *canva) SetIterations(nIters int) {
+func (c *Canva) SetIterations(nIters int) {
 	c.opts.nIters = nIters
 }
 
-func (c *canva) SetAlpha(alpha int) {
+func (c *Canva) SetAlpha(alpha int) {
 	c.opts.alpha = alpha
 }
 
-func (c *canva) Draw(e Engine) {
+func (c *Canva) Draw(e Engine) {
 	e.Generative(c)
 }
 
-// FillBackground fills the background of the canva.
-func (c *canva) FillBackground() {
-	draw.Draw(c.img, c.img.Bounds(), &image.Uniform{c.opts.background}, image.ZP, draw.Src)
+// FillBackground fills the background of the Canva.
+func (c *Canva) FillBackground() {
+	draw.Draw(c.Img(), c.Img().Bounds(), &image.Uniform{c.Opts().Background()}, image.ZP, draw.Src)
 }
 
 // ToPng saves the image to local with PNG format.
-func (c *canva) ToPNG(fpath string) error {
+func (c *Canva) ToPNG(fpath string) error {
 	f, err := os.Create(fpath)
 	if err != nil {
 		return err
 	}
-	if err := png.Encode(f, c.img); err != nil {
+	if err := png.Encode(f, c.Img()); err != nil {
 		f.Close()
 		return err
 	}
@@ -109,12 +153,12 @@ func (c *canva) ToPNG(fpath string) error {
 }
 
 // ToJpeg saves the image to local with Jpeg format.
-func (c *canva) ToJPEG(path string) error {
+func (c *Canva) ToJPEG(path string) error {
 	f, err := os.Create(path)
 	if err != nil {
 		return err
 	}
-	if err := jpeg.Encode(f, c.img, nil); err != nil {
+	if err := jpeg.Encode(f, c.Img(), nil); err != nil {
 		f.Close()
 		return err
 	}

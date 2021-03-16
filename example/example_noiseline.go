@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
 	"image/color"
 	"math/rand"
 	"time"
@@ -20,6 +21,6 @@ func main() {
 	c.SetBackground(color.RGBA{0xF0, 0xFE, 0xFF, 0xFF})
 	c.FillBackground()
 	c.SetColorSchema(colors)
-	c.Draw(generativeart.NewNoiseLine(1000))
+	c.Draw(arts.NewNoiseLine(1000))
 	c.ToPNG("noiseline.png")
 }

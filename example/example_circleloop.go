@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
 	"github.com/jdxyw/generativeart/common"
 	"math/rand"
 	"time"
@@ -16,6 +17,6 @@ func main() {
 	c.SetAlpha(30)
 	c.SetIterations(1000)
 	c.FillBackground()
-	c.Draw(generativeart.NewCircleLoop(100))
+	c.Draw(arts.NewCircleLoop(100))
 	c.ToPNG("circleloop.png")
 }

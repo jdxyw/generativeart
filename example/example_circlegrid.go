@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
 	"image/color"
 	"math/rand"
 	"time"
@@ -22,6 +23,6 @@ func main() {
 	c.FillBackground()
 	c.SetColorSchema(colors)
 	c.SetLineWidth(2.0)
-	c.Draw(generativeart.NewCircleGrid(4, 6))
+	c.Draw(arts.NewCircleGrid(4, 6))
 	c.ToPNG("circlegrid.png")
 }

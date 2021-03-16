@@ -1,6 +1,7 @@
-package generativeart
+package arts
 
 import (
+	"github.com/jdxyw/generativeart"
 	"math/rand"
 
 	"github.com/fogleman/gg"
@@ -18,12 +19,12 @@ func NewMaze(step int) *maze {
 }
 
 // Generative draws a random maze image.
-func (m *maze) Generative(c *canva) {
-	ctex := gg.NewContextForRGBA(c.img)
-	ctex.SetColor(c.opts.lineColor)
-	ctex.SetLineWidth(c.opts.lineWidth)
-	for x := 0; x < c.width; x += m.step {
-		for y := 0; y < c.height; y += m.step {
+func (m *maze) Generative(c *generativeart.Canva) {
+	ctex := gg.NewContextForRGBA(c.Img())
+	ctex.SetColor(c.Opts().LineColor())
+	ctex.SetLineWidth(c.Opts().LineWidth())
+	for x := 0; x < c.Width(); x += m.step {
+		for y := 0; y < c.Height(); y += m.step {
 			if rand.Float32() > 0.5 {
 				ctex.DrawLine(float64(x), float64(y), float64(x+m.step), float64(y+m.step))
 			} else {

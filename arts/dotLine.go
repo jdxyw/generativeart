@@ -1,7 +1,8 @@
-package generativeart
+package arts
 
 import (
 	"github.com/fogleman/gg"
+	"github.com/jdxyw/generativeart"
 	"github.com/jdxyw/generativeart/common"
 	"math/rand"
 )
@@ -23,18 +24,18 @@ func NewDotLine(n int, ras, canv float64, randColor bool) *dotLine {
 	}
 }
 
-func (d *dotLine) Generative(c *canva) {
-	ctex := gg.NewContextForRGBA(c.img)
+func (d *dotLine) Generative(c *generativeart.Canva) {
+	ctex := gg.NewContextForRGBA(c.Img())
 
-	ctex.SetLineWidth(c.opts.lineWidth)
+	ctex.SetLineWidth(c.Opts().LineWidth())
 	var dir []int = []int{-1, 1}
-	for i := 0; i < c.opts.nIters; i++ {
+	for i := 0; i < c.Opts().NIters(); i++ {
 		oldx := rand.Intn(d.n - 1)
 		oldy := rand.Intn(d.n - 1)
 
 		n := rand.Intn(7)
 		if d.randColor {
-			ctex.SetColor(c.opts.colorSchema[rand.Intn(len(c.opts.colorSchema))])
+			ctex.SetColor(c.Opts().ColorSchema()[rand.Intn(len(c.Opts().ColorSchema()))])
 		} else {
 			ctex.SetRGBA255(common.RandomRangeInt(222, 255), common.RandomRangeInt(20, 222), 0, 255)
 		}
@@ -47,7 +48,7 @@ func (d *dotLine) Generative(c *canva) {
 				newy = oldy
 			}
 			if newx == oldx && rand.Intn(6) > 4 {
-				ctex.DrawEllipse(float64(oldx)*d.ras+d.canv, float64(oldy)*d.ras+d.canv, c.opts.lineWidth, c.opts.lineWidth)
+				ctex.DrawEllipse(float64(oldx)*d.ras+d.canv, float64(oldy)*d.ras+d.canv, c.Opts().LineWidth(), c.Opts().LineWidth())
 				ctex.Fill()
 				continue
 			}

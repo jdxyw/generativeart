@@ -1,7 +1,8 @@
-package generativeart
+package arts
 
 import (
 	"github.com/fogleman/gg"
+	"github.com/jdxyw/generativeart"
 	"github.com/jdxyw/generativeart/common"
 	"math"
 	"math/rand"
@@ -21,8 +22,8 @@ func NewOceanFish(lineNum, fishNum int) *oceanFish {
 }
 
 // Generative draws a ocean and fish images.
-func (o *oceanFish) Generative(c *canva) {
-	ctex := gg.NewContextForRGBA(c.img)
+func (o *oceanFish) Generative(c *generativeart.Canva) {
+	ctex := gg.NewContextForRGBA(c.Img())
 
 	o.drawlines(ctex, c)
 
@@ -30,12 +31,12 @@ func (o *oceanFish) Generative(c *canva) {
 		ctex.Push()
 
 		theta := float64(360*i) / float64(o.fishNum)
-		r := float64(c.width) / 4.0
+		r := float64(c.Width()) / 4.0
 
 		ctex.Push()
-		ctex.Translate(float64(c.width/2)+r*math.Cos(gg.Radians(theta)), float64(c.height/2)+r*math.Sin(gg.Radians(theta)))
+		ctex.Translate(float64(c.Width()/2)+r*math.Cos(gg.Radians(theta)), float64(c.Height()/2)+r*math.Sin(gg.Radians(theta)))
 		ctex.Rotate(gg.Radians(theta + 90))
-		o.drawfish(ctex, c, 0, 0, float64(c.width)/10)
+		o.drawfish(ctex, c, 0, 0, float64(c.Width())/10)
 		ctex.Pop()
 
 		ctex.Clip()
@@ -46,18 +47,18 @@ func (o *oceanFish) Generative(c *canva) {
 	}
 }
 
-func (o *oceanFish) drawlines(ctx *gg.Context, c *canva) {
+func (o *oceanFish) drawlines(ctx *gg.Context, c *generativeart.Canva) {
 	for i := 0; i < o.lineNum; i++ {
-		cl := c.opts.colorSchema[rand.Intn(len(c.opts.colorSchema))]
+		cl := c.Opts().ColorSchema()[rand.Intn(len(c.Opts().ColorSchema()))]
 		ctx.SetColor(cl)
 		ctx.SetLineWidth(common.RandomRangeFloat64(3, 20))
-		y := rand.Float64() * float64(c.height)
-		ctx.DrawLine(0, y+common.RandomRangeFloat64(-50, 50), float64(c.width), y+common.RandomRangeFloat64(-50, 50))
+		y := rand.Float64() * float64(c.Height())
+		ctx.DrawLine(0, y+common.RandomRangeFloat64(-50, 50), float64(c.Width()), y+common.RandomRangeFloat64(-50, 50))
 		ctx.Stroke()
 	}
 }
 
-func (o *oceanFish) drawfish(ctex *gg.Context, c *canva, ox, oy, r float64) {
+func (o *oceanFish) drawfish(ctex *gg.Context, c *generativeart.Canva, ox, oy, r float64) {
 	ctex.Push()
 	ctex.Translate(ox, oy)
 	ctex.Rotate(gg.Radians(180))
