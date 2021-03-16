@@ -163,3 +163,16 @@ d := generativeart.NewDotsWave(300)
 ```
 
 ![](../images/dotswave.png)
+
+## Circle Move
+
+### parameters
+
+- circleNum: The number of the circle in the image.
+
+
+```go
+cm := generativeart.NewCircleMove(1000)
+```
+
+![](../images/circlemove.png)

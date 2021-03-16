@@ -37,6 +37,7 @@ This package is still working in progress. More types would be added. Welcome an
 - Circle Loop2
 - Pixel Hole
 - Dots Wave
+- Circle Move
 
 For these kinds of art, the package provides as many parameters to control the appearance.
 
@@ -71,6 +72,7 @@ NewNoiseLine(n int)
 NewCircleLoop2(depth int)
 NewPixelHole(dotN int)
 NewDotsWave(dotsN int)
+NewCircleMove(circleNum int)
 ```
 
 ## Docs
@@ -419,22 +421,20 @@ func main() {
 
 ![](images/silksky.png)
 
-### Maze
+### Circle Move
 
 ```go
 func main() {
  rand.Seed(time.Now().Unix())
- c := generativeart.NewCanva(600, 600)
- c.SetBackground(generativeart.Azure)
- c.SetLineWidth(3)
- c.SetLineColor(generativeart.Orange)
+ c := generativeart.NewCanva(1200, 500)
+ c.SetBackground(common.White)
  c.FillBackground()
- c.Draw(generativeart.NewMaze(20))
- c.ToPNG("maze.png")
+ c.Draw(generativeart.NewCircleMove(1000))
+ c.ToPNG("circlemove.png")
 }
 ```
 
-![](images/maze.png)
+![](images/circlemove.png)
 
 ### Random Circle
 
