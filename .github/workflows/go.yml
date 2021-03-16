@@ -21,5 +21,8 @@ jobs:
     - name: Build
       run: go build -v ./*.go
 
+    - name: Build arts
+      run: go build -v ./arts/*.go
+
     - name: Test
-      run: go test -v ./*.go
+      run: go test -v ./common/...
