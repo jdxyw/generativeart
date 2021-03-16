@@ -32,8 +32,8 @@ func (cm *circleMove) Generative(c *generativeart.Canva) {
 			theta := common.Remap(j, 0, np, 0, math.Pi*2)
 			cx := float64(i)*3 - 200.0
 			cy := float64(c.Height())/2 + math.Sin(float64(i)/50)*float64(c.Height())/12.0
-			xx := math.Cos(theta+cx/10)*float64(c.Height())/6.0
-			yy := math.Sin(theta+cx/10)*float64(c.Height())/6.0
+			xx := math.Cos(theta+cx/10) * float64(c.Height()) / 6.0
+			yy := math.Sin(theta+cx/10) * float64(c.Height()) / 6.0
 			p := common.NewVector(xx, yy)
 			xx = (xx + cx) / 150
 			yy = (yy + cy) / 150
