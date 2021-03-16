@@ -1,7 +1,8 @@
-package generativeart
+package arts
 
 import (
 	"github.com/fogleman/gg"
+	"github.com/jdxyw/generativeart"
 	"github.com/jdxyw/generativeart/common"
 	"math"
 	"math/rand"
@@ -18,14 +19,14 @@ func NewColorCircle(circleNum int) *colorCircle {
 }
 
 // Generative draws a color circle images.
-func (cc *colorCircle) Generative(c *canva) {
-	ctex := gg.NewContextForRGBA(c.img)
+func (cc *colorCircle) Generative(c *generativeart.Canva) {
+	ctex := gg.NewContextForRGBA(c.Img())
 
 	for i := 0; i < cc.circleNum; i++ {
 		rnd := rand.Intn(3)
-		x := common.RandomRangeFloat64(-0.1, 1.1) * float64(c.width)
-		y := common.RandomRangeFloat64(-0.1, 1.1) * float64(c.height)
-		s := common.RandomRangeFloat64(0, common.RandomRangeFloat64(0, float64(c.width/2))) + 10
+		x := common.RandomRangeFloat64(-0.1, 1.1) * float64(c.Width())
+		y := common.RandomRangeFloat64(-0.1, 1.1) * float64(c.Height())
+		s := common.RandomRangeFloat64(0, common.RandomRangeFloat64(0, float64(c.Width()/2))) + 10
 		if rnd == 2 {
 			rnd = rand.Intn(3)
 		}
@@ -34,7 +35,7 @@ func (cc *colorCircle) Generative(c *canva) {
 			cc.drawCircleV1(ctex, c, x, y, s)
 		case 1:
 			ctex.SetLineWidth(common.RandomRangeFloat64(0, 1))
-			ctex.SetColor(c.opts.colorSchema[rand.Intn(len(c.opts.colorSchema))])
+			ctex.SetColor(c.Opts().ColorSchema()[rand.Intn(len(c.Opts().ColorSchema()))])
 			ctex.DrawCircle(x, y, common.RandomRangeFloat64(0, s)/2)
 			ctex.Stroke()
 		case 2:
@@ -43,10 +44,10 @@ func (cc *colorCircle) Generative(c *canva) {
 	}
 }
 
-func (cc *colorCircle) drawCircleV1(ctex *gg.Context, c *canva, x, y, s float64) {
+func (cc *colorCircle) drawCircleV1(ctex *gg.Context, c *generativeart.Canva, x, y, s float64) {
 	n := common.RandomRangeInt(4, 30)
 	cs := common.RandomRangeFloat64(2, 8)
-	ctex.SetColor(c.opts.colorSchema[rand.Intn(len(c.opts.colorSchema))])
+	ctex.SetColor(c.Opts().ColorSchema()[rand.Intn(len(c.Opts().ColorSchema()))])
 	ctex.Push()
 	ctex.Translate(x, y)
 	for a := 0.0; a < math.Pi*2.0; a += math.Pi * 2.0 / float64(n) {
@@ -56,8 +57,8 @@ func (cc *colorCircle) drawCircleV1(ctex *gg.Context, c *canva, x, y, s float64)
 	ctex.Pop()
 }
 
-func (cc *colorCircle) drawCircleV2(ctex *gg.Context, c *canva, x, y, s float64) {
-	cl := c.opts.colorSchema[rand.Intn(len(c.opts.colorSchema))]
+func (cc *colorCircle) drawCircleV2(ctex *gg.Context, c *generativeart.Canva, x, y, s float64) {
+	cl := c.Opts().ColorSchema()[rand.Intn(len(c.Opts().ColorSchema()))]
 	ctex.SetLineWidth(1.0)
 	sx := s * common.RandomRangeFloat64(0.1, 0.55)
 	for j := 0.0001; j < sx; j++ {

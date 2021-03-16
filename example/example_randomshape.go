@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
 	"github.com/jdxyw/generativeart/common"
 	"image/color"
 	"math/rand"
@@ -20,6 +21,6 @@ func main() {
 		{0x19, 0x6E, 0x94, 0xFF},
 		{0x35, 0x3A, 0x57, 0xFF},
 	})
-	c.Draw(generativeart.NewRandomShape(150))
+	c.Draw(arts.NewRandomShape(150))
 	c.ToPNG("randomshape.png")
 }

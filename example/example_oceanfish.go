@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
 	"image/color"
 	"math/rand"
 	"time"
@@ -25,6 +26,6 @@ func main() {
 	}
 	c := generativeart.NewCanva(500, 500)
 	c.SetColorSchema(colors)
-	c.Draw(generativeart.NewOceanFish(100, 8))
+	c.Draw(arts.NewOceanFish(100, 8))
 	c.ToPNG("oceanfish.png")
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
 	"image/color"
 	"math/rand"
 	"time"
@@ -20,6 +21,6 @@ func main() {
 	c.SetBackground(color.RGBA{0x1a, 0x06, 0x33, 0xFF})
 	c.FillBackground()
 	c.SetColorSchema(colors)
-	c.Draw(generativeart.NewContourLine(500))
+	c.Draw(arts.NewContourLine(500))
 	c.ToPNG("contourline.png")
 }

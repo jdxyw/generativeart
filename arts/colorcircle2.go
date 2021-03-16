@@ -1,7 +1,8 @@
-package generativeart
+package arts
 
 import (
 	"github.com/fogleman/gg"
+	"github.com/jdxyw/generativeart"
 	"github.com/jdxyw/generativeart/common"
 	"math"
 	"math/rand"
@@ -19,19 +20,19 @@ func NewColorCircle2(circleNum int) *colorCircle2 {
 }
 
 // Generative draws a color circle image.
-func (cc *colorCircle2) Generative(c *canva) {
-	ctex := gg.NewContextForRGBA(c.img)
+func (cc *colorCircle2) Generative(c *generativeart.Canva) {
+	ctex := gg.NewContextForRGBA(c.Img())
 
 	for i := 0; i < cc.circleNum; i++ {
-		x := common.RandomRangeFloat64(0, float64(c.width))
-		y := common.RandomRangeFloat64(0, float64(c.height))
+		x := common.RandomRangeFloat64(0, float64(c.Width()))
+		y := common.RandomRangeFloat64(0, float64(c.Height()))
 
-		r1 := common.RandomRangeFloat64(50.0, float64(c.width)/4)
-		r2 := common.RandomRangeFloat64(10.0, float64(c.width)/3)
+		r1 := common.RandomRangeFloat64(50.0, float64(c.Width())/4)
+		r2 := common.RandomRangeFloat64(10.0, float64(c.Width())/3)
 
 		cc.circle(ctex, c, x, y, r1, r2)
 		if rand.Float64() < 0.3 {
-			col := c.opts.colorSchema[rand.Intn(len(c.opts.colorSchema))]
+			col := c.Opts().ColorSchema()[rand.Intn(len(c.Opts().ColorSchema()))]
 			ctex.SetColor(col)
 			ctex.DrawCircle(x, y, r1/2.0)
 			ctex.Fill()
@@ -39,8 +40,8 @@ func (cc *colorCircle2) Generative(c *canva) {
 	}
 }
 
-func (cc *colorCircle2) circle(ctex *gg.Context, c *canva, x, y, d, dx float64) {
-	col := c.opts.colorSchema[rand.Intn(len(c.opts.colorSchema))]
+func (cc *colorCircle2) circle(ctex *gg.Context, c *generativeart.Canva, x, y, d, dx float64) {
+	col := c.Opts().ColorSchema()[rand.Intn(len(c.Opts().ColorSchema()))]
 
 	for j := 0.0; j < dx; j += 1.0 {
 		dd := d + j*2.0

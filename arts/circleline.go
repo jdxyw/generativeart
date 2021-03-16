@@ -1,7 +1,8 @@
-package generativeart
+package arts
 
 import (
 	"github.com/fogleman/gg"
+	"github.com/jdxyw/generativeart"
 	"github.com/jdxyw/generativeart/common"
 	"math"
 	"math/rand"
@@ -30,15 +31,15 @@ func NewCircleLine(step float64, lineNum int, radius, xaixs, yaixs float64) *cir
 }
 
 // Generative draws a cirle line image.
-func (cl *circleLine) Generative(c *canva) {
-	ctex := gg.NewContextForRGBA(c.img)
-	ctex.SetLineWidth(c.opts.lineWidth)
-	ctex.SetColor(c.opts.lineColor)
+func (cl *circleLine) Generative(c *generativeart.Canva) {
+	ctex := gg.NewContextForRGBA(c.Img())
+	ctex.SetLineWidth(c.Opts().LineWidth())
+	ctex.SetColor(c.Opts().LineColor())
 	var points []point
 	for theta := -math.Pi; theta <= math.Pi; theta += cl.step {
 		x := cl.radius * math.Cos(theta)
 		y := cl.radius * math.Sin(theta)
-		xi, yi := common.ConvertCartesianToPixel(x, y, cl.xaixs, cl.yaixs, c.width, c.height)
+		xi, yi := common.ConvertCartesianToPixel(x, y, cl.xaixs, cl.yaixs, c.Width(), c.Height())
 		points = append(points, point{
 			x: float64(xi),
 			y: float64(yi),

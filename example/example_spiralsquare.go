@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
 	"github.com/jdxyw/generativeart/common"
 	"math/rand"
 	"time"
@@ -16,6 +17,6 @@ func main() {
 	c.SetColorSchema(common.Plasma)
 	c.SetForeground(common.Tomato)
 	c.FillBackground()
-	c.Draw(generativeart.NewSpiralSquare(40, 400, 0.05, true))
+	c.Draw(arts.NewSpiralSquare(40, 400, 0.05, true))
 	c.ToPNG("spiralsquare.png")
 }

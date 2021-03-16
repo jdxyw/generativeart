@@ -1,7 +1,8 @@
-package generativeart
+package arts
 
 import (
 	"github.com/fogleman/gg"
+	"github.com/jdxyw/generativeart"
 	"math"
 )
 
@@ -16,20 +17,20 @@ func NewCircleLoop(radius float64) *circleLoop {
 }
 
 // Generative draws a Circle Loop images.
-func (cl *circleLoop) Generative(c *canva) {
-	ctex := gg.NewContextForRGBA(c.img)
+func (cl *circleLoop) Generative(c *generativeart.Canva) {
+	ctex := gg.NewContextForRGBA(c.Img())
 
 	r := cl.radius
 	var theta float64 = 0
-	for i := 0; i < c.opts.nIters; i++ {
+	for i := 0; i < c.Opts().NIters(); i++ {
 		ctex.Push()
-		ctex.Translate(float64(c.width/2), float64(c.height/2))
+		ctex.Translate(float64(c.Width()/2), float64(c.Height()/2))
 		x := cl.radius * math.Cos(gg.Radians(theta))
 		y := cl.radius * math.Sin(gg.Radians(theta*2))
 
-		ctex.SetLineWidth(c.opts.lineWidth)
-		ctex.SetColor(c.opts.lineColor)
-		ctex.SetRGBA255(int(c.opts.lineColor.R), int(c.opts.lineColor.G), int(c.opts.lineColor.B), c.opts.alpha)
+		ctex.SetLineWidth(c.Opts().LineWidth())
+		ctex.SetColor(c.Opts().LineColor())
+		ctex.SetRGBA255(int(c.Opts().LineColor().R), int(c.Opts().LineColor().G), int(c.Opts().LineColor().B), c.Opts().Alpha())
 		ctex.DrawEllipse(x, y, r/2, r/2)
 		ctex.Stroke()
 		ctex.Pop()

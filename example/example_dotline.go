@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
 	"github.com/jdxyw/generativeart/common"
 	"image/color"
 	"math/rand"
@@ -16,6 +17,6 @@ func main() {
 	c.SetIterations(15000)
 	c.SetColorSchema(common.Plasma)
 	c.FillBackground()
-	c.Draw(generativeart.NewDotLine(100, 20, 50, false))
+	c.Draw(arts.NewDotLine(100, 20, 50, false))
 	c.ToPNG("dotline.png")
 }

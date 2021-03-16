@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
 	"github.com/jdxyw/generativeart/common"
 	"math/rand"
 	"time"
@@ -14,6 +15,6 @@ func main() {
 	c.SetLineWidth(1.0)
 	c.SetLineColor(common.LightPink)
 	c.FillBackground()
-	c.Draw(generativeart.NewCircleLine(0.02, 600, 1.5, 2, 2))
+	c.Draw(arts.NewCircleLine(0.02, 600, 1.5, 2, 2))
 	c.ToPNG("circleline.png")
 }

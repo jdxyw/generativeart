@@ -1,7 +1,8 @@
-package generativeart
+package arts
 
 import (
 	"github.com/fogleman/gg"
+	"github.com/jdxyw/generativeart"
 	"github.com/jdxyw/generativeart/common"
 	"math"
 	"math/rand"
@@ -19,13 +20,13 @@ func NewContourLine(lineNum int) *contourLine {
 }
 
 // Generative draws a contour line image.
-func (cl *contourLine) Generative(c *canva) {
-	ctex := gg.NewContextForRGBA(c.img)
+func (cl *contourLine) Generative(c *generativeart.Canva) {
+	ctex := gg.NewContextForRGBA(c.Img())
 	noise := common.NewPerlinNoise()
 	for i := 0; i < cl.lineNum; i++ {
-		cl := c.opts.colorSchema[rand.Intn(len(c.opts.colorSchema))]
-		x := rand.Float64() * float64(c.width)
-		y := rand.Float64() * float64(c.height)
+		cl := c.Opts().ColorSchema()[rand.Intn(len(c.Opts().ColorSchema()))]
+		x := rand.Float64() * float64(c.Width())
+		y := rand.Float64() * float64(c.Height())
 
 		for j := 0; j < 1500; j++ {
 
@@ -37,9 +38,9 @@ func (cl *contourLine) Generative(c *canva) {
 			ctex.DrawEllipse(x, y, 2, 2)
 			ctex.Fill()
 
-			if x > float64(c.width) || x < 0 || y > float64(c.height) || y < 0 || rand.Float64() < 0.001 {
-				x = rand.Float64() * float64(c.width)
-				y = rand.Float64() * float64(c.height)
+			if x > float64(c.Width()) || x < 0 || y > float64(c.Height()) || y < 0 || rand.Float64() < 0.001 {
+				x = rand.Float64() * float64(c.Width())
+				y = rand.Float64() * float64(c.Height())
 			}
 		}
 	}

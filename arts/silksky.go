@@ -1,7 +1,8 @@
-package generativeart
+package arts
 
 import (
 	"github.com/fogleman/gg"
+	"github.com/jdxyw/generativeart"
 	"github.com/jdxyw/generativeart/common"
 	"math/rand"
 )
@@ -20,10 +21,10 @@ func NewSilkSky(circleNum int, sunRadius float64) *silkSky {
 }
 
 // Generative draws a silk sky image.
-func (s *silkSky) Generative(c *canva) {
-	ctex := gg.NewContextForRGBA(c.img)
-	xm := float64(rand.Intn(c.width/5)) + float64(c.width*4/5-c.width/5)
-	ym := float64(rand.Intn(c.height/5)) + float64(c.height*4/5-c.height/5)
+func (s *silkSky) Generative(c *generativeart.Canva) {
+	ctex := gg.NewContextForRGBA(c.Img())
+	xm := float64(rand.Intn(c.Width()/5)) + float64(c.Width()*4/5-c.Width()/5)
+	ym := float64(rand.Intn(c.Height()/5)) + float64(c.Height()*4/5-c.Height()/5)
 
 	mh := s.circleNum*2 + 2
 	ms := s.circleNum*2 + 50
@@ -37,9 +38,9 @@ func (s *silkSky) Generative(c *canva) {
 				V: 70,
 			}
 			rgba := hsv.ToRGB(mh, ms, mv)
-			xn := (float64(i) + 0.5) * float64(c.width) / float64(s.circleNum)
-			yn := (float64(j) + 0.5) * float64(c.height) / float64(s.circleNum)
-			ctex.SetRGBA255(int(rgba.R), int(rgba.G), int(rgba.B), c.opts.alpha)
+			xn := (float64(i) + 0.5) * float64(c.Width()) / float64(s.circleNum)
+			yn := (float64(j) + 0.5) * float64(c.Height()) / float64(s.circleNum)
+			ctex.SetRGBA255(int(rgba.R), int(rgba.G), int(rgba.B), c.Opts().Alpha())
 			r := common.Distance(xn, yn, xm, ym)
 			ctex.DrawEllipse(xn, yn, r-s.sunRadius/2, r-s.sunRadius/2)
 			ctex.Fill()

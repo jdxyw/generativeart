@@ -1,7 +1,8 @@
-package generativeart
+package arts
 
 import (
 	"github.com/fogleman/gg"
+	"github.com/jdxyw/generativeart"
 	"github.com/jdxyw/generativeart/common"
 	"math"
 	"math/rand"
@@ -90,20 +91,20 @@ func circleSliceUpdate(cs []circle, w, h int) []circle {
 }
 
 // Generative draws a random circles image.
-func (r *randCircle) Generative(c *canva) {
-	ctex := gg.NewContextForRGBA(c.img)
+func (r *randCircle) Generative(c *generativeart.Canva) {
+	ctex := gg.NewContextForRGBA(c.Img())
 
-	for j := 0; j < c.opts.nIters; j++ {
+	for j := 0; j < c.Opts().NIters(); j++ {
 		cn := rand.Intn(r.maxCircle) + int(r.maxCircle/3)
-		circles := newCircleSlice(cn, c.width, c.height, r.minSteps, r.maxSteps, r.minRadius, r.maxRadius)
+		circles := newCircleSlice(cn, c.Width(), c.Height(), r.minSteps, r.maxSteps, r.minRadius, r.maxRadius)
 
 		for i := 0; i < r.maxStepsPerCircle; i++ {
 			for _, c1 := range circles {
 				for _, c2 := range circles {
 
-					cl := c.opts.lineColor
+					cl := c.Opts().LineColor()
 					if r.isRandColor {
-						cl = c.opts.colorSchema[rand.Intn(len(c.opts.colorSchema))]
+						cl = c.Opts().ColorSchema()[rand.Intn(len(c.Opts().ColorSchema()))]
 					}
 
 					if c1 == c2 {
@@ -117,14 +118,14 @@ func (r *randCircle) Generative(c *canva) {
 						cy := (c1.y + c2.y) / 2
 
 						ctex.SetRGBA255(int(cl.R), int(cl.G), int(cl.B), 30)
-						ctex.SetLineWidth(c.opts.lineWidth)
+						ctex.SetLineWidth(c.Opts().LineWidth())
 						ctex.DrawEllipse(cx, cy, distance/2, distance/2)
 						ctex.Stroke()
 					}
 				}
 			}
 
-			circles = circleSliceUpdate(circles, c.width, c.height)
+			circles = circleSliceUpdate(circles, c.Width(), c.Height())
 		}
 	}
 }

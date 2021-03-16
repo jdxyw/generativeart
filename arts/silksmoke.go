@@ -1,7 +1,8 @@
-package generativeart
+package arts
 
 import (
 	"github.com/fogleman/gg"
+	"github.com/jdxyw/generativeart"
 	"github.com/jdxyw/generativeart/common"
 	"math/rand"
 )
@@ -29,23 +30,23 @@ func NewSilkSmoke(mc, msp int, minStep, maxStep, minRadius, maxRadius float64, i
 }
 
 // Generative draws a silk smoke image.
-func (s *sileSmoke) Generative(c *canva) {
-	ctex := gg.NewContextForRGBA(c.img)
+func (s *sileSmoke) Generative(c *generativeart.Canva) {
+	ctex := gg.NewContextForRGBA(c.Img())
 
 	cn := rand.Intn(s.maxCircle) + int(s.maxCircle/3)
-	circles := newCircleSlice(cn, c.width, c.height, s.minSteps, s.maxSteps, s.minRadius, s.maxRadius)
+	circles := newCircleSlice(cn, c.Width(), c.Height(), s.minSteps, s.maxSteps, s.minRadius, s.maxRadius)
 
 	for i := 0; i < s.maxStepsPerCircle; i++ {
 		ctex.SetRGBA255(0, 0, 0, 5)
-		ctex.DrawRectangle(0, 0, float64(c.width), float64(c.height))
+		ctex.DrawRectangle(0, 0, float64(c.Width()), float64(c.Height()))
 		ctex.Fill()
 
 		for _, c1 := range circles {
 			for _, c2 := range circles {
 
-				cl := c.opts.lineColor
+				cl := c.Opts().LineColor()
 				if s.isRandColor {
-					cl = c.opts.colorSchema[rand.Intn(len(c.opts.colorSchema))]
+					cl = c.Opts().ColorSchema()[rand.Intn(len(c.Opts().ColorSchema()))]
 				}
 
 				if c1 == c2 {
@@ -58,8 +59,8 @@ func (s *sileSmoke) Generative(c *canva) {
 					cx := (c1.x + c2.x) / 2
 					cy := (c1.y + c2.y) / 2
 
-					ctex.SetRGBA255(int(cl.R), int(cl.G), int(cl.B), c.opts.alpha)
-					ctex.SetLineWidth(c.opts.lineWidth)
+					ctex.SetRGBA255(int(cl.R), int(cl.G), int(cl.B), c.Opts().Alpha())
+					ctex.SetLineWidth(c.Opts().LineWidth())
 
 					ctex.LineTo(c1.x, c1.y)
 					ctex.LineTo(c2.x, c2.y)
@@ -71,6 +72,6 @@ func (s *sileSmoke) Generative(c *canva) {
 			}
 		}
 
-		circles = circleSliceUpdate(circles, c.width, c.height)
+		circles = circleSliceUpdate(circles, c.Width(), c.Height())
 	}
 }

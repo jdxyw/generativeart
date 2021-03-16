@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
 	"github.com/jdxyw/generativeart/common"
 	"math/rand"
 	"time"
@@ -14,6 +15,6 @@ func main() {
 	c.FillBackground()
 	c.SetColorSchema(common.DarkRed)
 	c.SetForeground(common.LightPink)
-	c.Draw(generativeart.NewJanus(10, 0.2))
+	c.Draw(arts.NewJanus(10, 0.2))
 	c.ToPNG("janus.png")
 }
