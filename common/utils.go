@@ -10,6 +10,8 @@ type HSV struct {
 	H, S, V int
 }
 
+// ToRGB converts a HSV color mode to RGB mode
+// mh, ms, mv are used to set the maximum number for HSV.
 func (hs HSV) ToRGB(mh, ms, mv int) color.RGBA {
 	if hs.H > mh {
 		hs.H = mh
@@ -111,18 +113,22 @@ func ConvertPolarToPixel(r, theta, xaixs, yaixs float64, h, w int) (int, int) {
 	return i, j
 }
 
+// Distance returns the Euclidean distance between two point on 2D dimension.
 func Distance(x1, y1, x2, y2 float64) float64 {
 	return math.Sqrt(math.Pow(x1-x2, 2.0) + math.Pow(y1-y2, 2.0))
 }
 
+// RandomRangeInt returns a integer number between min and max.
 func RandomRangeInt(min, max int) int {
 	return rand.Intn(max-min) + min
 }
 
+// RandomRangeFloat64 returns a float64 number between min and max.
 func RandomRangeFloat64(min, max float64) float64 {
 	return min + rand.Float64()*(max-min)
 }
 
+// RandomGaussian returns a gaussian random float64 number.
 func RandomGaussian(mean, std float64) float64 {
 	return rand.NormFloat64()*std + mean
 }
