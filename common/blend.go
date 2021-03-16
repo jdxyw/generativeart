@@ -14,14 +14,14 @@ const (
 func Blend(src, dest *image.RGBA, mode BlendMode) *image.RGBA {
 	img := image.NewRGBA(src.Bounds())
 
-	for i := 0; i <src.Bounds().Max.X; i++ {
-		for j :=0; j<src.Bounds().Max.Y; j++ {
+	for i := 0; i < src.Bounds().Max.X; i++ {
+		for j := 0; j < src.Bounds().Max.Y; j++ {
 			switch mode {
 			case Add:
-				if compareColor(src.At(i, j), Black) {
-					img.Set(i, j, dest.At(i, j))
+				if compareColor(src.RGBAAt(i, j), Black) {
+					img.Set(i, j, dest.RGBAAt(i, j))
 				} else {
-					img.SetRGBA(i, j, add(src.At(i, j), dest.At(i, j)))
+					img.SetRGBA(i, j, add(src.RGBAAt(i, j), dest.RGBAAt(i, j)))
 				}
 			}
 		}
@@ -29,9 +29,9 @@ func Blend(src, dest *image.RGBA, mode BlendMode) *image.RGBA {
 	return img
 }
 
-func compareColor(src, dst color.Color) bool {
-	sr, sg, sb ,sa := src.RGBA()
-	dr, dg, db, da := dst.RGBA()
+func compareColor(src, dst color.RGBA) bool {
+	sr, sg, sb, sa := src.R, src.G, src.B, src.A
+	dr, dg, db, da := dst.R, dst.G, dst.B, dst.A
 
 	if sr == dr && sg == dg && sb == db && sa == da {
 		return true
@@ -39,24 +39,18 @@ func compareColor(src, dst color.Color) bool {
 	return false
 }
 
-func add(srcC, dstC color.Color) color.RGBA {
+func add(srcC, dstC color.RGBA) color.RGBA {
 	c := color.RGBA{}
-	sr, sg, sb ,sa := srcC.RGBA()
-	dr, dg, db, da := dstC.RGBA()
+	sr, sg, sb, sa := srcC.R, srcC.G, srcC.B, srcC.A
+	dr, dg, db, da := dstC.R, dstC.G, dstC.B, dstC.A
 
-	//aSrc := float64(sa)/255.0
-	//aDst := 1.0 - aSrc
+	aSrc := float64(sa) / 255.0
+	aDst := 1.0 - aSrc
 
-	//c.R = uint8(float64(sr) * aSrc + float64(dr)*aDst)
-	//c.G = uint8(float64(sg) * aSrc + float64(dg)*aDst)
-	//c.B = uint8(float64(sb) * aSrc + float64(db)*aDst)
-	//c.A = uint8(float64(sa) * aSrc + float64(da)*aDst)
-
-	c.R = uint8(ConstrainInt(int(uint32(float64(sr)*0.05)+dr), 0, 255))
-	c.G = uint8(ConstrainInt(int(uint32(float64(sg)*0.05)+dg), 0, 255))
-	c.B = uint8(ConstrainInt(int(uint32(float64(sb)*0.05)+db), 0, 255))
-	c.A = uint8(ConstrainInt(int(uint32(float64(sa)*0.9)+da), 0, 255))
-	//c.A = uint8(float64(sa) * aSrc + float64(da)*aDst)
+	c.R = uint8(ConstrainInt(int(float64(sr)*aSrc+float64(dr)*aDst), 0, 255))
+	c.G = uint8(ConstrainInt(int(float64(sg)*aSrc+float64(dg)*aDst), 0, 255))
+	c.B = uint8(ConstrainInt(int(float64(sb)*aSrc+float64(db)*aDst), 0, 255))
+	c.A = uint8(ConstrainInt(int(float64(sa)*aSrc+float64(da)*aDst), 0, 255))
 
 	return c
 }

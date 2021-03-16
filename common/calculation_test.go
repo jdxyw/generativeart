@@ -13,9 +13,9 @@ func TestConstrain(t *testing.T) {
 		args args
 		want float64
 	}{
-		{name: "testcase1", args: args{val: 1.0, low:0.5, high: 1.5}, want: 1.0},
-		{name: "testcase2", args: args{val: 0.4, low:0.5, high: 1.5}, want: 0.5},
-		{name: "testcase3", args: args{val: -1.0, low:-3.5, high: 1.5}, want: -1.0},
+		{name: "testcase1", args: args{val: 1.0, low: 0.5, high: 1.5}, want: 1.0},
+		{name: "testcase2", args: args{val: 0.4, low: 0.5, high: 1.5}, want: 0.5},
+		{name: "testcase3", args: args{val: -1.0, low: -3.5, high: 1.5}, want: -1.0},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

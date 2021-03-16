@@ -31,11 +31,11 @@ type Options struct {
 }
 
 // NewCanva returns a canva.
-func NewCanva(h, w int) *canva {
+func NewCanva(w, h int) *canva {
 	return &canva{
 		height: h,
 		width:  w,
-		img:    image.NewRGBA(image.Rect(0, 0, h, w)),
+		img:    image.NewRGBA(image.Rect(0, 0, w, h)),
 		// Set some defaults value
 		opts: Options{
 			background:  common.Azure,
