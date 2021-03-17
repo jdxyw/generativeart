@@ -176,3 +176,13 @@ cm := generativeart.NewCircleMove(1000)
 ```
 
 ![](../images/circlemove.png)
+
+### Circle Noise
+
+### parameters
+
+- dotsN: The number of dot.
+- colorMin: The minimum color.
+- colorMax: The maximum color.
+
+![](../images/circlenoise.png)
