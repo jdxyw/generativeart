@@ -29,8 +29,8 @@
     - [Noise Line](#noise-line)
     - [Dot Line](#dot-line)
     - [Ocean Fish](#ocean-fish)
-    - [Silk Smoke](#silk-smoke)
     - [Circle Loop](#circle-loop)
+    - [Circle Noise](#circle-noise)
     - [Julia Set](#julia-set)
     - [Silk Sky](#silk-sky)
     - [Circle Move](#circle-move)
@@ -70,6 +70,7 @@ This package is still working in progress. More types would be added. Welcome an
 - Pixel Hole
 - Dots Wave
 - Circle Move
+- Circle Noise
 
 For these kinds of art, the package provides as many parameters to control the appearance.
 
@@ -105,6 +106,7 @@ NewCircleLoop2(depth int)
 NewPixelHole(dotN int)
 NewDotsWave(dotsN int)
 NewCircleMove(circleNum int)
+NewCircleNoise(dotsN, colorMin, colorMax int)
 ```
 
 ## Docs
@@ -378,26 +380,6 @@ func main() {
 
 ![](images/oceanfish.png)
 
-### Silk Smoke
-
-```go
-func main() {
- rand.Seed(time.Now().Unix())
- c := generativeart.NewCanva(500, 500)
- c.SetBackground(common.Black)
- c.SetLineWidth(1.0)
- c.SetLineColor(common.MediumAquamarine)
- c.SetAlpha(30)
- c.SetColorSchema(common.Plasma)
- c.SetIterations(4)
- c.FillBackground()
- c.Draw(arts.NewSilkSmoke(400, 20, 0.2, 2, 10, 30, false))
- c.ToPNG("silksmoke.png")
-}
-```
-
-![](images/silksmoke.png)
-
 ### Circle Loop
 
 ```go
@@ -416,6 +398,24 @@ func main() {
 ```
 
 ![](images/circleloop.png)
+
+### Circle Noise
+
+```go
+func main() {
+	rand.Seed(time.Now().Unix())
+	c := generativeart.NewCanva(500, 500)
+	c.SetBackground(common.White)
+	c.SetAlpha(80)
+	c.SetLineWidth(0.3)
+	c.FillBackground()
+	c.SetIterations(400)
+	c.Draw(arts.NewCircleNoise(2000, 60, 80))
+	c.ToPNG("circlenoise.png")
+}
+```
+
+![](images/circlenoise.png)
 
 ### Julia Set
 
