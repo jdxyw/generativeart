@@ -452,14 +452,14 @@ func main() {
 
 ```go
 func main() {
-	rand.Seed(time.Now().Unix())
-	c := generativeart.NewCanva(500, 500)
-	c.SetBackground(color.RGBA{R: 30, G: 30, B: 30, A: 255})
-	c.FillBackground()
-	c.SetLineWidth(1.0)
-	c.SetLineColor(common.Tomato)
-	c.Draw(arts.NewBlackHole(200, 400, 0.01))
-	c.ToPNG("blackhole.png")
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(500, 500)
+ c.SetBackground(color.RGBA{R: 30, G: 30, B: 30, A: 255})
+ c.FillBackground()
+ c.SetLineWidth(1.0)
+ c.SetLineColor(common.Tomato)
+ c.Draw(arts.NewBlackHole(200, 400, 0.01))
+ c.ToPNG("blackhole.png")
 }
 ```
 
@@ -543,3 +543,4 @@ Thanks for the following sites and repos, I got lots of ideas, inspiration, code
 - <https://openprocessing.org/sketch/1102157>
 - <https://openprocessing.org/sketch/1071233>
 - <https://openprocessing.org/user/139364>
+- <https://openprocessing.org/sketch/792407>
