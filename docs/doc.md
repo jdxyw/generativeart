@@ -32,6 +32,8 @@
 		- [parameters](#parameters-13)
 	- [Yarn](#yarn)
 		- [parameters](#parameters-14)
+	- [Black Hole](#black-hole)
+		- [parameters](#parameters-15)
 ## Color Circle 2
 
 `Color Circle2` is version 2 of `Color Circle`. It still draws the circle and point cloud.
@@ -225,10 +227,24 @@ cm := arts.NewCircleMove(1000)
 
 ### parameters
 
-- n: The number of curve.
+- n: The number of the curve.
 
 ```go
 y := arts.NewYarn(2000)
 ```
 
 ![](../images/yarn.png)
+
+## Black Hole
+
+### parameters
+
+- circleN: The number of the circle.
+- density: Control the density of the circle.
+- circleGap: Identify the gap between two circles.
+
+```go
+b := arts.NewBlackHole(200, 400, 0.01)
+```
+
+![](../images/blackhole.png)

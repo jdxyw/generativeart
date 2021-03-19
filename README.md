@@ -32,6 +32,7 @@
     - [Circle Loop](#circle-loop)
     - [Circle Noise](#circle-noise)
     - [Julia Set](#julia-set)
+    - [Black Hole](#black-hole)
     - [Silk Sky](#silk-sky)
     - [Circle Move](#circle-move)
     - [Random Circle](#random-circle)
@@ -72,6 +73,7 @@ This package is still working in progress. More types would be added. Welcome an
 - Circle Move
 - Circle Noise
 - Yarn
+- Black Hole
 
 For these kinds of art, the package provides as many parameters to control the appearance.
 
@@ -109,6 +111,7 @@ NewDotsWave(dotsN int)
 NewCircleMove(circleNum int)
 NewCircleNoise(dotsN, colorMin, colorMax int)
 NewYarn(n int)
+NewBlackHole(circleN int, density, circleGap float64)
 ```
 
 ## Docs
@@ -444,6 +447,23 @@ func main() {
 ```
 
 ![](images/julia.png)
+
+### Black Hole
+
+```go
+func main() {
+	rand.Seed(time.Now().Unix())
+	c := generativeart.NewCanva(500, 500)
+	c.SetBackground(color.RGBA{R: 30, G: 30, B: 30, A: 255})
+	c.FillBackground()
+	c.SetLineWidth(1.0)
+	c.SetLineColor(common.Tomato)
+	c.Draw(arts.NewBlackHole(200, 400, 0.01))
+	c.ToPNG("blackhole.png")
+}
+```
+
+![](images/blackhole.png)
 
 ### Silk Sky
 
