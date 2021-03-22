@@ -1,13 +1,15 @@
 package generativeart
 
 import (
-	"github.com/jdxyw/generativeart/common"
+	"bytes"
 	"image"
 	"image/color"
 	"image/draw"
 	"image/jpeg"
 	"image/png"
 	"os"
+
+	"github.com/jdxyw/generativeart/common"
 )
 
 type Engine interface {
@@ -168,4 +170,14 @@ func (c *Canva) ToJPEG(path string) error {
 	}
 
 	return nil
+}
+
+// ToBytes returns the image as a jpeg-encoded []byte
+func (c *Canva) ToBytes() ([]byte, error) {
+	buffer := new(bytes.Buffer)
+	if err := jpeg.Encode(buffer, c.Img(), nil); err != nil {
+		return nil, err
+	}
+
+	return buffer.Bytes(), nil
 }
