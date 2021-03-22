@@ -34,6 +34,9 @@
 		- [parameters](#parameters-14)
 	- [Black Hole](#black-hole)
 		- [parameters](#parameters-15)
+	- [Color Canva](#color-canva)
+		- [parameters](#parameters-16)
+
 ## Color Circle 2
 
 `Color Circle2` is version 2 of `Color Circle`. It still draws the circle and point cloud.
@@ -95,9 +98,10 @@ rs := NewRandomShape(150)
 - lineNum: It indicates how many lines.
 
 ![](../images/contourline.png)
+
 ## Silk Sky
 
-`Silk Sky` would draw an image with multiple circles converge to one point or one circle. 
+`Silk Sky` would draw an image with multiple circles converge to one point or one circle.
 
 ### parameters
 
@@ -122,9 +126,9 @@ silkSky := NewSilkSky(circleNum int, sunRadius float64)
 
 ```go
 func julia1(z complex128) complex128 {
-	c := complex(-0.1, 0.651)
-	z = z*z + c
-	return z
+ c := complex(-0.1, 0.651)
+ z = z*z + c
+ return z
 }
 julia := arts.NewJulia(julia1, 40, 1.5, 1.5)
 ```
@@ -206,7 +210,6 @@ d := arts.NewDotsWave(300)
 
 - circleNum: The number of the circle in the image.
 
-
 ```go
 cm := arts.NewCircleMove(1000)
 ```
@@ -248,3 +251,15 @@ b := arts.NewBlackHole(200, 400, 0.01)
 ```
 
 ![](../images/blackhole.png)
+
+## Color Canva
+
+### parameters
+
+- seg:
+
+```go
+cc := arts.NewColorCanve(5)
+```
+
+![](../images/colorcanva.png)
