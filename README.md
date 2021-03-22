@@ -75,6 +75,7 @@ This package is still working in progress. More types would be added. Welcome an
 - Circle Noise
 - Yarn
 - Black Hole
+- Color Canva
 
 For these kinds of art, the package provides as many parameters to control the appearance.
 
@@ -113,6 +114,7 @@ NewCircleMove(circleNum int)
 NewCircleNoise(dotsN, colorMin, colorMax int)
 NewYarn(n int)
 NewBlackHole(circleN int, density, circleGap float64)
+NewColorCanve(seg float64)
 ```
 
 ## Docs
