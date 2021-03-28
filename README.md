@@ -11,6 +11,7 @@
 - [generativeart](#generativeart)
 - [Table of Contents](#table-of-contents)
   - [Buy me a coffee](#buy-me-a-coffee)
+  - [Contributing](#contributing)
   - [Types supported](#types-supported)
   - [Install](#install)
   - [Art Type](#art-type)
@@ -43,6 +44,10 @@
 ## Buy me a coffee
 
 If you found this package is useful, maybe you could buy me a coffee from [Paypal](https://www.paypal.me/jdxyw).
+
+## Contributing
+
+I am glad to see someone to contribute to this repo, please follow the [CONTRIBUTING.md](https://github.com/jdxyw/generativeart/blob/master/CONTRIBUTING.md) for more information. Or you can just open an issue or PR.
 
 ## Types supported
 
