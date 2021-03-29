@@ -576,3 +576,4 @@ Thanks for the following sites and repos, I got lots of ideas, inspiration, code
 - <https://openprocessing.org/sketch/1071233>
 - <https://openprocessing.org/user/139364>
 - <https://openprocessing.org/sketch/792407>
+- <https://www.iquilezles.org/www/articles/warp/warp.htm>
