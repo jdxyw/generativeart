@@ -49,3 +49,7 @@ func LerpColor(c1, c2 color.RGBA, ratio float64) color.RGBA {
 
 	return color.RGBA{r, g, b, a}
 }
+
+func Magnitude(x, y float64) float64 {
+	return math.Sqrt(x*x + y*y)
+}
