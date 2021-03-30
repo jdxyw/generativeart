@@ -12,14 +12,16 @@ type ColorMapping func(float64, float64, float64) color.RGBA
 type domainWrap struct {
 	noise            *common.PerlinNoise
 	scale            float64
+	scale2			 float64
 	xOffset, yOffset float64
 	fn               ColorMapping
 }
 
 // NewDomainWrap returns a domainWrap object.
-func NewDomainWrap(scale, xOffset, yOffset float64, cmap ColorMapping) *domainWrap {
+func NewDomainWrap(scale, scale2, xOffset, yOffset float64, cmap ColorMapping) *domainWrap {
 	return &domainWrap{
 		scale:   scale,
+		scale2: scale2,
 		xOffset: xOffset,
 		yOffset: yOffset,
 		noise:   common.NewPerlinNoise(),
@@ -43,10 +45,10 @@ func (d *domainWrap) pattern(x, y, xOffest, yOffset float64) (float64, float64, 
 	qx := d.fbm(x+xOffest, y+yOffset)
 	qy := d.fbm(x+xOffest+5.2, y+yOffset+1.3)
 
-	rx := d.fbm(x+4.0*qx+1.7, y+4.0*qy+9.2)
-	ry := d.fbm(x+4.0*qx+8.3, y+4.0*qy+2.8)
+	rx := d.fbm(x+d.scale2*qx+1.7, y+d.scale2*qy+9.2)
+	ry := d.fbm(x+d.scale2*qx+8.3, y+d.scale2*qy+2.8)
 
-	return d.fbm(qx+4*rx, qy+4*ry), common.Magnitude(qx, qy), common.Magnitude(rx, ry)
+	return d.fbm(qx+d.scale2*rx, qy+d.scale2*ry), common.Magnitude(qx, qy), common.Magnitude(rx, ry)
 }
 
 func (d *domainWrap) fbm(x, y float64) float64 {
