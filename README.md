@@ -31,6 +31,7 @@
     - [Dot Line](#dot-line)
     - [Ocean Fish](#ocean-fish)
     - [Circle Loop](#circle-loop)
+    - [Domain Warp](#domain-warp)
     - [Circle Noise](#circle-noise)
     - [Color Canva](#color-canva)
     - [Julia Set](#julia-set)
@@ -81,6 +82,7 @@ This package is still working in progress. More types would be added. Welcome an
 - Yarn
 - Black Hole
 - Color Canva
+- Domain Warp
 
 For these kinds of art, the package provides as many parameters to control the appearance.
 
@@ -120,6 +122,7 @@ NewCircleNoise(dotsN, colorMin, colorMax int)
 NewYarn(n int)
 NewBlackHole(circleN int, density, circleGap float64)
 NewColorCanve(seg float64)
+NewDomainWrap(scale, xOffset, yOffset float64, cmap ColorMapping)
 ```
 
 ## Docs
@@ -413,6 +416,31 @@ func main() {
 ```
 
 ![](images/circleloop.png)
+
+### Domain Warp
+
+```go
+func cmap(r, m1, m2 float64) color.RGBA {
+ rgb := color.RGBA{
+  uint8(common.Constrain(m1*255*r, 0, 255)),
+  uint8(common.Constrain(r*200, 0, 255)),
+  uint8(common.Constrain(m2*255*r, 70, 255)),
+  255,
+ }
+ return rgb
+}
+
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(500, 500)
+ c.SetBackground(common.Black)
+ c.FillBackground()
+ c.Draw(arts.NewDomainWrap(0.01, 4, 8, cmap))
+ c.ToPNG("domainwarp.png")
+}
+```
+
+![](images/domainwarp.png)
 
 ### Circle Noise
 

@@ -1,35 +1,40 @@
 package arts
 
 import (
-	"github.com/fogleman/gg"
 	"github.com/jdxyw/generativeart"
 	"github.com/jdxyw/generativeart/common"
+	"image/color"
 )
+
+// ColorMapping maps some parameters to color space.
+type ColorMapping func(float64, float64, float64) color.RGBA
 
 type domainWrap struct {
 	noise            *common.PerlinNoise
 	scale            float64
 	xOffset, yOffset float64
+	fn               ColorMapping
 }
 
 // NewDomainWrap returns a domainWrap object.
-func NewDomainWrap(scale, xOffset, yOffset float64) *domainWrap {
+func NewDomainWrap(scale, xOffset, yOffset float64, cmap ColorMapping) *domainWrap {
 	return &domainWrap{
 		scale:   scale,
 		xOffset: xOffset,
 		yOffset: yOffset,
 		noise:   common.NewPerlinNoise(),
+		fn:      cmap,
 	}
 }
 
 // Generative draws a domain warp image.
 // Reference: https://www.iquilezles.org/www/articles/warp/warp.htm
 func (d *domainWrap) Generative(c *generativeart.Canva) {
-	_ = gg.NewContextForRGBA(c.Img())
-
 	for h := 0.0; h < float64(c.Height()); h += 1.0 {
-		for w := 0.0; h < float64(c.Width()); h += 1.0 {
-			_, _, _ = d.pattern(w*d.scale, h*d.scale, d.xOffset, d.yOffset)
+		for w := 0.0; w < float64(c.Width()); w += 1.0 {
+			r, m1, m2 := d.pattern(w*d.scale, h*d.scale, d.xOffset, d.yOffset)
+			rgb := d.fn(r, m1, m2)
+			c.Img().Set(int(w), int(h), rgb)
 		}
 	}
 }

@@ -20,7 +20,7 @@ func main() {
 	rand.Seed(time.Now().Unix())
 	c := generativeart.NewCanva(500, 500)
 	c.SetIterations(800)
-	c.SetColorSchema(common.Viridis)
+	c.SetColorSchema(common.Citrus)
 	c.FillBackground()
 	c.Draw(arts.NewJulia(julia1, 40, 1.5, 1.5))
 	c.ToPNG("julia.png")

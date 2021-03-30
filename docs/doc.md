@@ -36,6 +36,8 @@
 		- [parameters](#parameters-15)
 	- [Color Canva](#color-canva)
 		- [parameters](#parameters-16)
+	- [Domain Warping](#domain-warping)
+		- [parameters](#parameters-17)
 
 ## Color Circle 2
 
@@ -263,3 +265,20 @@ cc := arts.NewColorCanve(5)
 ```
 
 ![](../images/colorcanva.png)
+
+## Domain Warping
+
+Warping, or domain distortion is a very common technique in computer graphics for generating procedural textures and geometry. It's often used to pinch an object, stretch it, twist it, bend it, make it thicker or apply any deformation you want.
+
+### parameters
+
+- scale: Control the noise generator.
+- xOffset: Control the noise generator.
+- yOffset: Control the noise generator.
+- fn: A function to mapping the `noise` to color.
+
+```go
+d := arts.NewDomainWrap(0.01, 4, 8, cmap)
+```
+
+![](../images/domainwarp.png)
