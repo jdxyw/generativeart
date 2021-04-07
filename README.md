@@ -33,6 +33,7 @@
     - [Circle Loop](#circle-loop)
     - [Domain Warp](#domain-warp)
     - [Circle Noise](#circle-noise)
+    - [Perlin Perls](#perlin-perls)
     - [Color Canva](#color-canva)
     - [Julia Set](#julia-set)
     - [Black Hole](#black-hole)
@@ -83,6 +84,7 @@ This package is still working in progress. More types would be added. Welcome an
 - Black Hole
 - Color Canva
 - Domain Warp
+- Perlin Perls
 
 For these kinds of art, the package provides as many parameters to control the appearance.
 
@@ -123,6 +125,7 @@ NewYarn(n int)
 NewBlackHole(circleN int, density, circleGap float64)
 NewColorCanve(seg float64)
 NewDomainWrap(scale, scale2, xOffset, yOffset float64, cmap ColorMapping)
+NewPerlinPerls(circleN, dotsN, colorMin, colorMax int)
 ```
 
 ## Docs
@@ -459,6 +462,24 @@ func main() {
 ```
 
 ![](images/circlenoise.png)
+
+### Perlin Perls
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(500, 500)
+ c.SetBackground(common.White)
+ c.SetAlpha(120)
+ c.SetLineWidth(0.3)
+ c.FillBackground()
+ c.SetIterations(200)
+ c.Draw(arts.NewPerlinPerls(10, 200, 40, 80))
+ c.ToPNG("perlinperls.png")
+}
+```
+
+![](../images/perlinperls.png)
 
 ### Color Canva
 

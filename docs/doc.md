@@ -38,6 +38,8 @@
 		- [parameters](#parameters-16)
 	- [Domain Warping](#domain-warping)
 		- [parameters](#parameters-17)
+	- [Perlin Perls](#perlin-perls)
+		- [parameters](#parameters-18)
 
 ## Color Circle 2
 
@@ -282,3 +284,18 @@ d := arts.NewDomainWrap(0.01, 4, 8, cmap)
 ```
 
 ![](../images/domainwarp.png)
+
+## Perlin Perls
+
+### parameters
+
+- circleN: The number of circle on this image.
+- dotsN: The number of dots in each circle. 
+- colorMin: The minimum color.
+- colorMax: The maximum color.
+
+```go
+pp := arts.NewPerlinPerls(10, 200, 40, 80
+```
+
+![](../images/perlinperls.png)

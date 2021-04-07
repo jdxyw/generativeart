@@ -12,7 +12,7 @@ func main() {
 	rand.Seed(time.Now().Unix())
 	c := generativeart.NewCanva(500, 500)
 	c.SetBackground(common.White)
-	c.SetAlpha(80)
+	c.SetAlpha(5)
 	c.SetLineWidth(0.3)
 	c.FillBackground()
 	c.SetIterations(400)
