@@ -479,7 +479,7 @@ func main() {
 }
 ```
 
-![](../images/perlinperls.png)
+![](images/perlinperls.png)
 
 ### Color Canva
 
