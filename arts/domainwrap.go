@@ -12,7 +12,7 @@ type ColorMapping func(float64, float64, float64) color.RGBA
 type domainWrap struct {
 	noise            *common.PerlinNoise
 	scale            float64
-	scale2			 float64
+	scale2           float64
 	xOffset, yOffset float64
 	fn               ColorMapping
 }
@@ -21,7 +21,7 @@ type domainWrap struct {
 func NewDomainWrap(scale, scale2, xOffset, yOffset float64, cmap ColorMapping) *domainWrap {
 	return &domainWrap{
 		scale:   scale,
-		scale2: scale2,
+		scale2:  scale2,
 		xOffset: xOffset,
 		yOffset: yOffset,
 		noise:   common.NewPerlinNoise(),

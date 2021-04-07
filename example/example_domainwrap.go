@@ -24,6 +24,6 @@ func main() {
 	c := generativeart.NewCanva(500, 500)
 	c.SetBackground(common.Black)
 	c.FillBackground()
-	c.Draw(arts.NewDomainWrap(0.01, 4,4, 20, cmap))
+	c.Draw(arts.NewDomainWrap(0.01, 4, 4, 20, cmap))
 	c.ToPNG("domainwarp.png")
 }

@@ -18,6 +18,7 @@ type dot struct {
 	prevx, prevy float64
 	theta        float64
 	count        int
+	cx, cy       float64
 }
 
 func NewCircleNoise(dotsN, colorMin, colorMax int) *circleNoise {
