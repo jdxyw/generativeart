@@ -81,6 +81,7 @@ func (hs HSV) ToRGB(mh, ms, mv int) color.RGBA {
 	return rgb
 }
 
+// ConvertCartesianToPixel converts cartesian coordinates to actual pixels in an image.
 func ConvertCartesianToPixel(x, y, xaixs, yaixs float64, h, w int) (int, int) {
 	xr, yr := x/xaixs, y/yaixs
 	var i, j int
@@ -95,6 +96,7 @@ func ConvertCartesianToPolarPixel(x, y, xaixs, yaixs float64, h, w int) (int, in
 	return ConvertPolarToPixel(r, theta, xaixs, yaixs, h, w)
 }
 
+// ConvertCartesianToPolar converts points from cartesian coordinates to polar coordinates.
 func ConvertCartesianToPolar(x, y float64) (float64, float64) {
 	r := math.Sqrt(x*x + y*y)
 	theta := math.Atanh(y / x)
@@ -102,6 +104,7 @@ func ConvertCartesianToPolar(x, y float64) (float64, float64) {
 	return r, theta
 }
 
+// ConvertPolarToPixel converts polar coordinates to actual pixels in an image.
 func ConvertPolarToPixel(r, theta, xaixs, yaixs float64, h, w int) (int, int) {
 	x, y := r*math.Cos(theta), r*math.Sin(theta)
 
