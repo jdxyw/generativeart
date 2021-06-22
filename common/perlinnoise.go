@@ -15,7 +15,7 @@ const (
 	perlinAmpFalloff = 0.5
 )
 
-// PerlinNoise is a perline noise struct to generate perlin noise.
+// PerlinNoise is a perlin noise struct to generate perlin noise.
 type PerlinNoise struct {
 	perlin []float64
 }
@@ -36,12 +36,12 @@ func (p *PerlinNoise) Noise1D(x float64) float64 {
 	return p.noise(x, 0, 0)
 }
 
-// Noise1D returns a float noise number on two dimensions.
+// Noise2D returns a float noise number on two dimensions.
 func (p *PerlinNoise) Noise2D(x, y float64) float64 {
 	return p.noise(x, y, 0)
 }
 
-// Noise1D returns a float noise number on three dimensions.
+// Noise3D returns a float noise number on three dimensions.
 func (p *PerlinNoise) Noise3D(x, y, z float64) float64 {
 	return p.noise(x, y, z)
 }
