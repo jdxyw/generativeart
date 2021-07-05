@@ -131,6 +131,10 @@ func (c *Canva) Draw(e Engine) {
 	e.Generative(c)
 }
 
+func (c *Canva) DrawTimelapse(e Engine) {
+
+}
+
 // FillBackground fills the background of the Canva.
 func (c *Canva) FillBackground() {
 	draw.Draw(c.Img(), c.Img().Bounds(), &image.Uniform{c.Opts().Background()}, image.ZP, draw.Src)
@@ -142,12 +146,12 @@ func (c *Canva) ToPNG(fpath string) error {
 	if err != nil {
 		return err
 	}
-	if err := png.Encode(f, c.Img()); err != nil {
+	if err = png.Encode(f, c.Img()); err != nil {
 		f.Close()
 		return err
 	}
 
-	if err := f.Close(); err != nil {
+	if err = f.Close(); err != nil {
 		return err
 	}
 
