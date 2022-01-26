@@ -127,7 +127,7 @@ func ParseHexColor(s string) (color.RGBA, error) {
 		return Black, fmt.Errorf("invalid hex color string %v", s)
 	}
 
-	if c, ok := parseHex(s); ok {
+	if c, ok := parseHex(s[1:]); ok {
 		return c, nil
 	}
 	return Black, fmt.Errorf("invalid hex color string %v", s)
@@ -137,7 +137,7 @@ func ParseHexColor(s string) (color.RGBA, error) {
 // Reference: https://stackoverflow.com/questions/54197913/parse-hex-string-to-image-color
 func parseHex(s string) (color.RGBA, bool) {
 	c := color.RGBA{}
-	c.A = 1
+	c.A = 255
 	ok := true
 
 	hexToByte := func(b byte) byte {
