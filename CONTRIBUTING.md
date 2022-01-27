@@ -13,4 +13,4 @@ If you add new art, please add a new example under the folder `example`. And wri
 ## Code
 
 - Add concise and detailed comments.
-- The code style shold follow the [Go Code Review Comments](https://code.google.com/p/go-wiki/wiki/CodeReviewComments).
+- The code style should follow the [Go Code Review Comments](https://code.google.com/p/go-wiki/wiki/CodeReviewComments).
