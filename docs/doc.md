@@ -72,6 +72,18 @@
 		- [parameters](#parameters-33)
 	- [Aurora Wave](#aurora-wave)
 		- [parameters](#parameters-34)
+	- [Fractal Flame](#fractal-flame)
+		- [parameters](#parameters-35)
+	- [Joy Division](#joy-division)
+		- [parameters](#parameters-36)
+	- [Boids Flock](#boids-flock)
+		- [parameters](#parameters-37)
+	- [Islamic Star](#islamic-star)
+		- [parameters](#parameters-38)
+	- [Delaunay Stained](#delaunay-stained)
+		- [parameters](#parameters-39)
+	- [Phyllotaxis](#phyllotaxis)
+		- [parameters](#parameters-40)
 
 ## Color Circle 2
 
@@ -587,3 +599,97 @@ aw := arts.NewAuroraWave(4, 220, 1.0)
 ```
 
 ![](../images/aurorawave.png)
+
+## Fractal Flame
+
+`Fractal Flame` implements Scott Draves' Iterated Function System (IFS) cosmic flame algorithm with non-linear variations (sinusoidal, spherical, swirl, horseshoe, handkerchief), dihedral rotational symmetry, and log-density tone mapping.
+
+### parameters
+
+- iterations: The number of chaos-game IFS trajectory iterations to accumulate.
+- symmetry: The dihedral rotational symmetry order.
+
+```go
+ff := arts.NewFractalFlame(1800000, 5)
+```
+
+![](../images/fractalflame.png)
+
+## Joy Division
+
+`Joy Division` renders pulsar elevation ridgelines inspired by CP 1919 (*Unknown Pleasures*) with painter's algorithm horizon occlusion, FBM ridge synthesis, and luminous crest strokes.
+
+### parameters
+
+- lineNum: The number of horizontal pulsar scanlines stacked vertically.
+- amplitude: Controls the vertical ridge peak elevation multiplier.
+- frequency: Controls the horizontal FBM spatial frequency of the ridges.
+
+```go
+jd := arts.NewJoyDivision(72, 1.0, 1.0)
+```
+
+![](../images/joydivision.png)
+
+## Boids Flock
+
+`Boids Flock` simulates Craig Reynolds' emergent flocking choreography (separation, alignment, cohesion, and vortex attractors) and renders tapered calligraphic silk ribbon trails with glowing heads.
+
+### parameters
+
+- boidNum: The number of autonomous boid agents in the flock.
+- steps: The number of simulation steps recorded along each trajectory.
+- perceptionRadius: The neighborhood radius within which boids align, cohere, and separate.
+
+```go
+bf := arts.NewBoidsFlock(240, 140, 52.0)
+```
+
+![](../images/boidsflock.png)
+
+## Islamic Star
+
+`Islamic Star` generates Moroccan *Zellige* and Persian *Girih* rosettes using Hankin's polygons-in-contact method on an octagonal/square tessellation with over-under woven gold-leaf strapwork.
+
+### parameters
+
+- gridSize: The number of tiling cells along each axis of the tessellation.
+- contactAngle: The Hankin ray contact angle (in degrees) controlling star point geometry.
+- strapWidth: The pixel width of the woven interlacing ribbon straps.
+
+```go
+is := arts.NewIslamicStar(4, 67.5, 4.5)
+```
+
+![](../images/islamicstar.png)
+
+## Delaunay Stained
+
+`Delaunay Stained` constructs a Bowyer-Watson Delaunay triangulation stained-glass mosaic with 3D normal-mapped facet illumination, inner jewel sub-facets, and leaded gold-vein borders.
+
+### parameters
+
+- siteNum: The number of seed vertices in the triangulation.
+- jitter: Controls vertex displacement from a stratified radial/grid distribution.
+
+```go
+ds := arts.NewDelaunayStained(220, 0.65)
+```
+
+![](../images/delaunaystained.png)
+
+## Phyllotaxis
+
+`Phyllotaxis` generates golden-angle botanical spiral primordia (Vogel's model) with Fibonacci parastichy veins, shaded 3D botanical scales/florets, and bioluminescent pollen highlights.
+
+### parameters
+
+- seedCount: The number of botanical primordia florets arranged along the spiral.
+- divergenceAngle: The divergence angle in degrees between successive florets (typically the golden angle `137.50776405`).
+- scaleFactor: The radial spacing constant scaling the square-root spiral radius.
+
+```go
+pt := arts.NewPhyllotaxis(420, 137.50776405, 11.5)
+```
+
+![](../images/phyllotaxis.png)
