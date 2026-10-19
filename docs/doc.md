@@ -48,6 +48,18 @@
 		- [parameters](#parameters-21)
 	- [Guilloche](#guilloche)
 		- [parameters](#parameters-22)
+	- [Clifford Nebula](#clifford-nebula)
+		- [parameters](#parameters-23)
+	- [Physarum](#physarum)
+		- [parameters](#parameters-24)
+	- [Differential Growth](#differential-growth)
+		- [parameters](#parameters-25)
+	- [Chladni](#chladni)
+		- [parameters](#parameters-26)
+	- [Voronoi Crystal](#voronoi-crystal)
+		- [parameters](#parameters-27)
+	- [Ink Landscape](#ink-landscape)
+		- [parameters](#parameters-28)
 
 ## Color Circle 2
 
@@ -373,3 +385,99 @@ g := arts.NewGuilloche(28, 175, 65, 115)
 ```
 
 ![](../images/guilloche.png)
+
+## Clifford Nebula
+
+`Clifford Nebula` renders a strange attractor density cloud (nebula/flam3 histogram rendering) using the Clifford strange attractor equations with log-density tone mapping and velocity-dependent chromaticity.
+
+### parameters
+
+- iterations: The number of strange attractor trajectory steps to accumulate.
+- a, b, c, d: The four Clifford attractor control coefficients.
+
+```go
+cn := arts.NewCliffordNebula(1500000, -1.7, 1.8, -1.9, -0.4)
+```
+
+![](../images/cliffordnebula.png)
+
+## Physarum
+
+`Physarum` simulates a bioluminescent slime mold transport network with chemotaxis-driven agents, trail deposition, and 3x3 Gaussian diffusion and decay.
+
+### parameters
+
+- agentNum: The number of chemotaxis agents in the simulation.
+- steps: The number of simulation steps.
+- sensorAngle: The angle offset (in radians) of the left/right chemical sensors.
+- turnAngle: The steering angle (in radians) when turning toward higher trail concentrations.
+
+```go
+p := arts.NewPhysarum(45000, 110, 0, 0)
+```
+
+![](../images/physarum.png)
+
+## Differential Growth
+
+`Differential Growth` simulates organic coral and lichen-like folding loops via spring attraction, local repulsion, and dynamic edge subdivision, rendering history trails as luminous strata.
+
+### parameters
+
+- steps: The number of growth simulation iterations.
+- maxNodes: The maximum number of vertices allowed in the closed loop.
+- minDist: The target equilibrium spring length between adjacent nodes.
+- maxDist: The edge length threshold above which a new midpoint node is inserted.
+- repulsionRadius: The spatial radius within which non-adjacent nodes repel each other.
+
+```go
+dg := arts.NewDifferentialGrowth(220, 1600, 3.5, 7.5, 18.0)
+```
+
+![](../images/differentialgrowth.png)
+
+## Chladni
+
+`Chladni` simulates cymatic standing-wave resonance plates where stochastic particles migrate toward zero-amplitude nodal lines of 2D Chladni eigenmodes.
+
+### parameters
+
+- particleNum: The number of acoustic sand particles to simulate.
+- m, n: The harmonic mode numbers of the standing wave.
+- a, b: The superposition weights of the two orthogonal eigenmodes.
+
+```go
+ch := arts.NewChladni(90000, 7, 3, 1.0, -1.0)
+```
+
+![](../images/chladni.png)
+
+## Voronoi Crystal
+
+`Voronoi Crystal` generates Lloyd-relaxed Voronoi cellular stained-glass crystals with directional facet shading, inner sub-facets, and glowing mineral veins.
+
+### parameters
+
+- cellNum: The number of Voronoi seed sites.
+- relaxSteps: The number of Lloyd centroidal relaxation iterations.
+
+```go
+vc := arts.NewVoronoiCrystal(85, 4)
+```
+
+![](../images/voronoicrystal.png)
+
+## Ink Landscape
+
+`Ink Landscape` generates traditional East Asian *Shan Shui* ink-wash mountain landscapes with atmospheric fog perspective, FBM ridgelines, vertical *cunfa* texture strokes, and a glowing sun/moon disc.
+
+### parameters
+
+- layerNum: The number of receding mountain ridgeline layers.
+- roughness: Controls the fractal Brownian motion terrain relief amplitude.
+
+```go
+il := arts.NewInkLandscape(8, 0.45)
+```
+
+![](../images/inklandscape.png)
