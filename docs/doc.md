@@ -40,6 +40,14 @@
 		- [parameters](#parameters-17)
 	- [Perlin Perls](#perlin-perls)
 		- [parameters](#parameters-18)
+	- [Curl Flow](#curl-flow)
+		- [parameters](#parameters-19)
+	- [Sand Ring](#sand-ring)
+		- [parameters](#parameters-20)
+	- [Watercolor](#watercolor)
+		- [parameters](#parameters-21)
+	- [Guilloche](#guilloche)
+		- [parameters](#parameters-22)
 
 ## Color Circle 2
 
@@ -299,3 +307,69 @@ pp := arts.NewPerlinPerls(10, 200, 40, 80
 ```
 
 ![](../images/perlinperls.png)
+
+## Curl Flow
+
+`Curl Flow` traces divergence-free curl-noise streamlines across the canvas with smooth organic ribbons and variable stroke widths.
+
+### parameters
+
+- lineNum: The number of streamlines to trace.
+- stepNum: The number of integration steps along each streamline.
+- noiseScale: The spatial frequency scale of the multi-octave curl noise field.
+
+```go
+cf := arts.NewCurlFlow(110, 36, 0.0045)
+```
+
+![](../images/curlflow.png)
+
+## Sand Ring
+
+`Sand Ring` renders concentric noisy rings using stochastic sand-spline grain deposition and additive luminous blending.
+
+### parameters
+
+- ringNum: The number of concentric deformed rings.
+- grainsPerStep: The density of sand grains deposited per interpolation step.
+- noiseScale: The amplitude of the radial Perlin noise deformation.
+
+```go
+sr := arts.NewSandRing(22, 22, 1.3)
+```
+
+![](../images/sandring.png)
+
+## Watercolor
+
+`Watercolor` simulates organic translucent watercolor washes by recursively subdividing and jittering polygons across multiple pigment layers.
+
+### parameters
+
+- shapeNum: The number of watercolor blotch shapes on the canvas.
+- layers: The number of translucent pigment layers stacked per shape.
+- subdivisions: The number of recursive edge subdivisions per polygon layer.
+- roughness: Controls the edge displacement variance during subdivision.
+
+```go
+wc := arts.NewWatercolor(9, 22, 5, 0.32)
+```
+
+![](../images/watercolor.png)
+
+## Guilloche
+
+`Guilloche` generates intricate spirographic hypotrochoid and epitrochoid rosette patterns with phase-shifted harmonic envelopes and luminous interference.
+
+### parameters
+
+- curveNum: The number of phase-shifted guilloche curves in the family.
+- majorR: The radius of the fixed outer circle.
+- minorR: The radius of the rolling circle.
+- penOffset: The distance of the drawing pen from the rolling circle center.
+
+```go
+g := arts.NewGuilloche(28, 175, 65, 115)
+```
+
+![](../images/guilloche.png)

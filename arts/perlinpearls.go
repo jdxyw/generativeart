@@ -112,8 +112,7 @@ func (pp *perlinPearls) Generative(c *generativeart.Canva) {
 					common.Distance(cs[i].x, cs[i].y, ds[i][k].prevx, ds[i][k].prevy) < cs[i].radius {
 					ctex.SetLineWidth(c.Opts().LineWidth())
 					rgb := hsv.ToRGB(100, 100, 100)
-					rgb.A = uint8(c.Opts().Alpha())
-					ctex.SetColor(rgb)
+					ctex.SetColor(common.WithAlpha(rgb, uint8(c.Opts().Alpha())))
 					ctex.DrawLine(ds[i][k].prevx, ds[i][k].prevy, ds[i][k].x, ds[i][k].y)
 					ctex.Stroke()
 				}

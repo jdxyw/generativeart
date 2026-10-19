@@ -73,8 +73,7 @@ func (cc *colorCircle) drawCircleV2(ctex *gg.Context, c *generativeart.Canva, x,
 		}
 
 		//alpha := RandomRangeInt(30, 150)
-		cl.A = uint8(alpha)
-		ctex.SetColor(cl)
+		ctex.SetColor(common.WithAlpha(cl, uint8(alpha)))
 
 		for i := 0; i < 200; i++ {
 			theta := common.RandomRangeFloat64(0, math.Pi*2)
