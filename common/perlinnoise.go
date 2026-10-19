@@ -31,6 +31,18 @@ func NewPerlinNoise() *PerlinNoise {
 	return perlin
 }
 
+// NewPerlinNoiseWithSeed returns a deterministic PerlinNoise initialized with the given seed.
+func NewPerlinNoiseWithSeed(seed int64) *PerlinNoise {
+	rng := rand.New(rand.NewSource(seed))
+	perlin := &PerlinNoise{
+		perlin: make([]float64, perlinSize+1),
+	}
+	for i := range perlin.perlin {
+		perlin.perlin[i] = rng.Float64()
+	}
+	return perlin
+}
+
 // Noise1D returns a float noise number on one dimension.
 func (p *PerlinNoise) Noise1D(x float64) float64 {
 	return p.noise(x, 0, 0)

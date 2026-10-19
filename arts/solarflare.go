@@ -38,7 +38,12 @@ func (o *solarFlare) Generative(c *generativeart.Canva) {
 			ctex.Push()
 			ctex.Translate(float64(c.Width()/2), float64(c.Height()/2))
 			ctex.SetLineWidth(1.0)
-			ctex.SetColor(c.Opts().LineColor())
+			lc := c.Opts().LineColor()
+			alpha := lc.A
+			if c.Opts().Alpha() != 255 {
+				alpha = uint8(c.Opts().Alpha())
+			}
+			ctex.SetColor(common.WithAlpha(lc, alpha))
 
 			for j := 0.0; j < float64(nPoints+1); j += 1.0 {
 				a := j / float64(nPoints) * math.Pi * 2
@@ -52,7 +57,7 @@ func (o *solarFlare) Generative(c *generativeart.Canva) {
 			ctex.Stroke()
 			ctex.Pop()
 
-			//c.Img() = common.Blend(img, c.Img(), common.Add)
+			c.Blend(img, common.Add)
 			xOffset += offsetInc
 			yOffset += offsetInc
 			r *= m

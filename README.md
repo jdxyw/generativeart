@@ -40,6 +40,10 @@
     - [Silk Sky](#silk-sky)
     - [Circle Move](#circle-move)
     - [Random Circle](#random-circle)
+    - [Curl Flow](#curl-flow)
+    - [Sand Ring](#sand-ring)
+    - [Watercolor](#watercolor)
+    - [Guilloche](#guilloche)
   - [TODO](#todo)
   - [Contribution](#contribution)
 
@@ -85,6 +89,10 @@ This package is still working in progress. More types would be added. Welcome an
 - Color Canva
 - Domain Warp
 - Perlin Perls
+- Curl Flow
+- Sand Ring
+- Watercolor
+- Guilloche
 
 For these kinds of art, the package provides as many parameters to control the appearance.
 
@@ -126,6 +134,10 @@ NewBlackHole(circleN int, density, circleGap float64)
 NewColorCanve(seg float64)
 NewDomainWrap(scale, scale2, xOffset, yOffset float64, cmap ColorMapping)
 NewPerlinPerls(circleN, dotsN, colorMin, colorMax int)
+NewCurlFlow(lineNum, stepNum int, noiseScale float64)
+NewSandRing(ringNum, grainsPerStep int, noiseScale float64)
+NewWatercolor(shapeNum, layers, subdivisions int, roughness float64)
+NewGuilloche(curveNum int, majorR, minorR, penOffset float64)
 ```
 
 ## Docs
@@ -598,6 +610,71 @@ func main() {
 ```
 
 ![](images/randcircle.png)
+
+### Curl Flow
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 14, G: 18, B: 28, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Cyberpunk)
+ c.Draw(arts.NewCurlFlow(110, 36, 0.0045))
+ c.ToPNG("curlflow.png")
+}
+```
+
+![Curl Flow](images/curlflow.png)
+
+### Sand Ring
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 8, G: 10, B: 18, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Plasma)
+ c.Draw(arts.NewSandRing(22, 22, 1.3))
+ c.ToPNG("sandring.png")
+}
+```
+
+![Sand Ring](images/sandring.png)
+
+### Watercolor
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 247, G: 243, B: 234, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Dunhuang)
+ c.SetLineColor(color.RGBA{R: 32, G: 28, B: 38, A: 255})
+ c.Draw(arts.NewWatercolor(9, 22, 5, 0.32))
+ c.ToPNG("watercolor.png")
+}
+```
+
+![Watercolor](images/watercolor.png)
+
+### Guilloche
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 12, G: 15, B: 26, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Oceanic)
+ c.Draw(arts.NewGuilloche(28, 175, 65, 115))
+ c.ToPNG("guilloche.png")
+}
+```
+
+![Guilloche](images/guilloche.png)
 
 ## TODO
 

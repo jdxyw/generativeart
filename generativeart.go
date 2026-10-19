@@ -10,6 +10,7 @@ import (
 	"os"
 
 	"github.com/jdxyw/generativeart/common"
+	"github.com/jdxyw/generativeart/render"
 )
 
 type Engine interface {
@@ -138,6 +139,36 @@ func (c *Canva) DrawTimelapse(e Engine) {
 // FillBackground fills the background of the Canva.
 func (c *Canva) FillBackground() {
 	draw.Draw(c.Img(), c.Img().Bounds(), &image.Uniform{c.Opts().Background()}, image.ZP, draw.Src)
+}
+
+// NewRenderCanvas creates a render.Canvas initialized from c.Img().
+func (c *Canva) NewRenderCanvas() *render.Canvas {
+	return render.NewCanvasFromRGBA(c.Img())
+}
+
+// MergeRenderCanvas resolves rc back into c.Img().
+func (c *Canva) MergeRenderCanvas(rc *render.Canvas) {
+	if rc == nil {
+		return
+	}
+	c.img = rc.ResolveToRGBA(c.Img())
+}
+
+// MergeRenderCanvasToneMapped resolves rc back into c.Img() using ACES filmic tone mapping.
+func (c *Canva) MergeRenderCanvasToneMapped(rc *render.Canvas, exposure, gamma float64) {
+	if rc == nil {
+		return
+	}
+	c.img = rc.ResolveToneMapped(c.Img(), exposure, gamma)
+}
+
+// Blend applies common.Blend onto c.Img().
+func (c *Canva) Blend(src *image.RGBA, mode common.BlendMode) {
+	if src == nil || c.img == nil {
+		return
+	}
+	blended := common.Blend(src, c.img, mode)
+	draw.Draw(c.img, c.img.Bounds(), blended, blended.Bounds().Min, draw.Src)
 }
 
 // ToPng saves the image to local with PNG format.

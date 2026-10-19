@@ -46,12 +46,14 @@ func (cc *colorCircle2) circle(ctex *gg.Context, c *generativeart.Canva, x, y, d
 	for j := 0.0; j < dx; j += 1.0 {
 		dd := d + j*2.0
 		alpha := int((dx / j) * 255.0)
-		if alpha > 255 {
+		if alpha > 255 || j == 0.0 {
 			alpha = 255
 		}
-		col.A = uint8(alpha)
+		if alpha < 0 {
+			alpha = 0
+		}
 
-		ctex.SetColor(col)
+		ctex.SetColor(common.WithAlpha(col, uint8(alpha)))
 		for i := 0; i < 150; i++ {
 			theta := common.RandomRangeFloat64(0, math.Pi*2)
 			xx := x + dd*0.5*math.Cos(theta)

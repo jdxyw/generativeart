@@ -75,8 +75,7 @@ func (cn *circleNoise) Generative(c *generativeart.Canva) {
 				common.Distance(float64(c.Width())/2, float64(c.Height())/2, dots[i].prevx, dots[i].prevy) < radius {
 				ctex.SetLineWidth(c.Opts().LineWidth())
 				rgb := hsv.ToRGB(100, 100, 100)
-				rgb.A = uint8(c.Opts().Alpha())
-				ctex.SetColor(rgb)
+				ctex.SetColor(common.WithAlpha(rgb, uint8(c.Opts().Alpha())))
 				ctex.DrawLine(dots[i].prevx, dots[i].prevy, dots[i].x, dots[i].y)
 				ctex.Stroke()
 			}

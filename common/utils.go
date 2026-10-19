@@ -13,19 +13,24 @@ type HSV struct {
 // ToRGB converts a HSV color mode to RGB mode
 // mh, ms, mv are used to set the maximum number for HSV.
 func (hs HSV) ToRGB(mh, ms, mv int) color.RGBA {
-	if hs.H > mh {
-		hs.H = mh
+	if mh <= 0 {
+		mh = 360
+	}
+	if ms <= 0 {
+		ms = 100
+	}
+	if mv <= 0 {
+		mv = 100
 	}
 
-	if hs.S > ms {
-		hs.S = ms
+	hVal := hs.H % mh
+	if hVal < 0 {
+		hVal += mh
 	}
+	sVal := ConstrainInt(hs.S, 0, ms)
+	vVal := ConstrainInt(hs.V, 0, mv)
 
-	if hs.V > mv {
-		hs.V = mv
-	}
-
-	h, s, v := float64(hs.H)/float64(mh), float64(hs.S)/float64(ms), float64(hs.V)/float64(mv)
+	h, s, v := float64(hVal)/float64(mh), float64(sVal)/float64(ms), float64(vVal)/float64(mv)
 
 	var r, g, b float64
 	if s == 0 { //HSV from 0 to 1
@@ -34,7 +39,7 @@ func (hs HSV) ToRGB(mh, ms, mv int) color.RGBA {
 		b = v * 255
 	} else {
 		h = h * 6
-		if h == 6 {
+		if h >= 6 {
 			h = 0
 		} //H must be < 1
 		i := math.Floor(h) //Or ... var_i = floor( var_h )
@@ -73,12 +78,60 @@ func (hs HSV) ToRGB(mh, ms, mv int) color.RGBA {
 		b = b * 255
 	}
 	rgb := color.RGBA{
-		R: uint8(r),
-		G: uint8(g),
-		B: uint8(b),
-		A: 0,
+		R: uint8(ConstrainInt(int(math.Round(r)), 0, 255)),
+		G: uint8(ConstrainInt(int(math.Round(g)), 0, 255)),
+		B: uint8(ConstrainInt(int(math.Round(b)), 0, 255)),
+		A: 255,
 	}
 	return rgb
+}
+
+// HSVFromFloat converts floating-point HSV (h in [0, 360] or [0, 1], s in [0, 1], v in [0, 1]) to color.RGBA.
+func HSVFromFloat(h, s, v float64) color.RGBA {
+	if h > 1.0 || h < 0.0 {
+		h = math.Mod(h, 360.0)
+		if h < 0 {
+			h += 360.0
+		}
+		h /= 360.0
+	}
+	s = Clamp01(s)
+	v = Clamp01(v)
+
+	var r, g, b float64
+	if s == 0 {
+		r, g, b = v, v, v
+	} else {
+		h6 := h * 6.0
+		if h6 >= 6.0 {
+			h6 = 0.0
+		}
+		i := math.Floor(h6)
+		f := h6 - i
+		p := v * (1.0 - s)
+		q := v * (1.0 - s*f)
+		t := v * (1.0 - s*(1.0-f))
+		switch int(i) {
+		case 0:
+			r, g, b = v, t, p
+		case 1:
+			r, g, b = q, v, p
+		case 2:
+			r, g, b = p, v, t
+		case 3:
+			r, g, b = p, q, v
+		case 4:
+			r, g, b = t, p, v
+		default:
+			r, g, b = v, p, q
+		}
+	}
+	return color.RGBA{
+		R: uint8(ConstrainInt(int(math.Round(r*255.0)), 0, 255)),
+		G: uint8(ConstrainInt(int(math.Round(g*255.0)), 0, 255)),
+		B: uint8(ConstrainInt(int(math.Round(b*255.0)), 0, 255)),
+		A: 255,
+	}
 }
 
 // ConvertCartesianToPixel converts cartesian coordinates to actual pixels in an image.
@@ -99,7 +152,7 @@ func ConvertCartesianToPolarPixel(x, y, xaixs, yaixs float64, h, w int) (int, in
 // ConvertCartesianToPolar converts points from cartesian coordinates to polar coordinates.
 func ConvertCartesianToPolar(x, y float64) (float64, float64) {
 	r := math.Sqrt(x*x + y*y)
-	theta := math.Atanh(y / x)
+	theta := math.Atan2(y, x)
 
 	return r, theta
 }
