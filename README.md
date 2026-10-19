@@ -56,6 +56,12 @@
     - [Space Colonization](#space-colonization)
     - [Truchet Flow](#truchet-flow)
     - [Aurora Wave](#aurora-wave)
+    - [Fractal Flame](#fractal-flame)
+    - [Joy Division](#joy-division)
+    - [Boids Flock](#boids-flock)
+    - [Islamic Star](#islamic-star)
+    - [Delaunay Stained](#delaunay-stained)
+    - [Phyllotaxis](#phyllotaxis)
   - [TODO](#todo)
   - [Contribution](#contribution)
 
@@ -117,6 +123,12 @@ This package is still working in progress. More types would be added. Welcome an
 - Space Colonization
 - Truchet Flow
 - Aurora Wave
+- Fractal Flame
+- Joy Division
+- Boids Flock
+- Islamic Star
+- Delaunay Stained
+- Phyllotaxis
 
 For these kinds of art, the package provides as many parameters to control the appearance.
 
@@ -174,6 +186,12 @@ NewApollonianGasket(maxDepth int, minRadius float64)
 NewSpaceColonization(attractorNum, steps int, stepDist, killDist float64)
 NewTruchetFlow(baseGrid, maxDepth int)
 NewAuroraWave(curtainNum, ribbonSteps int, turbulence float64)
+NewFractalFlame(iterations, symmetry int)
+NewJoyDivision(lineNum int, amplitude, frequency float64)
+NewBoidsFlock(boidNum, steps int, perceptionRadius float64)
+NewIslamicStar(gridSize int, contactAngle, strapWidth float64)
+NewDelaunayStained(siteNum int, jitter float64)
+NewPhyllotaxis(seedCount int, divergenceAngle, scaleFactor float64)
 ```
 
 ## Docs
@@ -903,6 +921,102 @@ func main() {
 ```
 
 ![Aurora Borealis Wave](images/aurorawave.png)
+
+### Fractal Flame
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 4, G: 4, B: 10, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Magma)
+ c.Draw(arts.NewFractalFlame(1800000, 5))
+ c.ToPNG("fractalflame.png")
+}
+```
+
+![Fractal Flame IFS](images/fractalflame.png)
+
+### Joy Division
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 8, G: 10, B: 18, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Cyberpunk)
+ c.Draw(arts.NewJoyDivision(72, 1.0, 1.0))
+ c.ToPNG("joydivision.png")
+}
+```
+
+![Joy Division Pulsar Waves](images/joydivision.png)
+
+### Boids Flock
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 10, G: 14, B: 24, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Sunset)
+ c.Draw(arts.NewBoidsFlock(240, 140, 52.0))
+ c.ToPNG("boidsflock.png")
+}
+```
+
+![Boids Murmuration Flock](images/boidsflock.png)
+
+### Islamic Star
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 18, G: 22, B: 32, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Dunhuang)
+ c.Draw(arts.NewIslamicStar(4, 67.5, 4.5))
+ c.ToPNG("islamicstar.png")
+}
+```
+
+![Islamic Girih Star Rosette](images/islamicstar.png)
+
+### Delaunay Stained
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 12, G: 14, B: 22, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Plasma)
+ c.Draw(arts.NewDelaunayStained(220, 0.65))
+ c.ToPNG("delaunaystained.png")
+}
+```
+
+![Delaunay Prismatic Stained Glass](images/delaunaystained.png)
+
+### Phyllotaxis
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 12, G: 18, B: 20, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Botanical)
+ c.Draw(arts.NewPhyllotaxis(420, 137.50776405, 11.5))
+ c.ToPNG("phyllotaxis.png")
+}
+```
+
+![Golden Angle Phyllotaxis Lotus](images/phyllotaxis.png)
 
 ## TODO
 
