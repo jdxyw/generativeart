@@ -44,6 +44,12 @@
     - [Sand Ring](#sand-ring)
     - [Watercolor](#watercolor)
     - [Guilloche](#guilloche)
+    - [Clifford Nebula](#clifford-nebula)
+    - [Physarum](#physarum)
+    - [Differential Growth](#differential-growth)
+    - [Chladni](#chladni)
+    - [Voronoi Crystal](#voronoi-crystal)
+    - [Ink Landscape](#ink-landscape)
   - [TODO](#todo)
   - [Contribution](#contribution)
 
@@ -93,6 +99,12 @@ This package is still working in progress. More types would be added. Welcome an
 - Sand Ring
 - Watercolor
 - Guilloche
+- Clifford Nebula
+- Physarum
+- Differential Growth
+- Chladni
+- Voronoi Crystal
+- Ink Landscape
 
 For these kinds of art, the package provides as many parameters to control the appearance.
 
@@ -138,6 +150,12 @@ NewCurlFlow(lineNum, stepNum int, noiseScale float64)
 NewSandRing(ringNum, grainsPerStep int, noiseScale float64)
 NewWatercolor(shapeNum, layers, subdivisions int, roughness float64)
 NewGuilloche(curveNum int, majorR, minorR, penOffset float64)
+NewCliffordNebula(iterations int, a, b, c, d float64)
+NewPhysarum(agentNum, steps int, sensorAngle, turnAngle float64)
+NewDifferentialGrowth(steps, maxNodes int, minDist, maxDist, repulsionRadius float64)
+NewChladni(particleNum int, m, n, a, b float64)
+NewVoronoiCrystal(cellNum, relaxSteps int)
+NewInkLandscape(layerNum int, roughness float64)
 ```
 
 ## Docs
@@ -675,6 +693,102 @@ func main() {
 ```
 
 ![Guilloche](images/guilloche.png)
+
+### Clifford Nebula
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 6, G: 6, B: 14, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Inferno)
+ c.Draw(arts.NewCliffordNebula(1500000, -1.7, 1.8, -1.9, -0.4))
+ c.ToPNG("cliffordnebula.png")
+}
+```
+
+![Clifford Nebula](images/cliffordnebula.png)
+
+### Physarum
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 6, G: 10, B: 18, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Cyberpunk)
+ c.Draw(arts.NewPhysarum(45000, 110, 0, 0))
+ c.ToPNG("physarum.png")
+}
+```
+
+![Physarum Network](images/physarum.png)
+
+### Differential Growth
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 10, G: 12, B: 22, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Sunset)
+ c.Draw(arts.NewDifferentialGrowth(220, 1600, 3.5, 7.5, 18.0))
+ c.ToPNG("differentialgrowth.png")
+}
+```
+
+![Differential Growth Coral](images/differentialgrowth.png)
+
+### Chladni
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 8, G: 12, B: 22, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Oceanic)
+ c.Draw(arts.NewChladni(90000, 7, 3, 1.0, -1.0))
+ c.ToPNG("chladni.png")
+}
+```
+
+![Chladni Cymatics](images/chladni.png)
+
+### Voronoi Crystal
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 24, G: 22, B: 30, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Dunhuang)
+ c.Draw(arts.NewVoronoiCrystal(85, 4))
+ c.ToPNG("voronoicrystal.png")
+}
+```
+
+![Voronoi Agate Crystal](images/voronoicrystal.png)
+
+### Ink Landscape
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 244, G: 239, B: 228, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.UkiyoE)
+ c.Draw(arts.NewInkLandscape(8, 0.45))
+ c.ToPNG("inklandscape.png")
+}
+```
+
+![Shan-Shui Ink Landscape](images/inklandscape.png)
 
 ## TODO
 
