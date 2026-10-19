@@ -50,6 +50,12 @@
     - [Chladni](#chladni)
     - [Voronoi Crystal](#voronoi-crystal)
     - [Ink Landscape](#ink-landscape)
+    - [Gray Scott](#gray-scott)
+    - [Lissajous Ribbon](#lissajous-ribbon)
+    - [Apollonian Gasket](#apollonian-gasket)
+    - [Space Colonization](#space-colonization)
+    - [Truchet Flow](#truchet-flow)
+    - [Aurora Wave](#aurora-wave)
   - [TODO](#todo)
   - [Contribution](#contribution)
 
@@ -105,6 +111,12 @@ This package is still working in progress. More types would be added. Welcome an
 - Chladni
 - Voronoi Crystal
 - Ink Landscape
+- Gray Scott
+- Lissajous Ribbon
+- Apollonian Gasket
+- Space Colonization
+- Truchet Flow
+- Aurora Wave
 
 For these kinds of art, the package provides as many parameters to control the appearance.
 
@@ -156,6 +168,12 @@ NewDifferentialGrowth(steps, maxNodes int, minDist, maxDist, repulsionRadius flo
 NewChladni(particleNum int, m, n, a, b float64)
 NewVoronoiCrystal(cellNum, relaxSteps int)
 NewInkLandscape(layerNum int, roughness float64)
+NewGrayScott(steps int, feed, kill float64)
+NewLissajousRibbon(curves int, freqX, freqY, freqZ float64)
+NewApollonianGasket(maxDepth int, minRadius float64)
+NewSpaceColonization(attractorNum, steps int, stepDist, killDist float64)
+NewTruchetFlow(baseGrid, maxDepth int)
+NewAuroraWave(curtainNum, ribbonSteps int, turbulence float64)
 ```
 
 ## Docs
@@ -789,6 +807,102 @@ func main() {
 ```
 
 ![Shan-Shui Ink Landscape](images/inklandscape.png)
+
+### Gray Scott
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 8, G: 12, B: 20, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Viridis)
+ c.Draw(arts.NewGrayScott(3200, 0.037, 0.060))
+ c.ToPNG("grayscott.png")
+}
+```
+
+![Gray Scott Turing Coral](images/grayscott.png)
+
+### Lissajous Ribbon
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 6, G: 8, B: 16, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Plasma)
+ c.Draw(arts.NewLissajousRibbon(140, 3.0, 4.0, 5.0))
+ c.ToPNG("lissajousribbon.png")
+}
+```
+
+![Lissajous Silk Ribbon](images/lissajousribbon.png)
+
+### Apollonian Gasket
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 10, G: 14, B: 24, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Dunhuang)
+ c.Draw(arts.NewApollonianGasket(7, 2.5))
+ c.ToPNG("apolloniangasket.png")
+}
+```
+
+![Apollonian Gasket Astrolabe](images/apolloniangasket.png)
+
+### Space Colonization
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 8, G: 14, B: 18, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Cyberpunk)
+ c.Draw(arts.NewSpaceColonization(1800, 160, 6.0, 55.0))
+ c.ToPNG("spacecolonization.png")
+}
+```
+
+![Space Colonization Tree](images/spacecolonization.png)
+
+### Truchet Flow
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 245, G: 240, B: 230, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.UkiyoE)
+ c.Draw(arts.NewTruchetFlow(6, 3))
+ c.ToPNG("truchetflow.png")
+}
+```
+
+![Multi-Scale Truchet Flow](images/truchetflow.png)
+
+### Aurora Wave
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 5, G: 8, B: 18, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Oceanic)
+ c.Draw(arts.NewAuroraWave(4, 220, 1.0))
+ c.ToPNG("aurorawave.png")
+}
+```
+
+![Aurora Borealis Wave](images/aurorawave.png)
 
 ## TODO
 
