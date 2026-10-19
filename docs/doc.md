@@ -60,6 +60,18 @@
 		- [parameters](#parameters-27)
 	- [Ink Landscape](#ink-landscape)
 		- [parameters](#parameters-28)
+	- [Gray Scott](#gray-scott)
+		- [parameters](#parameters-29)
+	- [Lissajous Ribbon](#lissajous-ribbon)
+		- [parameters](#parameters-30)
+	- [Apollonian Gasket](#apollonian-gasket)
+		- [parameters](#parameters-31)
+	- [Space Colonization](#space-colonization)
+		- [parameters](#parameters-32)
+	- [Truchet Flow](#truchet-flow)
+		- [parameters](#parameters-33)
+	- [Aurora Wave](#aurora-wave)
+		- [parameters](#parameters-34)
 
 ## Color Circle 2
 
@@ -481,3 +493,97 @@ il := arts.NewInkLandscape(8, 0.45)
 ```
 
 ![](../images/inklandscape.png)
+
+## Gray Scott
+
+`Gray Scott` simulates reaction-diffusion morphogenesis (Turing patterns) on a 2D chemical grid with spatial parameter gradients and 3D normal-mapped specular lighting.
+
+### parameters
+
+- steps: The number of reaction-diffusion PDE integration steps.
+- feed: The base chemical feed rate `F`.
+- kill: The base chemical kill rate `k`.
+
+```go
+gs := arts.NewGrayScott(3200, 0.037, 0.060)
+```
+
+![](../images/grayscott.png)
+
+## Lissajous Ribbon
+
+`Lissajous Ribbon` renders 3D phase-evolving harmonic Lissajous silk ribbons with perspective projection, depth-modulated stroke weights, and additive interference glow.
+
+### parameters
+
+- curves: The number of phase-shifted harmonic ribbon layers.
+- freqX, freqY, freqZ: The 3D harmonic oscillation frequencies along X, Y, and Z axes.
+
+```go
+lr := arts.NewLissajousRibbon(140, 3.0, 4.0, 5.0)
+```
+
+![](../images/lissajousribbon.png)
+
+## Apollonian Gasket
+
+`Apollonian Gasket` generates recursive fractal circle packings using Descartes' Circle Theorem and complex Descartes centers with glowing nested rings and jewel-like shading.
+
+### parameters
+
+- maxDepth: The maximum recursion depth for Soddy circle subdivision.
+- minRadius: The minimum pixel radius threshold for packed circles.
+
+```go
+ag := arts.NewApollonianGasket(7, 2.5)
+```
+
+![](../images/apolloniangasket.png)
+
+## Space Colonization
+
+`Space Colonization` grows organic bioluminescent mycelial and vascular branching networks toward nutrient attractors, with Strahler-like branch thickness tapering and glowing spore tips.
+
+### parameters
+
+- attractorNum: The number of nutrient attractor points distributed across the canvas.
+- steps: The number of network growth iterations.
+- stepDist: The branch extension step length per iteration.
+- killDist: The attraction radius within which attractors influence growing nodes.
+
+```go
+sc := arts.NewSpaceColonization(1800, 160, 6.0, 55.0)
+```
+
+![](../images/spacecolonization.png)
+
+## Truchet Flow
+
+`Truchet Flow` constructs multi-scale quadtree Smith-Truchet quarter-circle tilings with interlocking multi-band ribbons and under/over weave shadows.
+
+### parameters
+
+- baseGrid: The initial coarse grid resolution along each axis.
+- maxDepth: The maximum quadtree subdivision depth.
+
+```go
+tf := arts.NewTruchetFlow(6, 3)
+```
+
+![](../images/truchetflow.png)
+
+## Aurora Wave
+
+`Aurora Wave` renders boreal geomagnetic light curtains and starfields using FBM-warped vertical ray deposition, altitude-based spectral transitions, and water reflections.
+
+### parameters
+
+- curtainNum: The number of overlapping aurora ribbon curtains.
+- ribbonSteps: The horizontal sampling density along each aurora curtain.
+- turbulence: Controls the FBM fold amplitude and curtain undulation.
+
+```go
+aw := arts.NewAuroraWave(4, 220, 1.0)
+```
+
+![](../images/aurorawave.png)
