@@ -68,6 +68,13 @@
     - [Penrose Tiling](#penrose-tiling)
     - [Isometric City](#isometric-city)
     - [DLA Frost](#dla-frost)
+    - [Impasto Flow](#impasto-flow)
+    - [Voxel Terrain](#voxel-terrain)
+    - [Packed Capsules](#packed-capsules)
+    - [Orphic Discs](#orphic-discs)
+    - [Nautilus Spiral](#nautilus-spiral)
+    - [Mosaic Sun](#mosaic-sun)
+    - [Tangent Cones](#tangent-cones)
   - [TODO](#todo)
   - [Contribution](#contribution)
 
@@ -141,6 +148,13 @@ This package is still working in progress. More types would be added. Welcome an
 - Penrose Tiling
 - Isometric City
 - DLA Frost
+- Impasto Flow
+- Voxel Terrain
+- Packed Capsules
+- Orphic Discs
+- Nautilus Spiral
+- Mosaic Sun
+- Tangent Cones
 
 For these kinds of art, the package provides as many parameters to control the appearance.
 
@@ -210,6 +224,13 @@ NewAizawaAttractor(iterations int, dofStrength float64)
 NewPenroseTiling(subdivisions int)
 NewIsometricCity(gridSize int, density float64)
 NewDLAFrost(particleCount int, stickiness float64)
+NewImpastoFlow(strokeCount, steps int, fieldScale float64)
+NewVoxelTerrain(gridRes int, heightScale, contrast float64)
+NewPackedCapsules(capsuleCount int, maxScale, minScale float64)
+NewOrphicDiscs(discCount int)
+NewNautilusSpiral(turns int, chambersPerTurn int)
+NewMosaicSun(ringCount int, rayDensity float64)
+NewTangentCones(coneCount int)
 ```
 
 ## Docs
@@ -1131,6 +1152,118 @@ func main() {
 ```
 
 ![DLA Frost](images/dlafrost.png)
+
+### Impasto Flow
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 8, G: 7, B: 16, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Sunset)
+ c.Draw(arts.NewImpastoFlow(3200, 520, 0.0032))
+ c.ToPNG("impastoflow.png")
+}
+```
+
+![Impasto Flow](images/impastoflow.png)
+
+### Voxel Terrain
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 10, G: 12, B: 26, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Oceanic)
+ c.Draw(arts.NewVoxelTerrain(340, 2.6, 1.0))
+ c.ToPNG("voxelterrain.png")
+}
+```
+
+![Voxel Terrain](images/voxelterrain.png)
+
+### Packed Capsules
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 238, G: 236, B: 229, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Oceanic)
+ c.Draw(arts.NewPackedCapsules(2200, 7.2, 3.6))
+ c.ToPNG("packedcapsules.png")
+}
+```
+
+![Packed Capsules](images/packedcapsules.png)
+
+### Orphic Discs
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 72, G: 178, B: 102, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Youthful)
+ c.Draw(arts.NewOrphicDiscs(34))
+ c.ToPNG("orphicdiscs.png")
+}
+```
+
+![Orphic Discs](images/orphicdiscs.png)
+
+### Nautilus Spiral
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 18, G: 24, B: 34, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Dunhuang)
+ c.Draw(arts.NewNautilusSpiral(5, 68))
+ c.ToPNG("nautilusspiral.png")
+}
+```
+
+![Nautilus Spiral](images/nautilusspiral.png)
+
+### Mosaic Sun
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 22, G: 26, B: 48, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Sunset)
+ c.Draw(arts.NewMosaicSun(32, 1.0))
+ c.ToPNG("mosaicsun.png")
+}
+```
+
+![Mosaic Sun](images/mosaicsun.png)
+
+### Tangent Cones
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 234, G: 88, B: 56, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Sunset)
+ c.Draw(arts.NewTangentCones(26))
+ c.ToPNG("tangentcones.png")
+}
+```
+
+![Tangent Cones](images/tangentcones.png)
 
 ## TODO
 

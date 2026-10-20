@@ -96,6 +96,20 @@
 		- [parameters](#parameters-45)
 	- [DLA Frost](#dla-frost)
 		- [parameters](#parameters-46)
+	- [Impasto Flow](#impasto-flow)
+		- [parameters](#parameters-47)
+	- [Voxel Terrain](#voxel-terrain)
+		- [parameters](#parameters-48)
+	- [Packed Capsules](#packed-capsules)
+		- [parameters](#parameters-49)
+	- [Orphic Discs](#orphic-discs)
+		- [parameters](#parameters-50)
+	- [Nautilus Spiral](#nautilus-spiral)
+		- [parameters](#parameters-51)
+	- [Mosaic Sun](#mosaic-sun)
+		- [parameters](#parameters-52)
+	- [Tangent Cones](#tangent-cones)
+		- [parameters](#parameters-53)
 
 ## Color Circle 2
 
@@ -796,3 +810,109 @@ df := arts.NewDLAFrost(18000, 0.55)
 ```
 
 ![](../images/dlafrost.png)
+
+## Impasto Flow
+
+`Impasto Flow` renders multi-vortex fluid dynamics with dense fibrous impasto brushstrokes, 3D specular ridge highlights, and dark ambient troughs.
+
+### parameters
+
+- strokeCount: The number of layered fibrous impasto brush ribbons to trace.
+- steps: The number of advection integration steps per stroke.
+- fieldScale: Controls the spatial frequency of the curl-noise and vortex velocity field.
+
+```go
+iflow := arts.NewImpastoFlow(3200, 520, 0.0032)
+```
+
+![](../images/impastoflow.png)
+
+## Voxel Terrain
+
+`Voxel Terrain` generates an isometric micro-voxel stepped topographic canyon with stratified thermal/oceanic contour bands and directional sun-cast shadows.
+
+### parameters
+
+- gridRes: The horizontal resolution of the isometric voxel heightfield grid.
+- heightScale: Controls the vertical terrace extrusion multiplier and cliff relief.
+- contrast: Controls the shadow depth and top/side facet illumination contrast.
+
+```go
+vt := arts.NewVoxelTerrain(340, 2.6, 1.0)
+```
+
+![](../images/voxelterrain.png)
+
+## Packed Capsules
+
+`Packed Capsules` generates a multi-scale collision-free packing of oriented flow-aligned capsules, target rings, and micro-dots with crisp ink outlines and elevation drop shadows.
+
+### parameters
+
+- capsuleCount: The number of candidate capsules and circles to pack into the flow field.
+- maxScale: The maximum size multiplier for primary focal capsules.
+- minScale: The minimum size multiplier for interstitial micro-capsules and dots.
+
+```go
+pc := arts.NewPackedCapsules(2200, 7.2, 3.6)
+```
+
+![](../images/packedcapsules.png)
+
+## Orphic Discs
+
+`Orphic Discs` creates Robert & Sonia Delaunay-inspired Orphic Cubism compositions with interlocking eccentric target discs, quadrant chord splits, and stippled gouache paper grain.
+
+### parameters
+
+- discCount: The number of nested eccentric disc assemblies distributed across the canvas.
+
+```go
+od := arts.NewOrphicDiscs(34)
+```
+
+![](../images/orphicdiscs.png)
+
+## Nautilus Spiral
+
+`Nautilus Spiral` constructs a golden logarithmic nautilus shell cross-section with curved hydrostatic septa, stippled biomineral chambers, and a warm Voronoi mosaic backdrop.
+
+### parameters
+
+- turns: The number of full logarithmic spiral revolutions.
+- chambersPerTurn: The number of subdivided shell chambers per revolution.
+
+```go
+ns := arts.NewNautilusSpiral(5, 68)
+```
+
+![](../images/nautilusspiral.png)
+
+## Mosaic Sun
+
+`Mosaic Sun` renders a stained-glass mosaic solar mandala with radiating alternating warm/cool rays, concentric ring tesserae, and swirling starry sky corona arcs.
+
+### parameters
+
+- ringCount: The number of concentric mosaic tile rings radiating from the solar core.
+- rayDensity: Controls the angular subdivision density of the radiating solar beams.
+
+```go
+ms := arts.NewMosaicSun(32, 1.0)
+```
+
+![](../images/mosaicsun.png)
+
+## Tangent Cones
+
+`Tangent Cones` renders 3D conical relief discs with eccentric apexes, tangent-wrap angular shading, cast drop shadows, and fine radial/concentric engraving rings.
+
+### parameters
+
+- coneCount: The number of non-overlapping and nested 3D conical discs.
+
+```go
+tc := arts.NewTangentCones(26)
+```
+
+![](../images/tangentcones.png)
