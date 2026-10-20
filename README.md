@@ -62,6 +62,12 @@
     - [Islamic Star](#islamic-star)
     - [Delaunay Stained](#delaunay-stained)
     - [Phyllotaxis](#phyllotaxis)
+    - [Poincare Disk](#poincare-disk)
+    - [Suminagashi](#suminagashi)
+    - [Aizawa Attractor](#aizawa-attractor)
+    - [Penrose Tiling](#penrose-tiling)
+    - [Isometric City](#isometric-city)
+    - [DLA Frost](#dla-frost)
   - [TODO](#todo)
   - [Contribution](#contribution)
 
@@ -129,6 +135,12 @@ This package is still working in progress. More types would be added. Welcome an
 - Islamic Star
 - Delaunay Stained
 - Phyllotaxis
+- Poincare Disk
+- Suminagashi
+- Aizawa Attractor
+- Penrose Tiling
+- Isometric City
+- DLA Frost
 
 For these kinds of art, the package provides as many parameters to control the appearance.
 
@@ -192,6 +204,12 @@ NewBoidsFlock(boidNum, steps int, perceptionRadius float64)
 NewIslamicStar(gridSize int, contactAngle, strapWidth float64)
 NewDelaunayStained(siteNum int, jitter float64)
 NewPhyllotaxis(seedCount int, divergenceAngle, scaleFactor float64)
+NewPoincareDisk(p, q, depth int)
+NewSuminagashi(dropCount, combPasses int, swirlStrength float64)
+NewAizawaAttractor(iterations int, dofStrength float64)
+NewPenroseTiling(subdivisions int)
+NewIsometricCity(gridSize int, density float64)
+NewDLAFrost(particleCount int, stickiness float64)
 ```
 
 ## Docs
@@ -1018,9 +1036,119 @@ func main() {
 
 ![Golden Angle Phyllotaxis Lotus](images/phyllotaxis.png)
 
+### Poincare Disk
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 8, G: 10, B: 20, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Dunhuang)
+ c.Draw(arts.NewPoincareDisk(7, 3, 5))
+ c.ToPNG("poincaredisk.png")
+}
+```
+
+![Poincare Disk](images/poincaredisk.png)
+
+### Suminagashi
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 244, G: 239, B: 229, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.UkiyoE)
+ c.Draw(arts.NewSuminagashi(48, 7, 1.0))
+ c.ToPNG("suminagashi.png")
+}
+```
+
+![Suminagashi](images/suminagashi.png)
+
+### Aizawa Attractor
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 5, G: 7, B: 15, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Cyberpunk)
+ c.Draw(arts.NewAizawaAttractor(900000, 1.0))
+ c.ToPNG("aizawaattractor.png")
+}
+```
+
+![Aizawa Attractor](images/aizawaattractor.png)
+
+### Penrose Tiling
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 10, G: 14, B: 24, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Oceanic)
+ c.Draw(arts.NewPenroseTiling(6))
+ c.ToPNG("penrosetiling.png")
+}
+```
+
+![Penrose Tiling](images/penrosetiling.png)
+
+### Isometric City
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 18, G: 20, B: 34, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Sunset)
+ c.Draw(arts.NewIsometricCity(11, 1.0))
+ c.ToPNG("isometriccity.png")
+}
+```
+
+![Isometric City](images/isometriccity.png)
+
+### DLA Frost
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 4, G: 8, B: 18, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Oceanic)
+ c.Draw(arts.NewDLAFrost(18000, 0.55))
+ c.ToPNG("dlafrost.png")
+}
+```
+
+![DLA Frost](images/dlafrost.png)
+
 ## TODO
 
-- Add more kinds of generative arts or types.
+See the full architectural and feature roadmap in [docs/roadmap.md](./docs/roadmap.md):
+
+1. **Dynamic Evolution & Seamless Loop Animation (`DrawTimelapse`)**: Support frame recording, 4D Simplex/Curl noise seamless loops, and GIF/APNG/MP4 export for time-evolving systems (`Physarum`, `DifferentialGrowth`, `GrayScott`, `BoidsFlock`, `CurlFlow`).
+2. **Pure-Go WebAssembly (WASM) Interactive Playground**: Compile `generativeart` to WASM (`GOOS=js GOARCH=wasm`) so users can tweak parameters, seeds, and palettes live in the browser gallery (`index.html`).
+3. **CLI Tool (`cmd/genart`) & Reproducible Seed Metadata**: Deterministic per-canvas RNG seeding, PNG `tEXt` recipe metadata embedding, and a CLI for 4K/8K wallpaper generation.
+4. **Image-Guided & Typography-Driven Art**: Reference image luminance/gradient fields, Weighted Voronoi Stippling portraits, TSP continuous-line art, and Edge-Tangent Flow painterly brushes.
+5. **Vector Export (`SVG` / `PDF`) & Pen Plotter Ecosystem**: Native vector output via `tdewolff/canvas`, Jobard-Lefer evenly-spaced streamlines, and 3D hidden-line removal.
+6. **3D SDF Raymarching & Mathematical Sculptures**: Pure-Go parallel Signed Distance Field raymarcher for `Mandelbulb`, `Gyroid` minimal surfaces, and 3D Kleinian/Apollonian sphere packings.
+7. **Next-Wave `arts/` Paradigms (20+ Planned Generators)**:
+   - *Flow & Topology*: `EvenStreamlines` (Jobard-Lefer), `MarchingIsolines`, `MagneticDipole`
+   - *3D Chaos & Complex Dynamics*: `AizawaAttractor` (3D DoF bokeh), `Buddhabrot`, `NewtonBasin`, `LyapunovFractal`
+   - *Hyperbolic & Quasicrystals*: `PoincareDisk` (`{p,q}` hyperbolic), `PenroseTiling`, `AmmannBeenker`
+   - *Morphogenesis & Physics*: `DLAFrost`, `CyclicAutomata` (BZ spirals), `VortexFluid`, `CircuitWFC`
+   - *2.5D Architecture & Origami*: `MondrianSubdivision`, `IsometricCity`, `OrigamiTessellation`
+   - *Natural Media & Script*: `Suminagashi` (fluid ink marbling), `AsemicCalligraphy`, `SashikoWeave`
 
 ## Contribution
 

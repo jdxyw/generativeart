@@ -140,6 +140,18 @@ func (c *Canvas) RasterizePath(p *canvas.Path, col color.RGBA, alpha float64) {
 	}
 }
 
+func strokeSingleSubpathSafe(sp *canvas.Path, width float64, capper canvas.Capper, joiner canvas.Joiner) (res *canvas.Path) {
+	defer func() {
+		if r := recover(); r != nil {
+			prev := canvas.FastStroke
+			canvas.FastStroke = true
+			res = sp.Stroke(width, capper, joiner, canvas.PixelTolerance)
+			canvas.FastStroke = prev
+		}
+	}()
+	return sp.Stroke(width, capper, joiner, canvas.PixelTolerance)
+}
+
 // StrokePath uses tdewolff/canvas's exact geometric stroke offsetting p.Stroke(width, capper, joiner, tolerance)
 // and rasterizes the resulting contour with sub-pixel anti-aliasing into the HDR Canvas.
 func (c *Canvas) StrokePath(p *canvas.Path, width float64, capper canvas.Capper, joiner canvas.Joiner, col color.RGBA, alpha float64) {
@@ -152,8 +164,23 @@ func (c *Canvas) StrokePath(p *canvas.Path, width float64, capper canvas.Capper,
 	if joiner == nil {
 		joiner = canvas.RoundJoin
 	}
-	stroked := p.Stroke(width, capper, joiner, canvas.PixelTolerance)
-	c.RasterizePath(stroked, col, alpha)
+	subpaths := p.Split()
+	if len(subpaths) <= 1 {
+		stroked := strokeSingleSubpathSafe(p, width, capper, joiner)
+		c.RasterizePath(stroked, col, alpha)
+		return
+	}
+	combined := &canvas.Path{}
+	for _, sp := range subpaths {
+		if sp.Empty() {
+			continue
+		}
+		stroked := strokeSingleSubpathSafe(sp, width, capper, joiner)
+		if stroked != nil && !stroked.Empty() {
+			combined = combined.Append(stroked)
+		}
+	}
+	c.RasterizePath(combined, col, alpha)
 }
 
 // FillPolygon fills a closed polygon specified by pts with sub-pixel anti-aliasing.

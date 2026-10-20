@@ -84,6 +84,18 @@
 		- [parameters](#parameters-39)
 	- [Phyllotaxis](#phyllotaxis)
 		- [parameters](#parameters-40)
+	- [Poincare Disk](#poincare-disk)
+		- [parameters](#parameters-41)
+	- [Suminagashi](#suminagashi)
+		- [parameters](#parameters-42)
+	- [Aizawa Attractor](#aizawa-attractor)
+		- [parameters](#parameters-43)
+	- [Penrose Tiling](#penrose-tiling)
+		- [parameters](#parameters-44)
+	- [Isometric City](#isometric-city)
+		- [parameters](#parameters-45)
+	- [DLA Frost](#dla-frost)
+		- [parameters](#parameters-46)
 
 ## Color Circle 2
 
@@ -693,3 +705,94 @@ pt := arts.NewPhyllotaxis(420, 137.50776405, 11.5)
 ```
 
 ![](../images/phyllotaxis.png)
+
+## Poincare Disk
+
+`Poincare Disk` generates Escher-inspired hyperbolic `{p, q}` tessellations inside the Poincaré disk using Möbius gyrovector transformations, geodesic circular arcs, and jewel-like cell shading.
+
+### parameters
+
+- p: The number of sides of each hyperbolic polygon (`(p-2)*(q-2) > 4`).
+- q: The number of polygons meeting at each vertex.
+- depth: The recursion depth of Möbius edge reflections across geodesic arcs.
+
+```go
+pd := arts.NewPoincareDisk(7, 3, 5)
+```
+
+![](../images/poincaredisk.png)
+
+## Suminagashi
+
+`Suminagashi` simulates Japanese floating-ink marbling using area-preserving radial fluid lens deformations, comb-tine rake advection, and curl-noise micro-turbulence on Washi paper.
+
+### parameters
+
+- dropCount: The number of concentric ink drops deposited into the water bath.
+- combPasses: The number of directional comb-rake advection passes across the surface.
+- swirlStrength: Controls the curl-noise vortex and tine displacement intensity.
+
+```go
+sm := arts.NewSuminagashi(48, 7, 1.0)
+```
+
+![](../images/suminagashi.png)
+
+## Aizawa Attractor
+
+`Aizawa Attractor` integrates the 3D Aizawa chaotic strange attractor and projects millions of trajectory samples through a thin-lens camera with Depth-of-Field (DoF) circle-of-confusion bokeh splatting.
+
+### parameters
+
+- iterations: The number of 4th-order Runge-Kutta trajectory steps to accumulate.
+- dofStrength: Controls the camera aperture and Depth-of-Field bokeh blur radius.
+
+```go
+aa := arts.NewAizawaAttractor(900000, 1.0)
+```
+
+![](../images/aizawaattractor.png)
+
+## Penrose Tiling
+
+`Penrose Tiling` constructs 5-fold aperiodic quasicrystal P2/P3 tilings via recursive Robinson golden-triangle deflation, decorated with De Bruijn Ammann bars, shaded facets, and golden vertices.
+
+### parameters
+
+- subdivisions: The number of golden-ratio Robinson triangle deflation generations.
+
+```go
+pt := arts.NewPenroseTiling(6)
+```
+
+![](../images/penrosetiling.png)
+
+## Isometric City
+
+`Isometric City` generates a *Monument Valley*-inspired 2.5D axonometric architectural citadel with tiered towers, courtyards, arched colonnades, sky-bridges, staircases, and directional sun/shadow illumination.
+
+### parameters
+
+- gridSize: The number of axonometric city blocks along each horizontal axis.
+- density: Controls structural height variation, bridge connectivity, and architectural density.
+
+```go
+ic := arts.NewIsometricCity(11, 1.0)
+```
+
+![](../images/isometriccity.png)
+
+## DLA Frost
+
+`DLA Frost` simulates anisotropic 6-fold Diffusion-Limited Aggregation (DLA) crystal dendrite growth with age-stratified Oklab ice gradients, specular crystal facets, and bioluminescent frost tips.
+
+### parameters
+
+- particleCount: The target number of aggregated crystal particles in the cluster.
+- stickiness: Controls the 6-fold hexagonal dendritic anisotropy and sticking probability.
+
+```go
+df := arts.NewDLAFrost(18000, 0.55)
+```
+
+![](../images/dlafrost.png)

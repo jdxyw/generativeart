@@ -305,7 +305,7 @@
 
   <header class="hero">
     <div class="hero-inner">
-      <div class="hero-eyebrow" id="heroEyebrow">✨ 53 Generative Art Engines · 64-Bit Linear HDR Canvas · Oklab Color Science</div>
+      <div class="hero-eyebrow" id="heroEyebrow">✨ 59 Generative Art Engines · 64-Bit Linear HDR Canvas · Oklab Color Science</div>
       <h1 id="heroTitle">Generative Art in Go</h1>
       <p id="heroSub">From divergence-free curl flows, strange attractor nebulae, and bioluminescent slime molds to traditional Shan-Shui ink landscapes — a high-precision generative art exhibition in Go.</p>
       <div class="install-bar">
@@ -342,7 +342,127 @@
 
   <main class="gallery-container">
     <div class="gallery-grid" id="galleryGrid">
-      <article class="art-card" data-idx="0" data-cat="flow" data-new="1" data-search="curl flow 无散度旋度流体丝带 arts.newcurlflow(110, 36, 0.0045) 基于 2d curl noise 无散度旋度场与可变宽度书法样条、多纤维毛笔笔刷，配合 oklab 渐变与 hdr 泛光。 divergence-free 2d curl noise streamlines rendered with calligraphic tapered splines, bristle brushes, and hdr bloom." onclick="openModal(0)">
+      <article class="art-card" data-idx="0" data-cat="geom" data-new="1" data-search="poincaré hyperbolic disk 庞加莱双曲圆盘密铺 arts.newpoincaredisk(7, 3, 5) 基于 möbius 自守变换群递归生成的 {7,3} 非欧双曲正七边形密铺，具有精确正交圆弧测地线与星盘刻度。 non-euclidean {7,3} hyperbolic polygon tessellation generated via möbius inversions with orthogonal geodesic arcs and astrolabe bezel." onclick="openModal(0)">
+        <div class="art-thumb-wrap">
+          <img src="images/thumbs/poincaredisk.jpg" alt="Poincaré Hyperbolic Disk" />
+          <div class="card-badges">
+            <span class="badge cat-badge" data-zh="几何密铺与晶格" data-en="Geometry & Tessellation">几何密铺与晶格</span>
+            <span class="badge new">HDR NEW</span>
+          </div>
+        </div>
+        <div class="art-body">
+          <div class="art-title-row">
+            <span class="art-title">Poincaré Hyperbolic Disk</span>
+            <span class="art-sub">庞加莱双曲圆盘密铺</span>
+          </div>
+          <p class="art-desc" data-zh="基于 Möbius 自守变换群递归生成的 {7,3} 非欧双曲正七边形密铺，具有精确正交圆弧测地线与星盘刻度。" data-en="Non-Euclidean {7,3} hyperbolic polygon tessellation generated via Möbius inversions with orthogonal geodesic arcs and astrolabe bezel.">基于 Möbius 自守变换群递归生成的 {7,3} 非欧双曲正七边形密铺，具有精确正交圆弧测地线与星盘刻度。</p>
+          <div class="art-footer">
+            <div class="swatches"><span class="swatch" style="background:#c85a32"></span><span class="swatch" style="background:#d4a373"></span><span class="swatch" style="background:#457b9d"></span><span class="swatch" style="background:#f4ce84"></span></div>
+            <span class="code-tag">NewPoincareDisk()</span>
+          </div>
+        </div>
+      </article>
+      <article class="art-card" data-idx="1" data-cat="media" data-new="1" data-search="suminagashi marbling 浮水墨流理石纹 arts.newsuminagashi(48, 7, 1.0) 基于面积守恒径向推挤变换、兰金涡旋与梳状剪切逆向平流求解的日本浮水墨流纹。 japanese floating-ink marbling synthesized via area-preserving drop homeomorphisms, rankine vortices, and comb-tine inverse advection." onclick="openModal(1)">
+        <div class="art-thumb-wrap">
+          <img src="images/thumbs/suminagashi.jpg" alt="Suminagashi Marbling" />
+          <div class="card-badges">
+            <span class="badge cat-badge" data-zh="水彩水墨与笔刷" data-en="Natural Media & Ink">水彩水墨与笔刷</span>
+            <span class="badge new">HDR NEW</span>
+          </div>
+        </div>
+        <div class="art-body">
+          <div class="art-title-row">
+            <span class="art-title">Suminagashi Marbling</span>
+            <span class="art-sub">浮水墨流理石纹</span>
+          </div>
+          <p class="art-desc" data-zh="基于面积守恒径向推挤变换、兰金涡旋与梳状剪切逆向平流求解的日本浮水墨流纹。" data-en="Japanese floating-ink marbling synthesized via area-preserving drop homeomorphisms, Rankine vortices, and comb-tine inverse advection.">基于面积守恒径向推挤变换、兰金涡旋与梳状剪切逆向平流求解的日本浮水墨流纹。</p>
+          <div class="art-footer">
+            <div class="swatches"><span class="swatch" style="background:#264653"></span><span class="swatch" style="background:#c85a32"></span><span class="swatch" style="background:#e9c46a"></span><span class="swatch" style="background:#f4efe5"></span></div>
+            <span class="code-tag">NewSuminagashi()</span>
+          </div>
+        </div>
+      </article>
+      <article class="art-card" data-idx="2" data-cat="chaos" data-new="1" data-search="aizawa attractor 相泽奇异吸引子星云 arts.newaizawaattractor(900000, 1.0) 以四阶龙格-库塔法积分 90 万步三维相泽微分方程，经景深散景圆盘采样与对数密度色调映射呈现环面涡管。 rk4 integration of 900,000 3d aizawa strange attractor steps with thin-lens depth-of-field bokeh splatting and log-density tone mapping." onclick="openModal(2)">
+        <div class="art-thumb-wrap">
+          <img src="images/thumbs/aizawaattractor.jpg" alt="Aizawa Attractor" />
+          <div class="card-badges">
+            <span class="badge cat-badge" data-zh="混沌与分形" data-en="Chaos & Fractals">混沌与分形</span>
+            <span class="badge new">HDR NEW</span>
+          </div>
+        </div>
+        <div class="art-body">
+          <div class="art-title-row">
+            <span class="art-title">Aizawa Attractor</span>
+            <span class="art-sub">相泽奇异吸引子星云</span>
+          </div>
+          <p class="art-desc" data-zh="以四阶龙格-库塔法积分 90 万步三维相泽微分方程，经景深散景圆盘采样与对数密度色调映射呈现环面涡管。" data-en="RK4 integration of 900,000 3D Aizawa strange attractor steps with thin-lens depth-of-field bokeh splatting and log-density tone mapping.">以四阶龙格-库塔法积分 90 万步三维相泽微分方程，经景深散景圆盘采样与对数密度色调映射呈现环面涡管。</p>
+          <div class="art-footer">
+            <div class="swatches"><span class="swatch" style="background:#7209b7"></span><span class="swatch" style="background:#f72585"></span><span class="swatch" style="background:#4cc9f0"></span><span class="swatch" style="background:#ffffff"></span></div>
+            <span class="code-tag">NewAizawaAttractor()</span>
+          </div>
+        </div>
+      </article>
+      <article class="art-card" data-idx="3" data-cat="geom" data-new="1" data-search="penrose quasicrystal 彭罗斯黄金准晶密铺 arts.newpenrosetiling(6) 基于黄金分割比 φ 的 robinson 三角递归替换细分，拼合 p2 鸢形与飞镖十重非周期准晶并绘制连续 ammann 圆弧。 10-fold aperiodic penrose p2 kite-and-dart quasicrystal via golden-ratio robinson triangle deflation with continuous ammann matching arcs." onclick="openModal(3)">
+        <div class="art-thumb-wrap">
+          <img src="images/thumbs/penrosetiling.jpg" alt="Penrose Quasicrystal" />
+          <div class="card-badges">
+            <span class="badge cat-badge" data-zh="几何密铺与晶格" data-en="Geometry & Tessellation">几何密铺与晶格</span>
+            <span class="badge new">HDR NEW</span>
+          </div>
+        </div>
+        <div class="art-body">
+          <div class="art-title-row">
+            <span class="art-title">Penrose Quasicrystal</span>
+            <span class="art-sub">彭罗斯黄金准晶密铺</span>
+          </div>
+          <p class="art-desc" data-zh="基于黄金分割比 φ 的 Robinson 三角递归替换细分，拼合 P2 鸢形与飞镖十重非周期准晶并绘制连续 Ammann 圆弧。" data-en="10-fold aperiodic Penrose P2 kite-and-dart quasicrystal via golden-ratio Robinson triangle deflation with continuous Ammann matching arcs.">基于黄金分割比 φ 的 Robinson 三角递归替换细分，拼合 P2 鸢形与飞镖十重非周期准晶并绘制连续 Ammann 圆弧。</p>
+          <div class="art-footer">
+            <div class="swatches"><span class="swatch" style="background:#00bbf9"></span><span class="swatch" style="background:#00f5d4"></span><span class="swatch" style="background:#1b4965"></span><span class="swatch" style="background:#f4ce84"></span></div>
+            <span class="code-tag">NewPenroseTiling()</span>
+          </div>
+        </div>
+      </article>
+      <article class="art-card" data-idx="4" data-cat="geom" data-new="1" data-search="isometric monument city 纪念碑谷轴测建筑乌托邦 arts.newisometriccity(11, 1.0) 纪念碑谷风格的 2.5d 等轴测阶梯金字塔城堡，包含空中廊桥、穹顶方尖碑、暮光天际线与碧水运河。 monument-valley-inspired 2.5d axonometric architectural citadel with stepped ziggurats, sky-bridges, domes, and twilight canal reflections." onclick="openModal(4)">
+        <div class="art-thumb-wrap">
+          <img src="images/thumbs/isometriccity.jpg" alt="Isometric Monument City" />
+          <div class="card-badges">
+            <span class="badge cat-badge" data-zh="几何密铺与晶格" data-en="Geometry & Tessellation">几何密铺与晶格</span>
+            <span class="badge new">HDR NEW</span>
+          </div>
+        </div>
+        <div class="art-body">
+          <div class="art-title-row">
+            <span class="art-title">Isometric Monument City</span>
+            <span class="art-sub">纪念碑谷轴测建筑乌托邦</span>
+          </div>
+          <p class="art-desc" data-zh="纪念碑谷风格的 2.5D 等轴测阶梯金字塔城堡，包含空中廊桥、穹顶方尖碑、暮光天际线与碧水运河。" data-en="Monument-Valley-inspired 2.5D axonometric architectural citadel with stepped ziggurats, sky-bridges, domes, and twilight canal reflections.">纪念碑谷风格的 2.5D 等轴测阶梯金字塔城堡，包含空中廊桥、穹顶方尖碑、暮光天际线与碧水运河。</p>
+          <div class="art-footer">
+            <div class="swatches"><span class="swatch" style="background:#b83b5e"></span><span class="swatch" style="background:#f08a5d"></span><span class="swatch" style="background:#f9ed69"></span><span class="swatch" style="background:#269eac"></span></div>
+            <span class="code-tag">NewIsometricCity()</span>
+          </div>
+        </div>
+      </article>
+      <article class="art-card" data-idx="5" data-cat="bio" data-new="1" data-search="dla bioluminescent frost 扩散限制凝聚生物发光冰晶 arts.newdlafrost(18000, 0.55) 空间网格加速的布朗运动随机游走与六重雪花对称各向异性黏附，按子树质量赋权渲染发光枝晶。 diffusion-limited aggregation fractal crystal with 6-fold anisotropic sticking and strahler subtree-mass bioluminescent glow." onclick="openModal(5)">
+        <div class="art-thumb-wrap">
+          <img src="images/thumbs/dlafrost.jpg" alt="DLA Bioluminescent Frost" />
+          <div class="card-badges">
+            <span class="badge cat-badge" data-zh="生物涌现与形态" data-en="Emergence & Biology">生物涌现与形态</span>
+            <span class="badge new">HDR NEW</span>
+          </div>
+        </div>
+        <div class="art-body">
+          <div class="art-title-row">
+            <span class="art-title">DLA Bioluminescent Frost</span>
+            <span class="art-sub">扩散限制凝聚生物发光冰晶</span>
+          </div>
+          <p class="art-desc" data-zh="空间网格加速的布朗运动随机游走与六重雪花对称各向异性黏附，按子树质量赋权渲染发光枝晶。" data-en="Diffusion-Limited Aggregation fractal crystal with 6-fold anisotropic sticking and Strahler subtree-mass bioluminescent glow.">空间网格加速的布朗运动随机游走与六重雪花对称各向异性黏附，按子树质量赋权渲染发光枝晶。</p>
+          <div class="art-footer">
+            <div class="swatches"><span class="swatch" style="background:#03045e"></span><span class="swatch" style="background:#0077b6"></span><span class="swatch" style="background:#00b4d8"></span><span class="swatch" style="background:#caf0f8"></span></div>
+            <span class="code-tag">NewDLAFrost()</span>
+          </div>
+        </div>
+      </article>
+      <article class="art-card" data-idx="6" data-cat="flow" data-new="1" data-search="curl flow 无散度旋度流体丝带 arts.newcurlflow(110, 36, 0.0045) 基于 2d curl noise 无散度旋度场与可变宽度书法样条、多纤维毛笔笔刷，配合 oklab 渐变与 hdr 泛光。 divergence-free 2d curl noise streamlines rendered with calligraphic tapered splines, bristle brushes, and hdr bloom." onclick="openModal(6)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/curlflow.jpg" alt="Curl Flow" />
           <div class="card-badges">
@@ -362,7 +482,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="1" data-cat="chaos" data-new="1" data-search="clifford nebula 奇异吸引子深空星云 arts.newcliffordnebula(1500000, -1.7, 1.8, -1.9, -0.4) 150 万次 clifford 混沌吸引子亚像素双线性沉积，结合 99.8% 分位数对数色调映射与星团高光。 1.5m clifford strange attractor points accumulated via bilinear sub-pixel splatting and log-density tone mapping." onclick="openModal(1)">
+      <article class="art-card" data-idx="7" data-cat="chaos" data-new="1" data-search="clifford nebula 奇异吸引子深空星云 arts.newcliffordnebula(1500000, -1.7, 1.8, -1.9, -0.4) 150 万次 clifford 混沌吸引子亚像素双线性沉积，结合 99.8% 分位数对数色调映射与星团高光。 1.5m clifford strange attractor points accumulated via bilinear sub-pixel splatting and log-density tone mapping." onclick="openModal(7)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/cliffordnebula.jpg" alt="Clifford Nebula" />
           <div class="card-badges">
@@ -382,7 +502,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="2" data-cat="bio" data-new="1" data-search="physarum network 双种群生物发光黏菌网络 arts.newphysarum(45000, 110, 0, 0) 4.5 万个三触角趋化性黏菌智能体在双种群信息素场中自组织演化出的生物发光血管与菌丝网络。 bioluminescent two-species slime mold transport network emerging from 45,000 chemotactic agents." onclick="openModal(2)">
+      <article class="art-card" data-idx="8" data-cat="bio" data-new="1" data-search="physarum network 双种群生物发光黏菌网络 arts.newphysarum(45000, 110, 0, 0) 4.5 万个三触角趋化性黏菌智能体在双种群信息素场中自组织演化出的生物发光血管与菌丝网络。 bioluminescent two-species slime mold transport network emerging from 45,000 chemotactic agents." onclick="openModal(8)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/physarum.jpg" alt="Physarum Network" />
           <div class="card-badges">
@@ -402,7 +522,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="3" data-cat="bio" data-new="1" data-search="differential growth 差分生长珊瑚与脑纹 arts.newdifferentialgrowth(220, 1600, 3.5, 7.5, 18.0) 基于空间哈希加速的自回避弹性闭环不断分裂褶皱，将历史生长轮廓层叠渲染为立体珊瑚形态。 self-avoiding elastic contour morphogenesis with spatial-hash repulsion and layered historical growth ridges." onclick="openModal(3)">
+      <article class="art-card" data-idx="9" data-cat="bio" data-new="1" data-search="differential growth 差分生长珊瑚与脑纹 arts.newdifferentialgrowth(220, 1600, 3.5, 7.5, 18.0) 基于空间哈希加速的自回避弹性闭环不断分裂褶皱，将历史生长轮廓层叠渲染为立体珊瑚形态。 self-avoiding elastic contour morphogenesis with spatial-hash repulsion and layered historical growth ridges." onclick="openModal(9)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/differentialgrowth.jpg" alt="Differential Growth" />
           <div class="card-badges">
@@ -422,7 +542,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="4" data-cat="media" data-new="1" data-search="ink landscape 东方水墨山水与寒梅 arts.newinklandscape(8, 0.45) 多重分形山脊、层间云雾墨色稀释、枯笔焦墨皴擦、朱砂落日飞鸟与前景递归红梅枝干。 traditional shan-shui ink-wash mountain ridges, misty atmospheric dilution, vermilion sun, and recursive plum blossoms." onclick="openModal(4)">
+      <article class="art-card" data-idx="10" data-cat="media" data-new="1" data-search="ink landscape 东方水墨山水与寒梅 arts.newinklandscape(8, 0.45) 多重分形山脊、层间云雾墨色稀释、枯笔焦墨皴擦、朱砂落日飞鸟与前景递归红梅枝干。 traditional shan-shui ink-wash mountain ridges, misty atmospheric dilution, vermilion sun, and recursive plum blossoms." onclick="openModal(10)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/inklandscape.jpg" alt="Ink Landscape" />
           <div class="card-badges">
@@ -442,7 +562,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="5" data-cat="geom" data-new="1" data-search="voronoi crystal 劳埃德松弛玛瑙晶格 arts.newvoronoicrystal(85, 4) 精确半平面裁剪 voronoi 多边形并经多轮 lloyd 质心松弛，内部绘制同心玛瑙晶带与立体切面。 lloyd-relaxed centroidal voronoi cells with concentric agate banding, 3d bevel shading, and watercolor washes." onclick="openModal(5)">
+      <article class="art-card" data-idx="11" data-cat="geom" data-new="1" data-search="voronoi crystal 劳埃德松弛玛瑙晶格 arts.newvoronoicrystal(85, 4) 精确半平面裁剪 voronoi 多边形并经多轮 lloyd 质心松弛，内部绘制同心玛瑙晶带与立体切面。 lloyd-relaxed centroidal voronoi cells with concentric agate banding, 3d bevel shading, and watercolor washes." onclick="openModal(11)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/voronoicrystal.jpg" alt="Voronoi Crystal" />
           <div class="card-badges">
@@ -462,7 +582,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="6" data-cat="bio" data-new="1" data-search="gray-scott coral 图灵反应扩散 3d 珊瑚浮雕 arts.newgrayscott(3200, 0.037, 0.060) 求解 gray-scott 反应扩散偏微分方程，重构 3d 表面法向量并施加 blinn-phong 高光与环境光遮蔽。 gray-scott reaction-diffusion turing pattern rendered with 3d surface normals and blinn-phong specular lighting." onclick="openModal(6)">
+      <article class="art-card" data-idx="12" data-cat="bio" data-new="1" data-search="gray-scott coral 图灵反应扩散 3d 珊瑚浮雕 arts.newgrayscott(3200, 0.037, 0.060) 求解 gray-scott 反应扩散偏微分方程，重构 3d 表面法向量并施加 blinn-phong 高光与环境光遮蔽。 gray-scott reaction-diffusion turing pattern rendered with 3d surface normals and blinn-phong specular lighting." onclick="openModal(12)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/grayscott.jpg" alt="Gray-Scott Coral" />
           <div class="card-badges">
@@ -482,7 +602,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="7" data-cat="chaos" data-new="1" data-search="lissajous ribbon 3d 谐波虹彩焦散丝绸 arts.newlissajousribbon(140, 3.0, 4.0, 5.0) 三维透视投影的多相位谐波曲面，沿法向边缘呈现真实光学焦散褶皱与亚像素沙画丝线。 3d perspective-projected harmonograph silk sculpture with optical caustic folds and sub-pixel sand fibers." onclick="openModal(7)">
+      <article class="art-card" data-idx="13" data-cat="chaos" data-new="1" data-search="lissajous ribbon 3d 谐波虹彩焦散丝绸 arts.newlissajousribbon(140, 3.0, 4.0, 5.0) 三维透视投影的多相位谐波曲面，沿法向边缘呈现真实光学焦散褶皱与亚像素沙画丝线。 3d perspective-projected harmonograph silk sculpture with optical caustic folds and sub-pixel sand fibers." onclick="openModal(13)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/lissajousribbon.jpg" alt="Lissajous Ribbon" />
           <div class="card-badges">
@@ -502,7 +622,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="8" data-cat="geom" data-new="1" data-search="apollonian gasket 笛卡尔相切圆分形星盘 arts.newapolloniangasket(7, 2.5) 利用实数与复数笛卡尔圆定理递归求解精确相切圆分形，并在大圆内嵌套星盘刻度与旋轮花纹。 recursive mutually tangent circle packing via descartes theorem with intricate celestial astrolabe filigree." onclick="openModal(8)">
+      <article class="art-card" data-idx="14" data-cat="geom" data-new="1" data-search="apollonian gasket 笛卡尔相切圆分形星盘 arts.newapolloniangasket(7, 2.5) 利用实数与复数笛卡尔圆定理递归求解精确相切圆分形，并在大圆内嵌套星盘刻度与旋轮花纹。 recursive mutually tangent circle packing via descartes theorem with intricate celestial astrolabe filigree." onclick="openModal(14)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/apolloniangasket.jpg" alt="Apollonian Gasket" />
           <div class="card-badges">
@@ -522,7 +642,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="9" data-cat="bio" data-new="1" data-search="space colonization 空间殖民生物发光神经树 arts.newspacecolonization(1800, 160, 6.0, 55.0) 基于生长素吸引点的空间殖民分枝算法，按 murray 定律计算主干到末梢直径衰减并点缀发光突触。 auxin-driven space colonization venation tree following murray pipe-model thickness law with glowing synaptic tips." onclick="openModal(9)">
+      <article class="art-card" data-idx="15" data-cat="bio" data-new="1" data-search="space colonization 空间殖民生物发光神经树 arts.newspacecolonization(1800, 160, 6.0, 55.0) 基于生长素吸引点的空间殖民分枝算法，按 murray 定律计算主干到末梢直径衰减并点缀发光突触。 auxin-driven space colonization venation tree following murray pipe-model thickness law with glowing synaptic tips." onclick="openModal(15)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/spacecolonization.jpg" alt="Space Colonization" />
           <div class="card-badges">
@@ -542,7 +662,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="10" data-cat="geom" data-new="1" data-search="truchet flow 多尺度四叉树编织密铺 arts.newtruchetflow(6, 3) 自适应四叉树细分下的多尺度 smith truchet 圆弧织带，具有上下穿插的 2.5d 阴影与棉纸肌理。 multi-scale quadtree smith truchet interwoven ribbons with 2.5d over-under shadows on textured cotton paper." onclick="openModal(10)">
+      <article class="art-card" data-idx="16" data-cat="geom" data-new="1" data-search="truchet flow 多尺度四叉树编织密铺 arts.newtruchetflow(6, 3) 自适应四叉树细分下的多尺度 smith truchet 圆弧织带，具有上下穿插的 2.5d 阴影与棉纸肌理。 multi-scale quadtree smith truchet interwoven ribbons with 2.5d over-under shadows on textured cotton paper." onclick="openModal(16)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/truchetflow.jpg" alt="Truchet Flow" />
           <div class="card-badges">
@@ -562,7 +682,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="11" data-cat="flow" data-new="1" data-search="aurora wave 磁层极光帷幕与高山湖泊倒影 arts.newaurorawave(4, 220, 1.0) 模拟地球磁力线垂直射线与高度相关的极光光谱，配合周日星轨、月光雪山剪影与湖面水波倒影。 magnetospheric aurora borealis curtains with altitude emission spectra over rim-lit mountains and rippled lake reflections." onclick="openModal(11)">
+      <article class="art-card" data-idx="17" data-cat="flow" data-new="1" data-search="aurora wave 磁层极光帷幕与高山湖泊倒影 arts.newaurorawave(4, 220, 1.0) 模拟地球磁力线垂直射线与高度相关的极光光谱，配合周日星轨、月光雪山剪影与湖面水波倒影。 magnetospheric aurora borealis curtains with altitude emission spectra over rim-lit mountains and rippled lake reflections." onclick="openModal(17)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/aurorawave.jpg" alt="Aurora Wave" />
           <div class="card-badges">
@@ -582,7 +702,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="12" data-cat="chaos" data-new="1" data-search="fractal flame scott draves 非线性分形火焰 arts.newfractalflame(1800000, 5) 融合 swirl、spherical、horseshoe、julian 非线性变体与五重旋转对称的混沌博弈分形火焰。 non-linear iterated function system fractal flame with 5-fold rotational symmetry and log-density tone mapping." onclick="openModal(12)">
+      <article class="art-card" data-idx="18" data-cat="chaos" data-new="1" data-search="fractal flame scott draves 非线性分形火焰 arts.newfractalflame(1800000, 5) 融合 swirl、spherical、horseshoe、julian 非线性变体与五重旋转对称的混沌博弈分形火焰。 non-linear iterated function system fractal flame with 5-fold rotational symmetry and log-density tone mapping." onclick="openModal(18)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/fractalflame.jpg" alt="Fractal Flame" />
           <div class="card-badges">
@@ -602,7 +722,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="13" data-cat="flow" data-new="1" data-search="joy division waves 脉冲星地平线遮挡声波山脊 arts.newjoydivision(72, 1.0, 1.0) 致敬 cp 1919 脉冲星波形，融合多重分形脉冲与严格画家算法地平线遮挡，脊线随高度呈现霓虹渐变。 pulsar radio waveform ridgelines with true painter-algorithm horizon occlusion and oklab neon crest gradients." onclick="openModal(13)">
+      <article class="art-card" data-idx="19" data-cat="flow" data-new="1" data-search="joy division waves 脉冲星地平线遮挡声波山脊 arts.newjoydivision(72, 1.0, 1.0) 致敬 cp 1919 脉冲星波形，融合多重分形脉冲与严格画家算法地平线遮挡，脊线随高度呈现霓虹渐变。 pulsar radio waveform ridgelines with true painter-algorithm horizon occlusion and oklab neon crest gradients." onclick="openModal(19)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/joydivision.jpg" alt="Joy Division Waves" />
           <div class="card-badges">
@@ -622,7 +742,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="14" data-cat="bio" data-new="1" data-search="boids flock 雷诺兹鸟群流体丝带与千纸鹤 arts.newboidsflock(240, 140, 52.0) 在双涡旋与 curl 风场中模拟 240 只 boids 分离/对齐/聚合行为，轨迹化作渐变书法丝带与折纸飞鸟。 reynolds flocking murmuration in a dual-vortex curl wind field with calligraphic trajectory ribbons and origami darts." onclick="openModal(14)">
+      <article class="art-card" data-idx="20" data-cat="bio" data-new="1" data-search="boids flock 雷诺兹鸟群流体丝带与千纸鹤 arts.newboidsflock(240, 140, 52.0) 在双涡旋与 curl 风场中模拟 240 只 boids 分离/对齐/聚合行为，轨迹化作渐变书法丝带与折纸飞鸟。 reynolds flocking murmuration in a dual-vortex curl wind field with calligraphic trajectory ribbons and origami darts." onclick="openModal(20)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/boidsflock.jpg" alt="Boids Flock" />
           <div class="card-badges">
@@ -642,7 +762,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="15" data-cat="geom" data-new="1" data-search="islamic star 汉金多边形星芒与掐丝珐琅镶嵌 arts.newislamicstar(4, 67.5, 4.5) 在半正定 4.8.8 密铺上实现 hankin 接触射线星芒求交，内部填充掐丝珐琅水彩并编织上下穿插鎏金织带。 hankin polygons-in-contact islamic girih star rosette with cloisonné watercolor enamel and woven brass strapwork." onclick="openModal(15)">
+      <article class="art-card" data-idx="21" data-cat="geom" data-new="1" data-search="islamic star 汉金多边形星芒与掐丝珐琅镶嵌 arts.newislamicstar(4, 67.5, 4.5) 在半正定 4.8.8 密铺上实现 hankin 接触射线星芒求交，内部填充掐丝珐琅水彩并编织上下穿插鎏金织带。 hankin polygons-in-contact islamic girih star rosette with cloisonné watercolor enamel and woven brass strapwork." onclick="openModal(21)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/islamicstar.jpg" alt="Islamic Star" />
           <div class="card-badges">
@@ -662,7 +782,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="16" data-cat="geom" data-new="1" data-search="delaunay stained glass 德劳内三角棱镜彩绘玻璃 arts.newdelaunaystained(220, 0.65) 精确 bowyer-watson 德劳内三角剖分，每个单元拆分为三棱锥宝石切面并叠加沙画晶纹与金属铅条。 bowyer-watson delaunay triangulation with 3d gemstone pyramid facets, sand striations, and metallic lead came." onclick="openModal(16)">
+      <article class="art-card" data-idx="22" data-cat="geom" data-new="1" data-search="delaunay stained glass 德劳内三角棱镜彩绘玻璃 arts.newdelaunaystained(220, 0.65) 精确 bowyer-watson 德劳内三角剖分，每个单元拆分为三棱锥宝石切面并叠加沙画晶纹与金属铅条。 bowyer-watson delaunay triangulation with 3d gemstone pyramid facets, sand striations, and metallic lead came." onclick="openModal(22)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/delaunaystained.jpg" alt="Delaunay Stained Glass" />
           <div class="card-badges">
@@ -682,7 +802,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="17" data-cat="bio" data-new="1" data-search="phyllotaxis lotus 黄金角费马螺旋多肉莲座 arts.newphyllotaxis(420, 137.50776405, 11.5) 按黄金分割角 137.50776° 排布 420 片立体叶片，具有环境光遮蔽投影、叶尖珊瑚红晕染与叶脉露珠。 sculptural golden-angle fermat spiral succulent rosette with ambient occlusion shadows and coral-blushed leaf tips." onclick="openModal(17)">
+      <article class="art-card" data-idx="23" data-cat="bio" data-new="1" data-search="phyllotaxis lotus 黄金角费马螺旋多肉莲座 arts.newphyllotaxis(420, 137.50776405, 11.5) 按黄金分割角 137.50776° 排布 420 片立体叶片，具有环境光遮蔽投影、叶尖珊瑚红晕染与叶脉露珠。 sculptural golden-angle fermat spiral succulent rosette with ambient occlusion shadows and coral-blushed leaf tips." onclick="openModal(23)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/phyllotaxis.jpg" alt="Phyllotaxis Lotus" />
           <div class="card-badges">
@@ -702,7 +822,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="18" data-cat="media" data-new="1" data-search="sand ring 亚像素沙画同心波环 arts.newsandring(22, 22, 1.3) 受分形噪声扰动的同心圆环，以数万次亚像素沙粒采样与径向高斯柔光散景叠加而成。 fbm-deformed concentric rings rendered via stochastic sub-pixel sand splines and luminous bokeh particles." onclick="openModal(18)">
+      <article class="art-card" data-idx="24" data-cat="media" data-new="1" data-search="sand ring 亚像素沙画同心波环 arts.newsandring(22, 22, 1.3) 受分形噪声扰动的同心圆环，以数万次亚像素沙粒采样与径向高斯柔光散景叠加而成。 fbm-deformed concentric rings rendered via stochastic sub-pixel sand splines and luminous bokeh particles." onclick="openModal(24)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/sandring.jpg" alt="Sand Ring" />
           <div class="card-badges">
@@ -722,7 +842,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="19" data-cat="media" data-new="1" data-search="watercolor wash tyler hobbs 风格湿画法水彩 arts.newwatercolor(9, 22, 5, 0.32) 递归多边形中点位移扰动 + 22 层超低透明度 multiply 正片叠底叠色，呈现真实水彩边缘沉淀与棉纸纹理。 wet-on-wet recursive midpoint-displaced polygons blended in multiply mode over procedural cotton paper grain." onclick="openModal(19)">
+      <article class="art-card" data-idx="25" data-cat="media" data-new="1" data-search="watercolor wash tyler hobbs 风格湿画法水彩 arts.newwatercolor(9, 22, 5, 0.32) 递归多边形中点位移扰动 + 22 层超低透明度 multiply 正片叠底叠色，呈现真实水彩边缘沉淀与棉纸纹理。 wet-on-wet recursive midpoint-displaced polygons blended in multiply mode over procedural cotton paper grain." onclick="openModal(25)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/watercolor.jpg" alt="Watercolor Wash" />
           <div class="card-badges">
@@ -742,7 +862,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="20" data-cat="geom" data-new="1" data-search="guilloche rosette 精密矢量旋轮钞票纹饰 arts.newguilloche(28, 175, 65, 115) 基于 tdewolff/canvas 精确几何偏移描边的内摆线旋轮花盘，采用 screen 与 add 发光混合。 precision hypotrochoid guilloché spirograph curves stroked via exact vector path offsetting and screen/add blending." onclick="openModal(20)">
+      <article class="art-card" data-idx="26" data-cat="geom" data-new="1" data-search="guilloche rosette 精密矢量旋轮钞票纹饰 arts.newguilloche(28, 175, 65, 115) 基于 tdewolff/canvas 精确几何偏移描边的内摆线旋轮花盘，采用 screen 与 add 发光混合。 precision hypotrochoid guilloché spirograph curves stroked via exact vector path offsetting and screen/add blending." onclick="openModal(26)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/guilloche.jpg" alt="Guilloche Rosette" />
           <div class="card-badges">
@@ -762,7 +882,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="21" data-cat="flow" data-new="1" data-search="chladni cymatics 克拉尼声学驻波共振金沙 arts.newchladni(90000, 7, 3, 1.0, -1.0) 求解二维共振板驻波本征方程，模拟 9 万颗金沙微粒向零振幅节线随机振动迁移沉积。 acoustic standing-wave cymatics simulation where 90,000 golden sand grains migrate to zero-amplitude nodal lines." onclick="openModal(21)">
+      <article class="art-card" data-idx="27" data-cat="flow" data-new="1" data-search="chladni cymatics 克拉尼声学驻波共振金沙 arts.newchladni(90000, 7, 3, 1.0, -1.0) 求解二维共振板驻波本征方程，模拟 9 万颗金沙微粒向零振幅节线随机振动迁移沉积。 acoustic standing-wave cymatics simulation where 90,000 golden sand grains migrate to zero-amplitude nodal lines." onclick="openModal(27)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/chladni.jpg" alt="Chladni Cymatics" />
           <div class="card-badges">
@@ -782,7 +902,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="22" data-cat="flow" data-new="0" data-search="domain warp inigo quilez 分形域扭曲 arts.newdomainwrap(0.01, 4, 4, 20, cmap) 通过迭代 fbm(p + fbm(p)) 对二维坐标空间进行连续扭曲，产生绸缎与大理石般的流体纹理。 iterative fbm(p + fbm(p)) coordinate space distortion creating marble and liquid metallic shaders." onclick="openModal(22)">
+      <article class="art-card" data-idx="28" data-cat="flow" data-new="0" data-search="domain warp inigo quilez 分形域扭曲 arts.newdomainwrap(0.01, 4, 4, 20, cmap) 通过迭代 fbm(p + fbm(p)) 对二维坐标空间进行连续扭曲，产生绸缎与大理石般的流体纹理。 iterative fbm(p + fbm(p)) coordinate space distortion creating marble and liquid metallic shaders." onclick="openModal(28)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/domainwarp.jpg" alt="Domain Warp" />
           <div class="card-badges">
@@ -802,7 +922,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="23" data-cat="chaos" data-new="0" data-search="julia set 复平面朱利亚分形集 arts.newjulia(julia1, 40, 1.5, 1.5) 经典的复平面迭代逃逸时间分形 z = z² + c。 classic complex-plane escape-time julia fractal set." onclick="openModal(23)">
+      <article class="art-card" data-idx="29" data-cat="chaos" data-new="0" data-search="julia set 复平面朱利亚分形集 arts.newjulia(julia1, 40, 1.5, 1.5) 经典的复平面迭代逃逸时间分形 z = z² + c。 classic complex-plane escape-time julia fractal set." onclick="openModal(29)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/julia.jpg" alt="Julia Set" />
           <div class="card-badges">
@@ -822,7 +942,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="24" data-cat="chaos" data-new="0" data-search="black hole 极坐标噪声黑洞环 arts.newblackhole(200, 400, 0.01) 多层受噪声扰动的极坐标同心圆环，形成深邃的引力吸积盘视觉效果。 polar noise-deformed concentric accretion rings." onclick="openModal(24)">
+      <article class="art-card" data-idx="30" data-cat="chaos" data-new="0" data-search="black hole 极坐标噪声黑洞环 arts.newblackhole(200, 400, 0.01) 多层受噪声扰动的极坐标同心圆环，形成深邃的引力吸积盘视觉效果。 polar noise-deformed concentric accretion rings." onclick="openModal(30)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/blackhole.jpg" alt="Black Hole" />
           <div class="card-badges">
@@ -842,7 +962,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="25" data-cat="flow" data-new="0" data-search="noise line 三维噪声流场彩带 arts.newnoiseline(1000) 在三维噪声场中游走的千条正弦变宽彩带与随机椭圆底纹。 1,000 tapered particle worms swimming through a 3d noise field." onclick="openModal(25)">
+      <article class="art-card" data-idx="31" data-cat="flow" data-new="0" data-search="noise line 三维噪声流场彩带 arts.newnoiseline(1000) 在三维噪声场中游走的千条正弦变宽彩带与随机椭圆底纹。 1,000 tapered particle worms swimming through a 3d noise field." onclick="openModal(31)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/noiseline.jpg" alt="Noise Line" />
           <div class="card-badges">
@@ -862,7 +982,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="26" data-cat="flow" data-new="0" data-search="contour line 噪声流场等高轨迹 arts.newcontourline(500) 500 条粒子沿二维噪声场切线方向长距离漂移留下的绚丽轨迹。 500 long-exposure particle traces drifting across a 2d noise field." onclick="openModal(26)">
+      <article class="art-card" data-idx="32" data-cat="flow" data-new="0" data-search="contour line 噪声流场等高轨迹 arts.newcontourline(500) 500 条粒子沿二维噪声场切线方向长距离漂移留下的绚丽轨迹。 500 long-exposure particle traces drifting across a 2d noise field." onclick="openModal(32)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/contourline.jpg" alt="Contour Line" />
           <div class="card-badges">
@@ -882,7 +1002,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="27" data-cat="flow" data-new="0" data-search="perlin pearls 噪声流场珍珠圆 arts.newperlinperls(10, 200, 40, 80) 互不重叠的圆域内包裹细腻的 hsv 噪声流场丝线。 non-overlapping circular pearls filled with fine hsv noise trajectories." onclick="openModal(27)">
+      <article class="art-card" data-idx="33" data-cat="flow" data-new="0" data-search="perlin pearls 噪声流场珍珠圆 arts.newperlinperls(10, 200, 40, 80) 互不重叠的圆域内包裹细腻的 hsv 噪声流场丝线。 non-overlapping circular pearls filled with fine hsv noise trajectories." onclick="openModal(33)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/perlinperls.jpg" alt="Perlin Pearls" />
           <div class="card-badges">
@@ -902,7 +1022,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="28" data-cat="flow" data-new="0" data-search="circle noise 圆域裁剪流场 arts.newcirclenoise(2000, 60, 80) 约束在中心圆域内的 2000 个噪声粒子丝滑轨迹。 2,000 noise-driven trajectories constrained within a central circular boundary." onclick="openModal(28)">
+      <article class="art-card" data-idx="34" data-cat="flow" data-new="0" data-search="circle noise 圆域裁剪流场 arts.newcirclenoise(2000, 60, 80) 约束在中心圆域内的 2000 个噪声粒子丝滑轨迹。 2,000 noise-driven trajectories constrained within a central circular boundary." onclick="openModal(34)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/circlenoise.jpg" alt="Circle Noise" />
           <div class="card-badges">
@@ -922,7 +1042,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="29" data-cat="classic" data-new="0" data-search="color circle 2 彩环光晕点云 arts.newcolorcircle2(30) 带有逆距离透明度衰减径向点云光晕的彩色圆环组合。 layered color circles surrounded by inverse-distance radial point-cloud halos." onclick="openModal(29)">
+      <article class="art-card" data-idx="35" data-cat="classic" data-new="0" data-search="color circle 2 彩环光晕点云 arts.newcolorcircle2(30) 带有逆距离透明度衰减径向点云光晕的彩色圆环组合。 layered color circles surrounded by inverse-distance radial point-cloud halos." onclick="openModal(35)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/colorcircle2.jpg" alt="Color Circle 2" />
           <div class="card-badges">
@@ -942,7 +1062,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="30" data-cat="classic" data-new="0" data-search="color circle 多层散点彩圆 arts.newcolorcircle(30) 重叠半透明圆盘与散点光环构成的明快几何作品。 overlapping translucent discs and radial point clouds." onclick="openModal(30)">
+      <article class="art-card" data-idx="36" data-cat="classic" data-new="0" data-search="color circle 多层散点彩圆 arts.newcolorcircle(30) 重叠半透明圆盘与散点光环构成的明快几何作品。 overlapping translucent discs and radial point clouds." onclick="openModal(36)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/colorcircle.jpg" alt="Color Circle" />
           <div class="card-badges">
@@ -962,7 +1082,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="31" data-cat="geom" data-new="0" data-search="circle composes circle 递归分形彩圆环 arts.newcircleloop2(7) 7 层深度递归生成的圆中圆分形星团结构。 depth-7 recursive branching circle composition." onclick="openModal(31)">
+      <article class="art-card" data-idx="37" data-cat="geom" data-new="0" data-search="circle composes circle 递归分形彩圆环 arts.newcircleloop2(7) 7 层深度递归生成的圆中圆分形星团结构。 depth-7 recursive branching circle composition." onclick="openModal(37)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/colorloop2.jpg" alt="Circle Composes Circle" />
           <div class="card-badges">
@@ -982,7 +1102,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="32" data-cat="chaos" data-new="0" data-search="pixel hole 螺旋散点像素漩涡 arts.newpixelhole(60) 由中心向外旋转扩散的彩色圆点漩涡黑洞。 spiral noise-perturbed dot bursts radiating from a dark core." onclick="openModal(32)">
+      <article class="art-card" data-idx="38" data-cat="chaos" data-new="0" data-search="pixel hole 螺旋散点像素漩涡 arts.newpixelhole(60) 由中心向外旋转扩散的彩色圆点漩涡黑洞。 spiral noise-perturbed dot bursts radiating from a dark core." onclick="openModal(38)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/pixelhole.jpg" alt="Pixel Hole" />
           <div class="card-badges">
@@ -1002,7 +1122,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="33" data-cat="flow" data-new="0" data-search="dots wave 正弦波浪彩点流 arts.newdotswave(300) 300 组旋转正弦波圆点串构成的动感波浪。 300 rotated sine-wave dot trails." onclick="openModal(33)">
+      <article class="art-card" data-idx="39" data-cat="flow" data-new="0" data-search="dots wave 正弦波浪彩点流 arts.newdotswave(300) 300 组旋转正弦波圆点串构成的动感波浪。 300 rotated sine-wave dot trails." onclick="openModal(39)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/dotswave.jpg" alt="Dots Wave" />
           <div class="card-badges">
@@ -1022,7 +1142,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="34" data-cat="geom" data-new="0" data-search="dot line 圆域网格随机游走短线 arts.newdotline(100, 20, 50, false) 约束在圆形视野内的网格短线与圆点构成。 grid-constrained short random walks forming a circular macro-structure." onclick="openModal(34)">
+      <article class="art-card" data-idx="40" data-cat="geom" data-new="0" data-search="dot line 圆域网格随机游走短线 arts.newdotline(100, 20, 50, false) 约束在圆形视野内的网格短线与圆点构成。 grid-constrained short random walks forming a circular macro-structure." onclick="openModal(40)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/dotline.jpg" alt="Dot Line" />
           <div class="card-badges">
@@ -1042,7 +1162,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="35" data-cat="classic" data-new="0" data-search="ocean fish 波浪剪影游鱼群 arts.newoceanfish(100, 8) 利用参数化鱼形路径裁剪横纹背景生成的海洋游鱼图。 parametric fish clipping masks layered over striped ocean waves." onclick="openModal(35)">
+      <article class="art-card" data-idx="41" data-cat="classic" data-new="0" data-search="ocean fish 波浪剪影游鱼群 arts.newoceanfish(100, 8) 利用参数化鱼形路径裁剪横纹背景生成的海洋游鱼图。 parametric fish clipping masks layered over striped ocean waves." onclick="openModal(41)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/oceanfish.jpg" alt="Ocean Fish" />
           <div class="card-badges">
@@ -1062,7 +1182,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="36" data-cat="geom" data-new="0" data-search="circle grid 包豪斯几何圆格 arts.newcirclegrid(4, 6) 网格排列的同心圆弧与色块，带有浓郁包豪斯构成感。 bauhaus-inspired grid of procedural circular arc glyphs." onclick="openModal(36)">
+      <article class="art-card" data-idx="42" data-cat="geom" data-new="0" data-search="circle grid 包豪斯几何圆格 arts.newcirclegrid(4, 6) 网格排列的同心圆弧与色块，带有浓郁包豪斯构成感。 bauhaus-inspired grid of procedural circular arc glyphs." onclick="openModal(42)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/circlegrid.jpg" alt="Circle Grid" />
           <div class="card-badges">
@@ -1082,7 +1202,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="37" data-cat="geom" data-new="0" data-search="circle loop 旋转椭圆李萨如环 arts.newcircleloop(100) 1000 次低透明度叠加旋转绘制出的发光丝网圆环。 1,000 low-alpha rotating circle iterations forming a glowing torus." onclick="openModal(37)">
+      <article class="art-card" data-idx="43" data-cat="geom" data-new="0" data-search="circle loop 旋转椭圆李萨如环 arts.newcircleloop(100) 1000 次低透明度叠加旋转绘制出的发光丝网圆环。 1,000 low-alpha rotating circle iterations forming a glowing torus." onclick="openModal(43)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/circleloop.jpg" alt="Circle Loop" />
           <div class="card-badges">
@@ -1102,7 +1222,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="38" data-cat="flow" data-new="0" data-search="circle move 噪声形变行进波环 arts.newcirclemove(1000) 沿水平方向推进并受极坐标噪声连续形变的丝绸波纹。 translating polar noise-deformed closed loops." onclick="openModal(38)">
+      <article class="art-card" data-idx="44" data-cat="flow" data-new="0" data-search="circle move 噪声形变行进波环 arts.newcirclemove(1000) 沿水平方向推进并受极坐标噪声连续形变的丝绸波纹。 translating polar noise-deformed closed loops." onclick="openModal(44)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/circlemove.jpg" alt="Circle Move" />
           <div class="card-badges">
@@ -1122,7 +1242,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="39" data-cat="media" data-new="0" data-search="silk sky 向心丝绸天幕 arts.newsilksky(15, 5) 向日轮焦点汇聚的多层超低透明度丝绸光影。 grid of translucent ellipses sized by distance to a focal sun." onclick="openModal(39)">
+      <article class="art-card" data-idx="45" data-cat="media" data-new="0" data-search="silk sky 向心丝绸天幕 arts.newsilksky(15, 5) 向日轮焦点汇聚的多层超低透明度丝绸光影。 grid of translucent ellipses sized by distance to a focal sun." onclick="openModal(45)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/silksky.jpg" alt="Silk Sky" />
           <div class="card-badges">
@@ -1142,7 +1262,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="40" data-cat="media" data-new="0" data-search="silk smoke 粒子邻接薄纱烟雾 arts.newsilksmoke(40, 20, 0.2, 2, 10, 30, true) 反弹圆粒子在接近时连接三角形面片，累积出丝滑烟雾。 casey reas process-style bouncing circles drawing translucent proximity triangles." onclick="openModal(40)">
+      <article class="art-card" data-idx="46" data-cat="media" data-new="0" data-search="silk smoke 粒子邻接薄纱烟雾 arts.newsilksmoke(40, 20, 0.2, 2, 10, 30, true) 反弹圆粒子在接近时连接三角形面片，累积出丝滑烟雾。 casey reas process-style bouncing circles drawing translucent proximity triangles." onclick="openModal(46)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/silksmoke.jpg" alt="Silk Smoke" />
           <div class="card-badges">
@@ -1162,7 +1282,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="41" data-cat="classic" data-new="0" data-search="random circle 过程式邻接椭圆网 arts.newrandcicle(30, 80, 0.2, 2, 10, 30, true) 运动圆盘相互重叠时在交界处生成细腻椭圆簇。 overlapping autonomous circles generating organic clusters of ellipses." onclick="openModal(41)">
+      <article class="art-card" data-idx="47" data-cat="classic" data-new="0" data-search="random circle 过程式邻接椭圆网 arts.newrandcicle(30, 80, 0.2, 2, 10, 30, true) 运动圆盘相互重叠时在交界处生成细腻椭圆簇。 overlapping autonomous circles generating organic clusters of ellipses." onclick="openModal(47)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/randcircle.jpg" alt="Random Circle" />
           <div class="card-badges">
@@ -1182,7 +1302,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="42" data-cat="classic" data-new="0" data-search="random shapes 高斯分布旋转色块 arts.newrandomshape(150) 按二维高斯分布散落的旋转矩形与十字几何构成。 gaussian-distributed rotated rectangles and geometric crosses." onclick="openModal(42)">
+      <article class="art-card" data-idx="48" data-cat="classic" data-new="0" data-search="random shapes 高斯分布旋转色块 arts.newrandomshape(150) 按二维高斯分布散落的旋转矩形与十字几何构成。 gaussian-distributed rotated rectangles and geometric crosses." onclick="openModal(48)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/randomshape.jpg" alt="Random Shapes" />
           <div class="card-badges">
@@ -1202,7 +1322,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="43" data-cat="classic" data-new="0" data-search="janus 双面衰减同心圆弧 arts.newjanus(10, 0.2) 按比例衰减的对称半圆弧叠合而成的神秘图腾。 decaying scaled opposite arcs forming a symmetric emblem." onclick="openModal(43)">
+      <article class="art-card" data-idx="49" data-cat="classic" data-new="0" data-search="janus 双面衰减同心圆弧 arts.newjanus(10, 0.2) 按比例衰减的对称半圆弧叠合而成的神秘图腾。 decaying scaled opposite arcs forming a symmetric emblem." onclick="openModal(49)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/janus.jpg" alt="Janus" />
           <div class="card-badges">
@@ -1222,7 +1342,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="44" data-cat="geom" data-new="0" data-search="color canva 粗描边错位色块网格 arts.newcolorcanve(5) 蒙德里安/波普风格的随机错位黑边彩色方格。 shuffled grid of offset bold-stroked color rectangles." onclick="openModal(44)">
+      <article class="art-card" data-idx="50" data-cat="geom" data-new="0" data-search="color canva 粗描边错位色块网格 arts.newcolorcanve(5) 蒙德里安/波普风格的随机错位黑边彩色方格。 shuffled grid of offset bold-stroked color rectangles." onclick="openModal(50)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/colorcanva.jpg" alt="Color Canva" />
           <div class="card-badges">
@@ -1242,7 +1362,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="45" data-cat="geom" data-new="0" data-search="maze 经典斜线迷宫密铺 arts.newmaze(20) 10 print 风格的随机对角线迷宫密铺图案。 classic 10 print diagonal truchet maze tiling." onclick="openModal(45)">
+      <article class="art-card" data-idx="51" data-cat="geom" data-new="0" data-search="maze 经典斜线迷宫密铺 arts.newmaze(20) 10 print 风格的随机对角线迷宫密铺图案。 classic 10 print diagonal truchet maze tiling." onclick="openModal(51)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/maze.jpg" alt="Maze" />
           <div class="card-badges">
@@ -1262,7 +1382,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="46" data-cat="geom" data-new="0" data-search="spiral square 螺旋衰减嵌套方框 arts.newspiralsquare(40, 400, 0.05, true) 层层旋转缩小的嵌套正方形螺旋隧道。 stack of decaying rotated nested squares." onclick="openModal(46)">
+      <article class="art-card" data-idx="52" data-cat="geom" data-new="0" data-search="spiral square 螺旋衰减嵌套方框 arts.newspiralsquare(40, 400, 0.05, true) 层层旋转缩小的嵌套正方形螺旋隧道。 stack of decaying rotated nested squares." onclick="openModal(52)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/spiralsquare.jpg" alt="Spiral Square" />
           <div class="card-badges">
@@ -1282,7 +1402,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="47" data-cat="chaos" data-new="0" data-search="point ribbon 三角函数参数点带 arts.newpointribbon(50) 由三角参数方程驱动的连续折叠半透明点云丝带。 trigonometric parametric point ribbon." onclick="openModal(47)">
+      <article class="art-card" data-idx="53" data-cat="chaos" data-new="0" data-search="point ribbon 三角函数参数点带 arts.newpointribbon(50) 由三角参数方程驱动的连续折叠半透明点云丝带。 trigonometric parametric point ribbon." onclick="openModal(53)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/pointribbon.jpg" alt="Point Ribbon" />
           <div class="card-badges">
@@ -1302,7 +1422,7 @@
           </div>
         </div>
       </article>
-      <article class="art-card" data-idx="48" data-cat="media" data-new="0" data-search="yarn 一维噪声贝塞尔毛线团 arts.newyarn(2000) 2000 条由 perlin 噪声控制端点的三次贝塞尔曲线交织如纱线。 2,000 1d-noise-driven cubic bézier curves woven across the canvas." onclick="openModal(48)">
+      <article class="art-card" data-idx="54" data-cat="media" data-new="0" data-search="yarn 一维噪声贝塞尔毛线团 arts.newyarn(2000) 2000 条由 perlin 噪声控制端点的三次贝塞尔曲线交织如纱线。 2,000 1d-noise-driven cubic bézier curves woven across the canvas." onclick="openModal(54)">
         <div class="art-thumb-wrap">
           <img src="images/thumbs/yarn.jpg" alt="Yarn" />
           <div class="card-badges">
@@ -1384,7 +1504,13 @@
     ];
 
     const ARTWORKS = [
-      // Wave 1–3 New HDR Artworks (16)
+      // Wave 1–4 New HDR Artworks (28)
+      { id:'poincaredisk', title:'Poincaré Hyperbolic Disk', zh:'庞加莱双曲圆盘密铺', cat:'geom', isNew:true, img:'poincaredisk.png', bg:'color.RGBA{R: 8, G: 10, B: 20, A: 255}', schema:'common.Dunhuang', call:'arts.NewPoincareDisk(7, 3, 5)', colors:['#c85a32','#d4a373','#457b9d','#f4ce84'], zhDesc:'基于 Möbius 自守变换群递归生成的 {7,3} 非欧双曲正七边形密铺，具有精确正交圆弧测地线与星盘刻度。', enDesc:'Non-Euclidean {7,3} hyperbolic polygon tessellation generated via Möbius inversions with orthogonal geodesic arcs and astrolabe bezel.' },
+      { id:'suminagashi', title:'Suminagashi Marbling', zh:'浮水墨流理石纹', cat:'media', isNew:true, img:'suminagashi.png', bg:'color.RGBA{R: 244, G: 239, B: 229, A: 255}', schema:'common.UkiyoE', call:'arts.NewSuminagashi(48, 7, 1.0)', colors:['#264653','#c85a32','#e9c46a','#f4efe5'], zhDesc:'基于面积守恒径向推挤变换、兰金涡旋与梳状剪切逆向平流求解的日本浮水墨流纹。', enDesc:'Japanese floating-ink marbling synthesized via area-preserving drop homeomorphisms, Rankine vortices, and comb-tine inverse advection.' },
+      { id:'aizawaattractor', title:'Aizawa Attractor', zh:'相泽奇异吸引子星云', cat:'chaos', isNew:true, img:'aizawaattractor.png', bg:'color.RGBA{R: 5, G: 7, B: 15, A: 255}', schema:'common.Cyberpunk', call:'arts.NewAizawaAttractor(900000, 1.0)', colors:['#7209b7','#f72585','#4cc9f0','#ffffff'], zhDesc:'以四阶龙格-库塔法积分 90 万步三维相泽微分方程，经景深散景圆盘采样与对数密度色调映射呈现环面涡管。', enDesc:'RK4 integration of 900,000 3D Aizawa strange attractor steps with thin-lens depth-of-field bokeh splatting and log-density tone mapping.' },
+      { id:'penrosetiling', title:'Penrose Quasicrystal', zh:'彭罗斯黄金准晶密铺', cat:'geom', isNew:true, img:'penrosetiling.png', bg:'color.RGBA{R: 10, G: 14, B: 24, A: 255}', schema:'common.Oceanic', call:'arts.NewPenroseTiling(6)', colors:['#00bbf9','#00f5d4','#1b4965','#f4ce84'], zhDesc:'基于黄金分割比 φ 的 Robinson 三角递归替换细分，拼合 P2 鸢形与飞镖十重非周期准晶并绘制连续 Ammann 圆弧。', enDesc:'10-fold aperiodic Penrose P2 kite-and-dart quasicrystal via golden-ratio Robinson triangle deflation with continuous Ammann matching arcs.' },
+      { id:'isometriccity', title:'Isometric Monument City', zh:'纪念碑谷轴测建筑乌托邦', cat:'geom', isNew:true, img:'isometriccity.png', bg:'color.RGBA{R: 18, G: 20, B: 34, A: 255}', schema:'common.Sunset', call:'arts.NewIsometricCity(11, 1.0)', colors:['#b83b5e','#f08a5d','#f9ed69','#269eac'], zhDesc:'纪念碑谷风格的 2.5D 等轴测阶梯金字塔城堡，包含空中廊桥、穹顶方尖碑、暮光天际线与碧水运河。', enDesc:'Monument-Valley-inspired 2.5D axonometric architectural citadel with stepped ziggurats, sky-bridges, domes, and twilight canal reflections.' },
+      { id:'dlafrost', title:'DLA Bioluminescent Frost', zh:'扩散限制凝聚生物发光冰晶', cat:'bio', isNew:true, img:'dlafrost.png', bg:'color.RGBA{R: 4, G: 8, B: 18, A: 255}', schema:'common.Oceanic', call:'arts.NewDLAFrost(18000, 0.55)', colors:['#03045e','#0077b6','#00b4d8','#caf0f8'], zhDesc:'空间网格加速的布朗运动随机游走与六重雪花对称各向异性黏附，按子树质量赋权渲染发光枝晶。', enDesc:'Diffusion-Limited Aggregation fractal crystal with 6-fold anisotropic sticking and Strahler subtree-mass bioluminescent glow.' },
       { id:'curlflow', title:'Curl Flow', zh:'无散度旋度流体丝带', cat:'flow', isNew:true, img:'curlflow.png', bg:'color.RGBA{R: 14, G: 18, B: 28, A: 255}', schema:'common.Cyberpunk', call:'arts.NewCurlFlow(110, 36, 0.0045)', colors:['#00f5d4','#7b2cbf','#f72585','#ffbe0b'], zhDesc:'基于 2D Curl Noise 无散度旋度场与可变宽度书法样条、多纤维毛笔笔刷，配合 Oklab 渐变与 HDR 泛光。', enDesc:'Divergence-free 2D curl noise streamlines rendered with calligraphic tapered splines, bristle brushes, and HDR bloom.' },
       { id:'cliffordnebula', title:'Clifford Nebula', zh:'奇异吸引子深空星云', cat:'chaos', isNew:true, img:'cliffordnebula.png', bg:'color.RGBA{R: 6, G: 6, B: 14, A: 255}', schema:'common.Inferno', call:'arts.NewCliffordNebula(1500000, -1.7, 1.8, -1.9, -0.4)', colors:['#160b39','#932667','#dd513a','#fca50a'], zhDesc:'150 万次 Clifford 混沌吸引子亚像素双线性沉积，结合 99.8% 分位数对数色调映射与星团高光。', enDesc:'1.5M Clifford strange attractor points accumulated via bilinear sub-pixel splatting and log-density tone mapping.' },
       { id:'physarum', title:'Physarum Network', zh:'双种群生物发光黏菌网络', cat:'bio', isNew:true, img:'physarum.png', bg:'color.RGBA{R: 6, G: 10, B: 18, A: 255}', schema:'common.Cyberpunk', call:'arts.NewPhysarum(45000, 110, 0, 0)', colors:['#00f5d4','#3a86ff','#ff007f','#b5179e'], zhDesc:'4.5 万个三触角趋化性黏菌智能体在双种群信息素场中自组织演化出的生物发光血管与菌丝网络。', enDesc:'Bioluminescent two-species slime mold transport network emerging from 45,000 chemotactic agents.' },
