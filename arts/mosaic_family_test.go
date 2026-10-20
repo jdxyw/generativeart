@@ -1,0 +1,32 @@
+package arts
+
+import (
+	"testing"
+
+	"github.com/jdxyw/generativeart"
+)
+
+func TestMosaicFamilyGenerators(t *testing.T) {
+	cases := []struct {
+		name string
+		eng  generativeart.Engine
+	}{
+		{"MosaicSun", NewMosaicSun(24, 1.0)},
+		{"MosaicVortex", NewMosaicVortex(24, 1.0)},
+		{"MosaicWave", NewMosaicWave(24, 1.0)},
+		{"MosaicCanyon", NewMosaicCanyon(24, 1.0)},
+		{"MosaicLotus", NewMosaicLotus(10, 1.0)},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			c := generativeart.NewCanva(160, 160)
+			c.FillBackground()
+			c.Draw(tc.eng)
+			img := c.Img()
+			if img == nil || img.Bounds().Dx() != 160 || img.Bounds().Dy() != 160 {
+				t.Fatalf("%s produced invalid canvas image", tc.name)
+			}
+		})
+	}
+}
