@@ -531,3 +531,123 @@ func (c *Canvas) DrawShadedOrb(
 		c.DrawSoftRing(center.X, center.Y, radius, 1.35, strokeCol, math.Min(1.0, alpha*1.15))
 	}
 }
+
+// InsetPolygon shrinks each vertex of pts toward its centroid by shrink pixels,
+// preserving crisp dark grout lines between adjacent low-poly crystal facets.
+func InsetPolygon(pts []Point, shrink float64) []Point {
+	if len(pts) == 0 {
+		return nil
+	}
+	var cx, cy float64
+	for _, p := range pts {
+		cx += p.X
+		cy += p.Y
+	}
+	center := Pt(cx/float64(len(pts)), cy/float64(len(pts)))
+	out := make([]Point, len(pts))
+	for i, p := range pts {
+		d := p.Sub(center)
+		l := d.Len()
+		if l > shrink*2.5 {
+			out[i] = p.Sub(d.Mul(shrink / l))
+		} else {
+			out[i] = p.Lerp(center, 0.08)
+		}
+	}
+	return out
+}
+
+// DrawMosaicBrick renders a crisp, flow-aligned, sheared parallelogram mosaic brick
+// along segment p0 -> p1 with automatic grout inset scaled by scale.
+func (c *Canvas) DrawMosaicBrick(
+	p0, p1 Point,
+	halfThick, shear, scale float64,
+	col color.RGBA,
+	alpha float64,
+) {
+	if c == nil || halfThick <= 0 || alpha <= 0 || col.A == 0 {
+		return
+	}
+	if scale <= 0 {
+		scale = 1.0
+	}
+	dir := p1.Sub(p0)
+	length := dir.Len()
+	if length < 1e-4 {
+		return
+	}
+	tVec := dir.Mul(1.0 / length)
+	nVec := tVec.Perp()
+
+	insetL := math.Min(0.45*scale, length*0.04)
+	insetT := math.Min(0.35*scale, halfThick*0.06)
+	a := p0.Add(tVec.Mul(insetL))
+	b := p1.Sub(tVec.Mul(insetL))
+	ht := math.Max(1.1, halfThick-insetT)
+
+	shearVec := tVec.Mul(shear * ht)
+	v0 := a.Add(nVec.Mul(ht)).Add(shearVec)
+	v1 := b.Add(nVec.Mul(ht)).Add(shearVec)
+	v2 := b.Sub(nVec.Mul(ht)).Sub(shearVec)
+	v3 := a.Sub(nVec.Mul(ht)).Sub(shearVec)
+
+	c.FillPolygon([]Point{v0, v1, v2, v3}, col, alpha)
+}
+
+// DrawCurvedTessera renders a curved, sheared ceramic mosaic tile along a short
+// polyline centerline (2+ points), preserving crisp grout gaps along both longitudinal
+// and transverse joints.
+func (c *Canvas) DrawCurvedTessera(
+	pts []Point,
+	halfThick, shear, scale float64,
+	col color.RGBA,
+	alpha float64,
+) {
+	if c == nil || len(pts) < 2 || halfThick <= 0 || alpha <= 0 || col.A == 0 {
+		return
+	}
+	if len(pts) == 2 {
+		c.DrawMosaicBrick(pts[0], pts[1], halfThick, shear, scale, col, alpha)
+		return
+	}
+	if scale <= 0 {
+		scale = 1.0
+	}
+	insetT := math.Min(0.35*scale, halfThick*0.06)
+	ht := math.Max(1.1, halfThick-insetT)
+
+	n := len(pts)
+	upper := make([]Point, n)
+	lower := make([]Point, n)
+	for i := 0; i < n; i++ {
+		var tan Point
+		switch {
+		case i == 0:
+			tan = pts[1].Sub(pts[0]).Norm()
+		case i == n-1:
+			tan = pts[n-1].Sub(pts[n-2]).Norm()
+		default:
+			tan = pts[i+1].Sub(pts[i-1]).Norm()
+		}
+		norm := tan.Perp()
+		base := pts[i]
+		if i == 0 {
+			segLen := pts[1].Dist(pts[0])
+			base = base.Add(tan.Mul(math.Min(0.45*scale, segLen*0.08)))
+		} else if i == n-1 {
+			segLen := pts[n-1].Dist(pts[n-2])
+			base = base.Sub(tan.Mul(math.Min(0.45*scale, segLen*0.08)))
+		}
+		shearVec := tan.Mul(shear * ht)
+		upper[i] = base.Add(norm.Mul(ht)).Add(shearVec)
+		lower[i] = base.Sub(norm.Mul(ht)).Sub(shearVec)
+	}
+
+	poly := make([]Point, 0, 2*n)
+	poly = append(poly, upper...)
+	for i := n - 1; i >= 0; i-- {
+		poly = append(poly, lower[i])
+	}
+	c.FillPolygon(poly, col, alpha)
+}
+

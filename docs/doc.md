@@ -916,3 +916,64 @@ tc := arts.NewTangentCones(26)
 ```
 
 ![](../images/tangentcones.png)
+
+## Mosaic Vortex
+
+`Mosaic Vortex` renders a Starry-Night-inspired swirling sky vortex of anisotropic mosaic tesserae, a low-poly crystal crescent moon, a pinwheel star eye, rolling twilight hills, and a faceted cypress spire.
+
+### parameters
+
+- ringSteps: The number of concentric warped mosaic courses in the primary sky vortex.
+- brickScale: Controls the size multiplier of the mosaic bricks and grout insets.
+
+```go
+mv := arts.NewMosaicVortex(34, 1.0)
+```
+
+![](../images/mosaicvortex.png)
+
+## Mosaic Wave
+
+`Mosaic Wave` renders a Ukiyo-e-inspired Great Cresting Wave of flow-aligned mosaic courses, geometric low-poly sea-foam claws, a faceted crimson sun disc, and a snow-capped Mount Fuji peak.
+
+### parameters
+
+- waveCourses: The number of flow-aligned mosaic wave courses from crest to foreground trough.
+- brickScale: Controls the size multiplier of the mosaic bricks and grout insets.
+
+```go
+mw := arts.NewMosaicWave(32, 1.0)
+```
+
+![](../images/mosaicwave.png)
+
+## Mosaic Canyon
+
+`Mosaic Canyon` renders stratified terracotta and ochre canyon cliffs framing a winding turquoise and gold river beneath a blazing low-poly eclipse sun.
+
+### parameters
+
+- strataSteps: The number of geological stratum courses across the canyon walls.
+- brickScale: Controls the size multiplier of the mosaic bricks and grout insets.
+
+```go
+mc := arts.NewMosaicCanyon(32, 1.0)
+```
+
+![](../images/mosaiccanyon.png)
+
+## Mosaic Lotus
+
+`Mosaic Lotus` renders a monumental low-poly stained-glass lotus mandala over concentric jade-and-turquoise pond ripples, sinuous golden koi flow ribbons, and faceted emerald lily pads.
+
+### parameters
+
+- petals: The number of lotus petals per mandala ring.
+- brickScale: Controls the size multiplier of the mosaic bricks and grout insets.
+
+```go
+ml := arts.NewMosaicLotus(12, 1.0)
+```
+
+![](../images/mosaiclotus.png)
+

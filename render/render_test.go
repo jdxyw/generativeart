@@ -206,3 +206,35 @@ func TestApplyBloomAndPostProcess(t *testing.T) {
 		t.Fatalf("expected valid non-negative corner pixel after paper texture + vignette, got %f", rCorner)
 	}
 }
+
+func TestMosaicPrimitivesAndInsetPolygon(t *testing.T) {
+	c := NewCanvas(64, 64)
+	c.FillBackground(common.Black)
+	c.SetBlendMode(BlendOver)
+
+	amber := color.RGBA{R: 242, G: 172, B: 50, A: 255}
+	teal := color.RGBA{R: 72, G: 168, B: 178, A: 255}
+
+	c.DrawMosaicBrick(Pt(10, 20), Pt(40, 22), 5.0, 0.3, 1.0, amber, 1.0)
+	c.DrawCurvedTessera([]Point{Pt(12, 42), Pt(28, 38), Pt(48, 44)}, 4.5, -0.25, 1.0, teal, 1.0)
+
+	inset := InsetPolygon([]Point{Pt(10, 10), Pt(30, 10), Pt(20, 28)}, 1.5)
+	if len(inset) != 3 {
+		t.Fatalf("expected 3 vertices from InsetPolygon, got %d", len(inset))
+	}
+
+	img := c.ResolveToRGBA(nil)
+	lit := 0
+	for y := 0; y < 64; y++ {
+		for x := 0; x < 64; x++ {
+			px := img.RGBAAt(x, y)
+			if px.R > 0 || px.G > 0 || px.B > 0 {
+				lit++
+			}
+		}
+	}
+	if lit < 120 {
+		t.Fatalf("expected DrawMosaicBrick and DrawCurvedTessera to rasterize >120 pixels, got %d", lit)
+	}
+}
+

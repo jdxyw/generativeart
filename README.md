@@ -75,6 +75,10 @@
     - [Nautilus Spiral](#nautilus-spiral)
     - [Mosaic Sun](#mosaic-sun)
     - [Tangent Cones](#tangent-cones)
+    - [Mosaic Vortex](#mosaic-vortex)
+    - [Mosaic Wave](#mosaic-wave)
+    - [Mosaic Canyon](#mosaic-canyon)
+    - [Mosaic Lotus](#mosaic-lotus)
   - [TODO](#todo)
   - [Contribution](#contribution)
 
@@ -155,6 +159,10 @@ This package is still working in progress. More types would be added. Welcome an
 - Nautilus Spiral
 - Mosaic Sun
 - Tangent Cones
+- Mosaic Vortex
+- Mosaic Wave
+- Mosaic Canyon
+- Mosaic Lotus
 
 For these kinds of art, the package provides as many parameters to control the appearance.
 
@@ -231,6 +239,10 @@ NewOrphicDiscs(discCount int)
 NewNautilusSpiral(turns int, chambersPerTurn int)
 NewMosaicSun(ringCount int, rayDensity float64)
 NewTangentCones(coneCount int)
+NewMosaicVortex(ringSteps int, brickScale float64)
+NewMosaicWave(waveCourses int, brickScale float64)
+NewMosaicCanyon(strataSteps int, brickScale float64)
+NewMosaicLotus(petals int, brickScale float64)
 ```
 
 ## Docs
@@ -1264,6 +1276,70 @@ func main() {
 ```
 
 ![Tangent Cones](images/tangentcones.png)
+
+### Mosaic Vortex
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 16, G: 20, B: 38, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Oceanic)
+ c.Draw(arts.NewMosaicVortex(34, 1.0))
+ c.ToPNG("mosaicvortex.png")
+}
+```
+
+![Mosaic Vortex](images/mosaicvortex.png)
+
+### Mosaic Wave
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 18, G: 24, B: 44, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.UkiyoE)
+ c.Draw(arts.NewMosaicWave(32, 1.0))
+ c.ToPNG("mosaicwave.png")
+}
+```
+
+![Mosaic Wave](images/mosaicwave.png)
+
+### Mosaic Canyon
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 22, G: 18, B: 32, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Dunhuang)
+ c.Draw(arts.NewMosaicCanyon(32, 1.0))
+ c.ToPNG("mosaiccanyon.png")
+}
+```
+
+![Mosaic Canyon](images/mosaiccanyon.png)
+
+### Mosaic Lotus
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 16, G: 24, B: 42, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Botanical)
+ c.Draw(arts.NewMosaicLotus(12, 1.0))
+ c.ToPNG("mosaiclotus.png")
+}
+```
+
+![Mosaic Lotus](images/mosaiclotus.png)
 
 ## TODO
 
