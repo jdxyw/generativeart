@@ -4,7 +4,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/jdxyw/generativeart)](https://goreportcard.com/report/github.com/jdxyw/generativeart)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/jdxyw/generativeart/master/LICENSE)
 
-`generativeart` is a pure-`Go` generative art engine and algorithm collection supporting **74 generative art types** across flow fields, strange attractors, biological morphogenesis, non-Euclidean geometry, stained-glass mosaics, cloisonné enamel, and traditional printmaking.
+`generativeart` is a pure-`Go` generative art engine and algorithm collection supporting **78 generative art types** across flow fields, strange attractors, biological morphogenesis, non-Euclidean geometry, stained-glass mosaics, cloisonné enamel, 3D origami, and traditional printmaking.
 
 - 🌐 **Live Interactive Web Gallery (GitHub Pages)**: **[https://jdxyw.github.io/generativeart/](https://jdxyw.github.io/generativeart/)**
 - 🖼️ **Full Code & Image Gallery (`gallery.md`)**: **[./gallery.md](./gallery.md)**
@@ -15,17 +15,17 @@
 
 ## Featured Gallery Highlights
 
-> Browse all **74 artworks**, full `Go` source snippets, and rendered previews in **[`gallery.md`](./gallery.md)** or on the **[Interactive GitHub Pages Gallery](https://jdxyw.github.io/generativeart/)**.
+> Browse all **78 artworks**, full `Go` source snippets, and rendered previews in **[`gallery.md`](./gallery.md)** or on the **[Interactive GitHub Pages Gallery](https://jdxyw.github.io/generativeart/)**.
 
-| [Cloisonné Enamel](./gallery.md#cloisonne-enamel) | [Woodblock Wave](./gallery.md#woodblock-wave) | [Art Deco Sunburst](./gallery.md#art-deco-sunburst) | [Stained Rose Window](./gallery.md#stained-rose-window) |
+| [Even Streamlines](./gallery.md#even-streamlines) | [Marching Isolines](./gallery.md#marching-isolines) | [Origami Tessellation](./gallery.md#origami-tessellation) | [Mondrian Subdivision](./gallery.md#mondrian-subdivision) |
 | :---: | :---: | :---: | :---: |
+| ![Even Streamlines](images/evenstreamlines.png) | ![Marching Isolines](images/marchingisolines.png) | ![Origami Tessellation](images/origamitessellation.png) | ![Mondrian Subdivision](images/mondriansubdivision.png) |
+| **[Cloisonné Enamel](./gallery.md#cloisonne-enamel)** | **[Woodblock Wave](./gallery.md#woodblock-wave)** | **[Art Deco Sunburst](./gallery.md#art-deco-sunburst)** | **[Stained Rose Window](./gallery.md#stained-rose-window)** |
 | ![Cloisonne Enamel](images/cloisonneenamel.png) | ![Woodblock Wave](images/woodblockwave.png) | ![Art Deco Sunburst](images/artdecosunburst.png) | ![Stained Rose Window](images/stainedrosewindow.png) |
 | **[Mosaic Vortex](./gallery.md#mosaic-vortex)** | **[Mosaic Wave](./gallery.md#mosaic-wave)** | **[Mosaic Canyon](./gallery.md#mosaic-canyon)** | **[Mosaic Lotus](./gallery.md#mosaic-lotus)** |
 | ![Mosaic Vortex](images/mosaicvortex.png) | ![Mosaic Wave](images/mosaicwave.png) | ![Mosaic Canyon](images/mosaiccanyon.png) | ![Mosaic Lotus](images/mosaiclotus.png) |
-| **[Mosaic Sun](./gallery.md#mosaic-sun)** | **[Impasto Flow](./gallery.md#impasto-flow)** | **[Nautilus Spiral](./gallery.md#nautilus-spiral)** | **[Poincaré Disk](./gallery.md#poincare-disk)** |
-| ![Mosaic Sun](images/mosaicsun.png) | ![Impasto Flow](images/impastoflow.png) | ![Nautilus Spiral](images/nautilusspiral.png) | ![Poincare Disk](images/poincaredisk.png) |
 
-👉 **[View All 74 Artworks & Code Examples in `gallery.md` →](./gallery.md)**
+👉 **[View All 78 Artworks & Code Examples in `gallery.md` →](./gallery.md)**
 
 ---
 
@@ -167,9 +167,15 @@ _ = c.ToGIF("loop.gif", 6)
 
 ## Supported Art Types & Constructors
 
-All 74 generators implement `generativeart.Engine` under package `github.com/jdxyw/generativeart/arts` (see [gallery.md](./gallery.md) for visual examples and [docs/doc.md](./docs/doc.md) for parameter details):
+All 78 generators implement `generativeart.Engine` under package `github.com/jdxyw/generativeart/arts` (see [gallery.md](./gallery.md) for visual examples and [docs/doc.md](./docs/doc.md) for parameter details):
 
 ```go
+// Wave 9: Topological Contours, Streamline Engraving, 3D Origami & Bauhaus SDF Relief
+NewEvenStreamlines(dSep, dTest float64)
+NewMarchingIsolines(levels int, noiseScale float64)
+NewOrigamiTessellation(cols, rows int, foldDepth float64)
+NewMondrianSubdivision(depth int, pad float64)
+
 // Wave 8: Decorative Arts, Cloisonné Enamel & Printmaking
 NewCloisonneEnamel(rings, petals int)
 NewWoodblockWave(ridgeLayers, waveLines int)

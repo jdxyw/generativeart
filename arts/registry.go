@@ -96,6 +96,36 @@ func paramFloat(p map[string]interface{}, key string, def float64) float64 {
 }
 
 var registry = []ArtDescriptor{
+	// Wave 9: Topological Contours, Streamline Engraving, 3D Origami & Bauhaus SDF Relief
+	{
+		ID: "evenstreamlines", StructName: "evenStreamlines", Category: "flow",
+		DefaultBG: color.RGBA{12, 16, 28, 255}, DefaultPal: "oceanic",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewEvenStreamlines(paramFloat(p, "dSep", 7.5), paramFloat(p, "dTest", 3.9))
+		},
+	},
+	{
+		ID: "marchingisolines", StructName: "marchingIsolines", Category: "geom",
+		DefaultBG: color.RGBA{12, 22, 42, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewMarchingIsolines(paramInt(p, "levels", 16), paramFloat(p, "noiseScale", 1.0))
+		},
+	},
+	{
+		ID: "origamitessellation", StructName: "origamiTessellation", Category: "geom",
+		DefaultBG: color.RGBA{16, 22, 44, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewOrigamiTessellation(paramInt(p, "cols", 14), paramInt(p, "rows", 14), paramFloat(p, "foldDepth", 1.0))
+		},
+	},
+	{
+		ID: "mondriansubdivision", StructName: "mondrianSubdivision", Category: "geom",
+		DefaultBG: color.RGBA{18, 18, 24, 255}, DefaultPal: "sunset",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewMondrianSubdivision(paramInt(p, "depth", 4), paramFloat(p, "pad", 6.0))
+		},
+	},
+
 	// Wave 8: Decorative Arts, Cloisonné Enamel & Printmaking
 	{
 		ID: "cloisonneenamel", StructName: "cloisonneEnamel", Category: "media",

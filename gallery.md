@@ -8,6 +8,11 @@ This gallery contains standalone `Go` usage examples and rendered outputs for `g
 
 ## Table of Contents
 
+- [Wave 9: Topological Contours, Streamline Engraving, 3D Origami & Bauhaus SDF Relief](#wave-9-topological-contours-streamline-engraving-3d-origami--bauhaus-sdf-relief)
+  - [Even Streamlines](#even-streamlines)
+  - [Marching Isolines](#marching-isolines)
+  - [Origami Tessellation](#origami-tessellation)
+  - [Mondrian Subdivision](#mondrian-subdivision)
 - [Wave 8: Decorative Arts, Cloisonné Enamel & Printmaking](#wave-8-decorative-arts-cloisonné-enamel--printmaking)
   - [Cloisonne Enamel](#cloisonne-enamel)
   - [Woodblock Wave](#woodblock-wave)
@@ -81,6 +86,74 @@ This gallery contains standalone `Go` usage examples and rendered outputs for `g
   - [Silk Sky](#silk-sky)
   - [Circle Move](#circle-move)
   - [Random Circle](#random-circle)
+
+---
+
+## Wave 9: Topological Contours, Streamline Engraving, 3D Origami & Bauhaus SDF Relief
+
+### Even Streamlines
+
+```go
+func main() {
+	rand.Seed(time.Now().Unix())
+	c := generativeart.NewCanva(600, 600)
+	c.SetBackground(color.RGBA{R: 12, G: 16, B: 28, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Oceanic)
+	c.Draw(arts.NewEvenStreamlines(7.5, 3.9))
+	c.ToPNG("evenstreamlines.png")
+}
+```
+
+![Even Streamlines](images/evenstreamlines.png)
+
+### Marching Isolines
+
+```go
+func main() {
+	rand.Seed(time.Now().Unix())
+	c := generativeart.NewCanva(600, 600)
+	c.SetBackground(color.RGBA{R: 12, G: 22, B: 42, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewMarchingIsolines(16, 1.0))
+	c.ToPNG("marchingisolines.png")
+}
+```
+
+![Marching Isolines](images/marchingisolines.png)
+
+### Origami Tessellation
+
+```go
+func main() {
+	rand.Seed(time.Now().Unix())
+	c := generativeart.NewCanva(600, 600)
+	c.SetBackground(color.RGBA{R: 16, G: 22, B: 44, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewOrigamiTessellation(14, 14, 1.0))
+	c.ToPNG("origamitessellation.png")
+}
+```
+
+![Origami Tessellation](images/origamitessellation.png)
+
+### Mondrian Subdivision
+
+```go
+func main() {
+	rand.Seed(time.Now().Unix())
+	c := generativeart.NewCanva(600, 600)
+	c.SetBackground(color.RGBA{R: 18, G: 18, B: 24, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Sunset)
+	c.Draw(arts.NewMondrianSubdivision(4, 6.0))
+	c.ToPNG("mondriansubdivision.png")
+}
+```
+
+![Mondrian Subdivision](images/mondriansubdivision.png)
 
 ---
 
