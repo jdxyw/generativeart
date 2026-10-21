@@ -79,6 +79,10 @@
     - [Mosaic Wave](#mosaic-wave)
     - [Mosaic Canyon](#mosaic-canyon)
     - [Mosaic Lotus](#mosaic-lotus)
+    - [Cloisonne Enamel](#cloisonne-enamel)
+    - [Woodblock Wave](#woodblock-wave)
+    - [Art Deco Sunburst](#art-deco-sunburst)
+    - [Stained Rose Window](#stained-rose-window)
   - [TODO](#todo)
   - [Contribution](#contribution)
 
@@ -163,6 +167,10 @@ This package is still working in progress. More types would be added. Welcome an
 - Mosaic Wave
 - Mosaic Canyon
 - Mosaic Lotus
+- Cloisonne Enamel
+- Woodblock Wave
+- Art Deco Sunburst
+- Stained Rose Window
 
 For these kinds of art, the package provides as many parameters to control the appearance.
 
@@ -243,6 +251,10 @@ NewMosaicVortex(ringSteps int, brickScale float64)
 NewMosaicWave(waveCourses int, brickScale float64)
 NewMosaicCanyon(strataSteps int, brickScale float64)
 NewMosaicLotus(petals int, brickScale float64)
+NewCloisonneEnamel(rings, petals int)
+NewWoodblockWave(ridgeLayers, waveLines int)
+NewArtDecoSunburst(rayCount, archTiers int)
+NewStainedRoseWindow(petals, rings int)
 ```
 
 ## Docs
@@ -1340,6 +1352,70 @@ func main() {
 ```
 
 ![Mosaic Lotus](images/mosaiclotus.png)
+
+### Cloisonne Enamel
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 18, G: 14, B: 22, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Dunhuang)
+ c.Draw(arts.NewCloisonneEnamel(6, 12))
+ c.ToPNG("cloisonneenamel.png")
+}
+```
+
+![Cloisonne Enamel](images/cloisonneenamel.png)
+
+### Woodblock Wave
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 242, G: 232, B: 206, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.UkiyoE)
+ c.Draw(arts.NewWoodblockWave(5, 42))
+ c.ToPNG("woodblockwave.png")
+}
+```
+
+![Woodblock Wave](images/woodblockwave.png)
+
+### Art Deco Sunburst
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 14, G: 16, B: 24, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Sunset)
+ c.Draw(arts.NewArtDecoSunburst(36, 7))
+ c.ToPNG("artdecosunburst.png")
+}
+```
+
+![Art Deco Sunburst](images/artdecosunburst.png)
+
+### Stained Rose Window
+
+```go
+func main() {
+ rand.Seed(time.Now().Unix())
+ c := generativeart.NewCanva(600, 600)
+ c.SetBackground(color.RGBA{R: 12, G: 11, B: 18, A: 255})
+ c.FillBackground()
+ c.SetColorSchema(common.Cyberpunk)
+ c.Draw(arts.NewStainedRoseWindow(12, 5))
+ c.ToPNG("stainedrosewindow.png")
+}
+```
+
+![Stained Rose Window](images/stainedrosewindow.png)
 
 ## TODO
 
