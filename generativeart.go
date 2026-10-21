@@ -7,6 +7,7 @@ import (
 	"image/draw"
 	"image/jpeg"
 	"image/png"
+	"math/rand"
 	"os"
 
 	"github.com/jdxyw/generativeart/common"
@@ -21,6 +22,8 @@ type Canva struct {
 	height, width int
 	img           *image.RGBA
 	opts          Options
+	rng           *rand.Rand
+	noise         *common.NoiseEngine
 }
 
 func (c *Canva) Opts() Options {
@@ -47,6 +50,11 @@ type Options struct {
 	colorSchema []color.RGBA
 	nIters      int
 	alpha       int
+	seed        int64
+}
+
+func (o Options) Seed() int64 {
+	return o.seed
 }
 
 func (o Options) Alpha() int {
@@ -79,10 +87,12 @@ func (o Options) Background() color.RGBA {
 
 // NewCanva returns a Canva.
 func NewCanva(w, h int) *Canva {
+	defaultSeed := int64(20261021)
 	return &Canva{
 		height: h,
 		width:  w,
 		img:    image.NewRGBA(image.Rect(0, 0, w, h)),
+		rng:    rand.New(rand.NewSource(defaultSeed)),
 		// Set some defaults value
 		opts: Options{
 			background:  common.Azure,
@@ -92,8 +102,39 @@ func NewCanva(w, h int) *Canva {
 			colorSchema: common.Youthful,
 			nIters:      20,
 			alpha:       255,
+			seed:        defaultSeed,
 		},
 	}
+}
+
+// SetSeed sets a deterministic random seed for this canvas, updating its local
+// *rand.Rand, NoiseEngine, and the package-level math/rand seed for legacy engines.
+func (c *Canva) SetSeed(seed int64) {
+	c.opts.seed = seed
+	c.rng = rand.New(rand.NewSource(seed))
+	c.noise = common.NewNoiseEngine(seed)
+	rand.Seed(seed)
+}
+
+// Seed returns the deterministic seed configured on this canvas.
+func (c *Canva) Seed() int64 {
+	return c.opts.seed
+}
+
+// Rand returns the canvas-scoped deterministic *rand.Rand generator.
+func (c *Canva) Rand() *rand.Rand {
+	if c.rng == nil {
+		c.rng = rand.New(rand.NewSource(c.opts.seed))
+	}
+	return c.rng
+}
+
+// Noise returns the canvas-scoped deterministic *common.NoiseEngine.
+func (c *Canva) Noise() *common.NoiseEngine {
+	if c.noise == nil {
+		c.noise = common.NewNoiseEngine(c.opts.seed)
+	}
+	return c.noise
 }
 
 func (c *Canva) SetOptions(opts Options) {

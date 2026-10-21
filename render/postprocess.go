@@ -71,59 +71,63 @@ func (c *Canvas) ApplyBloom(threshold, sigma, strength float64) {
 		kernel[k] /= sum
 	}
 
-	// 3. Horizontal separable pass
+	// 3. Horizontal separable pass (parallelized across rows)
 	temp := make([]float64, nPix*3)
-	for y := 0; y < h; y++ {
-		rowOff := y * w
-		for x := 0; x < w; x++ {
-			var accR, accG, accB float64
-			for k := -radius; k <= radius; k++ {
-				sx := x + k
-				if sx < 0 {
-					sx = 0
-				} else if sx >= w {
-					sx = w - 1
+	parallelRows(w, h, func(y0, y1 int) {
+		for y := y0; y < y1; y++ {
+			rowOff := y * w
+			for x := 0; x < w; x++ {
+				var accR, accG, accB float64
+				for k := -radius; k <= radius; k++ {
+					sx := x + k
+					if sx < 0 {
+						sx = 0
+					} else if sx >= w {
+						sx = w - 1
+					}
+					wk := kernel[k+radius]
+					sIdx := (rowOff + sx) * 3
+					accR += bright[sIdx+0] * wk
+					accG += bright[sIdx+1] * wk
+					accB += bright[sIdx+2] * wk
 				}
-				wk := kernel[k+radius]
-				sIdx := (rowOff + sx) * 3
-				accR += bright[sIdx+0] * wk
-				accG += bright[sIdx+1] * wk
-				accB += bright[sIdx+2] * wk
+				dIdx := (rowOff + x) * 3
+				temp[dIdx+0] = accR
+				temp[dIdx+1] = accG
+				temp[dIdx+2] = accB
 			}
-			dIdx := (rowOff + x) * 3
-			temp[dIdx+0] = accR
-			temp[dIdx+1] = accG
-			temp[dIdx+2] = accB
 		}
-	}
+	})
 
-	// 4. Vertical separable pass + additive HDR composite
-	for y := 0; y < h; y++ {
-		for x := 0; x < w; x++ {
-			var accR, accG, accB float64
-			for k := -radius; k <= radius; k++ {
-				sy := y + k
-				if sy < 0 {
-					sy = 0
-				} else if sy >= h {
-					sy = h - 1
+	// 4. Vertical separable pass + additive HDR composite (parallelized across rows)
+	parallelRows(w, h, func(y0, y1 int) {
+		for y := y0; y < y1; y++ {
+			for x := 0; x < w; x++ {
+				var accR, accG, accB float64
+				for k := -radius; k <= radius; k++ {
+					sy := y + k
+					if sy < 0 {
+						sy = 0
+					} else if sy >= h {
+						sy = h - 1
+					}
+					wk := kernel[k+radius]
+					sIdx := (sy*w + x) * 3
+					accR += temp[sIdx+0] * wk
+					accG += temp[sIdx+1] * wk
+					accB += temp[sIdx+2] * wk
 				}
-				wk := kernel[k+radius]
-				sIdx := (sy*w + x) * 3
-				accR += temp[sIdx+0] * wk
-				accG += temp[sIdx+1] * wk
-				accB += temp[sIdx+2] * wk
-			}
-			cIdx := (y*w + x) * 4
-			c.pix[cIdx+0] += accR * strength
-			c.pix[cIdx+1] += accG * strength
-			c.pix[cIdx+2] += accB * strength
-			if c.pix[cIdx+3] < 1.0 {
-				glowA := common.Constrain((accR+accG+accB)*strength*0.333, 0, 1)
-				c.pix[cIdx+3] = c.pix[cIdx+3] + glowA*(1.0-c.pix[cIdx+3])
+				cIdx := (y*w + x) * 4
+				c.pix[cIdx+0] += accR * strength
+				c.pix[cIdx+1] += accG * strength
+				c.pix[cIdx+2] += accB * strength
+				if c.pix[cIdx+3] < 1.0 {
+					glowA := common.Constrain((accR+accG+accB)*strength*0.333, 0, 1)
+					c.pix[cIdx+3] = c.pix[cIdx+3] + glowA*(1.0-c.pix[cIdx+3])
+				}
 			}
 		}
-	}
+	})
 }
 
 // hash2D is a fast deterministic 2D spatial hash returning a value in [-1, 1].
@@ -170,27 +174,29 @@ func (c *Canvas) ApplyPaperTexture(intensity float64, seed int64) {
 	s3 := rng.Uint64()
 
 	w, h := c.Width, c.Height
-	for y := 0; y < h; y++ {
-		fy := float64(y)
-		for x := 0; x < w; x++ {
-			fx := float64(x)
+	parallelRows(w, h, func(y0, y1 int) {
+		for y := y0; y < y1; y++ {
+			fy := float64(y)
+			for x := 0; x < w; x++ {
+				fx := float64(x)
 
-			// Coarse paper clouding + medium directional weave + fine micro-tooth
-			coarse := valueNoise2D(fx*0.035, fy*0.035, s1)
-			fiberX := valueNoise2D(fx*0.25, fy*0.06, s2)
-			fiberY := valueNoise2D(fx*0.06, fy*0.25, s2^0xA5A5A5A5)
-			fine := hash2D(x, y, s3)
+				// Coarse paper clouding + medium directional weave + fine micro-tooth
+				coarse := valueNoise2D(fx*0.035, fy*0.035, s1)
+				fiberX := valueNoise2D(fx*0.25, fy*0.06, s2)
+				fiberY := valueNoise2D(fx*0.06, fy*0.25, s2^0xA5A5A5A5)
+				fine := hash2D(x, y, s3)
 
-			paper := 0.35*coarse + 0.25*fiberX + 0.25*fiberY + 0.15*fine
-			mod := 1.0 + paper*intensity*0.14
-			lift := paper * intensity * 0.008
+				paper := 0.35*coarse + 0.25*fiberX + 0.25*fiberY + 0.15*fine
+				mod := 1.0 + paper*intensity*0.14
+				lift := paper * intensity * 0.008
 
-			idx := (y*w + x) * 4
-			c.pix[idx+0] = math.Max(0, c.pix[idx+0]*mod+lift)
-			c.pix[idx+1] = math.Max(0, c.pix[idx+1]*mod+lift)
-			c.pix[idx+2] = math.Max(0, c.pix[idx+2]*mod+lift)
+				idx := (y*w + x) * 4
+				c.pix[idx+0] = math.Max(0, c.pix[idx+0]*mod+lift)
+				c.pix[idx+1] = math.Max(0, c.pix[idx+1]*mod+lift)
+				c.pix[idx+2] = math.Max(0, c.pix[idx+2]*mod+lift)
+			}
 		}
-	}
+	})
 }
 
 // ApplyVignette applies a smooth cosine/polynomial radial darkening near the canvas edges.
@@ -204,20 +210,22 @@ func (c *Canvas) ApplyVignette(strength float64) {
 	invRx := 1.0 / math.Max(1.0, cx)
 	invRy := 1.0 / math.Max(1.0, cy)
 
-	for y := 0; y < c.Height; y++ {
-		dy := (float64(y) + 0.5 - cy) * invRy
-		for x := 0; x < c.Width; x++ {
-			dx := (float64(x) + 0.5 - cx) * invRx
-			// r2 is 0 at center, 1 at midpoint of edges, 2 at corners
-			r2 := (dx*dx + dy*dy) * 0.5
-			t := common.Constrain(r2, 0, 1)
-			smooth := t * t * (3.0 - 2.0*t)
-			factor := 1.0 - strength*smooth*0.65
+	parallelRows(c.Width, c.Height, func(y0, y1 int) {
+		for y := y0; y < y1; y++ {
+			dy := (float64(y) + 0.5 - cy) * invRy
+			for x := 0; x < c.Width; x++ {
+				dx := (float64(x) + 0.5 - cx) * invRx
+				// r2 is 0 at center, 1 at midpoint of edges, 2 at corners
+				r2 := (dx*dx + dy*dy) * 0.5
+				t := common.Constrain(r2, 0, 1)
+				smooth := t * t * (3.0 - 2.0*t)
+				factor := 1.0 - strength*smooth*0.65
 
-			idx := (y*c.Width + x) * 4
-			c.pix[idx+0] *= factor
-			c.pix[idx+1] *= factor
-			c.pix[idx+2] *= factor
+				idx := (y*c.Width + x) * 4
+				c.pix[idx+0] *= factor
+				c.pix[idx+1] *= factor
+				c.pix[idx+2] *= factor
+			}
 		}
-	}
+	})
 }

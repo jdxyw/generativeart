@@ -6,11 +6,61 @@ import (
 	"image/png"
 	"math"
 	"os"
+	"runtime"
+	"sync"
 
 	"github.com/jdxyw/generativeart/common"
 	"github.com/lucasb-eyer/go-colorful"
 	"golang.org/x/image/vector"
 )
+
+var srgb8ToLinearLUT [256]float64
+
+func init() {
+	for i := 0; i < 256; i++ {
+		srgb8ToLinearLUT[i] = SRGBToLinear(float64(i) / 255.0)
+	}
+}
+
+// SRGB8ToLinear returns the exact linear-light value in [0, 1] for an 8-bit sRGB component
+// using an O(1) precomputed lookup table.
+func SRGB8ToLinear(b uint8) float64 {
+	return srgb8ToLinearLUT[b]
+}
+
+// parallelRows partitions [0, height) across runtime.NumCPU() workers when the canvas
+// has at least 16,384 pixels, falling back to a single-threaded call for small buffers.
+func parallelRows(width, height int, fn func(y0, y1 int)) {
+	if height <= 0 {
+		return
+	}
+	workers := runtime.NumCPU()
+	if workers <= 1 || width*height < 16384 || height < workers*2 {
+		fn(0, height)
+		return
+	}
+	if workers > height {
+		workers = height
+	}
+	var wg sync.WaitGroup
+	chunk := (height + workers - 1) / workers
+	for w := 0; w < workers; w++ {
+		y0 := w * chunk
+		y1 := y0 + chunk
+		if y0 >= height {
+			break
+		}
+		if y1 > height {
+			y1 = height
+		}
+		wg.Add(1)
+		go func(startY, endY int) {
+			defer wg.Done()
+			fn(startY, endY)
+		}(y0, y1)
+	}
+	wg.Wait()
+}
 
 // Point represents a 2D high-precision floating-point coordinate.
 type Point struct {
@@ -79,6 +129,16 @@ func (p Point) Lerp(q Point, t float64) Point {
 	}
 }
 
+// Dot returns the 2D dot product p.X*q.X + p.Y*q.Y.
+func (p Point) Dot(q Point) float64 {
+	return p.X*q.X + p.Y*q.Y
+}
+
+// Cross returns the 2D scalar cross product p.X*q.Y - p.Y*q.X.
+func (p Point) Cross(q Point) float64 {
+	return p.X*q.Y - p.Y*q.X
+}
+
 // BlendMode defines how source colors are composited into the linear-RGB HDR canvas.
 type BlendMode int
 
@@ -138,16 +198,16 @@ func LinearToSRGB(c float64) float64 {
 // ColorToLinearRGB extracts non-premultiplied linear RGB and normalized alpha from any color.Color.
 func ColorToLinearRGB(col color.Color) (rLin, gLin, bLin, a float64) {
 	if rgba, ok := col.(color.RGBA); ok {
-		rLin = SRGBToLinear(float64(rgba.R) / 255.0)
-		gLin = SRGBToLinear(float64(rgba.G) / 255.0)
-		bLin = SRGBToLinear(float64(rgba.B) / 255.0)
+		rLin = srgb8ToLinearLUT[rgba.R]
+		gLin = srgb8ToLinearLUT[rgba.G]
+		bLin = srgb8ToLinearLUT[rgba.B]
 		a = float64(rgba.A) / 255.0
 		return
 	}
 	if nrgba, ok := col.(color.NRGBA); ok {
-		rLin = SRGBToLinear(float64(nrgba.R) / 255.0)
-		gLin = SRGBToLinear(float64(nrgba.G) / 255.0)
-		bLin = SRGBToLinear(float64(nrgba.B) / 255.0)
+		rLin = srgb8ToLinearLUT[nrgba.R]
+		gLin = srgb8ToLinearLUT[nrgba.G]
+		bLin = srgb8ToLinearLUT[nrgba.B]
 		a = float64(nrgba.A) / 255.0
 		return
 	}
@@ -198,10 +258,7 @@ func OklabToLinearRGB(lab Oklab) (rLin, gLin, bLin float64) {
 
 // RGBAToOklab converts an sRGB color.RGBA to Oklab.
 func RGBAToOklab(c color.RGBA) Oklab {
-	rLin := SRGBToLinear(float64(c.R) / 255.0)
-	gLin := SRGBToLinear(float64(c.G) / 255.0)
-	bLin := SRGBToLinear(float64(c.B) / 255.0)
-	return LinearRGBAToOklab(rLin, gLin, bLin)
+	return LinearRGBAToOklab(srgb8ToLinearLUT[c.R], srgb8ToLinearLUT[c.G], srgb8ToLinearLUT[c.B])
 }
 
 // OklabToRGBA converts an Oklab color and alpha byte back to sRGB color.RGBA with gamut clamping.
@@ -265,16 +322,31 @@ func LerpLuv(c1, c2 color.RGBA, t float64) color.RGBA {
 	return color.RGBA{R: r, G: g, B: b, A: a}
 }
 
-// MultiStopGradient represents an ordered multi-stop color gradient.
+// MultiStopGradient represents an ordered multi-stop color gradient with pre-cached
+// Oklab and Linear-RGB stop coordinates for fast interpolation.
 type MultiStopGradient struct {
-	Colors []color.RGBA
+	Colors      []color.RGBA
+	oklabStops  []Oklab
+	linearStops [][4]float64
 }
 
 // NewMultiStopGradient creates a MultiStopGradient from a slice or variadic list of colors.
 func NewMultiStopGradient(colors ...color.RGBA) *MultiStopGradient {
-	cp := make([]color.RGBA, len(colors))
+	n := len(colors)
+	cp := make([]color.RGBA, n)
 	copy(cp, colors)
-	return &MultiStopGradient{Colors: cp}
+	okStops := make([]Oklab, n)
+	linStops := make([][4]float64, n)
+	for i, c := range cp {
+		rL, gL, bL, a := ColorToLinearRGB(c)
+		linStops[i] = [4]float64{rL, gL, bL, a}
+		okStops[i] = LinearRGBAToOklab(rL, gL, bL)
+	}
+	return &MultiStopGradient{
+		Colors:      cp,
+		oklabStops:  okStops,
+		linearStops: linStops,
+	}
 }
 
 // SampleOklab samples the multi-stop gradient at t in [0, 1] using Oklab interpolation.
@@ -315,8 +387,15 @@ func (g *MultiStopGradient) Sample(t float64, space ColorSpace) color.RGBA {
 	case ColorSpaceLuv:
 		return LerpLuv(c1, c2, localT)
 	case ColorSpaceLinearRGB:
-		r1, g1, b1, a1 := ColorToLinearRGB(c1)
-		r2, g2, b2, a2 := ColorToLinearRGB(c2)
+		var r1, g1, b1, a1, r2, g2, b2, a2 float64
+		if len(g.linearStops) == n {
+			s1, s2 := g.linearStops[idx], g.linearStops[idx+1]
+			r1, g1, b1, a1 = s1[0], s1[1], s1[2], s1[3]
+			r2, g2, b2, a2 = s2[0], s2[1], s2[2], s2[3]
+		} else {
+			r1, g1, b1, a1 = ColorToLinearRGB(c1)
+			r2, g2, b2, a2 = ColorToLinearRGB(c2)
+		}
 		r := LinearToSRGB(common.Constrain(r1+(r2-r1)*localT, 0, 1))
 		gr := LinearToSRGB(common.Constrain(g1+(g2-g1)*localT, 0, 1))
 		b := LinearToSRGB(common.Constrain(b1+(b2-b1)*localT, 0, 1))
@@ -328,6 +407,16 @@ func (g *MultiStopGradient) Sample(t float64, space ColorSpace) color.RGBA {
 			A: uint8(math.Round(a * 255.0)),
 		}
 	default:
+		if len(g.oklabStops) == n {
+			lab1, lab2 := g.oklabStops[idx], g.oklabStops[idx+1]
+			lab := Oklab{
+				L: lab1.L + (lab2.L-lab1.L)*localT,
+				A: lab1.A + (lab2.A-lab1.A)*localT,
+				B: lab1.B + (lab2.B-lab1.B)*localT,
+			}
+			a := uint8(math.Round(float64(c1.A) + (float64(c2.A)-float64(c1.A))*localT))
+			return OklabToRGBA(lab, a)
+		}
 		return LerpOklab(c1, c2, localT)
 	}
 }
@@ -533,9 +622,9 @@ func (c *Canvas) BlendPixel(x, y int, col color.RGBA, alpha float64) {
 	if x < 0 || x >= c.Width || y < 0 || y >= c.Height || alpha <= 0 || col.A == 0 {
 		return
 	}
-	rLin := SRGBToLinear(float64(col.R) / 255.0)
-	gLin := SRGBToLinear(float64(col.G) / 255.0)
-	bLin := SRGBToLinear(float64(col.B) / 255.0)
+	rLin := srgb8ToLinearLUT[col.R]
+	gLin := srgb8ToLinearLUT[col.G]
+	bLin := srgb8ToLinearLUT[col.B]
 	effAlpha := (float64(col.A) / 255.0) * common.Constrain(alpha, 0, 1)
 	c.BlendPixelLinear(x, y, rLin, gLin, bLin, effAlpha, c.blendMode)
 }
@@ -547,26 +636,28 @@ func (c *Canvas) ResolveToRGBA(dst *image.RGBA) *image.RGBA {
 		dst = image.NewRGBA(image.Rect(0, 0, c.Width, c.Height))
 	}
 	b := dst.Bounds()
-	for y := 0; y < c.Height; y++ {
-		for x := 0; x < c.Width; x++ {
-			idx := (y*c.Width + x) * 4
-			rLin := common.Constrain(c.pix[idx+0], 0, 1)
-			gLin := common.Constrain(c.pix[idx+1], 0, 1)
-			bLin := common.Constrain(c.pix[idx+2], 0, 1)
-			a := common.Constrain(c.pix[idx+3], 0, 1)
+	parallelRows(c.Width, c.Height, func(y0, y1 int) {
+		for y := y0; y < y1; y++ {
+			for x := 0; x < c.Width; x++ {
+				idx := (y*c.Width + x) * 4
+				rLin := common.Constrain(c.pix[idx+0], 0, 1)
+				gLin := common.Constrain(c.pix[idx+1], 0, 1)
+				bLin := common.Constrain(c.pix[idx+2], 0, 1)
+				a := common.Constrain(c.pix[idx+3], 0, 1)
 
-			// Convert linear RGB -> sRGB and premultiply by alpha for image.RGBA.
-			rS := LinearToSRGB(rLin) * a
-			gS := LinearToSRGB(gLin) * a
-			bS := LinearToSRGB(bLin) * a
+				// Convert linear RGB -> sRGB and premultiply by alpha for image.RGBA.
+				rS := LinearToSRGB(rLin) * a
+				gS := LinearToSRGB(gLin) * a
+				bS := LinearToSRGB(bLin) * a
 
-			off := dst.PixOffset(b.Min.X+x, b.Min.Y+y)
-			dst.Pix[off+0] = uint8(math.Round(rS * 255.0))
-			dst.Pix[off+1] = uint8(math.Round(gS * 255.0))
-			dst.Pix[off+2] = uint8(math.Round(bS * 255.0))
-			dst.Pix[off+3] = uint8(math.Round(a * 255.0))
+				off := dst.PixOffset(b.Min.X+x, b.Min.Y+y)
+				dst.Pix[off+0] = uint8(math.Round(rS * 255.0))
+				dst.Pix[off+1] = uint8(math.Round(gS * 255.0))
+				dst.Pix[off+2] = uint8(math.Round(bS * 255.0))
+				dst.Pix[off+3] = uint8(math.Round(a * 255.0))
+			}
 		}
-	}
+	})
 	return dst
 }
 
@@ -601,32 +692,34 @@ func (c *Canvas) ResolveToneMapped(dst *image.RGBA, exposure, gamma float64) *im
 		invGamma = 1.0 / gamma
 	}
 
-	for y := 0; y < c.Height; y++ {
-		for x := 0; x < c.Width; x++ {
-			idx := (y*c.Width + x) * 4
-			rMapped := acesFilmic(c.pix[idx+0] * exposure)
-			gMapped := acesFilmic(c.pix[idx+1] * exposure)
-			bMapped := acesFilmic(c.pix[idx+2] * exposure)
-			a := common.Constrain(c.pix[idx+3], 0, 1)
+	parallelRows(c.Width, c.Height, func(y0, y1 int) {
+		for y := y0; y < y1; y++ {
+			for x := 0; x < c.Width; x++ {
+				idx := (y*c.Width + x) * 4
+				rMapped := acesFilmic(c.pix[idx+0] * exposure)
+				gMapped := acesFilmic(c.pix[idx+1] * exposure)
+				bMapped := acesFilmic(c.pix[idx+2] * exposure)
+				a := common.Constrain(c.pix[idx+3], 0, 1)
 
-			var rS, gS, bS float64
-			if useSRGB {
-				rS = LinearToSRGB(rMapped) * a
-				gS = LinearToSRGB(gMapped) * a
-				bS = LinearToSRGB(bMapped) * a
-			} else {
-				rS = math.Pow(rMapped, invGamma) * a
-				gS = math.Pow(gMapped, invGamma) * a
-				bS = math.Pow(bMapped, invGamma) * a
+				var rS, gS, bS float64
+				if useSRGB {
+					rS = LinearToSRGB(rMapped) * a
+					gS = LinearToSRGB(gMapped) * a
+					bS = LinearToSRGB(bMapped) * a
+				} else {
+					rS = math.Pow(rMapped, invGamma) * a
+					gS = math.Pow(gMapped, invGamma) * a
+					bS = math.Pow(bMapped, invGamma) * a
+				}
+
+				off := dst.PixOffset(b.Min.X+x, b.Min.Y+y)
+				dst.Pix[off+0] = uint8(math.Round(common.Constrain(rS, 0, 1) * 255.0))
+				dst.Pix[off+1] = uint8(math.Round(common.Constrain(gS, 0, 1) * 255.0))
+				dst.Pix[off+2] = uint8(math.Round(common.Constrain(bS, 0, 1) * 255.0))
+				dst.Pix[off+3] = uint8(math.Round(a * 255.0))
 			}
-
-			off := dst.PixOffset(b.Min.X+x, b.Min.Y+y)
-			dst.Pix[off+0] = uint8(math.Round(common.Constrain(rS, 0, 1) * 255.0))
-			dst.Pix[off+1] = uint8(math.Round(common.Constrain(gS, 0, 1) * 255.0))
-			dst.Pix[off+2] = uint8(math.Round(common.Constrain(bS, 0, 1) * 255.0))
-			dst.Pix[off+3] = uint8(math.Round(a * 255.0))
 		}
-	}
+	})
 	return dst
 }
 

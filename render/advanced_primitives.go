@@ -376,14 +376,33 @@ func (c *Canvas) DrawHatchPatch(
 			base := pa.Lerp(pb, s)
 			if math.Abs(bowWeight) > 1e-6 {
 				chord := pb.Sub(pa)
-				n := chord.Perp()
-				linePts[k] = base.Add(n.Mul(bowWeight))
+				// Support both fractional chord bowing (|bow| <= 0.5) and pixel-space normal bowing (|bow| > 0.5)
+				if math.Abs(bow) > 0.5 {
+					linePts[k] = base.Add(chord.Perp().Norm().Mul(bowWeight))
+				} else {
+					linePts[k] = base.Add(chord.Perp().Mul(bowWeight))
+				}
 			} else {
 				linePts[k] = base
 			}
 		}
 
-		// Draw in 4 sub-segments along t so color can shift smoothly along the hatched curve
+		// Check if color is invariant along t; if so, stroke as a single seam-free curve
+		cStart := colorFn(s, 0.0)
+		cMid := colorFn(s, 0.5)
+		cEnd := colorFn(s, 1.0)
+		if cStart == cMid && cMid == cEnd {
+			p := &canvas.Path{}
+			p.MoveTo(linePts[0].X, linePts[0].Y)
+			for k := 1; k < samples; k++ {
+				p.LineTo(linePts[k].X, linePts[k].Y)
+			}
+			c.StrokePath(p, lineWidth, canvas.RoundCap, canvas.RoundJoin, cMid, alpha)
+			continue
+		}
+
+		// When color varies along t, use ButtCap on internal joins with a tiny tangent extension
+		// so there are no semi-circular RoundCap overlap blobs at chunk boundaries.
 		const chunks = 4
 		step := (samples - 1) / chunks
 		for ch := 0; ch < chunks; ch++ {
@@ -395,11 +414,22 @@ func (c *Canvas) DrawHatchPatch(
 			tMid := (float64(i0) + float64(i1)) / (2.0 * float64(samples-1))
 			col := colorFn(s, tMid)
 			p := &canvas.Path{}
-			p.MoveTo(linePts[i0].X, linePts[i0].Y)
-			for k := i0 + 1; k <= i1; k++ {
+			startPt := linePts[i0]
+			if ch > 0 && i0+1 < samples {
+				tan := linePts[i0+1].Sub(linePts[i0]).Norm()
+				startPt = startPt.Sub(tan.Mul(0.18))
+			}
+			p.MoveTo(startPt.X, startPt.Y)
+			for k := i0 + 1; k < i1; k++ {
 				p.LineTo(linePts[k].X, linePts[k].Y)
 			}
-			c.StrokePath(p, lineWidth, canvas.RoundCap, canvas.RoundJoin, col, alpha)
+			endPt := linePts[i1]
+			if ch < chunks-1 && i1 > 0 {
+				tan := linePts[i1].Sub(linePts[i1-1]).Norm()
+				endPt = endPt.Add(tan.Mul(0.18))
+			}
+			p.LineTo(endPt.X, endPt.Y)
+			c.StrokePath(p, lineWidth, canvas.ButtCap, canvas.RoundJoin, col, alpha)
 		}
 	}
 }

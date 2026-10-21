@@ -25,9 +25,9 @@ func (c *Canvas) SplatPoint(x, y float64, col color.RGBA, alpha float64) {
 	w01 := (1.0 - fx) * fy
 	w11 := fx * fy
 
-	rLin := SRGBToLinear(float64(col.R) / 255.0)
-	gLin := SRGBToLinear(float64(col.G) / 255.0)
-	bLin := SRGBToLinear(float64(col.B) / 255.0)
+	rLin := srgb8ToLinearLUT[col.R]
+	gLin := srgb8ToLinearLUT[col.G]
+	bLin := srgb8ToLinearLUT[col.B]
 	baseAlpha := (float64(col.A) / 255.0) * common.Constrain(alpha, 0, 1)
 
 	c.BlendPixelLinear(x0, y0, rLin, gLin, bLin, baseAlpha*w00, c.blendMode)
@@ -48,9 +48,9 @@ func (c *Canvas) DrawGlowDot(x, y, radius float64, col color.RGBA, alpha, hardne
 	}
 
 	hardness = common.Constrain(hardness, 0, 1)
-	rLin := SRGBToLinear(float64(col.R) / 255.0)
-	gLin := SRGBToLinear(float64(col.G) / 255.0)
-	bLin := SRGBToLinear(float64(col.B) / 255.0)
+	rLin := srgb8ToLinearLUT[col.R]
+	gLin := srgb8ToLinearLUT[col.G]
+	bLin := srgb8ToLinearLUT[col.B]
 	baseAlpha := (float64(col.A) / 255.0) * common.Constrain(alpha, 0, 1)
 
 	pad := radius + 1.5
@@ -111,9 +111,9 @@ func (c *Canvas) DrawSoftRing(x, y, radius, thickness float64, col color.RGBA, a
 	if c == nil || radius <= 0 || thickness <= 0 || alpha <= 0 || col.A == 0 {
 		return
 	}
-	rLin := SRGBToLinear(float64(col.R) / 255.0)
-	gLin := SRGBToLinear(float64(col.G) / 255.0)
-	bLin := SRGBToLinear(float64(col.B) / 255.0)
+	rLin := srgb8ToLinearLUT[col.R]
+	gLin := srgb8ToLinearLUT[col.G]
+	bLin := srgb8ToLinearLUT[col.B]
 	baseAlpha := (float64(col.A) / 255.0) * common.Constrain(alpha, 0, 1)
 
 	halfThick := math.Max(0.5, thickness*0.5)
