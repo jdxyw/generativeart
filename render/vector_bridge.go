@@ -120,9 +120,9 @@ func (c *Canvas) RasterizePath(p *canvas.Path, col color.RGBA, alpha float64) {
 
 	c.ras.Draw(c.maskBuf, c.maskBuf.Rect, image.Opaque, image.Point{})
 
-	rLin := SRGBToLinear(float64(col.R) / 255.0)
-	gLin := SRGBToLinear(float64(col.G) / 255.0)
-	bLin := SRGBToLinear(float64(col.B) / 255.0)
+	rLin := srgb8ToLinearLUT[col.R]
+	gLin := srgb8ToLinearLUT[col.G]
+	bLin := srgb8ToLinearLUT[col.B]
 	baseAlpha := (float64(col.A) / 255.0) * common.Constrain(alpha, 0, 1)
 
 	pix := c.maskBuf.Pix

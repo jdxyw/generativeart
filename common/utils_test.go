@@ -128,4 +128,18 @@ func TestNoiseEngine(t *testing.T) {
 	p1 := NewPerlinNoiseWithSeed(99)
 	p2 := NewPerlinNoiseWithSeed(99)
 	assert.Equal(t, p1.Noise2D(1.2, 3.4), p2.Noise2D(1.2, 3.4))
+
+	v4 := ne1.Simplex4D(0.7, 1.4, -0.8, 2.1)
+	assert.GreaterOrEqual(t, v4, -1.0)
+	assert.LessOrEqual(t, v4, 1.0)
+
+	// Verify exact periodic loop closure at phase=0.0 and phase=1.0
+	loop0 := ne1.FBM4DLoop(1.8, 2.4, 0.0, 1.2, 4, 2.0, 0.5)
+	loop1 := ne1.FBM4DLoop(1.8, 2.4, 1.0, 1.2, 4, 2.0, 0.5)
+	assert.InDelta(t, loop0, loop1, 1e-12)
+
+	c0 := ne1.Curl4DLoop(1.8, 2.4, 0.0, 1.2, 1e-3)
+	c1 := ne1.Curl4DLoop(1.8, 2.4, 1.0, 1.2, 1e-3)
+	assert.InDelta(t, c0.X, c1.X, 1e-9)
+	assert.InDelta(t, c0.Y, c1.Y, 1e-9)
 }

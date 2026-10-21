@@ -247,3 +247,61 @@ func TestMosaicPrimitivesAndInsetPolygon(t *testing.T) {
 	)
 }
 
+func TestFieldEngineAndSDF2D(t *testing.T) {
+	// 1. Verify SRGB8ToLinear LUT matches SRGBToLinear exactly
+	for i := 0; i < 256; i++ {
+		got := SRGB8ToLinear(uint8(i))
+		want := SRGBToLinear(float64(i) / 255.0)
+		if math.Abs(got-want) > 1e-15 {
+			t.Fatalf("SRGB8ToLinear(%d) = %v, want %v", i, got, want)
+		}
+	}
+
+	// 2. Verify Jobard-Lefer Evenly-Spaced Streamlines
+	cfg := DefaultStreamlineConfig(120, 120, 10.0)
+	lines := TraceEvenStreamlines(cfg, func(x, y float64) Point {
+		// Swirling vortex field around (60, 60)
+		dx := x - 60.0
+		dy := y - 60.0
+		return Pt(-dy-0.2*dx, dx-0.2*dy)
+	})
+	if len(lines) < 5 {
+		t.Fatalf("expected at least 5 evenly-spaced streamlines, got %d", len(lines))
+	}
+
+	// 3. Verify Marching Squares iso-contour extraction on a circle scalar field
+	contours := ExtractMarchingSquares(32, 32, 100.0, 100.0, 30.0, func(x, y float64) float64 {
+		return math.Hypot(x-50.0, y-50.0)
+	})
+	if len(contours) == 0 || len(contours[0]) < 16 {
+		t.Fatalf("expected closed circular contour from ExtractMarchingSquares, got %d contours", len(contours))
+	}
+
+	// 4. Verify 2D SDF Boolean & Bevel/DropShadow rendering on a 160x160 canvas (triggers parallelRows)
+	c := NewCanvas(160, 160)
+	c.FillBackground(common.Black)
+	c1 := SDFCircle(Pt(65, 80), 32)
+	c2 := SDFPolygon([]Point{Pt(75, 50), Pt(125, 80), Pt(75, 110)})
+	shape := SDFSmoothUnion(c1, c2, 8.0)
+
+	c.RenderSDFDropShadow(shape, Pt(4, 5), 6.0, 1.0, color.RGBA{R: 20, G: 20, B: 30, A: 255}, 0.8)
+	c.RenderSDFBevel(
+		shape,
+		color.RGBA{R: 40, G: 160, B: 180, A: 255},
+		color.RGBA{R: 15, G: 60, B: 90, A: 255},
+		color.RGBA{R: 220, G: 250, B: 255, A: 255},
+		8.0,
+		Pt(-0.7, -0.7),
+		1.0,
+	)
+	c.RenderIsoBand(42.0, 48.0, 1.5, color.RGBA{R: 250, G: 200, B: 60, A: 255}, 0.9, func(x, y float64) float64 {
+		return math.Hypot(x-80.0, y-80.0)
+	})
+
+	img := c.ResolveToRGBA(nil)
+	if img.RGBAAt(65, 80).G < 80 {
+		t.Fatalf("expected beveled SDF interior at (65,80) to be lit, got %+v", img.RGBAAt(65, 80))
+	}
+}
+
+
