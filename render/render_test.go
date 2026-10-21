@@ -236,5 +236,14 @@ func TestMosaicPrimitivesAndInsetPolygon(t *testing.T) {
 	if lit < 120 {
 		t.Fatalf("expected DrawMosaicBrick and DrawCurvedTessera to rasterize >120 pixels, got %d", lit)
 	}
+
+	c.DrawCloisonneCell(
+		[]Point{Pt(8, 8), Pt(28, 8), Pt(28, 28), Pt(8, 28)},
+		teal, common.Black, amber, common.Black, amber, common.White, 1.5,
+	)
+	c.DrawStainedGlassCell(
+		[]Point{Pt(34, 8), Pt(56, 8), Pt(56, 28), Pt(34, 28)},
+		common.Black, teal, amber, common.Black, 1.8,
+	)
 }
 

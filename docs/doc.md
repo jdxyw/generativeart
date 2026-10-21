@@ -977,3 +977,64 @@ ml := arts.NewMosaicLotus(12, 1.0)
 
 ![](../images/mosaiclotus.png)
 
+## Cloisonne Enamel
+
+`Cloisonne Enamel` renders an Imperial Jingtai-Blue (景泰蓝) cloisonné enamel medallion with double-stroked gilded brass wire filigree, vitreous enamel meniscus shading, auspicious Ruyi cloud scales, and lotus petals.
+
+### parameters
+
+- rings: The number of concentric enamel and Ruyi cloud rings.
+- petals: The number of lotus petals per medallion ring.
+
+```go
+ce := arts.NewCloisonneEnamel(6, 12)
+```
+
+![](../images/cloisonneenamel.png)
+
+## Woodblock Wave
+
+`Woodblock Wave` renders a polychrome Ukiyo-e woodblock print (锦绘版画) with bokashi ink gradation, carved woodgrain hatch lines, a vermilion sun with drifting clouds, Mount Fuji, a wooden sail ship, and rolling engraved sea swells.
+
+### parameters
+
+- ridgeLayers: The number of foreground wood-engraved wave swell layers.
+- waveLines: The total density of carved woodblock engraving lines across the swells.
+
+```go
+ww := arts.NewWoodblockWave(5, 42)
+```
+
+![](../images/woodblockwave.png)
+
+## Art Deco Sunburst
+
+`Art Deco Sunburst` renders a 1920s Chrysler-and-Metropolis-inspired Art Deco poster with brushed brass sunburst sectors, scalloped arch crowns, bilateral stepped ziggurat skyscrapers, and fountain fans.
+
+### parameters
+
+- rayCount: The number of radiating Art Deco sunburst sectors.
+- archTiers: The number of concentric scalloped Chrysler arch tiers around the solar core.
+
+```go
+ad := arts.NewArtDecoSunburst(36, 7)
+```
+
+![](../images/artdecosunburst.png)
+
+## Stained Rose Window
+
+`Stained Rose Window` renders a Chartres-and-Notre-Dame-inspired Gothic Cathedral Rose Window with backlit jewel-toned stained-glass compartments, Gothic pointed-arch lancets, oculus medallions, and heavy lead-came ironwork.
+
+### parameters
+
+- petals: The number of primary radial Gothic lancet sectors.
+- rings: The number of concentric stained-glass tracery rings.
+
+```go
+sr := arts.NewStainedRoseWindow(12, 5)
+```
+
+![](../images/stainedrosewindow.png)
+
+

@@ -651,3 +651,126 @@ func (c *Canvas) DrawCurvedTessera(
 	c.FillPolygon(poly, col, alpha)
 }
 
+// DrawCloisonneCell renders a vitreous cloisonné enamel (景泰蓝) compartment bounded by pts:
+// pooled dark meniscus rim near the brass wire walls, saturated jade/lapis/coral core,
+// off-center dome specular glaze sheen, and a double-stroked gilded brass cloisonné wire.
+func (c *Canvas) DrawCloisonneCell(
+	pts []Point,
+	baseCol, rimCol, highlightCol, wireShadow, wireGold, wireSpec color.RGBA,
+	wireWidth float64,
+) {
+	if c == nil || len(pts) < 3 {
+		return
+	}
+	if wireWidth <= 0 {
+		wireWidth = 1.6
+	}
+
+	// 1. Pooled deep enamel rim filling the entire cell
+	c.FillPolygon(pts, rimCol, 1.0)
+
+	// Compute cell centroid for meniscus progression and off-center dome sheen
+	var cx, cy float64
+	for _, p := range pts {
+		cx += p.X
+		cy += p.Y
+	}
+	center := Pt(cx/float64(len(pts)), cy/float64(len(pts)))
+
+	// 2. Layered vitreous enamel meniscus (from pooled rim to luminous mid-body)
+	const layers = 4
+	for l := 1; l <= layers; l++ {
+		u := float64(l) / float64(layers+1)
+		shrinkFrac := u * 0.44
+		ringPoly := make([]Point, len(pts))
+		for i, p := range pts {
+			ringPoly[i] = p.Lerp(center, shrinkFrac)
+		}
+		col := LerpOklab(rimCol, baseCol, math.Pow(u, 0.72))
+		c.FillPolygon(ringPoly, col, 1.0)
+	}
+
+	// 3. Off-center vitreous dome highlight shifted toward upper-left light source
+	domeCenter := center
+	if len(pts) > 0 {
+		domeCenter = center.Lerp(pts[0], 0.16)
+	}
+	domePoly := make([]Point, len(pts))
+	for i, p := range pts {
+		domePoly[i] = p.Lerp(domeCenter, 0.64)
+	}
+	c.FillPolygon(domePoly, LerpOklab(baseCol, highlightCol, 0.58), 0.92)
+
+	specPoly := make([]Point, len(pts))
+	for i, p := range pts {
+		specPoly[i] = p.Lerp(domeCenter, 0.80)
+	}
+	c.FillPolygon(specPoly, highlightCol, 0.85)
+
+	// 4. Double-stroked Gilded Brass Cloisonné Wire (shadow bevel + gold core + specular filament)
+	path := &canvas.Path{}
+	path.MoveTo(pts[0].X, pts[0].Y)
+	for i := 1; i < len(pts); i++ {
+		path.LineTo(pts[i].X, pts[i].Y)
+	}
+	path.Close()
+
+	c.StrokePath(path, wireWidth*1.45, canvas.RoundCap, canvas.RoundJoin, wireShadow, 0.95)
+	c.StrokePath(path, wireWidth*0.92, canvas.RoundCap, canvas.RoundJoin, wireGold, 1.0)
+	c.StrokePath(path, wireWidth*0.36, canvas.RoundCap, canvas.RoundJoin, wireSpec, 0.88)
+}
+
+// DrawStainedGlassCell renders a backlit Gothic stained-glass compartment with dark lead-came
+// solder borders, ruby/cobalt edge patina, glowing jewel-toned core, and a crystalline bevel.
+func (c *Canvas) DrawStainedGlassCell(
+	pts []Point,
+	edgeCol, coreCol, glowCol, leadCol color.RGBA,
+	leadWidth float64,
+) {
+	if c == nil || len(pts) < 3 {
+		return
+	}
+	if leadWidth <= 0 {
+		leadWidth = 1.8
+	}
+
+	var cx, cy float64
+	for _, p := range pts {
+		cx += p.X
+		cy += p.Y
+	}
+	center := Pt(cx/float64(len(pts)), cy/float64(len(pts)))
+
+	// 1. Outer lead-came shadow patina
+	c.FillPolygon(pts, edgeCol, 1.0)
+
+	// 2. Backlit stained-glass transmission layers
+	midPoly := make([]Point, len(pts))
+	corePoly := make([]Point, len(pts))
+	glowPoly := make([]Point, len(pts))
+	for i, p := range pts {
+		midPoly[i] = p.Lerp(center, 0.16)
+		corePoly[i] = p.Lerp(center, 0.36)
+		glowPoly[i] = p.Lerp(center, 0.62)
+	}
+	c.FillPolygon(midPoly, LerpOklab(edgeCol, coreCol, 0.65), 1.0)
+	c.FillPolygon(corePoly, coreCol, 1.0)
+	c.FillPolygon(glowPoly, glowCol, 0.95)
+
+	// 3. Subtle diagonal crystalline refraction facet inside the glass pane
+	if len(pts) >= 3 {
+		bevelTri := []Point{midPoly[0], midPoly[1], center}
+		c.FillPolygon(bevelTri, glowCol, 0.35)
+	}
+
+	// 4. Heavy Gothic lead-came outline
+	path := &canvas.Path{}
+	path.MoveTo(pts[0].X, pts[0].Y)
+	for i := 1; i < len(pts); i++ {
+		path.LineTo(pts[i].X, pts[i].Y)
+	}
+	path.Close()
+	c.StrokePath(path, leadWidth, canvas.RoundCap, canvas.RoundJoin, leadCol, 1.0)
+}
+
+
