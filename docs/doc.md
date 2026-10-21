@@ -1037,4 +1037,66 @@ sr := arts.NewStainedRoseWindow(12, 5)
 
 ![](../images/stainedrosewindow.png)
 
+## Even Streamlines
+
+`Even Streamlines` renders a celestial astrolabe and multi-vortex dipole chart using Jobard-Lefer evenly-spaced streamlines, inverted SDF clip masks, and 3D beveled planetary orbs.
+
+### parameters
+
+- dSep: The minimum seed separation distance between streamlines in pixels.
+- dTest: The minimum termination distance during RK4 streamline integration.
+
+```go
+es := arts.NewEvenStreamlines(7.5, 3.9)
+```
+
+![](../images/evenstreamlines.png)
+
+## Marching Isolines
+
+`Marching Isolines` renders stepped Huanglong-inspired karst travertine pools and topographic terraces using Marching Squares contour extraction, 3D elevation drop shadows, and gilded rims.
+
+### parameters
+
+- levels: The number of stepped topographic elevation terraces.
+- noiseScale: Controls the spatial frequency of the domain-warped scalar elevation field.
+
+```go
+mi := arts.NewMarchingIsolines(16, 1.0)
+```
+
+![](../images/marchingisolines.png)
+
+## Origami Tessellation
+
+`Origami Tessellation` renders a 3D Miura-ori and starburst diamond folded paper sculpture with analytical 3D normal Lambertian/Blinn-Phong shading, valley crease ambient occlusion, and gilded mountain ridges.
+
+### parameters
+
+- cols: The number of horizontal origami crease cells.
+- rows: The number of vertical origami crease cells.
+- foldDepth: Controls the 3D pleat extrusion amplitude.
+
+```go
+ot := arts.NewOrigamiTessellation(14, 14, 1.0)
+```
+
+![](../images/origamitessellation.png)
+
+## Mondrian Subdivision
+
+`Mondrian Subdivision` renders a Bauhaus / Constructivist 2.5D relief composition using golden-ratio KD-tree subdivision, sub-pixel clip mask stacks, and 2D SDF drop shadows and bevels.
+
+### parameters
+
+- depth: The maximum recursion depth of the golden-ratio KD-tree subdivision.
+- pad: The structural frame thickness between adjacent chambers.
+
+```go
+ms := arts.NewMondrianSubdivision(4, 6.0)
+```
+
+![](../images/mondriansubdivision.png)
+
+
 

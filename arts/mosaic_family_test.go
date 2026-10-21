@@ -20,6 +20,10 @@ func TestMosaicFamilyGenerators(t *testing.T) {
 		{"WoodblockWave", NewWoodblockWave(4, 32)},
 		{"ArtDecoSunburst", NewArtDecoSunburst(24, 5)},
 		{"StainedRoseWindow", NewStainedRoseWindow(10, 4)},
+		{"EvenStreamlines", NewEvenStreamlines(10.0, 5.2)},
+		{"MarchingIsolines", NewMarchingIsolines(10, 1.0)},
+		{"OrigamiTessellation", NewOrigamiTessellation(8, 8, 1.0)},
+		{"MondrianSubdivision", NewMondrianSubdivision(3, 5.0)},
 	}
 
 	for _, tc := range cases {
