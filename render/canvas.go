@@ -430,8 +430,12 @@ type Canvas struct {
 	pix       []float64
 	blendMode BlendMode
 
-	ras     *vector.Rasterizer
-	maskBuf *image.Alpha
+	ras          *vector.Rasterizer
+	maskBuf      *image.Alpha
+	recordVector bool
+	hasBg        bool
+	bgCol        color.RGBA
+	vecOps       []vectorOp
 }
 
 // NewCanvas allocates a new HDR linear-RGB Canvas with dimensions w x h.
@@ -443,10 +447,11 @@ func NewCanvas(w, h int) *Canvas {
 		h = 0
 	}
 	return &Canvas{
-		Width:     w,
-		Height:    h,
-		pix:       make([]float64, w*h*4),
-		blendMode: BlendOver,
+		Width:        w,
+		Height:       h,
+		pix:          make([]float64, w*h*4),
+		blendMode:    BlendOver,
+		recordVector: true,
 	}
 }
 
@@ -498,6 +503,18 @@ func (c *Canvas) FillBackground(col color.Color) {
 		c.pix[i+2] = bLin
 		c.pix[i+3] = a
 	}
+	if rgba, ok := col.(color.RGBA); ok {
+		c.bgCol = rgba
+	} else {
+		c.bgCol = color.RGBA{
+			R: uint8(math.Round(LinearToSRGB(rLin) * 255.0)),
+			G: uint8(math.Round(LinearToSRGB(gLin) * 255.0)),
+			B: uint8(math.Round(LinearToSRGB(bLin) * 255.0)),
+			A: uint8(math.Round(a * 255.0)),
+		}
+	}
+	c.hasBg = true
+	c.vecOps = c.vecOps[:0]
 }
 
 // PixelLinearAt returns the linear-RGB and alpha values at pixel (x, y).

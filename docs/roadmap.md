@@ -73,16 +73,23 @@ This document serves as the architectural blueprint for `generativeart`, coverin
 
 ---
 
-## Part III. Future Platform Foundations (Next Stages)
+## Part III. Platform & Export Foundations (Package 3 — Implemented)
 
-### 3.1 Dual Vector (`SVG` / `PDF`) & HDR Raster Backend
-- Record vector operations (`StrokePath`, `FillPolygon`, `DrawMosaicBrick`, `DrawCloisonneCell`) into an optional `tdewolff/canvas` scene graph alongside the HDR pixel buffer, exposing `c.ToSVG(path)` and `c.ToPDF(path)` for infinite-resolution archival printing and AxiDraw pen plotters.
+### 3.1 Dual Vector (`SVG` / `PDF`) & HDR Raster Backend (`render/vector_bridge.go`, `platform.go`)
+- Automatically records vector path operations (`RasterizePath`, `StrokePath`, `FillPolygon`, `DrawMosaicBrick`, `DrawCloisonneCell`, `DrawStainedGlassCell`, `DrawTaperedSpline`, `DrawHatchPatch`, etc.) alongside the 64-bit HDR pixel buffer.
+- Exposes `c.ToSVG(path)`, `c.WriteSVG(w)`, `c.ToPDF(path)`, and `c.WritePDF(w)` on `*Canva` (and `SaveSVG` / `SavePDF` on `*render.Canvas`) for infinite-resolution archival printing and pen plotters, with automatic raster embedding fallback for pure pixel-splat engines.
 
-### 3.2 `DrawTimelapse` Animation & PNG Recipe Metadata
-- Implement `AnimatedEngine` interface and `DrawTimelapse` to export seamless looping GIFs/APNGs driven by `FBM4DLoop` and `Curl4DLoop`.
-- Embed JSON seed/parameter recipes into PNG `tEXt` chunks (`GenerativeArt-Recipe`) on `ToPNG()` and provide `cmd/genart` CLI for 4K/8K replay.
+### 3.2 `DrawTimelapse` Animation & PNG `tEXt` Recipe Metadata (`platform.go`, `cmd/genart`)
+- **`AnimatedEngine` & `DrawTimelapse` / `ToGIF`**:
+  - Supports phase-driven seamless loop animations (`phase in [0, 1)`) via `AnimatedEngine` and `NewAnimatedEngine(...)`, as well as multi-seed timelapse sequences for any standard `Engine`, exporting adaptive-palette Floyd-Steinberg dithered looping GIFs via `c.ToGIF(path, delayCs)`.
+- **PNG `tEXt` Recipe Metadata (`GenerativeArt-Recipe`)**:
+  - `c.ToPNG(path)` automatically embeds a standard PNG `tEXt` chunk containing the JSON recipe (`engine`, `width`, `height`, `seed`, `background`, `params`), inspectable via `ReadPNGRecipe(path)` or `genart inspect <file.png>`.
+- **Standalone CLI (`cmd/genart`)**:
+  - `go run ./cmd/genart list`
+  - `go run ./cmd/genart render -art cloisonneenamel -w 1200 -h 1200 -seed 2026 -out cloisonne.svg` (supports `.png`, `.svg`, `.pdf`, `.gif`, `.jpg`)
+  - `go run ./cmd/genart inspect images/mosaicsun.png`
 
-### 3.3 Pure-Go WebAssembly (WASM) Interactive Gallery Playground
+### 3.3 Future Extension: Pure-Go WebAssembly (WASM) Interactive Gallery Playground
 - Compile `wasm/main.go` (`GOOS=js GOARCH=wasm`) so users can tweak seeds, palettes, and parameters live inside `index.html`.
 
 ---
