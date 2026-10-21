@@ -7,6 +7,7 @@ import (
 	"io"
 	"math"
 	"os"
+	"sync"
 
 	"github.com/jdxyw/generativeart/common"
 	"github.com/tdewolff/canvas"
@@ -15,6 +16,123 @@ import (
 	"github.com/tdewolff/canvas/renderers/svg"
 	"golang.org/x/image/vector"
 )
+
+type rasterWorkspace struct {
+	ras     *vector.Rasterizer
+	maskBuf *image.Alpha
+}
+
+var rasterWorkspacePool = sync.Pool{
+	New: func() interface{} {
+		return &rasterWorkspace{
+			ras: vector.NewRasterizer(64, 64),
+			maskBuf: &image.Alpha{
+				Pix:    make([]uint8, 64*64),
+				Stride: 64,
+				Rect:   image.Rect(0, 0, 64, 64),
+			},
+		}
+	},
+}
+
+// rasterizePathToMask rasterizes path p (in pixel coordinates) into a pooled alpha mask
+// clipped to [0, canvasW) x [0, canvasH). Call release() when finished reading mask.
+func rasterizePathToMask(p *canvas.Path, canvasW, canvasH int) (mask []uint8, minX, minY, bw, bh int, release func()) {
+	noop := func() {}
+	if p == nil || p.Empty() || canvasW <= 0 || canvasH <= 0 {
+		return nil, 0, 0, 0, 0, noop
+	}
+	pathNoArcs := p.ReplaceArcs()
+	bounds := pathNoArcs.FastBounds()
+
+	minX = int(math.Floor(bounds.X0)) - 2
+	minY = int(math.Floor(bounds.Y0)) - 2
+	maxX := int(math.Ceil(bounds.X1)) + 2
+	maxY := int(math.Ceil(bounds.Y1)) + 2
+
+	if minX < 0 {
+		minX = 0
+	}
+	if minY < 0 {
+		minY = 0
+	}
+	if maxX > canvasW {
+		maxX = canvasW
+	}
+	if maxY > canvasH {
+		maxY = canvasH
+	}
+	if minX >= maxX || minY >= maxY {
+		return nil, 0, 0, 0, 0, noop
+	}
+
+	bw = maxX - minX
+	bh = maxY - minY
+	ws := rasterWorkspacePool.Get().(*rasterWorkspace)
+	ws.ras.Reset(bw, bh)
+	ws.ras.DrawOp = draw.Src
+
+	ox := float32(minX)
+	oy := float32(minY)
+
+	d := pathNoArcs.Data()
+	subpathOpen := false
+	for i := 0; i < len(d); {
+		cmd := d[i]
+		switch cmd {
+		case canvas.MoveToCmd:
+			if subpathOpen {
+				ws.ras.ClosePath()
+			}
+			ws.ras.MoveTo(float32(d[i+1])-ox, float32(d[i+2])-oy)
+			subpathOpen = true
+			i += 4
+		case canvas.LineToCmd:
+			ws.ras.LineTo(float32(d[i+1])-ox, float32(d[i+2])-oy)
+			subpathOpen = true
+			i += 4
+		case canvas.QuadToCmd:
+			ws.ras.QuadTo(
+				float32(d[i+1])-ox, float32(d[i+2])-oy,
+				float32(d[i+3])-ox, float32(d[i+4])-oy,
+			)
+			subpathOpen = true
+			i += 6
+		case canvas.CubeToCmd:
+			ws.ras.CubeTo(
+				float32(d[i+1])-ox, float32(d[i+2])-oy,
+				float32(d[i+3])-ox, float32(d[i+4])-oy,
+				float32(d[i+5])-ox, float32(d[i+6])-oy,
+			)
+			subpathOpen = true
+			i += 8
+		case canvas.CloseCmd:
+			ws.ras.LineTo(float32(d[i+1])-ox, float32(d[i+2])-oy)
+			ws.ras.ClosePath()
+			subpathOpen = false
+			i += 4
+		default:
+			i += 8
+		}
+	}
+	if subpathOpen {
+		ws.ras.ClosePath()
+	}
+
+	needed := bw * bh
+	if cap(ws.maskBuf.Pix) < needed {
+		ws.maskBuf.Pix = make([]uint8, needed)
+	} else {
+		ws.maskBuf.Pix = ws.maskBuf.Pix[:needed]
+	}
+	ws.maskBuf.Stride = bw
+	ws.maskBuf.Rect = image.Rect(0, 0, bw, bh)
+
+	ws.ras.Draw(ws.maskBuf, ws.maskBuf.Rect, image.Opaque, image.Point{})
+	return ws.maskBuf.Pix, minX, minY, bw, bh, func() {
+		rasterWorkspacePool.Put(ws)
+	}
+}
 
 type vectorOp struct {
 	path  *canvas.Path
@@ -46,6 +164,10 @@ func (c *Canvas) RasterizePath(p *canvas.Path, col color.RGBA, alpha float64) {
 		return
 	}
 
+	if c.hasCustomTransform {
+		p = p.Transform(c.curMatrix)
+	}
+
 	if c.recordVector {
 		c.vecOps = append(c.vecOps, vectorOp{
 			path:  p.Copy(),
@@ -54,111 +176,17 @@ func (c *Canvas) RasterizePath(p *canvas.Path, col color.RGBA, alpha float64) {
 		})
 	}
 
-	// Replace elliptical arcs with exact cubic Bézier approximations so all segments
-	// map cleanly to MoveTo, LineTo, QuadTo, CubeTo, and Close.
-	pathNoArcs := p.ReplaceArcs()
-	bounds := pathNoArcs.FastBounds()
-
-	minX := int(math.Floor(bounds.X0)) - 2
-	minY := int(math.Floor(bounds.Y0)) - 2
-	maxX := int(math.Ceil(bounds.X1)) + 2
-	maxY := int(math.Ceil(bounds.Y1)) + 2
-
-	if minX < 0 {
-		minX = 0
-	}
-	if minY < 0 {
-		minY = 0
-	}
-	if maxX > c.Width {
-		maxX = c.Width
-	}
-	if maxY > c.Height {
-		maxY = c.Height
-	}
-	if minX >= maxX || minY >= maxY {
+	pix, minX, minY, bw, bh, release := rasterizePathToMask(p, c.Width, c.Height)
+	defer release()
+	if pix == nil || bw <= 0 || bh <= 0 {
 		return
 	}
-
-	bw := maxX - minX
-	bh := maxY - minY
-
-	if c.ras == nil {
-		c.ras = vector.NewRasterizer(bw, bh)
-	} else {
-		c.ras.Reset(bw, bh)
-	}
-	c.ras.DrawOp = draw.Src
-
-	ox := float32(minX)
-	oy := float32(minY)
-
-	d := pathNoArcs.Data()
-	subpathOpen := false
-	for i := 0; i < len(d); {
-		cmd := d[i]
-		switch cmd {
-		case canvas.MoveToCmd:
-			if subpathOpen {
-				c.ras.ClosePath()
-			}
-			c.ras.MoveTo(float32(d[i+1])-ox, float32(d[i+2])-oy)
-			subpathOpen = true
-			i += 4
-		case canvas.LineToCmd:
-			c.ras.LineTo(float32(d[i+1])-ox, float32(d[i+2])-oy)
-			subpathOpen = true
-			i += 4
-		case canvas.QuadToCmd:
-			c.ras.QuadTo(
-				float32(d[i+1])-ox, float32(d[i+2])-oy,
-				float32(d[i+3])-ox, float32(d[i+4])-oy,
-			)
-			subpathOpen = true
-			i += 6
-		case canvas.CubeToCmd:
-			c.ras.CubeTo(
-				float32(d[i+1])-ox, float32(d[i+2])-oy,
-				float32(d[i+3])-ox, float32(d[i+4])-oy,
-				float32(d[i+5])-ox, float32(d[i+6])-oy,
-			)
-			subpathOpen = true
-			i += 8
-		case canvas.CloseCmd:
-			c.ras.LineTo(float32(d[i+1])-ox, float32(d[i+2])-oy)
-			c.ras.ClosePath()
-			subpathOpen = false
-			i += 4
-		default:
-			// Fallback should never be reached because ReplaceArcs replaced ArcToCmd.
-			i += 8
-		}
-	}
-	if subpathOpen {
-		c.ras.ClosePath()
-	}
-
-	needed := bw * bh
-	if c.maskBuf == nil || cap(c.maskBuf.Pix) < needed {
-		c.maskBuf = &image.Alpha{
-			Pix:    make([]uint8, needed),
-			Stride: bw,
-			Rect:   image.Rect(0, 0, bw, bh),
-		}
-	} else {
-		c.maskBuf.Pix = c.maskBuf.Pix[:needed]
-		c.maskBuf.Stride = bw
-		c.maskBuf.Rect = image.Rect(0, 0, bw, bh)
-	}
-
-	c.ras.Draw(c.maskBuf, c.maskBuf.Rect, image.Opaque, image.Point{})
 
 	rLin := srgb8ToLinearLUT[col.R]
 	gLin := srgb8ToLinearLUT[col.G]
 	bLin := srgb8ToLinearLUT[col.B]
 	baseAlpha := (float64(col.A) / 255.0) * common.Constrain(alpha, 0, 1)
 
-	pix := c.maskBuf.Pix
 	for y := 0; y < bh; y++ {
 		rowOff := y * bw
 		dstY := minY + y

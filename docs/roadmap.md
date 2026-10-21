@@ -84,12 +84,19 @@ This document serves as the architectural blueprint for `generativeart`, coverin
   - Supports phase-driven seamless loop animations (`phase in [0, 1)`) via `AnimatedEngine` and `NewAnimatedEngine(...)`, as well as multi-seed timelapse sequences for any standard `Engine`, exporting adaptive-palette Floyd-Steinberg dithered looping GIFs via `c.ToGIF(path, delayCs)`.
 - **PNG `tEXt` Recipe Metadata (`GenerativeArt-Recipe`)**:
   - `c.ToPNG(path)` automatically embeds a standard PNG `tEXt` chunk containing the JSON recipe (`engine`, `width`, `height`, `seed`, `background`, `params`), inspectable via `ReadPNGRecipe(path)` or `genart inspect <file.png>`.
-- **Standalone CLI (`cmd/genart`)**:
+- **Standalone CLI (`cmd/genart`) & Unified Registry (`arts/registry.go`)**:
   - `go run ./cmd/genart list`
   - `go run ./cmd/genart render -art cloisonneenamel -w 1200 -h 1200 -seed 2026 -out cloisonne.svg` (supports `.png`, `.svg`, `.pdf`, `.gif`, `.jpg`)
   - `go run ./cmd/genart inspect images/mosaicsun.png`
+  - `go run ./cmd/genart replay images/mosaicsun.png -w 2400 -h 2400 -out mosaicsun_2400.png` (reconstructs exact engine & parameters from PNG `tEXt` recipe and re-renders at arbitrary resolution or vector `.svg`/`.pdf`)
 
-### 3.3 Future Extension: Pure-Go WebAssembly (WASM) Interactive Gallery Playground
+### 3.3 Modern 2D/HDR Pipeline Stack (`render/pipeline.go`, `generativeart.go`)
+- **Persistent Primary HDR Pipeline**: `Canva` maintains a persistent 64-bit linear HDR buffer across multi-pass `Draw` calls with lazy 8-bit `RGBA` resolution on `c.Img()`.
+- **2D Affine Transform Matrix Stack**: `PushMatrix`, `PopMatrix`, `Translate`, `Rotate`, `RotateAbout`, `Scale`, `ScaleAbout`.
+- **Sub-Pixel Stencil / Clip Mask Stack**: `PushClipPath`, `PushClipPolygon`, `PushClipCircle`, `PushClipSDF(sdf, invert)`, `PopClip`.
+- **Independent HDR Child Layers & `sync.Pool` Rasterizer**: `c.NewLayer()` and `c.CompositeLayer(layer, mode, opacity)` with pooled `vector.Rasterizer` workspaces.
+
+### 3.4 Future Extension: Pure-Go WebAssembly (WASM) Interactive Gallery Playground
 - Compile `wasm/main.go` (`GOOS=js GOARCH=wasm`) so users can tweak seeds, palettes, and parameters live inside `index.html`.
 
 ---

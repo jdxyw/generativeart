@@ -25,6 +25,8 @@ type Canva struct {
 	rng              *rand.Rand
 	noise            *common.NoiseEngine
 	lastRenderCanvas *render.Canvas
+	hdrDirty         bool
+	rgbaTouched      bool
 	frames           []*image.RGBA
 	lastRecipe       *RecipeMetadata
 }
@@ -34,6 +36,11 @@ func (c *Canva) Opts() Options {
 }
 
 func (c *Canva) Img() *image.RGBA {
+	if c.hdrDirty && c.lastRenderCanvas != nil {
+		c.img = c.lastRenderCanvas.ResolveToRGBA(c.img)
+		c.hdrDirty = false
+	}
+	c.rgbaTouched = true
 	return c.img
 }
 
@@ -188,26 +195,42 @@ func (c *Canva) DrawTimelapse(e Engine) {
 	c.DrawTimelapseFrames(e, frames)
 }
 
-// FillBackground fills the background of the Canva.
+// FillBackground fills the background of the Canva in both RGBA and persistent HDR buffers.
 func (c *Canva) FillBackground() {
-	draw.Draw(c.Img(), c.Img().Bounds(), &image.Uniform{c.Opts().Background()}, image.ZP, draw.Src)
+	draw.Draw(c.img, c.img.Bounds(), &image.Uniform{c.Opts().Background()}, image.ZP, draw.Src)
+	if c.lastRenderCanvas == nil || c.lastRenderCanvas.Width != c.width || c.lastRenderCanvas.Height != c.height {
+		c.lastRenderCanvas = render.NewCanvas(c.width, c.height)
+	}
+	c.lastRenderCanvas.FillBackground(c.Opts().Background())
+	c.hdrDirty = false
+	c.rgbaTouched = false
 }
 
-// NewRenderCanvas creates a render.Canvas initialized from c.Img().
+// NewRenderCanvas returns the persistent 64-bit linear HDR render.Canvas for this Canva.
+// If no legacy RGBA operations touched c.Img() since the last FillBackground or MergeRenderCanvas,
+// the persistent HDR buffer is returned directly without re-decoding 8-bit RGBA pixels.
 func (c *Canva) NewRenderCanvas() *render.Canvas {
-	rc := render.NewCanvasFromRGBA(c.Img())
-	rc.FillBackground(c.Opts().Background())
-	c.lastRenderCanvas = rc
-	return rc
+	if c.lastRenderCanvas == nil || c.lastRenderCanvas.Width != c.width || c.lastRenderCanvas.Height != c.height {
+		c.lastRenderCanvas = render.NewCanvasFromRGBA(c.img)
+		c.rgbaTouched = false
+		return c.lastRenderCanvas
+	}
+	if c.rgbaTouched {
+		c.lastRenderCanvas = render.NewCanvasFromRGBA(c.img)
+		c.rgbaTouched = false
+	}
+	return c.lastRenderCanvas
 }
 
-// MergeRenderCanvas resolves rc back into c.Img().
+// MergeRenderCanvas records rc as the active HDR buffer and marks RGBA for lazy resolution
+// when c.Img(), ToPNG(), ToJPEG(), or ToGIF() is invoked.
 func (c *Canva) MergeRenderCanvas(rc *render.Canvas) {
 	if rc == nil {
 		return
 	}
 	c.lastRenderCanvas = rc
-	c.img = rc.ResolveToRGBA(c.Img())
+	c.hdrDirty = true
+	c.rgbaTouched = false
 }
 
 // MergeRenderCanvasToneMapped resolves rc back into c.Img() using ACES filmic tone mapping.
@@ -216,7 +239,9 @@ func (c *Canva) MergeRenderCanvasToneMapped(rc *render.Canvas, exposure, gamma f
 		return
 	}
 	c.lastRenderCanvas = rc
-	c.img = rc.ResolveToneMapped(c.Img(), exposure, gamma)
+	c.img = rc.ResolveToneMapped(c.img, exposure, gamma)
+	c.hdrDirty = false
+	c.rgbaTouched = false
 }
 
 // LastRenderCanvas returns the most recent *render.Canvas used by this Canva.
@@ -226,11 +251,12 @@ func (c *Canva) LastRenderCanvas() *render.Canvas {
 
 // Blend applies common.Blend onto c.Img().
 func (c *Canva) Blend(src *image.RGBA, mode common.BlendMode) {
-	if src == nil || c.img == nil {
+	dst := c.Img()
+	if src == nil || dst == nil {
 		return
 	}
-	blended := common.Blend(src, c.img, mode)
-	draw.Draw(c.img, c.img.Bounds(), blended, blended.Bounds().Min, draw.Src)
+	blended := common.Blend(src, dst, mode)
+	draw.Draw(dst, dst.Bounds(), blended, blended.Bounds().Min, draw.Src)
 }
 
 // ToPNG saves the image to local with PNG format and embeds the deterministic

@@ -15,6 +15,10 @@ func (c *Canvas) SplatPoint(x, y float64, col color.RGBA, alpha float64) {
 	if c == nil || alpha <= 0 || col.A == 0 {
 		return
 	}
+	if c.hasCustomTransform {
+		tp := c.TransformPoint(Pt(x, y))
+		x, y = tp.X, tp.Y
+	}
 	x0 := int(math.Floor(x))
 	y0 := int(math.Floor(y))
 	fx := x - float64(x0)
@@ -41,6 +45,11 @@ func (c *Canvas) SplatPoint(x, y float64, col color.RGBA, alpha float64) {
 func (c *Canvas) DrawGlowDot(x, y, radius float64, col color.RGBA, alpha, hardness float64) {
 	if c == nil || radius <= 0 || alpha <= 0 || col.A == 0 {
 		return
+	}
+	if c.hasCustomTransform {
+		tp := c.TransformPoint(Pt(x, y))
+		x, y = tp.X, tp.Y
+		radius *= c.TransformScale()
 	}
 	if radius < 0.75 {
 		c.SplatPoint(x, y, col, alpha*common.Constrain(radius/0.75, 0.1, 1.0))
@@ -110,6 +119,13 @@ func (c *Canvas) DrawGlowDot(x, y, radius float64, col color.RGBA, alpha, hardne
 func (c *Canvas) DrawSoftRing(x, y, radius, thickness float64, col color.RGBA, alpha float64) {
 	if c == nil || radius <= 0 || thickness <= 0 || alpha <= 0 || col.A == 0 {
 		return
+	}
+	if c.hasCustomTransform {
+		tp := c.TransformPoint(Pt(x, y))
+		x, y = tp.X, tp.Y
+		sc := c.TransformScale()
+		radius *= sc
+		thickness *= sc
 	}
 	rLin := srgb8ToLinearLUT[col.R]
 	gLin := srgb8ToLinearLUT[col.G]

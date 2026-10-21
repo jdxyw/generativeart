@@ -74,8 +74,9 @@ func (c *Canva) DrawTimelapseFrames(e Engine, totalFrames int) {
 			e.Generative(c)
 		}
 
-		frameCopy := image.NewRGBA(c.img.Bounds())
-		copy(frameCopy.Pix, c.img.Pix)
+		resolved := c.Img()
+		frameCopy := image.NewRGBA(resolved.Bounds())
+		copy(frameCopy.Pix, resolved.Pix)
 		c.frames = append(c.frames, frameCopy)
 	}
 	c.SetSeed(baseSeed)
@@ -126,7 +127,7 @@ func (c *Canva) WriteGIF(w io.Writer, delayCentiseconds int) error {
 	}
 	srcFrames := c.frames
 	if len(srcFrames) == 0 && c.img != nil {
-		srcFrames = []*image.RGBA{c.img}
+		srcFrames = []*image.RGBA{c.Img()}
 	}
 	if len(srcFrames) == 0 {
 		return errors.New("no frames available to encode")
