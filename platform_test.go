@@ -128,3 +128,49 @@ func TestDrawTimelapseAndAnimatedGIF(t *testing.T) {
 		t.Fatalf("expected 4 frames in decoded GIF, got %d", len(decodedGIF.Image))
 	}
 }
+
+func TestPersistentHDRCanvaAndReplayPNG(t *testing.T) {
+	// 1. Verify persistent HDR buffer across multiple Engine draws without 8-bit clamping
+	c := generativeart.NewCanva(64, 64)
+	c.SetBackground(common.Black)
+	c.FillBackground()
+
+	hdrPass := generativeart.NewAnimatedEngine(func(cv *generativeart.Canva, _, _ int, _ float64) {
+		rc := cv.NewRenderCanvas()
+		rc.SetBlendMode(render.BlendAdd)
+		rc.SetPixelLinear(32, 32, 0.8, 0.5, 0.2, 1.0)
+		// Add 0.8 again in linear light -> 1.6 (above 1.0!)
+		rc.BlendPixelLinear(32, 32, 0.8, 0.5, 0.2, 1.0, render.BlendAdd)
+		cv.MergeRenderCanvas(rc)
+	})
+	c.Draw(hdrPass)
+
+	// Calling NewRenderCanvas() again before c.Img() must preserve the un-clamped 1.6 HDR value
+	rc2 := c.NewRenderCanvas()
+	rLin, _, _, _ := rc2.PixelLinearAt(32, 32)
+	if rLin < 1.5 {
+		t.Fatalf("expected persistent HDR buffer to retain linear R > 1.5 across passes, got %f", rLin)
+	}
+
+	// 2. Verify arts.ReplayPNG reconstructs and re-renders a saved PNG at a new resolution
+	tmpDir := t.TempDir()
+	srcPNG := filepath.Join(tmpDir, "source_rose.png")
+
+	cRose := generativeart.NewCanva(120, 120)
+	cRose.SetSeed(2026)
+	cRose.SetBackground(color.RGBA{R: 12, G: 11, B: 18, A: 255})
+	cRose.FillBackground()
+	cRose.Draw(arts.NewStainedRoseWindow(8, 4))
+	if err := cRose.ToPNG(srcPNG); err != nil {
+		t.Fatalf("ToPNG failed: %v", err)
+	}
+
+	replayed, meta, err := arts.ReplayPNG(srcPNG, 240, 240)
+	if err != nil {
+		t.Fatalf("ReplayPNG failed: %v", err)
+	}
+	if meta.Engine != "stainedRoseWindow" || replayed.Width() != 240 || replayed.Height() != 240 {
+		t.Fatalf("unexpected replayed canvas or metadata: w=%d h=%d meta=%+v", replayed.Width(), replayed.Height(), meta)
+	}
+}
+

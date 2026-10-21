@@ -11,6 +11,7 @@ import (
 
 	"github.com/jdxyw/generativeart/common"
 	"github.com/lucasb-eyer/go-colorful"
+	"github.com/tdewolff/canvas"
 	"golang.org/x/image/vector"
 )
 
@@ -436,6 +437,11 @@ type Canvas struct {
 	hasBg        bool
 	bgCol        color.RGBA
 	vecOps       []vectorOp
+
+	hasCustomTransform bool
+	curMatrix          canvas.Matrix
+	transformStack     []canvas.Matrix
+	clipStack          [][]uint8
 }
 
 // NewCanvas allocates a new HDR linear-RGB Canvas with dimensions w x h.
@@ -452,6 +458,7 @@ func NewCanvas(w, h int) *Canvas {
 		pix:          make([]float64, w*h*4),
 		blendMode:    BlendOver,
 		recordVector: true,
+		curMatrix:    canvas.Identity,
 	}
 }
 
@@ -582,6 +589,13 @@ func blendChannel(cb, cs float64, mode BlendMode) float64 {
 func (c *Canvas) BlendPixelLinear(x, y int, rLin, gLin, bLin, alpha float64, mode BlendMode) {
 	if x < 0 || x >= c.Width || y < 0 || y >= c.Height || alpha <= 0 {
 		return
+	}
+	if len(c.clipStack) > 0 {
+		maskCov := c.clipStack[len(c.clipStack)-1][y*c.Width+x]
+		if maskCov == 0 {
+			return
+		}
+		alpha *= float64(maskCov) / 255.0
 	}
 	sa := common.Constrain(alpha, 0, 1)
 	idx := (y*c.Width + x) * 4

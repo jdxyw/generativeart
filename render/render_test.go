@@ -304,4 +304,50 @@ func TestFieldEngineAndSDF2D(t *testing.T) {
 	}
 }
 
+func TestTransformStackClipMaskAndLayers(t *testing.T) {
+	c := NewCanvas(100, 100)
+	c.FillBackground(common.Black)
+
+	// 1. Test 2D Affine Transform Stack (Translate + Scale)
+	c.PushMatrix()
+	c.Translate(50, 50)
+	c.Scale(2.0, 2.0)
+	c.FillPolygon([]Point{Pt(-5, -5), Pt(5, -5), Pt(5, 5), Pt(-5, 5)}, common.White, 1.0)
+	c.PopMatrix()
+
+	// Transformed square should cover [40..60] x [40..60], so (42, 42) must be white
+	r42, _, _, _ := c.PixelLinearAt(42, 42)
+	if r42 < 0.9 {
+		t.Fatalf("expected transformed polygon to fill (42,42), got rLin=%f", r42)
+	}
+
+	// 2. Test Sub-Pixel Clip Mask Stack (PushClipCircle + PopClip)
+	c.FillBackground(common.Black)
+	c.PushClipCircle(50, 50, 15)
+	if c.ClipDepth() != 1 {
+		t.Fatalf("expected ClipDepth() == 1, got %d", c.ClipDepth())
+	}
+	// Attempt to fill the entire 100x100 canvas with red; only the circle r<=15 should be lit
+	red := color.RGBA{R: 255, G: 0, B: 0, A: 255}
+	c.FillPolygon([]Point{Pt(0, 0), Pt(100, 0), Pt(100, 100), Pt(0, 100)}, red, 1.0)
+	c.PopClip()
+
+	rInside, _, _, _ := c.PixelLinearAt(50, 50)
+	rOutside, _, _, _ := c.PixelLinearAt(10, 10)
+	if rInside < 0.95 || rOutside > 0.01 {
+		t.Fatalf("clip mask failed: rInside=%f rOutside=%f", rInside, rOutside)
+	}
+
+	// 3. Test Independent Child Layer + Layer Bloom + CompositeLayer
+	layer := c.NewLayer()
+	layer.FillPolygon([]Point{Pt(20, 20), Pt(35, 20), Pt(35, 35), Pt(20, 35)}, color.RGBA{R: 0, G: 255, B: 128, A: 255}, 1.0)
+	c.CompositeLayer(layer, BlendScreen, 0.9)
+
+	_, gLayer, _, _ := c.PixelLinearAt(25, 25)
+	if gLayer < 0.8 {
+		t.Fatalf("expected composited layer to light up (25,25), got gLin=%f", gLayer)
+	}
+}
+
+
 

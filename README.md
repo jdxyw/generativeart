@@ -82,12 +82,17 @@ go run ./cmd/genart render -art artdecosunburst -w 800 -h 800 -out artdeco.pdf
 go run ./cmd/genart render -art mosaicvortex -w 400 -h 400 -frames 8 -delay 8 -out vortex.gif
 ```
 
-### 3. Inspect Embedded PNG Recipe Metadata
+### 3. Inspect & Replay Embedded PNG Recipe Metadata
 
 Every PNG saved via `c.ToPNG()` or `genart render` embeds a standard PNG `tEXt` chunk (`GenerativeArt-Recipe`) recording the engine name, dimensions, seed, background color, and struct parameters:
 
 ```bash
+# Inspect the embedded JSON recipe inside any generated PNG
 go run ./cmd/genart inspect cloisonne.png
+
+# Replay a saved PNG recipe at 4K resolution or convert it directly to Vector SVG / PDF
+go run ./cmd/genart replay cloisonne.png -w 2400 -h 2400 -out cloisonne_4k.png
+go run ./cmd/genart replay cloisonne.png -out cloisonne.svg
 ```
 
 ```json
