@@ -1,0 +1,130 @@
+package generativeart_test
+
+import (
+	"bytes"
+	"image/color"
+	"image/gif"
+	"image/png"
+	"math"
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+	"github.com/jdxyw/generativeart/render"
+)
+
+func TestPNGRecipeMetadataRoundTrip(t *testing.T) {
+	tmpDir := t.TempDir()
+	pngPath := filepath.Join(tmpDir, "mosaic_recipe.png")
+
+	c := generativeart.NewCanva(160, 160)
+	c.SetSeed(20261021)
+	c.SetBackground(color.RGBA{R: 22, G: 26, B: 48, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Sunset)
+	c.Draw(arts.NewMosaicSun(20, 1.0))
+
+	if err := c.ToPNG(pngPath); err != nil {
+		t.Fatalf("ToPNG failed: %v", err)
+	}
+
+	// Verify standard image/png decoder still decodes the file cleanly
+	f, err := os.Open(pngPath)
+	if err != nil {
+		t.Fatalf("Open failed: %v", err)
+	}
+	defer f.Close()
+	img, err := png.Decode(f)
+	if err != nil {
+		t.Fatalf("standard png.Decode failed on PNG with embedded recipe: %v", err)
+	}
+	if img.Bounds().Dx() != 160 || img.Bounds().Dy() != 160 {
+		t.Fatalf("unexpected image dimensions: %v", img.Bounds())
+	}
+
+	// Verify ReadPNGRecipe extracts the exact recipe metadata
+	meta, err := generativeart.ReadPNGRecipe(pngPath)
+	if err != nil {
+		t.Fatalf("ReadPNGRecipe failed: %v", err)
+	}
+	if meta.Engine != "mosaicSun" || meta.Seed != 20261021 || meta.Width != 160 || meta.Height != 160 {
+		t.Fatalf("unexpected recipe metadata: %+v", meta)
+	}
+	if ringSteps, ok := meta.Params["ringSteps"].(float64); !ok || int(ringSteps) != 20 {
+		t.Fatalf("expected ringSteps=20 in recipe params, got %+v", meta.Params)
+	}
+}
+
+func TestDualVectorSVGPDFExport(t *testing.T) {
+	c := generativeart.NewCanva(160, 160)
+	c.SetSeed(99)
+	c.SetBackground(color.RGBA{R: 18, G: 14, B: 22, A: 255})
+	c.FillBackground()
+	c.Draw(arts.NewCloisonneEnamel(4, 8))
+
+	rc := c.LastRenderCanvas()
+	if rc == nil || rc.VectorOpCount() < 20 {
+		t.Fatalf("expected recorded vector operations from CloisonneEnamel, got %v", rc)
+	}
+
+	var svgBuf bytes.Buffer
+	if err := c.WriteSVG(&svgBuf); err != nil {
+		t.Fatalf("WriteSVG failed: %v", err)
+	}
+	svgStr := svgBuf.String()
+	if !strings.Contains(svgStr, "<svg") || !strings.Contains(svgStr, "<path") {
+		t.Fatalf("expected valid SVG with <path> elements, got %d bytes", len(svgStr))
+	}
+
+	var pdfBuf bytes.Buffer
+	if err := c.WritePDF(&pdfBuf); err != nil {
+		t.Fatalf("WritePDF failed: %v", err)
+	}
+	if !bytes.HasPrefix(pdfBuf.Bytes(), []byte("%PDF-")) {
+		t.Fatalf("expected valid PDF header, got %d bytes", pdfBuf.Len())
+	}
+}
+
+func TestDrawTimelapseAndAnimatedGIF(t *testing.T) {
+	c := generativeart.NewCanva(96, 96)
+	c.SetSeed(777)
+	c.SetBackground(color.RGBA{R: 12, G: 16, B: 28, A: 255})
+
+	// Create a seamless 4-frame looping animation using Curl4DLoop
+	anim := generativeart.NewAnimatedEngine(func(cv *generativeart.Canva, frameIdx, totalFrames int, phase float64) {
+		rc := cv.NewRenderCanvas()
+		ne := cv.Noise()
+		v := ne.Curl4DLoop(1.5, 2.5, phase, 1.0, 1e-3)
+		cx := 48.0 + 18.0*math.Cos(phase*2.0*math.Pi) + v.X*2.0
+		cy := 48.0 + 18.0*math.Sin(phase*2.0*math.Pi) + v.Y*2.0
+		rc.FillPolygon([]render.Point{
+			render.Pt(cx-12, cy-12),
+			render.Pt(cx+12, cy-12),
+			render.Pt(cx+12, cy+12),
+			render.Pt(cx-12, cy+12),
+		}, color.RGBA{R: 240, G: 180, B: 60, A: 255}, 1.0)
+		cv.MergeRenderCanvas(rc)
+	})
+
+	c.DrawTimelapseFrames(anim, 4)
+	if len(c.Frames()) != 4 {
+		t.Fatalf("expected 4 recorded frames, got %d", len(c.Frames()))
+	}
+
+	var gifBuf bytes.Buffer
+	if err := c.WriteGIF(&gifBuf, 6); err != nil {
+		t.Fatalf("WriteGIF failed: %v", err)
+	}
+
+	decodedGIF, err := gif.DecodeAll(&gifBuf)
+	if err != nil {
+		t.Fatalf("gif.DecodeAll failed: %v", err)
+	}
+	if len(decodedGIF.Image) != 4 {
+		t.Fatalf("expected 4 frames in decoded GIF, got %d", len(decodedGIF.Image))
+	}
+}

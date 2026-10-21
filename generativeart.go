@@ -19,11 +19,14 @@ type Engine interface {
 }
 
 type Canva struct {
-	height, width int
-	img           *image.RGBA
-	opts          Options
-	rng           *rand.Rand
-	noise         *common.NoiseEngine
+	height, width    int
+	img              *image.RGBA
+	opts             Options
+	rng              *rand.Rand
+	noise            *common.NoiseEngine
+	lastRenderCanvas *render.Canvas
+	frames           []*image.RGBA
+	lastRecipe       *RecipeMetadata
 }
 
 func (c *Canva) Opts() Options {
@@ -170,11 +173,19 @@ func (c *Canva) SetAlpha(alpha int) {
 }
 
 func (c *Canva) Draw(e Engine) {
+	c.lastRecipe = captureEngineRecipe(c, e)
 	e.Generative(c)
 }
 
+// DrawTimelapse renders a multi-frame timelapse or seamless loop sequence (using
+// c.Opts().NIters() frames, defaulting to 12) into c.Frames(), which can then be
+// exported as an animated GIF via c.ToGIF(fpath, delayCs).
 func (c *Canva) DrawTimelapse(e Engine) {
-
+	frames := c.opts.nIters
+	if frames <= 0 {
+		frames = 12
+	}
+	c.DrawTimelapseFrames(e, frames)
 }
 
 // FillBackground fills the background of the Canva.
@@ -184,7 +195,10 @@ func (c *Canva) FillBackground() {
 
 // NewRenderCanvas creates a render.Canvas initialized from c.Img().
 func (c *Canva) NewRenderCanvas() *render.Canvas {
-	return render.NewCanvasFromRGBA(c.Img())
+	rc := render.NewCanvasFromRGBA(c.Img())
+	rc.FillBackground(c.Opts().Background())
+	c.lastRenderCanvas = rc
+	return rc
 }
 
 // MergeRenderCanvas resolves rc back into c.Img().
@@ -192,6 +206,7 @@ func (c *Canva) MergeRenderCanvas(rc *render.Canvas) {
 	if rc == nil {
 		return
 	}
+	c.lastRenderCanvas = rc
 	c.img = rc.ResolveToRGBA(c.Img())
 }
 
@@ -200,7 +215,13 @@ func (c *Canva) MergeRenderCanvasToneMapped(rc *render.Canvas, exposure, gamma f
 	if rc == nil {
 		return
 	}
+	c.lastRenderCanvas = rc
 	c.img = rc.ResolveToneMapped(c.Img(), exposure, gamma)
+}
+
+// LastRenderCanvas returns the most recent *render.Canvas used by this Canva.
+func (c *Canva) LastRenderCanvas() *render.Canvas {
+	return c.lastRenderCanvas
 }
 
 // Blend applies common.Blend onto c.Img().
@@ -212,22 +233,22 @@ func (c *Canva) Blend(src *image.RGBA, mode common.BlendMode) {
 	draw.Draw(c.img, c.img.Bounds(), blended, blended.Bounds().Min, draw.Src)
 }
 
-// ToPng saves the image to local with PNG format.
+// ToPNG saves the image to local with PNG format and embeds the deterministic
+// GenerativeArt-Recipe JSON metadata inside a standard PNG tEXt chunk.
 func (c *Canva) ToPNG(fpath string) error {
-	f, err := os.Create(fpath)
-	if err != nil {
+	var buf bytes.Buffer
+	if err := png.Encode(&buf, c.Img()); err != nil {
 		return err
 	}
-	if err = png.Encode(f, c.Img()); err != nil {
-		f.Close()
-		return err
+	rec := c.lastRecipe
+	if rec == nil {
+		rec = captureEngineRecipe(c, nil)
 	}
-
-	if err = f.Close(); err != nil {
-		return err
+	pngBytes := buf.Bytes()
+	if withMeta, err := InjectPNGRecipe(pngBytes, rec); err == nil {
+		pngBytes = withMeta
 	}
-
-	return nil
+	return os.WriteFile(fpath, pngBytes, 0644)
 }
 
 // ToJpeg saves the image to local with Jpeg format.
