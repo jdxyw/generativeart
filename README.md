@@ -27,10 +27,12 @@
 
 👉 **[View All 94 Artworks & Code Examples in `gallery.md` →](./gallery.md)**
 
-### 🎞️ Seamless Looping Animations (`DrawTimelapse` + `ToGIF`)
+### 🎞️ Seamless 600×600 HD Looping Animations (`DrawTimelapseFrames` + `ToGIF`)
 
-| BZ Spiral Waves (`cyclicautomata`) | 3D Gyroid TPMS (`gyroidsurface`) | Mosaic Sun (`mosaicsun`) | Magnetic Dipole (`magneticdipole`) |
+| Dunhuang Caisson (`dunhuangapsara`) | Gothic Rose Window (`stainedrosewindow`) | Newton Fractal Silk (`newtonbasin`) | 3D Miura-Ori (`origamitessellation`) |
 | :---: | :---: | :---: | :---: |
+| ![Dunhuang Caisson Loop](images/dunhuangapsara_loop.gif) | ![Gothic Rose Window Loop](images/stainedrosewindow_loop.gif) | ![Newton Basin Loop](images/newtonbasin_loop.gif) | ![Origami Tessellation Loop](images/origamitessellation_loop.gif) |
+| **BZ Spiral Waves (`cyclicautomata`)** | **3D Gyroid TPMS (`gyroidsurface`)** | **Mosaic Sun (`mosaicsun`)** | **Magnetic Dipole (`magneticdipole`)** |
 | ![BZ Spiral Waves Loop](images/cyclicautomata_loop.gif) | ![3D Gyroid Loop](images/gyroidsurface_loop.gif) | ![Mosaic Sun Loop](images/mosaicsun_loop.gif) | ![Magnetic Dipole Loop](images/magneticdipole_loop.gif) |
 
 ---

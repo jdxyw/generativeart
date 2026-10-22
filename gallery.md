@@ -6,17 +6,23 @@ This gallery contains standalone `Go` usage examples and rendered outputs for `g
 
 ---
 
-## 🎞️ Seamless Looping GIF Animations (`DrawTimelapseFrames` + `ToGIF`)
+## 🎞️ Seamless 600×600 HD Looping GIF Animations (`DrawTimelapseFrames` + `ToGIF`)
 
-| BZ Spiral Waves (`cyclicautomata`) | 3D Gyroid TPMS (`gyroidsurface`) | Mosaic Sun (`mosaicsun`) | Magnetic Dipole (`magneticdipole`) |
+| Dunhuang Caisson (`dunhuangapsara`) | Gothic Rose Window (`stainedrosewindow`) | Newton Fractal Silk (`newtonbasin`) | 3D Miura-Ori (`origamitessellation`) |
 | :---: | :---: | :---: | :---: |
+| ![Dunhuang Caisson Loop](images/dunhuangapsara_loop.gif) | ![Gothic Rose Window Loop](images/stainedrosewindow_loop.gif) | ![Newton Basin Loop](images/newtonbasin_loop.gif) | ![Origami Tessellation Loop](images/origamitessellation_loop.gif) |
+| **BZ Spiral Waves (`cyclicautomata`)** | **3D Gyroid TPMS (`gyroidsurface`)** | **Mosaic Sun (`mosaicsun`)** | **Magnetic Dipole (`magneticdipole`)** |
 | ![BZ Spiral Waves Loop](images/cyclicautomata_loop.gif) | ![3D Gyroid Loop](images/gyroidsurface_loop.gif) | ![Mosaic Sun Loop](images/mosaicsun_loop.gif) | ![Magnetic Dipole Loop](images/magneticdipole_loop.gif) |
 
 ```bash
-go run ./cmd/genart render -art cyclicautomata -w 360 -h 360 -frames 16 -delay 7 -out images/cyclicautomata_loop.gif
-go run ./cmd/genart render -art gyroidsurface  -w 360 -h 360 -frames 16 -delay 7 -out images/gyroidsurface_loop.gif
-go run ./cmd/genart render -art mosaicsun      -w 360 -h 360 -frames 16 -delay 7 -out images/mosaicsun_loop.gif
-go run ./cmd/genart render -art magneticdipole -w 360 -h 360 -frames 16 -delay 7 -out images/magneticdipole_loop.gif
+go run ./cmd/genart render -art dunhuangapsara      -w 600 -h 600 -frames 16 -delay 7 -out images/dunhuangapsara_loop.gif
+go run ./cmd/genart render -art stainedrosewindow   -w 600 -h 600 -frames 16 -delay 7 -out images/stainedrosewindow_loop.gif
+go run ./cmd/genart render -art newtonbasin         -w 600 -h 600 -frames 16 -delay 7 -out images/newtonbasin_loop.gif
+go run ./cmd/genart render -art origamitessellation -w 600 -h 600 -frames 16 -delay 7 -out images/origamitessellation_loop.gif
+go run ./cmd/genart render -art cyclicautomata      -w 600 -h 600 -frames 16 -delay 7 -out images/cyclicautomata_loop.gif
+go run ./cmd/genart render -art gyroidsurface       -w 600 -h 600 -frames 16 -delay 7 -out images/gyroidsurface_loop.gif
+go run ./cmd/genart render -art mosaicsun           -w 600 -h 600 -frames 16 -delay 7 -out images/mosaicsun_loop.gif
+go run ./cmd/genart render -art magneticdipole      -w 600 -h 600 -frames 16 -delay 7 -out images/magneticdipole_loop.gif
 ```
 
 ---

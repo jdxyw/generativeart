@@ -4,6 +4,8 @@ import (
 	"image/color"
 	"math"
 	"math/cmplx"
+	"runtime"
+	"sync"
 
 	"github.com/jdxyw/generativeart"
 	"github.com/jdxyw/generativeart/common"
@@ -33,9 +35,15 @@ func NewNewtonBasin(degree, maxIter int) *newtonBasin {
 
 // Generative renders the complex Newton-Raphson fractal rosette with 2x2 SSAA.
 func (nb *newtonBasin) Generative(c *generativeart.Canva) {
+	nb.GenerativeFrame(c, 0, 1, 0.0)
+}
+
+// GenerativeFrame renders frame frameIdx of a seamless 360-degree phase loop (phase in [0, 1)).
+func (nb *newtonBasin) GenerativeFrame(c *generativeart.Canva, frameIdx, totalFrames int, loopPhase float64) {
 	rc := c.NewRenderCanvas()
 	w, h := c.Width(), c.Height()
 	fw, fh := float64(w), float64(h)
+	animPhase := loopPhase * 2.0 * math.Pi
 
 	// Rich Stained-Silk & Jewel Palette for Root Basins
 	rootPalettes := [][3]color.RGBA{
@@ -95,10 +103,11 @@ func (nb *newtonBasin) Generative(c *generativeart.Canva) {
 				break
 			}
 			fVal := zPowNMinus1*z - 1.0
-			// Slightly relaxed complex damping (1.0 + 0.06i) creates swirling baroque spiral filaments at basin boundaries
+			// Slightly relaxed complex damping creates swirling baroque spiral filaments at basin boundaries
 			step := fVal / denom
 			prevZ = z
-			z = z - complex(0.98, 0.05)*step
+			damping := complex(0.98+0.04*math.Sin(animPhase), 0.05*math.Cos(animPhase))
+			z = z - damping*step
 
 			// Check convergence to any root
 			for rIdx, rt := range roots {
@@ -128,9 +137,9 @@ func (nb *newtonBasin) Generative(c *generativeart.Canva) {
 
 		pal := rootPalettes[rootIdx%len(rootPalettes)]
 		// Pleated silk wave modulation from smooth iteration count + argument angle around root
-		pleat := 0.5 + 0.5*math.Cos(smoothIter*0.85)
+		pleat := 0.5 + 0.5*math.Cos(smoothIter*0.85-animPhase*2.0)
 		arg := cmplx.Phase(z - prevZ)
-		normalShade := 0.5 + 0.5*math.Cos(arg-0.75)
+		normalShade := 0.5 + 0.5*math.Cos(arg-0.75-animPhase)
 
 		u := common.Constrain(pleat*0.62+normalShade*0.38, 0, 1)
 		var col color.RGBA
@@ -143,7 +152,7 @@ func (nb *newtonBasin) Generative(c *generativeart.Canva) {
 		// Highlight fractal Julia boundary ridges (high iteration count) with gilded filaments and dark troughs
 		if smoothIter > 10.0 {
 			ridge := common.Constrain((smoothIter-10.0)/16.0, 0, 1)
-			filament := 0.5 + 0.5*math.Sin(smoothIter*2.4)
+			filament := 0.5 + 0.5*math.Sin(smoothIter*2.4-animPhase*2.0)
 			if filament > 0.68 {
 				col = render.LerpOklab(col, boundaryGold, ridge*0.78)
 			} else {
@@ -154,24 +163,38 @@ func (nb *newtonBasin) Generative(c *generativeart.Canva) {
 		return render.SRGB8ToLinear(col.R), render.SRGB8ToLinear(col.G), render.SRGB8ToLinear(col.B)
 	}
 
-	// 2x2 Sub-Pixel Super-Sampling (SSAA) across all rows
+	// Parallel 2x2 Sub-Pixel Super-Sampling (SSAA) across all rows
 	offsets := [2]float64{0.25, 0.75}
-	for y := 0; y < h; y++ {
-		fy := float64(y)
-		for x := 0; x < w; x++ {
-			fx := float64(x)
-			var accR, accG, accB float64
-			for _, oy := range offsets {
-				for _, ox := range offsets {
-					rL, gL, bL := sampleComplex(fx+ox, fy+oy)
-					accR += rL
-					accG += gL
-					accB += bL
+	workers := runtime.NumCPU()
+	if workers < 1 {
+		workers = 1
+	}
+	var wg sync.WaitGroup
+	for wIdx := 0; wIdx < workers; wIdx++ {
+		y0 := (wIdx * h) / workers
+		y1 := ((wIdx + 1) * h) / workers
+		wg.Add(1)
+		go func(rowStart, rowEnd int) {
+			defer wg.Done()
+			for y := rowStart; y < rowEnd; y++ {
+				fy := float64(y)
+				for x := 0; x < w; x++ {
+					fx := float64(x)
+					var accR, accG, accB float64
+					for _, oy := range offsets {
+						for _, ox := range offsets {
+							rL, gL, bL := sampleComplex(fx+ox, fy+oy)
+							accR += rL
+							accG += gL
+							accB += bL
+						}
+					}
+					rc.SetPixelLinear(x, y, accR*0.25, accG*0.25, accB*0.25, 1.0)
 				}
 			}
-			rc.SetPixelLinear(x, y, accR*0.25, accG*0.25, accB*0.25, 1.0)
-		}
+		}(y0, y1)
 	}
+	wg.Wait()
 
 	c.MergeRenderCanvas(rc)
 }

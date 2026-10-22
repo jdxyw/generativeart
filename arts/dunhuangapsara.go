@@ -32,10 +32,16 @@ func NewDunhuangApsara(ribbons, haloRings int) *dunhuangApsara {
 
 // Generative renders the Dunhuang Mogao caisson ceiling and flying silk ribbons.
 func (da *dunhuangApsara) Generative(c *generativeart.Canva) {
+	da.GenerativeFrame(c, 0, 1, 0.0)
+}
+
+// GenerativeFrame renders frame frameIdx of a seamless 360-degree phase loop (phase in [0, 1)).
+func (da *dunhuangApsara) GenerativeFrame(c *generativeart.Canva, frameIdx, totalFrames int, loopPhase float64) {
 	rc := c.NewRenderCanvas()
 	w, h := float64(c.Width()), float64(c.Height())
 	scale := math.Min(w, h) / 600.0
 	cx, cy := 0.5*w, 0.5*h
+	animPhase := loopPhase * 2.0 * math.Pi
 
 	// Authentic Dunhuang Mineral Pigment Palette (石青, 石绿, 朱砂, 赭石, 泥金, 胡粉)
 	grottoDark := color.RGBA{R: 20, G: 14, B: 18, A: 255}
@@ -135,9 +141,9 @@ func (da *dunhuangApsara) Generative(c *generativeart.Canva) {
 		pts := make([]render.Point, 0, 28)
 		for k := 0; k <= 26; k++ {
 			u := float64(k) / 26.0
-			r := (0.20 + 0.25*u) * w
-			// Sinuous S-wave oscillation along the spiral silk ribbon
-			theta := baseAng + u*1.15*math.Pi + 0.14*math.Sin(u*math.Pi*4.0)
+			r := (0.20 + 0.25*u + 0.014*math.Sin(u*math.Pi*2.0-animPhase)) * w
+			// Sinuous S-wave oscillation travelling seamlessly along the spiral silk ribbon
+			theta := baseAng + u*1.15*math.Pi + 0.14*math.Sin(u*math.Pi*4.0-animPhase*2.0)
 			pts = append(pts, render.Pt(cx+r*math.Cos(theta), cy+r*math.Sin(theta)))
 		}
 		col := ribbonPal[rb%len(ribbonPal)]
@@ -160,16 +166,18 @@ func (da *dunhuangApsara) Generative(c *generativeart.Canva) {
 	rc.DrawSoftRing(cx, cy, rMandala*1.01, 4.5*scale, mudGold, 0.96)
 
 	const pearls = 48
+	pearlRot := animPhase / float64(pearls)
 	for i := 0; i < pearls; i++ {
-		a := (float64(i) / float64(pearls)) * 2.0 * math.Pi
+		a := (float64(i)/float64(pearls))*2.0*math.Pi + pearlRot
 		px := cx + rMandala*0.95*math.Cos(a)
 		py := cy + rMandala*0.95*math.Sin(a)
 		rc.DrawGlowDot(px, py, 2.8*scale, chalkIvory, 0.95, 0.88)
 	}
 
-	// 3 concentric rings of sculpted Baoxianghua lotus petals
+	// 3 concentric rings of sculpted Baoxianghua lotus petals (12 petals with p%2 alternation -> period = 2*dAng = 2*pi/6)
 	const petals = 12
 	dAng := (2.0 * math.Pi) / float64(petals)
+	lotusStepRot := animPhase / 6.0
 
 	drawBaoxiangRing := func(rIn, rOut, phase float64, baseCol, rimCol, specCol color.RGBA) {
 		for p := 0; p < petals; p++ {
@@ -192,13 +200,14 @@ func (da *dunhuangApsara) Generative(c *generativeart.Canva) {
 		}
 	}
 
-	drawBaoxiangRing(0.135*w, rMandala*0.90, 0.0, cinnabarRed, burntOchre, chalkIvory)
-	drawBaoxiangRing(0.078*w, 0.162*w, dAng*0.5, turquoiseJade, deepLapis, chalkIvory)
-	drawBaoxiangRing(0.032*w, 0.095*w, 0.0, mudGold, burntOchre, chalkIvory)
+	drawBaoxiangRing(0.135*w, rMandala*0.90, lotusStepRot, cinnabarRed, burntOchre, chalkIvory)
+	drawBaoxiangRing(0.078*w, 0.162*w, dAng*0.5-lotusStepRot, turquoiseJade, deepLapis, chalkIvory)
+	drawBaoxiangRing(0.032*w, 0.095*w, lotusStepRot, mudGold, burntOchre, chalkIvory)
 
 	// Central Golden Lotus Seed Pod
 	coreOrb := render.SDFCircle(render.Pt(cx, cy), 0.036*w)
-	rc.RenderSDFBevel(coreOrb, mudGold, burntOchre, chalkIvory, 0.018*w, render.Pt(-0.7, -0.7), 1.0)
+	lightDir := render.Pt(-0.7*math.Cos(animPhase)+0.7*math.Sin(animPhase), -0.7*math.Sin(animPhase)-0.7*math.Cos(animPhase))
+	rc.RenderSDFBevel(coreOrb, mudGold, burntOchre, chalkIvory, 0.018*w, lightDir, 1.0)
 
 	rc.ApplyPaperTexture(0.07, 202622)
 	c.MergeRenderCanvas(rc)

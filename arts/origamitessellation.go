@@ -66,9 +66,15 @@ func (v vec3) norm() vec3 {
 
 // Generative renders the 3D Miura-ori & starburst pyramid origami tessellation.
 func (ot *origamiTessellation) Generative(c *generativeart.Canva) {
+	ot.GenerativeFrame(c, 0, 1, 0.0)
+}
+
+// GenerativeFrame renders frame frameIdx of a seamless 360-degree phase loop (phase in [0, 1)).
+func (ot *origamiTessellation) GenerativeFrame(c *generativeart.Canva, frameIdx, totalFrames int, loopPhase float64) {
 	rc := c.NewRenderCanvas()
 	w, h := float64(c.Width()), float64(c.Height())
 	scale := math.Min(w, h) / 600.0
+	animPhase := loopPhase * 2.0 * math.Pi
 
 	// Sculptural Origami Palette (High-Contrast Dunhuang Vermilion, Imperial Gold, Turquoise & Deep Indigo Shadows)
 	deepIndigo := color.RGBA{R: 12, G: 18, B: 38, A: 255}
@@ -131,12 +137,12 @@ func (ot *origamiTessellation) Generative(c *generativeart.Canva) {
 				zigX = -1.0
 			}
 
-			chevronShiftX := zigY * dx * 0.24 * (1.0 + 0.25*math.Cos(rDist*math.Pi*3.0))
-			chevronShiftY := zigX * dy * 0.14 * math.Sin((uFrac+vFrac)*math.Pi*2.0)
+			chevronShiftX := zigY * dx * 0.24 * (1.0 + 0.25*math.Cos(rDist*math.Pi*3.0-animPhase))
+			chevronShiftY := zigX * dy * 0.14 * math.Sin((uFrac+vFrac)*math.Pi*2.0+animPhase)
 
-			// 3D elevation Z combining alternating crease pleats + global dome wave
-			pleatZ := (zigX*0.55 + zigY*0.45) * 24.0 * scale * ot.foldDepth
-			waveZ := 28.0 * scale * math.Cos(rDist*math.Pi*3.2)
+			// 3D elevation Z combining alternating crease pleats + travelling global dome wave
+			pleatZ := (zigX*0.55 + zigY*0.45) * 24.0 * scale * ot.foldDepth * (1.0 + 0.22*math.Sin(animPhase-rDist*math.Pi*2.5))
+			waveZ := 28.0 * scale * math.Cos(rDist*math.Pi*3.2-animPhase)
 			px := baseX + chevronShiftX
 			py := baseY + chevronShiftY - waveZ*0.22
 			pz := pleatZ + waveZ
@@ -197,9 +203,10 @@ func (ot *origamiTessellation) Generative(c *generativeart.Canva) {
 
 			// Alternate raised mountain pyramids and recessed valley Hopp-folds
 			isRaised := (ix+iy)%2 == 0
-			apexOffsetZ := 22.0 * scale * ot.foldDepth
+			breath := 1.0 + 0.25*math.Sin(animPhase-math.Hypot(uMid-0.5, vMid-0.5)*math.Pi*3.0)
+			apexOffsetZ := 22.0 * scale * ot.foldDepth * breath
 			if !isRaised {
-				apexOffsetZ = -18.0 * scale * ot.foldDepth
+				apexOffsetZ = -18.0 * scale * ot.foldDepth * breath
 			}
 
 			center := vec3{
