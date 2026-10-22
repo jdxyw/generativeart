@@ -1156,6 +1156,97 @@ nb := arts.NewNewtonBasin(6, 48)
 
 ![](../images/newtonbasin.png)
 
+## Vortex Fluid
+
+`Vortex Fluid` simulates Jovian atmospheric bands and Kármán vortex streets using backward Lagrangian RK4 advection of Rankine vortices, 3D cloud-top relief lighting, and Marching Squares filaments.
+
+### parameters
+
+- vorticesN: The number of counter-rotating Rankine vortices in the atmospheric flow.
+- steps: The number of backward RK4 advection steps.
+
+```go
+vf := arts.NewVortexFluid(9, 18)
+```
+
+![](../images/vortexfluid.png)
+
+## Cyclic Automata
+
+`Cyclic Automata` renders Belousov-Zhabotinsky chemical reaction spiral waves and excitable media phase fields with branch-cut-free complex phasor superposition, 3D Blinn-Phong shading, and Marching Squares contours.
+
+### parameters
+
+- states: The number of quantized excitable media chemical states.
+- steps: Controls the spiral wave evolution density.
+
+```go
+ca := arts.NewCyclicAutomata(14, 120)
+```
+
+![](../images/cyclicautomata.png)
+
+## Circuit WFC
+
+`Circuit WFC` synthesizes a gilded silicon wafer and cyberpunk PCB architecture using constraint-propagated octilinear (0/45/90-degree) trace routing, 3D beveled QFP microprocessor dies, and plated through-hole vias.
+
+### parameters
+
+- gridSize: The resolution of the octilinear PCB routing lattice.
+- busCount: The number of secondary bus traces routed across the board.
+
+```go
+cw := arts.NewCircuitWFC(28, 64)
+```
+
+![](../images/circuitwfc.png)
+
+## Asemic Calligraphy
+
+`Asemic Calligraphy` renders an Eastern cursive ink scroll (狂草书法长卷) on ruled Xuan paper with spring-mass brush dynamics, flying-white (Feibai) bristle splits, and vermilion artist seals.
+
+### parameters
+
+- cols: The number of vertical Zhisi-ruled calligraphy columns.
+- glyphsPerCol: The number of connected cursive glyphs per column.
+
+```go
+ac := arts.NewAsemicCalligraphy(6, 5)
+```
+
+![](../images/asemiccalligraphy.png)
+
+## Buddhabrot
+
+`Buddhabrot` renders a 3-channel spectral Nebulabrot probability density cloud using boundary importance sampling, bilateral symmetry, and Oklab false-color HDR tone mapping.
+
+### parameters
+
+- samplesN: The number of candidate complex C trajectories to sample.
+- maxIter: The maximum escape iteration threshold.
+
+```go
+bb := arts.NewBuddhabrot(450000, 360)
+```
+
+![](../images/buddhabrot.png)
+
+## Lyapunov Fractal
+
+`Lyapunov Fractal` renders a Markus-Lyapunov logistic stability exponent landscape with 3D metallic gold and turquoise bevel shading over deep cobalt and crimson chaos regions.
+
+### parameters
+
+- seq: The periodic A/B forcing sequence (e.g., `"AABAB"`).
+- maxIter: The number of logistic map iterations per pixel.
+
+```go
+lf := arts.NewLyapunovFractal("AABAB", 84)
+```
+
+![](../images/lyapunovfractal.png)
+
+
 
 
 

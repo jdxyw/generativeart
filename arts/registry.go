@@ -95,7 +95,61 @@ func paramFloat(p map[string]interface{}, key string, def float64) float64 {
 	}
 }
 
+func paramString(p map[string]interface{}, key, def string) string {
+	if p == nil {
+		return def
+	}
+	if s, ok := p[key].(string); ok && len(s) > 0 {
+		return s
+	}
+	return def
+}
+
 var registry = []ArtDescriptor{
+	// Wave 11: Jovian Vortex Fluid, BZ Spiral Waves, Gilded PCB WFC, Cursive Calligraphy, Buddhabrot & Lyapunov
+	{
+		ID: "vortexfluid", StructName: "vortexFluid", Category: "flow",
+		DefaultBG: color.RGBA{12, 22, 46, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewVortexFluid(paramInt(p, "vorticesN", 9), paramInt(p, "steps", 18))
+		},
+	},
+	{
+		ID: "cyclicautomata", StructName: "cyclicAutomata", Category: "bio",
+		DefaultBG: color.RGBA{10, 16, 34, 255}, DefaultPal: "sunset",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewCyclicAutomata(paramInt(p, "states", 14), paramInt(p, "steps", 120))
+		},
+	},
+	{
+		ID: "circuitwfc", StructName: "circuitWFC", Category: "geom",
+		DefaultBG: color.RGBA{8, 20, 26, 255}, DefaultPal: "cyberpunk",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewCircuitWFC(paramInt(p, "gridSize", 28), paramInt(p, "busCount", 64))
+		},
+	},
+	{
+		ID: "asemiccalligraphy", StructName: "asemicCalligraphy", Category: "media",
+		DefaultBG: color.RGBA{244, 236, 214, 255}, DefaultPal: "ukiyoe",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewAsemicCalligraphy(paramInt(p, "cols", 6), paramInt(p, "glyphsPerCol", 5))
+		},
+	},
+	{
+		ID: "buddhabrot", StructName: "buddhabrot", Category: "chaos",
+		DefaultBG: color.RGBA{4, 6, 14, 255}, DefaultPal: "inferno",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewBuddhabrot(paramInt(p, "samplesN", 450000), paramInt(p, "maxIter", 360))
+		},
+	},
+	{
+		ID: "lyapunovfractal", StructName: "lyapunovFractal", Category: "chaos",
+		DefaultBG: color.RGBA{8, 12, 26, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewLyapunovFractal(paramString(p, "seq", "AABAB"), paramInt(p, "maxIter", 84))
+		},
+	},
+
 	// Wave 10: 8-Fold Quasicrystals, Sashiko Embroidery, Electromagnetic Dipoles & Complex Newton Fractals
 	{
 		ID: "ammannbeenker", StructName: "ammannBeenker", Category: "geom",
