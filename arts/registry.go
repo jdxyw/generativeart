@@ -106,6 +106,50 @@ func paramString(p map[string]interface{}, key, def string) string {
 }
 
 var registry = []ArtDescriptor{
+	// Wave 12: Dunhuang Caisson, Celtic Knotwork, 3D Gyroid TPMS, Lichtenberg Plasma, Persian Muqarnas & Warring States Bronze
+	{
+		ID: "dunhuangapsara", StructName: "dunhuangApsara", Category: "media",
+		DefaultBG: color.RGBA{20, 14, 18, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewDunhuangApsara(paramInt(p, "ribbons", 8), paramInt(p, "haloRings", 5))
+		},
+	},
+	{
+		ID: "celticknotwork", StructName: "celticKnotwork", Category: "geom",
+		DefaultBG: color.RGBA{14, 18, 26, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewCelticKnotwork(paramInt(p, "gridSize", 8), paramFloat(p, "ribbonWidth", 1.0))
+		},
+	},
+	{
+		ID: "gyroidsurface", StructName: "gyroidSurface", Category: "geom",
+		DefaultBG: color.RGBA{10, 14, 26, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewGyroidSurface(paramFloat(p, "scaleFreq", 4.2), paramFloat(p, "thickness", 0.085))
+		},
+	},
+	{
+		ID: "lichtenbergtree", StructName: "lichtenbergTree", Category: "bio",
+		DefaultBG: color.RGBA{6, 8, 18, 255}, DefaultPal: "cyberpunk",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewLichtenbergTree(paramInt(p, "branches", 9), paramFloat(p, "roughness", 1.0))
+		},
+	},
+	{
+		ID: "persiantilework", StructName: "persianTilework", Category: "geom",
+		DefaultBG: color.RGBA{16, 12, 24, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewPersianTilework(paramInt(p, "symmetry", 16), paramInt(p, "rings", 6))
+		},
+	},
+	{
+		ID: "champleveenamel", StructName: "champleveEnamel", Category: "media",
+		DefaultBG: color.RGBA{12, 14, 18, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewChampleveEnamel(paramInt(p, "symmetry", 8), paramInt(p, "ringCount", 4))
+		},
+	},
+
 	// Wave 11: Jovian Vortex Fluid, BZ Spiral Waves, Gilded PCB WFC, Cursive Calligraphy, Buddhabrot & Lyapunov
 	{
 		ID: "vortexfluid", StructName: "vortexFluid", Category: "flow",

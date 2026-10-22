@@ -4,7 +4,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/jdxyw/generativeart)](https://goreportcard.com/report/github.com/jdxyw/generativeart)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/jdxyw/generativeart/master/LICENSE)
 
-`generativeart` is a pure-`Go` generative art engine and algorithm collection supporting **88 generative art types** across flow fields, strange attractors, biological morphogenesis, non-Euclidean geometry, quasicrystals, stained-glass mosaics, cloisonné enamel, 3D origami, and traditional printmaking.
+`generativeart` is a pure-`Go` generative art engine and algorithm collection supporting **94 generative art types** across flow fields, strange attractors, biological morphogenesis, 3D SDF raymarching, non-Euclidean geometry, quasicrystals, stained-glass mosaics, cloisonné enamel, 3D origami, and traditional printmaking.
 
 - 🌐 **Live Interactive Web Gallery (GitHub Pages)**: **[https://jdxyw.github.io/generativeart/](https://jdxyw.github.io/generativeart/)**
 - 🖼️ **Full Code & Image Gallery (`gallery.md`)**: **[./gallery.md](./gallery.md)**
@@ -15,17 +15,17 @@
 
 ## Featured Gallery Highlights
 
-> Browse all **88 artworks**, full `Go` source snippets, and rendered previews in **[`gallery.md`](./gallery.md)** or on the **[Interactive GitHub Pages Gallery](https://jdxyw.github.io/generativeart/)**.
+> Browse all **94 artworks**, full `Go` source snippets, and rendered previews in **[`gallery.md`](./gallery.md)** or on the **[Interactive GitHub Pages Gallery](https://jdxyw.github.io/generativeart/)**.
 
-| [Vortex Fluid](./gallery.md#vortex-fluid) | [Cyclic Automata](./gallery.md#cyclic-automata) | [Circuit WFC](./gallery.md#circuit-wfc) | [Asemic Calligraphy](./gallery.md#asemic-calligraphy) |
+| [Dunhuang Apsara](./gallery.md#dunhuang-apsara) | [Celtic Knotwork](./gallery.md#celtic-knotwork) | [Gyroid Surface](./gallery.md#gyroid-surface) | [Lichtenberg Tree](./gallery.md#lichtenberg-tree) |
 | :---: | :---: | :---: | :---: |
-| ![Vortex Fluid](images/vortexfluid.png) | ![Cyclic Automata](images/cyclicautomata.png) | ![Circuit WFC](images/circuitwfc.png) | ![Asemic Calligraphy](images/asemiccalligraphy.png) |
-| **[Buddhabrot](./gallery.md#buddhabrot)** | **[Lyapunov Fractal](./gallery.md#lyapunov-fractal)** | **[Ammann Beenker](./gallery.md#ammann-beenker)** | **[Sashiko Weave](./gallery.md#sashiko-weave)** |
-| ![Buddhabrot](images/buddhabrot.png) | ![Lyapunov Fractal](images/lyapunovfractal.png) | ![Ammann Beenker](images/ammannbeenker.png) | ![Sashiko Weave](images/sashikoweave.png) |
-| **[Magnetic Dipole](./gallery.md#magnetic-dipole)** | **[Newton Basin](./gallery.md#newton-basin)** | **[Even Streamlines](./gallery.md#even-streamlines)** | **[Marching Isolines](./gallery.md#marching-isolines)** |
-| ![Magnetic Dipole](images/magneticdipole.png) | ![Newton Basin](images/newtonbasin.png) | ![Even Streamlines](images/evenstreamlines.png) | ![Marching Isolines](images/marchingisolines.png) |
+| ![Dunhuang Apsara](images/dunhuangapsara.png) | ![Celtic Knotwork](images/celticknotwork.png) | ![Gyroid Surface](images/gyroidsurface.png) | ![Lichtenberg Tree](images/lichtenbergtree.png) |
+| **[Persian Tilework](./gallery.md#persian-tilework)** | **[Champlevé Enamel](./gallery.md#champleve-enamel)** | **[Vortex Fluid](./gallery.md#vortex-fluid)** | **[Cyclic Automata](./gallery.md#cyclic-automata)** |
+| ![Persian Tilework](images/persiantilework.png) | ![Champleve Enamel](images/champleveenamel.png) | ![Vortex Fluid](images/vortexfluid.png) | ![Cyclic Automata](images/cyclicautomata.png) |
+| **[Circuit WFC](./gallery.md#circuit-wfc)** | **[Asemic Calligraphy](./gallery.md#asemic-calligraphy)** | **[Buddhabrot](./gallery.md#buddhabrot)** | **[Lyapunov Fractal](./gallery.md#lyapunov-fractal)** |
+| ![Circuit WFC](images/circuitwfc.png) | ![Asemic Calligraphy](images/asemiccalligraphy.png) | ![Buddhabrot](images/buddhabrot.png) | ![Lyapunov Fractal](images/lyapunovfractal.png) |
 
-👉 **[View All 88 Artworks & Code Examples in `gallery.md` →](./gallery.md)**
+👉 **[View All 94 Artworks & Code Examples in `gallery.md` →](./gallery.md)**
 
 ---
 
@@ -167,9 +167,17 @@ _ = c.ToGIF("loop.gif", 6)
 
 ## Supported Art Types & Constructors
 
-All 88 generators implement `generativeart.Engine` under package `github.com/jdxyw/generativeart/arts` (see [gallery.md](./gallery.md) for visual examples and [docs/doc.md](./docs/doc.md) for parameter details):
+All 94 generators implement `generativeart.Engine` under package `github.com/jdxyw/generativeart/arts` (see [gallery.md](./gallery.md) for visual examples and [docs/doc.md](./docs/doc.md) for parameter details):
 
 ```go
+// Wave 12: Dunhuang Caisson, Celtic Knotwork, 3D Gyroid TPMS, Lichtenberg Plasma, Persian Muqarnas & Warring States Bronze
+NewDunhuangApsara(ribbons, haloRings int)
+NewCelticKnotwork(gridSize int, ribbonWidth float64)
+NewGyroidSurface(scaleFreq, thickness float64)
+NewLichtenbergTree(branches int, roughness float64)
+NewPersianTilework(symmetry, rings int)
+NewChampleveEnamel(symmetry, ringCount int)
+
 // Wave 11: Jovian Vortex Fluid, BZ Spiral Waves, Gilded PCB WFC, Cursive Calligraphy, Buddhabrot & Lyapunov
 NewVortexFluid(vorticesN, steps int)
 NewCyclicAutomata(states, steps int)
