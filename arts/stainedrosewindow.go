@@ -32,10 +32,16 @@ func NewStainedRoseWindow(petals, rings int) *stainedRoseWindow {
 
 // Generative renders the backlit Gothic cathedral rose window and corner spandrel trefoils.
 func (sr *stainedRoseWindow) Generative(c *generativeart.Canva) {
+	sr.GenerativeFrame(c, 0, 1, 0.0)
+}
+
+// GenerativeFrame renders frame frameIdx of a seamless 360-degree phase loop (phase in [0, 1)).
+func (sr *stainedRoseWindow) GenerativeFrame(c *generativeart.Canva, frameIdx, totalFrames int, loopPhase float64) {
 	rc := c.NewRenderCanvas()
 	w, h := float64(c.Width()), float64(c.Height())
 	scale := math.Min(w, h) / 600.0
 	cx, cy := 0.5*w, 0.5*h
+	animPhase := loopPhase * 2.0 * math.Pi
 
 	// Cathedral Lead-Came & Backlit Gothic Stained-Glass Palette
 	cathedralStone := color.RGBA{R: 12, G: 11, B: 18, A: 255}
@@ -99,9 +105,10 @@ func (sr *stainedRoseWindow) Generative(c *generativeart.Canva) {
 	}
 	for _, sc := range spandrelCenters {
 		rSp := 0.088 * w
-		// 4-lobed quatrefoil petals in each corner
+		// 4-lobed quatrefoil petals in each corner (period = pi because lobe%2 alternates)
+		spRot := animPhase * 0.5
 		for lobe := 0; lobe < 4; lobe++ {
-			thC := float64(lobe)*0.5*math.Pi + 0.25*math.Pi
+			thC := float64(lobe)*0.5*math.Pi + 0.25*math.Pi + spRot
 			pts := make([]render.Point, 0, 12)
 			pts = append(pts, sc)
 			lobeCenter := render.Pt(sc.X+rSp*0.52*math.Cos(thC), sc.Y+rSp*0.52*math.Sin(thC))
@@ -118,7 +125,7 @@ func (sr *stainedRoseWindow) Generative(c *generativeart.Canva) {
 		// Central golden diamond in each corner spandrel
 		dPts := make([]render.Point, 4)
 		for k := 0; k < 4; k++ {
-			a := float64(k) * 0.5 * math.Pi
+			a := float64(k)*0.5*math.Pi - animPhase*0.25
 			dPts[k] = render.Pt(sc.X+rSp*0.32*math.Cos(a), sc.Y+rSp*0.32*math.Sin(a))
 		}
 		rc.DrawStainedGlassCell(dPts, cathedralAmber.edge, cathedralAmber.core, cathedralAmber.glow, leadCame, leadW*0.85)
@@ -137,9 +144,11 @@ func (sr *stainedRoseWindow) Generative(c *generativeart.Canva) {
 	dOutAng := (2.0 * math.Pi) / float64(outerCount)
 	rRing4In := 0.365 * w
 	rRing4Out := 0.452 * w
+	// Outer ring color pattern repeats every 4 compartments -> exact seamless period = 4*dOutAng
+	rotRing4 := loopPhase * 4.0 * dOutAng
 
 	for i := 0; i < outerCount; i++ {
-		th0 := float64(i) * dOutAng
+		th0 := float64(i)*dOutAng + rotRing4
 		th1 := th0 + dOutAng
 		thMid := 0.5 * (th0 + th1)
 
@@ -183,9 +192,12 @@ func (sr *stainedRoseWindow) Generative(c *generativeart.Canva) {
 	rRing3In := 0.258 * w
 	rRing3Out := 0.365 * w
 	dAng := (2.0 * math.Pi) / float64(numPetals)
+	// Counter-rotate Ring 3 by one 2-petal symmetry period (-2*dAng) while spinning each oculus locally
+	rotRing3 := -loopPhase * 2.0 * dAng
+	localOculusSpin := loopPhase * (2.0 * math.Pi / 3.0)
 
 	for p := 0; p < numPetals; p++ {
-		th0 := float64(p) * dAng
+		th0 := float64(p)*dAng + rotRing3
 		th1 := th0 + dAng
 		thMid := 0.5 * (th0 + th1)
 
@@ -212,8 +224,8 @@ func (sr *stainedRoseWindow) Generative(c *generativeart.Canva) {
 
 		const ocPetals = 6
 		for op := 0; op < ocPetals; op++ {
-			a0 := (float64(op) / float64(ocPetals)) * 2.0 * math.Pi
-			a1 := (float64(op+1) / float64(ocPetals)) * 2.0 * math.Pi
+			a0 := (float64(op)/float64(ocPetals))*2.0*math.Pi + localOculusSpin
+			a1 := (float64(op+1)/float64(ocPetals))*2.0*math.Pi + localOculusSpin
 			aMid := 0.5 * (a0 + a1)
 			tri := []render.Point{
 				ocCenter,
@@ -232,8 +244,9 @@ func (sr *stainedRoseWindow) Generative(c *generativeart.Canva) {
 	// 4. Second Ring: Radiating Gothic Pointed Colonnette Lancets (r in [0.125w, 0.258w])
 	rRing2In := 0.125 * w
 	rRing2Out := 0.258 * w
+	rotRing2 := loopPhase * 2.0 * dAng
 	for p := 0; p < numPetals; p++ {
-		th0 := float64(p) * dAng
+		th0 := float64(p)*dAng + rotRing2
 		th1 := th0 + dAng
 		thMid := 0.5 * (th0 + th1)
 
@@ -286,8 +299,9 @@ func (sr *stainedRoseWindow) Generative(c *generativeart.Canva) {
 
 	// 5. Inner Star Rosette & Luminous Heart (r < 0.125w)
 	rRing1In := 0.048 * w
+	rotRing1 := -loopPhase * 2.0 * dAng
 	for p := 0; p < numPetals; p++ {
-		th0 := float64(p) * dAng
+		th0 := float64(p)*dAng + rotRing1
 		th1 := th0 + dAng
 		thMid := 0.5 * (th0 + th1)
 

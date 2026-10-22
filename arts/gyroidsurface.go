@@ -3,6 +3,8 @@ package arts
 import (
 	"image/color"
 	"math"
+	"runtime"
+	"sync"
 
 	"github.com/jdxyw/generativeart"
 	"github.com/jdxyw/generativeart/common"
@@ -124,88 +126,149 @@ func (gs *gyroidSurface) GenerativeFrame(c *generativeart.Canva, frameIdx, total
 	halfVec := (vec3{keyLight.x + viewVec.x, keyLight.y + viewVec.y, keyLight.z + viewVec.z}).norm()
 	fovScale := 1.42 / math.Min(fw, fh)
 
-	for y := 0; y < h; y++ {
-		for x := 0; x < w; x++ {
-			uvX := (float64(x) + 0.5 - 0.5*fw) * fovScale
-			uvY := (float64(y) + 0.5 - 0.5*fh) * fovScale
-			rayDir := (vec3{uvX, uvY, -1.55}).norm()
+	shadeRay := func(sx, sy float64) color.RGBA {
+		uvX := (sx - 0.5*fw) * fovScale
+		uvY := (sy - 0.5*fh) * fovScale
+		rayDir := (vec3{uvX, uvY, -1.55}).norm()
 
-			// Analytical ray-sphere bounding check (r = 1.28) to skip background rays immediately
-			b := camPos.dot(rayDir)
-			cVal := camPos.dot(camPos) - 1.28*1.28
-			disc := b*b - cVal
-			if disc < 0 {
-				// Subtle radial cosmic background glow
-				rBg := math.Hypot(uvX, uvY)
-				bgT := common.Constrain(1.0-rBg*0.85, 0, 1)
-				bgCol := render.LerpOklab(abyssBg, cobaltRim, bgT*0.22)
-				rc.BlendPixel(x, y, bgCol, 1.0)
-				continue
-			}
+		// Analytical ray-sphere bounding check (r = 1.28) to skip background rays immediately
+		b := camPos.dot(rayDir)
+		cVal := camPos.dot(camPos) - 1.28*1.28
+		disc := b*b - cVal
+		if disc < 0 {
+			rBg := math.Hypot(uvX, uvY)
+			bgT := common.Constrain(1.0-rBg*0.85, 0, 1)
+			return render.LerpOklab(abyssBg, cobaltRim, bgT*0.22)
+		}
 
-			sqrtD := math.Sqrt(disc)
-			tMin := math.Max(0.1, -b-sqrtD)
-			tMax := -b + sqrtD
+		sqrtD := math.Sqrt(disc)
+		tMin := math.Max(0.1, -b-sqrtD)
+		tMax := -b + sqrtD
 
-			t := tMin
-			hit := false
-			for step := 0; step < 68 && t <= tMax; step++ {
-				p := vec3{
-					camPos.x + rayDir.x*t,
-					camPos.y + rayDir.y*t,
-					camPos.z + rayDir.z*t,
-				}
-				d := sdfScene(p)
-				if d < 0.0022 {
-					hit = true
-					break
-				}
-				t += math.Max(0.006, d*0.82)
-			}
-
-			if !hit {
-				rBg := math.Hypot(uvX, uvY)
-				bgT := common.Constrain(1.0-rBg*0.85, 0, 1)
-				bgCol := render.LerpOklab(abyssBg, cobaltRim, bgT*0.22)
-				rc.BlendPixel(x, y, bgCol, 1.0)
-				continue
-			}
-
-			hitPos := vec3{
+		t := tMin
+		hit := false
+		for step := 0; step < 68 && t <= tMax; step++ {
+			p := vec3{
 				camPos.x + rayDir.x*t,
 				camPos.y + rayDir.y*t,
 				camPos.z + rayDir.z*t,
 			}
-			n := calcNormal(hitPos)
-			ao := calcAO(hitPos, n)
-			gSign := evalGyroidRaw(hitPos)
-
-			// Two-sided labyrinth coloring: positive gyroid channel = Gold/Coral, negative = Teal/Cobalt
-			var baseCol color.RGBA
-			rNorm := common.Constrain(math.Sqrt(hitPos.x*hitPos.x+hitPos.y*hitPos.y+hitPos.z*hitPos.z)/1.22, 0, 1)
-			if gSign >= 0 {
-				baseCol = render.LerpOklab(goldCore, coralRim, rNorm*0.75)
-			} else {
-				baseCol = render.LerpOklab(tealCore, cobaltRim, rNorm*0.75)
+			d := sdfScene(p)
+			if d < 0.0020 {
+				hit = true
+				break
 			}
-
-			ndotl := common.Constrain(n.dot(keyLight), 0, 1)
-			ndotFill := common.Constrain(n.dot(fillLight), 0, 1)
-			fresnel := math.Pow(common.Constrain(1.0-math.Abs(n.dot(rayDir)), 0, 1), 2.5)
-			spec := math.Pow(common.Constrain(n.dot(halfVec), 0, 1), 20.0)
-
-			illum := (0.18 + 0.72*ndotl + 0.24*ndotFill) * ao
-			col := render.LerpOklab(abyssBg, baseCol, common.Constrain(illum, 0.06, 1.0))
-			if fresnel > 0.1 {
-				col = render.LerpOklab(col, goldCore, common.Constrain(fresnel*0.42*ao, 0, 1))
-			}
-			if spec > 0.05 {
-				col = render.LerpOklab(col, ivorySpec, common.Constrain(spec*0.85*ao, 0, 1))
-			}
-
-			rc.BlendPixel(x, y, col, 1.0)
+			t += math.Max(0.0055, d*0.82)
 		}
+
+		if !hit {
+			rBg := math.Hypot(uvX, uvY)
+			bgT := common.Constrain(1.0-rBg*0.85, 0, 1)
+			return render.LerpOklab(abyssBg, cobaltRim, bgT*0.22)
+		}
+
+		hitPos := vec3{
+			camPos.x + rayDir.x*t,
+			camPos.y + rayDir.y*t,
+			camPos.z + rayDir.z*t,
+		}
+		n := calcNormal(hitPos)
+		ao := calcAO(hitPos, n)
+		gSign := evalGyroidRaw(hitPos)
+
+		// Two-sided labyrinth coloring: positive gyroid channel = Gold/Coral, negative = Teal/Cobalt
+		var baseCol color.RGBA
+		rNorm := common.Constrain(math.Sqrt(hitPos.x*hitPos.x+hitPos.y*hitPos.y+hitPos.z*hitPos.z)/1.22, 0, 1)
+		if gSign >= 0 {
+			baseCol = render.LerpOklab(goldCore, coralRim, rNorm*0.75)
+		} else {
+			baseCol = render.LerpOklab(tealCore, cobaltRim, rNorm*0.75)
+		}
+
+		ndotl := common.Constrain(n.dot(keyLight), 0, 1)
+		ndotFill := common.Constrain(n.dot(fillLight), 0, 1)
+		fresnel := math.Pow(common.Constrain(1.0-math.Abs(n.dot(rayDir)), 0, 1), 2.5)
+		spec := math.Pow(common.Constrain(n.dot(halfVec), 0, 1), 20.0)
+
+		illum := (0.18 + 0.72*ndotl + 0.24*ndotFill) * ao
+		col := render.LerpOklab(abyssBg, baseCol, common.Constrain(illum, 0.06, 1.0))
+		if fresnel > 0.1 {
+			col = render.LerpOklab(col, goldCore, common.Constrain(fresnel*0.42*ao, 0, 1))
+		}
+		if spec > 0.05 {
+			col = render.LerpOklab(col, ivorySpec, common.Constrain(spec*0.85*ao, 0, 1))
+		}
+		return col
 	}
+
+	// Pass 1: Parallel primary center-ray evaluation
+	primCols := make([]color.RGBA, w*h)
+	workers := runtime.NumCPU()
+	if workers < 1 {
+		workers = 1
+	}
+	var wg sync.WaitGroup
+	for wIdx := 0; wIdx < workers; wIdx++ {
+		y0 := (wIdx * h) / workers
+		y1 := ((wIdx + 1) * h) / workers
+		wg.Add(1)
+		go func(rowStart, rowEnd int) {
+			defer wg.Done()
+			for y := rowStart; y < rowEnd; y++ {
+				rowOff := y * w
+				fy := float64(y) + 0.5
+				for x := 0; x < w; x++ {
+					primCols[rowOff+x] = shadeRay(float64(x)+0.5, fy)
+				}
+			}
+		}(y0, y1)
+	}
+	wg.Wait()
+
+	// Pass 2: Parallel 2x2 Sub-Pixel Edge Anti-Aliasing (SSAA) on silhouette/ridge discontinuity pixels
+	subOffsets := [4][2]float64{{0.25, 0.25}, {0.75, 0.25}, {0.25, 0.75}, {0.75, 0.75}}
+	for wIdx := 0; wIdx < workers; wIdx++ {
+		y0 := (wIdx * h) / workers
+		y1 := ((wIdx + 1) * h) / workers
+		wg.Add(1)
+		go func(rowStart, rowEnd int) {
+			defer wg.Done()
+			for y := rowStart; y < rowEnd; y++ {
+				rowOff := y * w
+				for x := 0; x < w; x++ {
+					c0 := primCols[rowOff+x]
+					needAA := false
+					if x > 0 && x+1 < w && y > 0 && y+1 < h {
+						cR := primCols[rowOff+x+1]
+						cD := primCols[(y+1)*w+x]
+						dr1 := int(c0.R) - int(cR.R)
+						dg1 := int(c0.G) - int(cR.G)
+						db1 := int(c0.B) - int(cR.B)
+						dr2 := int(c0.R) - int(cD.R)
+						dg2 := int(c0.G) - int(cD.G)
+						db2 := int(c0.B) - int(cD.B)
+						if dr1*dr1+dg1*dg1+db1*db1 > 480 || dr2*dr2+dg2*dg2+db2*db2 > 480 {
+							needAA = true
+						}
+					}
+					if !needAA {
+						rc.SetPixelLinear(x, y, render.SRGB8ToLinear(c0.R), render.SRGB8ToLinear(c0.G), render.SRGB8ToLinear(c0.B), 1.0)
+						continue
+					}
+					var accR, accG, accB float64
+					fx, fy := float64(x), float64(y)
+					for _, off := range subOffsets {
+						sc := shadeRay(fx+off[0], fy+off[1])
+						accR += render.SRGB8ToLinear(sc.R)
+						accG += render.SRGB8ToLinear(sc.G)
+						accB += render.SRGB8ToLinear(sc.B)
+					}
+					rc.SetPixelLinear(x, y, accR*0.25, accG*0.25, accB*0.25, 1.0)
+				}
+			}
+		}(y0, y1)
+	}
+	wg.Wait()
 
 	c.MergeRenderCanvas(rc)
 }

@@ -12,8 +12,10 @@ import (
 	"image/color/palette"
 	"image/gif"
 	"io"
+	"math"
 	"os"
 	"reflect"
+	"runtime"
 	"sort"
 	"strings"
 	"sync"
@@ -91,27 +93,27 @@ func (c *Canva) Frames() []*image.RGBA {
 	return c.frames
 }
 
-// buildSharedAnimationPalette constructs a high-fidelity 256-color palette tailored to
-// the actual colors present in srcFrames (top 192 histogram colors + 64 Plan9 fallback colors),
-// along with a 15-bit (32x32x32) RGB lookup table for O(1) flicker-free frame quantization.
-func buildSharedAnimationPalette(srcFrames []*image.RGBA) (color.Palette, *[32768]uint8) {
+// buildSharedAnimationPalette constructs a high-precision 256-color palette tailored to
+// the actual color distribution across srcFrames using importance-weighted diversity seeding
+// and weighted K-Means centroid refinement, paired with an 18-bit (64x64x64 = 262,144) RGB
+// lookup table for O(1) flicker-free frame quantization.
+func buildSharedAnimationPalette(srcFrames []*image.RGBA) (color.Palette, *[262144]uint8, [][3]int) {
 	type bucket struct {
-		idx            int
-		count          int
+		count            int
 		sumR, sumG, sumB int
+		avgR, avgG, avgB int
+		weight           float64
 	}
 	var buckets [32768]bucket
-	for i := range buckets {
-		buckets[i].idx = i
-	}
 
-	// Sample frames to populate 15-bit RGB color histogram
-	for fIdx, img := range srcFrames {
-		if fIdx > 0 && fIdx != len(srcFrames)/2 && len(srcFrames) > 4 {
-			continue
-		}
-		pix := img.Pix
-		for i := 0; i+3 < len(pix); i += 8 {
+	// Sample up to 4 evenly-spaced frames across the animation to populate the color histogram
+	stepFrame := 1
+	if len(srcFrames) > 4 {
+		stepFrame = len(srcFrames) / 4
+	}
+	for fIdx := 0; fIdx < len(srcFrames); fIdx += stepFrame {
+		pix := srcFrames[fIdx].Pix
+		for i := 0; i+3 < len(pix); i += 4 {
 			r, g, b := int(pix[i]), int(pix[i+1]), int(pix[i+2])
 			key := ((r >> 3) << 10) | ((g >> 3) << 5) | (b >> 3)
 			buckets[key].count++
@@ -121,65 +123,163 @@ func buildSharedAnimationPalette(srcFrames []*image.RGBA) (color.Palette, *[3276
 		}
 	}
 
-	active := make([]bucket, 0, 1024)
+	active := make([]bucket, 0, 2048)
 	for _, bk := range buckets {
 		if bk.count > 0 {
+			bk.avgR = bk.sumR / bk.count
+			bk.avgG = bk.sumG / bk.count
+			bk.avgB = bk.sumB / bk.count
+			maxC := bk.avgR
+			if bk.avgG > maxC {
+				maxC = bk.avgG
+			}
+			if bk.avgB > maxC {
+				maxC = bk.avgB
+			}
+			minC := bk.avgR
+			if bk.avgG < minC {
+				minC = bk.avgG
+			}
+			if bk.avgB < minC {
+				minC = bk.avgB
+			}
+			chroma := float64(maxC-minC) / 255.0
+			// Sub-linear frequency weighting + chroma boost preserves crisp highlights and filigree strokes
+			bk.weight = math.Pow(float64(bk.count), 0.52) * (1.0 + 0.65*chroma)
 			active = append(active, bk)
 		}
 	}
 	sort.Slice(active, func(i, j int) bool {
-		return active[i].count > active[j].count
+		return active[i].weight > active[j].weight
 	})
 
-	pal := make(color.Palette, 0, 256)
-	for i := 0; i < len(active) && len(pal) < 200; i++ {
-		bk := active[i]
-		pal = append(pal, color.RGBA{
-			R: uint8(bk.sumR / bk.count),
-			G: uint8(bk.sumG / bk.count),
-			B: uint8(bk.sumB / bk.count),
-			A: 255,
-		})
-	}
-	for i := 0; len(pal) < 256 && i < len(palette.Plan9); i += 4 {
-		pal = append(pal, palette.Plan9[i])
+	// Multi-pass perceptual diversity seeding so all 256 slots cover the full gamut without clumping
+	centers := make([][3]int, 0, 256)
+	used := make([]bool, len(active))
+	thresholds := []int{420, 180, 72, 24, 0}
+	for _, minDist := range thresholds {
+		if len(centers) >= 256 {
+			break
+		}
+		for i, bk := range active {
+			if used[i] {
+				continue
+			}
+			tooClose := false
+			for _, c := range centers {
+				dr := bk.avgR - c[0]
+				dg := bk.avgG - c[1]
+				db := bk.avgB - c[2]
+				if 3*dr*dr+4*dg*dg+2*db*db < minDist {
+					tooClose = true
+					break
+				}
+			}
+			if !tooClose {
+				centers = append(centers, [3]int{bk.avgR, bk.avgG, bk.avgB})
+				used[i] = true
+				if len(centers) >= 256 {
+					break
+				}
+			}
+		}
 	}
 
-	// Precompute 15-bit RGB -> nearest palette index LUT
-	palRGBA := make([][3]int, len(pal))
-	for i, c := range pal {
-		r, g, b, _ := c.RGBA()
-		palRGBA[i] = [3]int{int(r >> 8), int(g >> 8), int(b >> 8)}
-	}
-
-	var lut [32768]uint8
-	for qr := 0; qr < 32; qr++ {
-		r8 := (qr << 3) | (qr >> 2)
-		for qg := 0; qg < 32; qg++ {
-			g8 := (qg << 3) | (qg >> 2)
-			for qb := 0; qb < 32; qb++ {
-				b8 := (qb << 3) | (qb >> 2)
+	// 3 iterations of weighted K-Means refinement over active histogram buckets
+	if len(centers) > 1 && len(active) > len(centers) {
+		sumW := make([]float64, len(centers))
+		sumR := make([]float64, len(centers))
+		sumG := make([]float64, len(centers))
+		sumB := make([]float64, len(centers))
+		for iter := 0; iter < 3; iter++ {
+			for k := range centers {
+				sumW[k], sumR[k], sumG[k], sumB[k] = 0, 0, 0, 0
+			}
+			for _, bk := range active {
 				bestIdx := 0
 				bestDist := 1 << 30
-				for pIdx, pc := range palRGBA {
-					dr := r8 - pc[0]
-					dg := g8 - pc[1]
-					db := b8 - pc[2]
-					// Perceptually weighted RGB distance
+				for k, c := range centers {
+					dr := bk.avgR - c[0]
+					dg := bk.avgG - c[1]
+					db := bk.avgB - c[2]
 					d := 3*dr*dr + 4*dg*dg + 2*db*db
 					if d < bestDist {
 						bestDist = d
-						bestIdx = pIdx
+						bestIdx = k
 						if d == 0 {
 							break
 						}
 					}
 				}
-				lut[(qr<<10)|(qg<<5)|qb] = uint8(bestIdx)
+				w := bk.weight
+				sumW[bestIdx] += w
+				sumR[bestIdx] += float64(bk.avgR) * w
+				sumG[bestIdx] += float64(bk.avgG) * w
+				sumB[bestIdx] += float64(bk.avgB) * w
+			}
+			for k := range centers {
+				if sumW[k] > 0 {
+					centers[k][0] = int(math.Round(sumR[k] / sumW[k]))
+					centers[k][1] = int(math.Round(sumG[k] / sumW[k]))
+					centers[k][2] = int(math.Round(sumB[k] / sumW[k]))
+				}
 			}
 		}
 	}
-	return pal, &lut
+
+	for i := 0; len(centers) < 256 && i < len(palette.Plan9); i += 4 {
+		r, g, b, _ := palette.Plan9[i].RGBA()
+		centers = append(centers, [3]int{int(r >> 8), int(g >> 8), int(b >> 8)})
+	}
+
+	pal := make(color.Palette, len(centers))
+	for i, c := range centers {
+		pal[i] = color.RGBA{R: uint8(c[0]), G: uint8(c[1]), B: uint8(c[2]), A: 255}
+	}
+
+	// Precompute 18-bit (64x64x64) RGB -> nearest palette index LUT in parallel
+	var lut [262144]uint8
+	var wg sync.WaitGroup
+	workers := runtime.NumCPU()
+	if workers < 1 {
+		workers = 1
+	}
+	for wIdx := 0; wIdx < workers; wIdx++ {
+		qrStart := (wIdx * 64) / workers
+		qrEnd := ((wIdx + 1) * 64) / workers
+		wg.Add(1)
+		go func(q0, q1 int) {
+			defer wg.Done()
+			for qr := q0; qr < q1; qr++ {
+				r8 := (qr << 2) | (qr >> 4)
+				for qg := 0; qg < 64; qg++ {
+					g8 := (qg << 2) | (qg >> 4)
+					base := (qr << 12) | (qg << 6)
+					for qb := 0; qb < 64; qb++ {
+						b8 := (qb << 2) | (qb >> 4)
+						bestIdx := 0
+						bestDist := 1 << 30
+						for pIdx, pc := range centers {
+							dr := r8 - pc[0]
+							dg := g8 - pc[1]
+							db := b8 - pc[2]
+							d := 3*dr*dr + 4*dg*dg + 2*db*db
+							if d < bestDist {
+								bestDist = d
+								bestIdx = pIdx
+								if d == 0 {
+									break
+								}
+							}
+						}
+						lut[base|qb] = uint8(bestIdx)
+					}
+				}
+			}
+		}(qrStart, qrEnd)
+	}
+	wg.Wait()
+	return pal, &lut, centers
 }
 
 // WriteGIF encodes the recorded timelapse frames (or the current canvas image if no
@@ -199,12 +299,13 @@ func (c *Canva) WriteGIF(w io.Writer, delayCentiseconds int) error {
 		return errors.New("no frames available to encode")
 	}
 
-	sharedPal, lut := buildSharedAnimationPalette(srcFrames)
+	sharedPal, lut, centers := buildSharedAnimationPalette(srcFrames)
+	// Subtle 4x4 micro-dither matrix (-2..+2) applied only when the pixel lies between palette stops
 	bayer4x4 := [4][4]int{
-		{-4, 0, -3, 1},
-		{2, -2, 3, -1},
-		{-3, 1, -4, 0},
-		{3, -1, 2, -2},
+		{-2, 0, -1, 1},
+		{1, -1, 2, 0},
+		{-1, 1, -2, 0},
+		{2, 0, 1, -1},
 	}
 
 	outGIF := &gif.GIF{
@@ -227,10 +328,24 @@ func (c *Canva) WriteGIF(w io.Writer, delayCentiseconds int) error {
 				srcOff := y * src.Stride
 				dstOff := y * pm.Stride
 				for x := 0; x < fw; x++ {
+					r0 := int(src.Pix[srcOff+x*4+0])
+					g0 := int(src.Pix[srcOff+x*4+1])
+					b0 := int(src.Pix[srcOff+x*4+2])
+					baseKey := ((r0 >> 2) << 12) | ((g0 >> 2) << 6) | (b0 >> 2)
+					idx0 := lut[baseKey]
+					pc := centers[idx0]
+					dr := r0 - pc[0]
+					dg := g0 - pc[1]
+					db := b0 - pc[2]
+					// Skip dithering on exact/near-exact matches so solid fills and vector strokes stay razor-sharp
+					if 3*dr*dr+4*dg*dg+2*db*db <= 28 {
+						pm.Pix[dstOff+x] = idx0
+						continue
+					}
 					dith := bRow[x&3]
-					r := int(src.Pix[srcOff+x*4+0]) + dith
-					g := int(src.Pix[srcOff+x*4+1]) + dith
-					bl := int(src.Pix[srcOff+x*4+2]) + dith
+					r := r0 + dith
+					g := g0 + dith
+					bl := b0 + dith
 					if r < 0 {
 						r = 0
 					} else if r > 255 {
@@ -246,7 +361,7 @@ func (c *Canva) WriteGIF(w io.Writer, delayCentiseconds int) error {
 					} else if bl > 255 {
 						bl = 255
 					}
-					key := ((r >> 3) << 10) | ((g >> 3) << 5) | (bl >> 3)
+					key := ((r >> 2) << 12) | ((g >> 2) << 6) | (bl >> 2)
 					pm.Pix[dstOff+x] = lut[key]
 				}
 			}
