@@ -8,6 +8,13 @@ This gallery contains standalone `Go` usage examples and rendered outputs for `g
 
 ## Table of Contents
 
+- [Wave 12: Dunhuang Caisson, Celtic Knotwork, 3D Gyroid TPMS, Lichtenberg Plasma, Persian Muqarnas & Warring States Bronze](#wave-12-dunhuang-caisson-celtic-knotwork-3d-gyroid-tpms-lichtenberg-plasma-persian-muqarnas--warring-states-bronze)
+  - [Dunhuang Apsara](#dunhuang-apsara)
+  - [Celtic Knotwork](#celtic-knotwork)
+  - [Gyroid Surface](#gyroid-surface)
+  - [Lichtenberg Tree](#lichtenberg-tree)
+  - [Persian Tilework](#persian-tilework)
+  - [Champleve Enamel](#champleve-enamel)
 - [Wave 11: Jovian Vortex Fluid, BZ Spiral Waves, Gilded PCB WFC, Cursive Calligraphy, Buddhabrot & Lyapunov](#wave-11-jovian-vortex-fluid-bz-spiral-waves-gilded-pcb-wfc-cursive-calligraphy-buddhabrot--lyapunov)
   - [Vortex Fluid](#vortex-fluid)
   - [Cyclic Automata](#cyclic-automata)
@@ -98,6 +105,106 @@ This gallery contains standalone `Go` usage examples and rendered outputs for `g
   - [Silk Sky](#silk-sky)
   - [Circle Move](#circle-move)
   - [Random Circle](#random-circle)
+
+---
+
+## Wave 12: Dunhuang Caisson, Celtic Knotwork, 3D Gyroid TPMS, Lichtenberg Plasma, Persian Muqarnas & Warring States Bronze
+
+### Dunhuang Apsara
+
+```go
+func main() {
+	rand.Seed(time.Now().Unix())
+	c := generativeart.NewCanva(600, 600)
+	c.SetBackground(color.RGBA{R: 20, G: 14, B: 18, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewDunhuangApsara(8, 5))
+	c.ToPNG("dunhuangapsara.png")
+}
+```
+
+![Dunhuang Apsara](images/dunhuangapsara.png)
+
+### Celtic Knotwork
+
+```go
+func main() {
+	rand.Seed(time.Now().Unix())
+	c := generativeart.NewCanva(600, 600)
+	c.SetBackground(color.RGBA{R: 14, G: 18, B: 26, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewCelticKnotwork(8, 1.0))
+	c.ToPNG("celticknotwork.png")
+}
+```
+
+![Celtic Knotwork](images/celticknotwork.png)
+
+### Gyroid Surface
+
+```go
+func main() {
+	rand.Seed(time.Now().Unix())
+	c := generativeart.NewCanva(600, 600)
+	c.SetBackground(color.RGBA{R: 10, G: 14, B: 26, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewGyroidSurface(4.2, 0.085))
+	c.ToPNG("gyroidsurface.png")
+}
+```
+
+![Gyroid Surface](images/gyroidsurface.png)
+
+### Lichtenberg Tree
+
+```go
+func main() {
+	rand.Seed(time.Now().Unix())
+	c := generativeart.NewCanva(600, 600)
+	c.SetBackground(color.RGBA{R: 6, G: 8, B: 18, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Cyberpunk)
+	c.Draw(arts.NewLichtenbergTree(9, 1.0))
+	c.ToPNG("lichtenbergtree.png")
+}
+```
+
+![Lichtenberg Tree](images/lichtenbergtree.png)
+
+### Persian Tilework
+
+```go
+func main() {
+	rand.Seed(time.Now().Unix())
+	c := generativeart.NewCanva(600, 600)
+	c.SetBackground(color.RGBA{R: 16, G: 12, B: 24, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewPersianTilework(16, 6))
+	c.ToPNG("persiantilework.png")
+}
+```
+
+![Persian Tilework](images/persiantilework.png)
+
+### Champleve Enamel
+
+```go
+func main() {
+	rand.Seed(time.Now().Unix())
+	c := generativeart.NewCanva(600, 600)
+	c.SetBackground(color.RGBA{R: 12, G: 14, B: 18, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewChampleveEnamel(8, 4))
+	c.ToPNG("champleveenamel.png")
+}
+```
+
+![Champleve Enamel](images/champleveenamel.png)
 
 ---
 

@@ -1246,6 +1246,97 @@ lf := arts.NewLyapunovFractal("AABAB", 84)
 
 ![](../images/lyapunovfractal.png)
 
+## Dunhuang Apsara
+
+`Dunhuang Apsara` renders a Tang-Dynasty Dunhuang Mogao Cave caisson ceiling (敦煌莫高窟盛唐藻井) with recessed square-diamond coffers, Baoxianghua lotus medallions, pearl chains, and flying celestial silk ribbons.
+
+### parameters
+
+- ribbons: The number of flying celestial silk ribbons swirling around the medallion.
+- haloRings: The number of concentric decorative coffer and lotus tiers.
+
+```go
+da := arts.NewDunhuangApsara(8, 5)
+```
+
+![](../images/dunhuangapsara.png)
+
+## Celtic Knotwork
+
+`Celtic Knotwork` renders an illuminated Book-of-Kells-inspired interlaced knotwork tapestry with exact alternating over-under strand crossings, umbral occlusion shadows, and gilded borders.
+
+### parameters
+
+- gridSize: The resolution of the interlaced knotwork grid.
+- ribbonWidth: Controls the width multiplier of the 4-layer illuminated manuscript ribbons.
+
+```go
+ck := arts.NewCelticKnotwork(8, 1.0)
+```
+
+![](../images/celticknotwork.png)
+
+## Gyroid Surface
+
+`Gyroid Surface` raymarches a 3D Schoen Gyroid triply periodic minimal surface (TPMS) bounded inside a sculpted sphere with two-sided Oklab iridescence, ambient occlusion, and specular highlights.
+
+### parameters
+
+- scaleFreq: The spatial frequency of the 3D Gyroid lattice.
+- thickness: The half-thickness of the minimal surface shell.
+
+```go
+gs := arts.NewGyroidSurface(4.2, 0.085)
+```
+
+![](../images/gyroidsurface.png)
+
+## Lichtenberg Tree
+
+`Lichtenberg Tree` renders a high-voltage dielectric breakdown Lichtenberg lightning figure captured inside a beveled obsidian-sapphire acrylic block with Strahler charge-flux thickness scaling and HDR plasma glow.
+
+### parameters
+
+- branches: The maximum recursion depth of the dielectric breakdown leader tree.
+- roughness: Controls the lateral jagged displacement of the lightning channels.
+
+```go
+lt := arts.NewLichtenbergTree(9, 1.0)
+```
+
+![](../images/lichtenbergtree.png)
+
+## Persian Tilework
+
+`Persian Tilework` renders an Isfahan-inspired Persian Muqarnas (stalactite vault) dome and Haft-Rangi glazed tile mandala with 16-fold Shamsa starbursts, pointed lancet niches, and golden Islimi arabesques.
+
+### parameters
+
+- symmetry: The rotational symmetry order of the dome (e.g., 16).
+- rings: The number of concentric Muqarnas vault tiers.
+
+```go
+pt := arts.NewPersianTilework(16, 6)
+```
+
+![](../images/persiantilework.png)
+
+## Champleve Enamel
+
+`Champleve Enamel` renders a Warring States (战国错金银嵌绿松石青铜鉴) gold, silver, and turquoise inlaid bronze mirror with cloud-and-thunder spirals (云雷纹), interlocking dragon scrolls, and cabochon turquoise bosses.
+
+### parameters
+
+- symmetry: The rotational symmetry order of the inlaid scroll bands.
+- ringCount: The number of concentric mirror ornament rings.
+
+```go
+ce := arts.NewChampleveEnamel(8, 4)
+```
+
+![](../images/champleveenamel.png)
+
+
 
 
 
