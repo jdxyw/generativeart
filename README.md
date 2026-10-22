@@ -35,6 +35,12 @@
 | **BZ Spiral Waves (`cyclicautomata`)** | **3D Gyroid TPMS (`gyroidsurface`)** | **Mosaic Sun (`mosaicsun`)** | **Magnetic Dipole (`magneticdipole`)** |
 | ![BZ Spiral Waves Loop](images/cyclicautomata_loop.gif) | ![3D Gyroid Loop](images/gyroidsurface_loop.gif) | ![Mosaic Sun Loop](images/mosaicsun_loop.gif) | ![Magnetic Dipole Loop](images/magneticdipole_loop.gif) |
 
+### 🖼️ Museum Exhibition Posters & Multi-Panel Contact Sheets (`genart poster`)
+
+| Curated Multi-Artwork Exhibition (`theme=dark`) | Multi-Seed Variation Study (`theme=light`) |
+| :---: | :---: |
+| ![Wave 12 Dark Poster](images/poster_wave12_dark.png) | ![Voronoi Light Poster](images/poster_voronoi_light.png) |
+
 ---
 
 ## Core Engine Capabilities
@@ -86,11 +92,44 @@ go run ./cmd/genart render -art cloisonneenamel -palette dunhuang -w 1200 -h 120
 go run ./cmd/genart render -art stainedrosewindow -w 800 -h 800 -out rose.svg
 go run ./cmd/genart render -art artdecosunburst -w 800 -h 800 -out artdeco.pdf
 
-# Render an 8-frame animated GIF timelapse
-go run ./cmd/genart render -art mosaicvortex -w 400 -h 400 -frames 8 -delay 8 -out vortex.gif
+# Render a 16-frame 600x600 HD seamless loop GIF animation
+go run ./cmd/genart render -art dunhuangapsara -w 600 -h 600 -frames 16 -delay 7 -out images/dunhuangapsara_loop.gif
 ```
 
-### 3. Inspect & Replay Embedded PNG Recipe Metadata
+### 3. Render Museum Exhibition Posters & Multi-Seed Contact Sheets (`genart poster`)
+
+`genart poster` composes either a **multi-seed variation study** for a single generator (`-art`) or a **curated multi-engine exhibition sheet** (`-arts`) with 45° beveled passe-partout mat windows, zero-dependency vector engraver typography, 3D Oklab palette swatches, and a vermilion seal:
+
+```bash
+# Curated 2x2 Multi-Engine Exhibition Poster (Obsidian Dark & Gold Mat)
+go run ./cmd/genart poster \
+  -arts dunhuangapsara,celticknotwork,gyroidsurface,persiantilework \
+  -grid 2x2 -panel 360 -theme dark \
+  -title "HERITAGE & TPMS SCULPTURE" \
+  -out images/poster_wave12_dark.png
+
+# 2x2 Multi-Seed Variation Contact Sheet (Museum Ivory Parchment Mat)
+go run ./cmd/genart poster \
+  -art voronoicrystal \
+  -grid 2x2 -panel 360 -theme light \
+  -title "VORONOI AGATE VARIATIONS" \
+  -out images/poster_voronoi_light.png
+```
+
+| Flag | Default | Description |
+| :--- | :--- | :--- |
+| `-art` | `dunhuangapsara` | Single generator ID for a multi-seed variation contact sheet |
+| `-arts` | `""` | Comma-separated generator IDs for a curated multi-engine exhibition poster |
+| `-grid` | `2x2` | Grid dimensions `RowsxCols` (e.g. `1x1`, `2x2`, `3x3`) |
+| `-panel` | `420` | Square pixel resolution (`WxH`) of each individual artwork panel |
+| `-theme` | `light` | Mat theme: `light` (Museum Ivory Parchment) or `dark` (Obsidian Gallery Gold) |
+| `-palette` | *(auto)* | Optional palette name override (e.g. `dunhuang`, `cyberpunk`, `ukiyoe`) |
+| `-title` | *(auto)* | Custom main exhibition title |
+| `-subtitle`| *(auto)* | Custom secondary subtitle |
+| `-seed` | `20261022` | Base deterministic random seed (panel $k$ uses `seed + 137*k`) |
+| `-out` | `poster.png` | Output path (`.png`, `.svg`, `.pdf`, `.jpg`) |
+
+### 4. Inspect & Replay Embedded PNG Recipe Metadata
 
 Every PNG saved via `c.ToPNG()` or `genart render` embeds a standard PNG `tEXt` chunk (`GenerativeArt-Recipe`) recording the engine name, dimensions, seed, background color, and struct parameters:
 
@@ -169,6 +208,20 @@ anim := generativeart.NewAnimatedEngine(func(c *generativeart.Canva, frameIdx, t
 
 c.DrawTimelapseFrames(anim, 24)
 _ = c.ToGIF("loop.gif", 6)
+```
+
+### Museum Exhibition Poster & Contact Sheet (`RenderPoster` / `ToPosterPNG`)
+
+```go
+cfg := generativeart.DefaultPosterConfig()
+cfg.Rows, cfg.Cols = 2, 2
+cfg.PanelSize = 360
+cfg.DarkTheme = true
+cfg.Title = "DUNHUANG CAISSON STUDY"
+cfg.Palette = common.Dunhuang
+
+poster := generativeart.RenderPoster(arts.NewDunhuangApsara(8, 5), cfg)
+_ = poster.ToPNG("poster_dunhuang.png")
 ```
 
 ---

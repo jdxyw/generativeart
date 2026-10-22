@@ -27,6 +27,22 @@ go run ./cmd/genart render -art magneticdipole      -w 600 -h 600 -frames 16 -de
 
 ---
 
+## 🖼️ Museum Exhibition Posters & Multi-Panel Contact Sheets (`genart poster`)
+
+| Curated Multi-Artwork Exhibition (`theme=dark`) | Multi-Seed Variation Study (`theme=light`) |
+| :---: | :---: |
+| ![Wave 12 Dark Poster](images/poster_wave12_dark.png) | ![Voronoi Light Poster](images/poster_voronoi_light.png) |
+
+```bash
+# Curated 2x2 Multi-Engine Exhibition Poster (Obsidian Dark & Gold Mat)
+go run ./cmd/genart poster -arts dunhuangapsara,celticknotwork,gyroidsurface,persiantilework -grid 2x2 -panel 360 -theme dark -title "HERITAGE & TPMS SCULPTURE" -out images/poster_wave12_dark.png
+
+# 2x2 Multi-Seed Variation Contact Sheet (Museum Ivory Parchment Mat)
+go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light -title "VORONOI AGATE VARIATIONS" -out images/poster_voronoi_light.png
+```
+
+---
+
 ## Table of Contents
 
 - [Wave 12: Dunhuang Caisson, Celtic Knotwork, 3D Gyroid TPMS, Lichtenberg Plasma, Persian Muqarnas & Warring States Bronze](#wave-12-dunhuang-caisson-celtic-knotwork-3d-gyroid-tpms-lichtenberg-plasma-persian-muqarnas--warring-states-bronze)

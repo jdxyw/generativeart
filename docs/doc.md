@@ -1,5 +1,10 @@
 # Table of Contents
 
+- [CLI Tool (`cmd/genart`) & Exhibition Poster Reference](#cli-tool-cmdgenart--exhibition-poster-reference)
+	- [`genart list`](#1-genart-list)
+	- [`genart render`](#2-genart-render)
+	- [`genart poster`](#3-genart-poster)
+	- [`genart inspect` & `genart replay`](#4-genart-inspect--genart-replay)
 - [Table of Contents](#table-of-contents)
 	- [Color Circle 2](#color-circle-2)
 		- [parameters](#parameters)
@@ -110,6 +115,59 @@
 		- [parameters](#parameters-52)
 	- [Tangent Cones](#tangent-cones)
 		- [parameters](#parameters-53)
+
+## CLI Tool (`cmd/genart`) & Exhibition Poster Reference
+
+The standalone CLI (`cmd/genart`) provides 5 subcommands for listing generators, rendering single works or seamless loop GIFs, composing museum exhibition posters, and inspecting/replaying PNG recipes:
+
+### 1. `genart list`
+
+Lists all 94 registered art generators (with category and default palette) and all 12+ built-in color palettes:
+
+```bash
+go run ./cmd/genart list
+```
+
+### 2. `genart render`
+
+Renders a single generator to `.png` (with embedded `GenerativeArt-Recipe` `tEXt` metadata), `.svg`, `.pdf`, `.gif`, or `.jpg`:
+
+```bash
+go run ./cmd/genart render -art <name> [-palette <name>] [-w 600] [-h 600] [-seed 20261022] [-frames 16] [-delay 7] -out <output.(png|svg|pdf|gif|jpg)>
+```
+
+### 3. `genart poster`
+
+Composes a museum-framed `1x1` print, an `RxC` multi-seed variation contact sheet (`-art`), or a curated multi-engine exhibition poster (`-arts`) with 45° beveled mat openings, zero-dependency vector engraver typography, 3D Oklab palette swatches, and a vermilion seal:
+
+```bash
+# Curated 2x2 Multi-Engine Exhibition Poster (Obsidian Dark & Gold Mat)
+go run ./cmd/genart poster -arts dunhuangapsara,celticknotwork,gyroidsurface,persiantilework -grid 2x2 -panel 360 -theme dark -title "HERITAGE & TPMS SCULPTURE" -out images/poster_wave12_dark.png
+
+# 2x2 Multi-Seed Variation Contact Sheet (Museum Ivory Parchment Mat)
+go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light -title "VORONOI AGATE VARIATIONS" -out images/poster_voronoi_light.png
+```
+
+- `-art <name>`: Single generator ID for a multi-seed variation study.
+- `-arts <a,b,c,d>`: Comma-separated generator IDs for a curated multi-artwork poster.
+- `-grid <RxC>`: Grid layout such as `1x1`, `2x2`, or `3x3` (default `2x2`).
+- `-panel <px>`: Pixel width and height of each square artwork panel (default `420`).
+- `-theme <light|dark>`: `light` (Museum Ivory Parchment) or `dark` (Obsidian Gallery Gold).
+- `-palette <name>`: Optional palette override.
+- `-title <text>` / `-subtitle <text>`: Custom engraved header/footer text.
+- `-seed <int64>`: Base deterministic random seed (default `20261022`).
+- `-out <path>`: Output file path (`.png`, `.svg`, `.pdf`, `.jpg`).
+
+### 4. `genart inspect` & `genart replay`
+
+Inspects the `GenerativeArt-Recipe` JSON chunk embedded in any PNG or replays it at any target resolution/vector format:
+
+```bash
+go run ./cmd/genart inspect images/dunhuangapsara.png
+go run ./cmd/genart replay images/dunhuangapsara.png -w 2400 -h 2400 -out dunhuang_4k.png
+```
+
+---
 
 ## Color Circle 2
 
