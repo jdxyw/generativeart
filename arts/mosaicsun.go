@@ -32,12 +32,18 @@ func NewMosaicSun(ringSteps int, brickScale float64) *mosaicSun {
 
 // Generative renders the bold, flat-shaded polygonal/diamond mosaic refraction of a glowing sun and waves.
 func (ms *mosaicSun) Generative(c *generativeart.Canva) {
+	ms.GenerativeFrame(c, 0, 1, 0.0)
+}
+
+// GenerativeFrame renders frame frameIdx of a seamless 360-degree phase loop (phase in [0, 1)).
+func (ms *mosaicSun) GenerativeFrame(c *generativeart.Canva, frameIdx, totalFrames int, loopPhase float64) {
 	rc := c.NewRenderCanvas()
 	w, h := float64(c.Width()), float64(c.Height())
 	scale := (math.Min(w, h) / 600.0) * ms.brickScale
 	if scale <= 0 {
 		scale = 1.0
 	}
+	animPhase := loopPhase * 2.0 * math.Pi
 
 	// Crisp poster-like palette
 	cadmiumOrange := color.RGBA{R: 232, G: 126, B: 44, A: 255}
@@ -77,10 +83,10 @@ func (ms *mosaicSun) Generative(c *generativeart.Canva) {
 		u := (r - rSun) / math.Max(1.0, 0.55*w)
 		// Diagonal/swirling wave modulation
 		diag := ((x - sunCX) * 0.65 - (y - sunCY) * 0.76) / math.Max(1.0, rSun)
-		swirl := math.Sin(u*14.0 - ang*2.0 + 0.6*math.Sin(diag*2.2))
+		swirl := math.Sin(u*14.0 - ang*2.0 - animPhase + 0.6*math.Sin(diag*2.2+animPhase))
 
 		// Warm tangential sunbeam streaks wrapping around the sun halo
-		beamWave := math.Cos(ang*5.0 + u*6.5)
+		beamWave := math.Cos(ang*5.0 + u*6.5 - animPhase)
 		if u < 0.42 && beamWave > 0.48+0.35*u {
 			if jitter > 0.55 {
 				return goldenAmber
@@ -116,7 +122,7 @@ func (ms *mosaicSun) Generative(c *generativeart.Canva) {
 
 		// Lower-left vibrant magenta/fuchsia wave crest region
 		magentaMask := (1.0 - common.Constrain(nx*1.55, 0, 1)) * common.Constrain(ny*1.35, 0, 1)
-		wavePhase := math.Sin(nx*9.5 + bandIdxFrac*11.0 + 0.8*math.Cos(nx*4.2))
+		wavePhase := math.Sin(nx*9.5 + bandIdxFrac*11.0 - animPhase + 0.8*math.Cos(nx*4.2+animPhase))
 
 		if magentaMask > 0.32 && (wavePhase > -0.15 || jitter < magentaMask*0.75) {
 			if jitter < 0.18 {
@@ -203,8 +209,8 @@ func (ms *mosaicSun) Generative(c *generativeart.Canva) {
 			thMid := 0.5 * (th0 + th1)
 
 			// Anisotropic radial flow warp so rings undulate like refractive sky currents
-			warp0 := 8.5 * scale * math.Sin(3.0*th0+float64(ring)*0.32)
-			warp1 := 8.5 * scale * math.Sin(3.0*th1+float64(ring)*0.32)
+			warp0 := 8.5 * scale * math.Sin(3.0*th0+float64(ring)*0.32-animPhase)
+			warp1 := 8.5 * scale * math.Sin(3.0*th1+float64(ring)*0.32-animPhase)
 			r0 := rBase + warp0
 			r1 := rBase + warp1
 
@@ -218,7 +224,7 @@ func (ms *mosaicSun) Generative(c *generativeart.Canva) {
 			}
 
 			// In the lower sea region, let the rolling wave bands take over cleanly
-			waveHorizon := 0.60*h + 24.0*scale*math.Sin(mid.X/(0.18*w)+0.4) - 18.0*scale*math.Cos(mid.X/(0.31*w))
+			waveHorizon := 0.60*h + 24.0*scale*math.Sin(mid.X/(0.18*w)+0.4-animPhase) - 18.0*scale*math.Cos(mid.X/(0.31*w)+animPhase)
 			if mid.Y > waveHorizon+brickThick*0.6 {
 				continue
 			}
@@ -244,8 +250,8 @@ func (ms *mosaicSun) Generative(c *generativeart.Canva) {
 
 		waveEvalY := func(x float64) float64 {
 			nx := x / math.Max(1.0, w)
-			crest1 := 28.0 * scale * math.Sin(nx*2.0*math.Pi*1.35+float64(wb)*0.22)
-			crest2 := 16.0 * scale * math.Cos(nx*2.0*math.Pi*2.4-float64(wb)*0.35+0.8)
+			crest1 := 28.0 * scale * math.Sin(nx*2.0*math.Pi*1.35+float64(wb)*0.22-animPhase)
+			crest2 := 16.0 * scale * math.Cos(nx*2.0*math.Pi*2.4-float64(wb)*0.35+0.8+animPhase)
 			swell := -22.0 * scale * math.Exp(-math.Pow((nx-0.24)/0.22, 2.0)) * math.Sin(bandFrac*math.Pi)
 			return baseY + crest1 + crest2 + swell
 		}

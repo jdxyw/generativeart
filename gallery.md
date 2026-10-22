@@ -6,6 +6,21 @@ This gallery contains standalone `Go` usage examples and rendered outputs for `g
 
 ---
 
+## 🎞️ Seamless Looping GIF Animations (`DrawTimelapseFrames` + `ToGIF`)
+
+| BZ Spiral Waves (`cyclicautomata`) | 3D Gyroid TPMS (`gyroidsurface`) | Mosaic Sun (`mosaicsun`) | Magnetic Dipole (`magneticdipole`) |
+| :---: | :---: | :---: | :---: |
+| ![BZ Spiral Waves Loop](images/cyclicautomata_loop.gif) | ![3D Gyroid Loop](images/gyroidsurface_loop.gif) | ![Mosaic Sun Loop](images/mosaicsun_loop.gif) | ![Magnetic Dipole Loop](images/magneticdipole_loop.gif) |
+
+```bash
+go run ./cmd/genart render -art cyclicautomata -w 360 -h 360 -frames 16 -delay 7 -out images/cyclicautomata_loop.gif
+go run ./cmd/genart render -art gyroidsurface  -w 360 -h 360 -frames 16 -delay 7 -out images/gyroidsurface_loop.gif
+go run ./cmd/genart render -art mosaicsun      -w 360 -h 360 -frames 16 -delay 7 -out images/mosaicsun_loop.gif
+go run ./cmd/genart render -art magneticdipole -w 360 -h 360 -frames 16 -delay 7 -out images/magneticdipole_loop.gif
+```
+
+---
+
 ## Table of Contents
 
 - [Wave 12: Dunhuang Caisson, Celtic Knotwork, 3D Gyroid TPMS, Lichtenberg Plasma, Persian Muqarnas & Warring States Bronze](#wave-12-dunhuang-caisson-celtic-knotwork-3d-gyroid-tpms-lichtenberg-plasma-persian-muqarnas--warring-states-bronze)

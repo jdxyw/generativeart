@@ -33,10 +33,16 @@ func NewCyclicAutomata(states, steps int) *cyclicAutomata {
 
 // Generative renders the Belousov-Zhabotinsky chemical spiral wave relief.
 func (ca *cyclicAutomata) Generative(c *generativeart.Canva) {
+	ca.GenerativeFrame(c, 0, 1, 0.0)
+}
+
+// GenerativeFrame renders frame frameIdx of a seamless 360-degree phase loop (phase in [0, 1)).
+func (ca *cyclicAutomata) GenerativeFrame(c *generativeart.Canva, frameIdx, totalFrames int, loopPhase float64) {
 	rc := c.NewRenderCanvas()
 	w, h := c.Width(), c.Height()
 	fw, fh := float64(w), float64(h)
 	scale := math.Min(fw, fh) / 600.0
+	timeShift := -loopPhase * 2.0 * math.Pi
 
 	// Belousov-Zhabotinsky Malachite, Turquoise, Coral & Gold Palette
 	abyssTrough := color.RGBA{R: 10, G: 16, B: 34, A: 255}
@@ -83,7 +89,7 @@ func (ca *cyclicAutomata) Generative(c *generativeart.Canva) {
 			dy := py - src.y
 			r := math.Hypot(dx, dy)
 			ang := math.Atan2(dy, dx)
-			phase := r*src.freq - src.charge*ang + src.phaseShift
+			phase := r*src.freq - src.charge*ang + src.phaseShift + timeShift
 			// Gaussian territory envelope so each spiral pacemaker dominates its basin cleanly
 			wgt := math.Exp(-(r * r) / ((145.0 * scale) * (145.0 * scale)))
 			// Core amplitude suppression r / sqrt(r^2 + r0^2) eliminates singularity at r=0
