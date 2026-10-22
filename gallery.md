@@ -8,6 +8,11 @@ This gallery contains standalone `Go` usage examples and rendered outputs for `g
 
 ## Table of Contents
 
+- [Wave 10: 8-Fold Quasicrystals, Sashiko Embroidery, Electromagnetic Dipoles & Complex Newton Fractals](#wave-10-8-fold-quasicrystals-sashiko-embroidery-electromagnetic-dipoles--complex-newton-fractals)
+  - [Ammann Beenker](#ammann-beenker)
+  - [Sashiko Weave](#sashiko-weave)
+  - [Magnetic Dipole](#magnetic-dipole)
+  - [Newton Basin](#newton-basin)
 - [Wave 9: Topological Contours, Streamline Engraving, 3D Origami & Bauhaus SDF Relief](#wave-9-topological-contours-streamline-engraving-3d-origami--bauhaus-sdf-relief)
   - [Even Streamlines](#even-streamlines)
   - [Marching Isolines](#marching-isolines)
@@ -86,6 +91,74 @@ This gallery contains standalone `Go` usage examples and rendered outputs for `g
   - [Silk Sky](#silk-sky)
   - [Circle Move](#circle-move)
   - [Random Circle](#random-circle)
+
+---
+
+## Wave 10: 8-Fold Quasicrystals, Sashiko Embroidery, Electromagnetic Dipoles & Complex Newton Fractals
+
+### Ammann Beenker
+
+```go
+func main() {
+	rand.Seed(time.Now().Unix())
+	c := generativeart.NewCanva(600, 600)
+	c.SetBackground(color.RGBA{R: 14, G: 14, B: 22, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewAmmannBeenker(5))
+	c.ToPNG("ammannbeenker.png")
+}
+```
+
+![Ammann Beenker](images/ammannbeenker.png)
+
+### Sashiko Weave
+
+```go
+func main() {
+	rand.Seed(time.Now().Unix())
+	c := generativeart.NewCanva(600, 600)
+	c.SetBackground(color.RGBA{R: 16, G: 28, B: 58, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.UkiyoE)
+	c.Draw(arts.NewSashikoWeave(3))
+	c.ToPNG("sashikoweave.png")
+}
+```
+
+![Sashiko Weave](images/sashikoweave.png)
+
+### Magnetic Dipole
+
+```go
+func main() {
+	rand.Seed(time.Now().Unix())
+	c := generativeart.NewCanva(600, 600)
+	c.SetBackground(color.RGBA{R: 8, G: 11, B: 22, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Cyberpunk)
+	c.Draw(arts.NewMagneticDipole(6, 28))
+	c.ToPNG("magneticdipole.png")
+}
+```
+
+![Magnetic Dipole](images/magneticdipole.png)
+
+### Newton Basin
+
+```go
+func main() {
+	rand.Seed(time.Now().Unix())
+	c := generativeart.NewCanva(600, 600)
+	c.SetBackground(color.RGBA{R: 10, G: 12, B: 22, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewNewtonBasin(6, 48))
+	c.ToPNG("newtonbasin.png")
+}
+```
+
+![Newton Basin](images/newtonbasin.png)
 
 ---
 

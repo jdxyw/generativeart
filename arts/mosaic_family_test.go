@@ -24,6 +24,10 @@ func TestMosaicFamilyGenerators(t *testing.T) {
 		{"MarchingIsolines", NewMarchingIsolines(10, 1.0)},
 		{"OrigamiTessellation", NewOrigamiTessellation(8, 8, 1.0)},
 		{"MondrianSubdivision", NewMondrianSubdivision(3, 5.0)},
+		{"AmmannBeenker", NewAmmannBeenker(4)},
+		{"SashikoWeave", NewSashikoWeave(2)},
+		{"MagneticDipole", NewMagneticDipole(4, 16)},
+		{"NewtonBasin", NewNewtonBasin(5, 24)},
 	}
 
 	for _, tc := range cases {

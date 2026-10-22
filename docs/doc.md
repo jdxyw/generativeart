@@ -1098,5 +1098,64 @@ ms := arts.NewMondrianSubdivision(4, 6.0)
 
 ![](../images/mondriansubdivision.png)
 
+## Ammann Beenker
+
+`Ammann Beenker` renders an 8-fold octagonal Ammann-Beenker aperiodic quasicrystal tessellation of squares and 45-degree star rhombi using De Bruijn's 4-grid dual projection, cloisonné enamel shading, and golden Ammann bars.
+
+### parameters
+
+- depth: Controls the quasicrystal grid density and tile scale.
+
+```go
+ab := arts.NewAmmannBeenker(5)
+```
+
+![](../images/ammannbeenker.png)
+
+## Sashiko Weave
+
+`Sashiko Weave` renders a Japanese Boro indigo textile patchwork quilted with 3D twisted Sashiko running-stitch embroidery (Asanoha hemp leaf, Seigaiha ocean waves, Shippo seven treasures, and Kikko lattices).
+
+### parameters
+
+- gridSize: The number of Boro fabric patches along each axis.
+
+```go
+sw := arts.NewSashikoWeave(3)
+```
+
+![](../images/sashikoweave.png)
+
+## Magnetic Dipole
+
+`Magnetic Dipole` renders an orthogonal electromagnetic field chart combining Marching Squares equipotential rings, Jobard-Lefer RK4 dipole field lines, and 3D beveled plasma pole cores.
+
+### parameters
+
+- polesN: The number of alternating positive and negative electromagnetic poles.
+- linesPerPole: Controls the streamline density around the poles.
+
+```go
+md := arts.NewMagneticDipole(6, 28)
+```
+
+![](../images/magneticdipole.png)
+
+## Newton Basin
+
+`Newton Basin` renders a complex Newton-Raphson root-finding fractal rosette with 2x2 SSAA, smooth exponential convergence shading, and 3D pleated silk normal lighting.
+
+### parameters
+
+- degree: The polynomial degree $n$ of $P(z) = z^n - 1$.
+- maxIter: The maximum number of complex Newton-Raphson iterations per sample.
+
+```go
+nb := arts.NewNewtonBasin(6, 48)
+```
+
+![](../images/newtonbasin.png)
+
+
 
 
