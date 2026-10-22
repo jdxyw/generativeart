@@ -96,6 +96,36 @@ func paramFloat(p map[string]interface{}, key string, def float64) float64 {
 }
 
 var registry = []ArtDescriptor{
+	// Wave 10: 8-Fold Quasicrystals, Sashiko Embroidery, Electromagnetic Dipoles & Complex Newton Fractals
+	{
+		ID: "ammannbeenker", StructName: "ammannBeenker", Category: "geom",
+		DefaultBG: color.RGBA{14, 14, 22, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewAmmannBeenker(paramInt(p, "depth", 5))
+		},
+	},
+	{
+		ID: "sashikoweave", StructName: "sashikoWeave", Category: "media",
+		DefaultBG: color.RGBA{16, 28, 58, 255}, DefaultPal: "ukiyoe",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewSashikoWeave(paramInt(p, "gridSize", 3))
+		},
+	},
+	{
+		ID: "magneticdipole", StructName: "magneticDipole", Category: "flow",
+		DefaultBG: color.RGBA{8, 11, 22, 255}, DefaultPal: "cyberpunk",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewMagneticDipole(paramInt(p, "polesN", 6), paramInt(p, "linesPerPole", 28))
+		},
+	},
+	{
+		ID: "newtonbasin", StructName: "newtonBasin", Category: "chaos",
+		DefaultBG: color.RGBA{10, 12, 22, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewNewtonBasin(paramInt(p, "degree", 6), paramInt(p, "maxIter", 48))
+		},
+	},
+
 	// Wave 9: Topological Contours, Streamline Engraving, 3D Origami & Bauhaus SDF Relief
 	{
 		ID: "evenstreamlines", StructName: "evenStreamlines", Category: "flow",
