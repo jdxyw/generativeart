@@ -3,8 +3,9 @@
 This document serves as the architectural blueprint for `generativeart`, covering:
 1. **Core Engine Refactoring & Performance Upgrades (Package 1 — Implemented)**
 2. **Computational Geometry, Topological Fields & 2D SDF Engine (Package 2 — Implemented)**
-3. **Future Platform Foundations (Dual Vector/HDR Backend, `DrawTimelapse`, WASM & CLI)**
-4. **Next-Wave `arts/` Visual Paradigms (Directions 2–5)**
+3. **Platform & Export Foundations (Package 3 — Implemented: Dual Vector/HDR Backend, `DrawTimelapse` HD GIF, PNG `tEXt` Recipes & `cmd/genart` CLI)**
+4. **Waves 9–12 `arts/` Visual Paradigms (94 Art Engines + 8 HD 600×600 Loop GIFs — Implemented)**
+5. **Next-Phase Roadmap: Exhibition Poster & ContactSheet Engine, Wave 13 (100-Art Milestone), Pure-Go WASM Playground & HD GIF Expansion**
 
 ---
 
@@ -123,4 +124,50 @@ With Packages 1 & 2 in place, the following 12 generators are unlocked:
 
 ### Direction 5: Traditional Textile Weave & Asemic Calligraphy
 11. **`SashikoWeave`** (`NewSashikoWeave(gridN int)`): Indigo-dyed Japanese Sashiko geometric embroidery with 3D twisted thread shading.
-12. **`AsemicCalligraphy`** (`NewAsemicCalligraphy(cols, glyphsPerCol int)`): Spring-mass cursive brush scroll with flying-white (`Feibai`) dry-brush physics and vermilion seal.
+12. **`AsemicCalligraphy`** (`NewAsemicCalligraphy(cols, glyphsPerCol int)`): Real Chinese running-cursive scroll (*Lantingji Xu*) with *Yongzi Bafa* brush physics, *Feibai* dry-brush splits, and vermilion seals.
+
+### Wave 12: Cultural Heritage, 3D TPMS Raymarching & High-Voltage Physics
+13. **`DunhuangApsara`** (`NewDunhuangApsara(ribbons, haloRings int)`): Tang-Dynasty Mogao caisson ceiling (*Zaojing*) with *Baoxianghua* lotus mandala and flying silk ribbons.
+14. **`CelticKnotwork`** (`NewCelticKnotwork(gridN int, ribbonWidth float64)`): *Book of Kells* illuminated manuscript interlaced knotwork with alternating over-under crossings.
+15. **`GyroidSurface`** (`NewGyroidSurface(scaleFreq, thickness float64)`): 3D SDF raymarched Schoen Gyroid minimal surface with 2×2 edge SSAA and two-sided ceramic glaze.
+16. **`LichtenbergTree`** (`NewLichtenbergTree(generations int, branchSpread float64)`): Dielectric breakdown lightning tree inside a beveled sapphire acrylic block.
+17. **`PersianTilework`** (`NewPersianTilework(petals, tiers int)`): 16-fold Isfahan *Muqarnas* stalactite vault dome with *Haft-Rangi* glazed tiles and *Islimi* vines.
+18. **`ChampleveEnamel`** (`NewChampleveEnamel(symmetry, rings int)`): Warring States black-bronze mirror inlaid with gold/silver dragon-cloud scrolls and cabochon turquoise.
+
+---
+
+## Part V. Next-Phase Roadmap (Directions 1–4)
+
+### 5.1 Direction 1: Wave 13 — Reaching the 100 Generative Art Engines Milestone (+6 Engines)
+Expand `arts/` from **94** to **100** generators with physical optics, caustics, thin-film interference, and classical horology/ceramics:
+1. **`KintsugiPorcelain`** (`NewKintsugiPorcelain(cracks, goldBranches int)`): Song-Dynasty Ru-ware celadon ice-crackle glaze (`汝窑冰裂纹开片`) repaired with 3D specular 24K gold Kintsugi lacquer seams (`金缮描金`).
+2. **`WaterCaustics`** (`NewWaterCaustics(waveModes int, dispersion float64)`): Refractive water-surface optical caustic network ($\det(J)^{-1}$ Jacobian ray convergence) with chromatic dispersion over submerged river stones.
+3. **`AgateGeode`** (`NewAgateGeode(rings, crystalClusters int)`): Cross-sectioned Brazilian amethyst geode cavity with concentric fortification agate banding and inward-pointing hexagonal quartz crystal prisms.
+4. **`CelestialArmillary`** (`NewCelestialArmillary(rings, stars int)`): Brass equatorial armillary sphere and astrolabe gearwork (`浑天仪与二十八宿星官图`) with graduated degree ticks and constellation geometry.
+5. **`SoapIridescence`** (`NewSoapIridescence(cells int, filmNm float64)`): Plateau's law foam lattice rendered with physical thin-film optical interference ($2 n d \cos\theta = m\lambda$) spectral iridescence.
+6. **`MalachiteBanding`** (`NewMalachiteBanding(centers, rings int)`): Botryoidal stalactitic malachite mineral cross-section with chatoyant velvet-green concentric rings.
+
+### 5.2 Direction 2: Pure-Go WebAssembly (WASM) Interactive Gallery Playground
+- **Architecture (`wasm/main.go`, `GOOS=js GOARCH=wasm`)**:
+  - Compile the pure-Go `generativeart` registry and HDR engine to WebAssembly.
+  - Provide an interactive **Live Studio / Playground** inside the web gallery where users can select any generator, tweak parameters via live sliders, switch palettes/seeds, render directly in the browser, and export lossless `.png` or vector `.svg`.
+
+### 5.3 Direction 3: Museum Exhibition Poster & Multi-Panel Contact Sheet Engine (`poster.go`, `cmd/genart poster` — Implemented)
+- **Motivation**: Generative artists routinely present works either as single matted museum prints or as $R \times C$ (`2×2`, `3×3`) **Small Multiples / Contact Sheets** comparing seed variations, parameter sweeps, or curated multi-engine series, complete with archival mat framing, palette swatch bars, and engraved technical typography.
+- **Architecture (`poster.go` & `cmd/genart`)**:
+  - `PosterConfig` & `PosterPanel`: Supports `1×1` single-work museum framing, `R×C` multi-seed variation grids (`RenderPoster`), and `R×C` curated multi-artwork exhibition sheets (`RenderGalleryPoster`).
+  - **Archival Mat & Double-Fillet Bevel**: Supports both **Museum Ivory Parchment (`light`)** and **Obsidian Gallery Gold (`dark`)** themes with 2D SDF drop shadows, recessed mat bevels, and double-line gilded fillet frames.
+  - **Zero-Dependency Vector Engraver Typography (`drawPosterText`)**: Built-in geometric vector stroke font supporting full ASCII (`A-Z`, `a-z`, `0-9`, technical symbols) rendered via sub-pixel anti-aliased vector paths (compatible with both HDR PNG and infinite-resolution SVG/PDF export).
+  - **Palette Swatch Bar & Seed Badges**: Automatically renders beveled circular color swatches, per-panel `#01 · SEED` captions, title/subtitle headers, and constructor recipe signatures.
+  - **CLI Subcommand (`genart poster`)**:
+    ```bash
+    # Render a 2x2 multi-seed variation contact sheet on Museum Ivory Parchment
+    go run ./cmd/genart poster -art dunhuangapsara -grid 2x2 -panel 420 -theme light -out images/poster_dunhuang_2x2.png
+
+    # Render a 2x2 curated multi-artwork exhibition poster in Obsidian Dark & Gold
+    go run ./cmd/genart poster -arts dunhuangapsara,celticknotwork,gyroidsurface,persiantilework -grid 2x2 -panel 420 -theme dark -title "WAVE XII EXHIBITION" -out images/poster_wave12.png
+    ```
+
+### 5.4 Direction 4: High-Definition 600×600 Seamless Loop GIF Expansion
+- Continue expanding the `600×600` 18-bit LUT + K-Means quantized seamless 360° loop GIF collection to cover fluid advection (`VortexFluid`), divergence-free ribbons (`CurlFlow`), imperial enamel reflections (`CloisonneEnamel`), and dielectric plasma pulses (`LichtenbergTree`).
+

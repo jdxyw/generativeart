@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/jdxyw/generativeart"
@@ -24,6 +25,8 @@ func main() {
 		runList()
 	case "render":
 		runRender(os.Args[2:])
+	case "poster":
+		runPoster(os.Args[2:])
 	case "inspect":
 		runInspect(os.Args[2:])
 	case "replay":
@@ -38,6 +41,7 @@ func printUsage() {
 	fmt.Println("Usage:")
 	fmt.Println("  genart list")
 	fmt.Println("  genart render -art <name> [-palette <name>] [-w 600] [-h 600] [-seed 20261021] [-frames 1] -out <file.(png|svg|pdf|gif|jpg)>")
+	fmt.Println("  genart poster [-art <name> | -arts <a,b,c,d>] [-grid 2x2] [-panel 420] [-theme light|dark] [-title \"...\"] -out <file.(png|svg|pdf|jpg)>")
 	fmt.Println("  genart inspect <file.png>")
 	fmt.Println("  genart replay <input.png> [-w 2400] [-h 2400] -out <file.(png|svg|pdf|jpg)>")
 }
@@ -177,3 +181,119 @@ func runReplay(args []string) {
 	}
 	fmt.Printf("Replayed %s (seed=%d) at %dx%d -> %s\n", meta.Engine, meta.Seed, c.Width(), c.Height(), *out)
 }
+
+func parseGridDim(gridStr string) (int, int) {
+	parts := strings.Split(strings.ToLower(strings.TrimSpace(gridStr)), "x")
+	if len(parts) == 2 {
+		r, err1 := strconv.Atoi(parts[0])
+		c, err2 := strconv.Atoi(parts[1])
+		if err1 == nil && err2 == nil && r > 0 && c > 0 {
+			return r, c
+		}
+	}
+	return 2, 2
+}
+
+func runPoster(args []string) {
+	fs := flag.NewFlagSet("poster", flag.ExitOnError)
+	artName := fs.String("art", "dunhuangapsara", "Single art generator name for multi-seed variation contact sheet")
+	artsList := fs.String("arts", "", "Comma-separated list of art generator names for curated multi-engine poster")
+	palName := fs.String("palette", "", "Optional palette override")
+	gridStr := fs.String("grid", "2x2", "Grid layout RowsxCols (e.g. 1x1, 2x2, 3x3)")
+	panelSize := fs.Int("panel", 420, "Width/Height in pixels of each artwork panel")
+	theme := fs.String("theme", "light", "Poster mat theme: 'light' (Museum Ivory Parchment) or 'dark' (Obsidian Gallery Gold)")
+	title := fs.String("title", "", "Custom poster main title")
+	subtitle := fs.String("subtitle", "", "Custom poster subtitle")
+	seed := fs.Int64("seed", 20261022, "Base deterministic random seed")
+	out := fs.String("out", "poster.png", "Output file path (.png, .svg, .pdf, .jpg)")
+	_ = fs.Parse(args)
+
+	rows, cols := parseGridDim(*gridStr)
+	cfg := generativeart.DefaultPosterConfig()
+	cfg.Rows = rows
+	cfg.Cols = cols
+	cfg.PanelSize = *panelSize
+	cfg.SeedBase = *seed
+	cfg.DarkTheme = strings.EqualFold(strings.TrimSpace(*theme), "dark")
+
+	var posterCanva *generativeart.Canva
+
+	if strings.TrimSpace(*artsList) != "" {
+		rawNames := strings.Split(*artsList, ",")
+		total := rows * cols
+		panels := make([]generativeart.PosterPanelSpec, total)
+		upperNames := make([]string, 0, total)
+		for i := 0; i < total; i++ {
+			name := strings.TrimSpace(rawNames[i%len(rawNames)])
+			desc, ok := arts.Lookup(name)
+			if !ok {
+				fmt.Fprintf(os.Stderr, "unknown art generator %q in -arts\n", name)
+				os.Exit(1)
+			}
+			chosenPalName := desc.DefaultPal
+			if *palName != "" {
+				chosenPalName = *palName
+			}
+			pal, _ := arts.PaletteByName(chosenPalName)
+			if i == 0 && len(pal) > 0 {
+				cfg.Palette = pal
+			}
+			pSeed := *seed + int64(i)*137
+			panels[i] = generativeart.PosterPanelSpec{
+				Engine:     desc.Build(nil),
+				Caption:    fmt.Sprintf("PLATE %02d  ·  %s  ·  SEED %d", i+1, strings.ToUpper(desc.ID), pSeed),
+				Seed:       pSeed,
+				Background: desc.DefaultBG,
+				Palette:    pal,
+			}
+			upperNames = append(upperNames, strings.ToUpper(desc.ID))
+		}
+		if *title != "" {
+			cfg.Title = *title
+		} else {
+			cfg.Title = "GENERATIVE ART CURATED EXHIBITION"
+		}
+		if *subtitle != "" {
+			cfg.Subtitle = *subtitle
+		} else {
+			cfg.Subtitle = strings.Join(upperNames, "  ·  ")
+		}
+		cfg.RecipeLabel = fmt.Sprintf("CURATED %dx%d EXHIBITION SHEET  ·  64-BIT LINEAR HDR  ·  BASE SEED %d", rows, cols, *seed)
+		posterCanva = generativeart.RenderGalleryPoster(panels, cfg)
+	} else {
+		desc, ok := arts.Lookup(*artName)
+		if !ok {
+			fmt.Fprintf(os.Stderr, "unknown art generator %q\n", *artName)
+			os.Exit(1)
+		}
+		chosenPalName := desc.DefaultPal
+		if *palName != "" {
+			chosenPalName = *palName
+		}
+		if pal, exists := arts.PaletteByName(chosenPalName); exists {
+			cfg.Palette = pal
+		}
+		cfg.Background = desc.DefaultBG
+		if *title != "" {
+			cfg.Title = *title
+		} else {
+			cfg.Title = strings.ToUpper(desc.ID) + "  ·  VARIATION STUDY"
+		}
+		if *subtitle != "" {
+			cfg.Subtitle = *subtitle
+		} else {
+			cfg.Subtitle = fmt.Sprintf("CATEGORY: %s  ·  PALETTE: %s  ·  64-BIT LINEAR HDR", strings.ToUpper(desc.Category), strings.ToUpper(chosenPalName))
+		}
+		cfg.RecipeLabel = fmt.Sprintf("ENGINE: arts.New%s  ·  GRID: %dx%d  ·  PANEL: %dx%d  ·  SEED: %d",
+			strings.Title(desc.ID), rows, cols, *panelSize, *panelSize, *seed)
+		posterCanva = generativeart.RenderPoster(desc.Build(nil), cfg)
+	}
+
+	if err := saveCanvaByExt(posterCanva, nil, 1, 8, *out, true); err != nil {
+		fmt.Fprintf(os.Stderr, "poster save failed: %v\n", err)
+		os.Exit(1)
+	}
+	fmt.Printf("Rendered exhibition poster (%dx%d px, grid=%dx%d, theme=%s) -> %s\n",
+		posterCanva.Width(), posterCanva.Height(), rows, cols, *theme, *out)
+}
+
