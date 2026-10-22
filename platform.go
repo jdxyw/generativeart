@@ -10,12 +10,13 @@ import (
 	"image"
 	"image/color"
 	"image/color/palette"
-	"image/draw"
 	"image/gif"
 	"io"
 	"os"
 	"reflect"
+	"sort"
 	"strings"
+	"sync"
 
 	"github.com/jdxyw/generativeart/render"
 )
@@ -90,34 +91,99 @@ func (c *Canva) Frames() []*image.RGBA {
 	return c.frames
 }
 
-// buildAdaptivePalette constructs a 256-color palette tailored to src by combining
-// a 216-color perceptual web cube with 40 dominant colors sampled from src.
-func buildAdaptivePalette(src *image.RGBA) color.Palette {
-	pal := make(color.Palette, 0, 256)
-	pal = append(pal, palette.Plan9[:216]...)
+// buildSharedAnimationPalette constructs a high-fidelity 256-color palette tailored to
+// the actual colors present in srcFrames (top 192 histogram colors + 64 Plan9 fallback colors),
+// along with a 15-bit (32x32x32) RGB lookup table for O(1) flicker-free frame quantization.
+func buildSharedAnimationPalette(srcFrames []*image.RGBA) (color.Palette, *[32768]uint8) {
+	type bucket struct {
+		idx            int
+		count          int
+		sumR, sumG, sumB int
+	}
+	var buckets [32768]bucket
+	for i := range buckets {
+		buckets[i].idx = i
+	}
 
-	b := src.Bounds()
-	w, h := b.Dx(), b.Dy()
-	if w > 0 && h > 0 {
-		stepX := w / 8
-		stepY := h / 5
-		if stepX < 1 {
-			stepX = 1
+	// Sample frames to populate 15-bit RGB color histogram
+	for fIdx, img := range srcFrames {
+		if fIdx > 0 && fIdx != len(srcFrames)/2 && len(srcFrames) > 4 {
+			continue
 		}
-		if stepY < 1 {
-			stepY = 1
+		pix := img.Pix
+		for i := 0; i+3 < len(pix); i += 8 {
+			r, g, b := int(pix[i]), int(pix[i+1]), int(pix[i+2])
+			key := ((r >> 3) << 10) | ((g >> 3) << 5) | (b >> 3)
+			buckets[key].count++
+			buckets[key].sumR += r
+			buckets[key].sumG += g
+			buckets[key].sumB += b
 		}
-		for y := stepY / 2; y < h && len(pal) < 256; y += stepY {
-			for x := stepX / 2; x < w && len(pal) < 256; x += stepX {
-				pal = append(pal, src.RGBAAt(b.Min.X+x, b.Min.Y+y))
+	}
+
+	active := make([]bucket, 0, 1024)
+	for _, bk := range buckets {
+		if bk.count > 0 {
+			active = append(active, bk)
+		}
+	}
+	sort.Slice(active, func(i, j int) bool {
+		return active[i].count > active[j].count
+	})
+
+	pal := make(color.Palette, 0, 256)
+	for i := 0; i < len(active) && len(pal) < 200; i++ {
+		bk := active[i]
+		pal = append(pal, color.RGBA{
+			R: uint8(bk.sumR / bk.count),
+			G: uint8(bk.sumG / bk.count),
+			B: uint8(bk.sumB / bk.count),
+			A: 255,
+		})
+	}
+	for i := 0; len(pal) < 256 && i < len(palette.Plan9); i += 4 {
+		pal = append(pal, palette.Plan9[i])
+	}
+
+	// Precompute 15-bit RGB -> nearest palette index LUT
+	palRGBA := make([][3]int, len(pal))
+	for i, c := range pal {
+		r, g, b, _ := c.RGBA()
+		palRGBA[i] = [3]int{int(r >> 8), int(g >> 8), int(b >> 8)}
+	}
+
+	var lut [32768]uint8
+	for qr := 0; qr < 32; qr++ {
+		r8 := (qr << 3) | (qr >> 2)
+		for qg := 0; qg < 32; qg++ {
+			g8 := (qg << 3) | (qg >> 2)
+			for qb := 0; qb < 32; qb++ {
+				b8 := (qb << 3) | (qb >> 2)
+				bestIdx := 0
+				bestDist := 1 << 30
+				for pIdx, pc := range palRGBA {
+					dr := r8 - pc[0]
+					dg := g8 - pc[1]
+					db := b8 - pc[2]
+					// Perceptually weighted RGB distance
+					d := 3*dr*dr + 4*dg*dg + 2*db*db
+					if d < bestDist {
+						bestDist = d
+						bestIdx = pIdx
+						if d == 0 {
+							break
+						}
+					}
+				}
+				lut[(qr<<10)|(qg<<5)|qb] = uint8(bestIdx)
 			}
 		}
 	}
-	return pal
+	return pal, &lut
 }
 
 // WriteGIF encodes the recorded timelapse frames (or the current canvas image if no
-// timelapse frames were recorded) as a looping animated GIF to w.
+// timelapse frames were recorded) as a flicker-free looping animated GIF to w.
 func (c *Canva) WriteGIF(w io.Writer, delayCentiseconds int) error {
 	if c == nil {
 		return errors.New("nil Canva")
@@ -133,18 +199,61 @@ func (c *Canva) WriteGIF(w io.Writer, delayCentiseconds int) error {
 		return errors.New("no frames available to encode")
 	}
 
+	sharedPal, lut := buildSharedAnimationPalette(srcFrames)
+	bayer4x4 := [4][4]int{
+		{-4, 0, -3, 1},
+		{2, -2, 3, -1},
+		{-3, 1, -4, 0},
+		{3, -1, 2, -2},
+	}
+
 	outGIF := &gif.GIF{
 		Image:     make([]*image.Paletted, len(srcFrames)),
 		Delay:     make([]int, len(srcFrames)),
 		LoopCount: 0,
 	}
+
+	var wg sync.WaitGroup
 	for i, rgba := range srcFrames {
-		pal := buildAdaptivePalette(rgba)
-		pm := image.NewPaletted(rgba.Bounds(), pal)
-		draw.FloydSteinberg.Draw(pm, rgba.Bounds(), rgba, rgba.Bounds().Min)
-		outGIF.Image[i] = pm
 		outGIF.Delay[i] = delayCentiseconds
+		wg.Add(1)
+		go func(frameIdx int, src *image.RGBA) {
+			defer wg.Done()
+			b := src.Bounds()
+			fw, fh := b.Dx(), b.Dy()
+			pm := image.NewPaletted(b, sharedPal)
+			for y := 0; y < fh; y++ {
+				bRow := bayer4x4[y&3]
+				srcOff := y * src.Stride
+				dstOff := y * pm.Stride
+				for x := 0; x < fw; x++ {
+					dith := bRow[x&3]
+					r := int(src.Pix[srcOff+x*4+0]) + dith
+					g := int(src.Pix[srcOff+x*4+1]) + dith
+					bl := int(src.Pix[srcOff+x*4+2]) + dith
+					if r < 0 {
+						r = 0
+					} else if r > 255 {
+						r = 255
+					}
+					if g < 0 {
+						g = 0
+					} else if g > 255 {
+						g = 255
+					}
+					if bl < 0 {
+						bl = 0
+					} else if bl > 255 {
+						bl = 255
+					}
+					key := ((r >> 3) << 10) | ((g >> 3) << 5) | (bl >> 3)
+					pm.Pix[dstOff+x] = lut[key]
+				}
+			}
+			outGIF.Image[frameIdx] = pm
+		}(i, rgba)
 	}
+	wg.Wait()
 	return gif.EncodeAll(w, outGIF)
 }
 

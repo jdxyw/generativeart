@@ -27,6 +27,12 @@
 
 👉 **[View All 94 Artworks & Code Examples in `gallery.md` →](./gallery.md)**
 
+### 🎞️ Seamless Looping Animations (`DrawTimelapse` + `ToGIF`)
+
+| BZ Spiral Waves (`cyclicautomata`) | 3D Gyroid TPMS (`gyroidsurface`) | Mosaic Sun (`mosaicsun`) | Magnetic Dipole (`magneticdipole`) |
+| :---: | :---: | :---: | :---: |
+| ![BZ Spiral Waves Loop](images/cyclicautomata_loop.gif) | ![3D Gyroid Loop](images/gyroidsurface_loop.gif) | ![Mosaic Sun Loop](images/mosaicsun_loop.gif) | ![Magnetic Dipole Loop](images/magneticdipole_loop.gif) |
+
 ---
 
 ## Core Engine Capabilities

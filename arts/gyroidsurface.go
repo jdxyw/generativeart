@@ -32,9 +32,15 @@ func NewGyroidSurface(scaleFreq, thickness float64) *gyroidSurface {
 
 // Generative raymarches the 3D Gyroid minimal surface sculpture.
 func (gs *gyroidSurface) Generative(c *generativeart.Canva) {
+	gs.GenerativeFrame(c, 0, 1, 0.0)
+}
+
+// GenerativeFrame raymarches frame frameIdx of a seamless 360-degree phase loop (phase in [0, 1)).
+func (gs *gyroidSurface) GenerativeFrame(c *generativeart.Canva, frameIdx, totalFrames int, loopPhase float64) {
 	rc := c.NewRenderCanvas()
 	w, h := c.Width(), c.Height()
 	fw, fh := float64(w), float64(h)
+	phaseShift := loopPhase * 2.0 * math.Pi
 
 	abyssBg := color.RGBA{R: 10, G: 14, B: 26, A: 255}
 	// Side A (+ gradient): Warm Imperial Gold, Amber & Cinnabar Coral
@@ -68,10 +74,10 @@ func (gs *gyroidSurface) Generative(c *generativeart.Canva) {
 		return vec3{x1, y2, z2}
 	}
 
-	// Raw signed gyroid scalar function g(p) in [-1.5, 1.5]
+	// Raw signed gyroid scalar function g(p) in [-1.5, 1.5], advancing smoothly by phaseShift
 	evalGyroidRaw := func(p vec3) float64 {
 		q := rotPoint(p)
-		sx, sy, sz := q.x*freq, q.y*freq, q.z*freq
+		sx, sy, sz := q.x*freq+phaseShift, q.y*freq+phaseShift, q.z*freq+phaseShift
 		return math.Sin(sx)*math.Cos(sy) + math.Sin(sy)*math.Cos(sz) + math.Sin(sz)*math.Cos(sx)
 	}
 

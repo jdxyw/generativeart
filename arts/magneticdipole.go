@@ -33,10 +33,16 @@ func NewMagneticDipole(polesN, linesPerPole int) *magneticDipole {
 
 // Generative renders the multi-pole electromagnetic field lines and orthogonal equipotential contours.
 func (md *magneticDipole) Generative(c *generativeart.Canva) {
+	md.GenerativeFrame(c, 0, 1, 0.0)
+}
+
+// GenerativeFrame renders frame frameIdx of a seamless 360-degree phase loop (phase in [0, 1)).
+func (md *magneticDipole) GenerativeFrame(c *generativeart.Canva, frameIdx, totalFrames int, loopPhase float64) {
 	rc := c.NewRenderCanvas()
 	w, h := float64(c.Width()), float64(c.Height())
 	scale := math.Min(w, h) / 600.0
 	cx, cy := 0.5*w, 0.5*h
+	animAng := loopPhase * 2.0 * math.Pi
 
 	// Cosmic Electromagnetic & Technical Astrolabe Palette
 	abyssSpace := color.RGBA{R: 8, G: 11, B: 22, A: 255}
@@ -65,8 +71,8 @@ func (md *magneticDipole) Generative(c *generativeart.Canva) {
 	// Place alternating + / - poles in a balanced asymmetric constellation
 	ringR := 0.255 * math.Min(w, h)
 	for i := 0; i < numPoles; i++ {
-		ang := (float64(i)/float64(numPoles))*2.0*math.Pi - 0.38
-		rMod := ringR * (0.88 + 0.18*math.Sin(float64(i)*1.7))
+		ang := (float64(i)/float64(numPoles))*2.0*math.Pi - 0.38 + 0.16*math.Sin(animAng+float64(i)*1.05)
+		rMod := ringR * (0.88 + 0.18*math.Sin(float64(i)*1.7+animAng))
 		charge := 1.0
 		if i%2 == 1 {
 			charge = -1.0

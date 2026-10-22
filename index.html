@@ -321,7 +321,7 @@
 
   <header class="hero">
     <div class="hero-inner">
-      <div class="hero-eyebrow" id="heroEyebrow">✨ 66 Generative Art Engines · 64-Bit Linear HDR Canvas · Oklab Color Science</div>
+      <div class="hero-eyebrow" id="heroEyebrow">✨ 94 Generative Art Engines · 4 Seamless Loop GIFs · 64-Bit Linear HDR Canvas · Oklab Color Science</div>
       <h1 id="heroTitle">Generative Art in Go</h1>
       <p id="heroSub">From divergence-free curl flows, strange attractor nebulae, and bioluminescent slime molds to traditional Shan-Shui ink landscapes — a high-precision generative art exhibition in Go.</p>
       <div class="install-bar">
@@ -413,6 +413,7 @@
 
     const CATEGORIES = [
       { id: 'all', zh: '全部作品', en: 'All Works' },
+      { id: 'anim', zh: '🎞️ 循环动图 GIF', en: '🎞️ Animated GIFs' },
       { id: 'new', zh: '🔥 全新 HDR 艺术', en: '🔥 Featured New HDR' },
       { id: 'flow', zh: '流场与波动', en: 'Flow & Waves' },
       { id: 'chaos', zh: '混沌与分形', en: 'Chaos & Fractals' },
@@ -423,6 +424,11 @@
     ];
 
     const ARTWORKS = [
+      // Seamless Looping GIF Animations
+      { id:'cyclicautomata', title:'BZ Spiral Waves (Loop GIF)', zh:'化学振荡螺旋波 360° 无缝动图', cat:'anim', isNew:true, isGif:true, img:'cyclicautomata_loop.gif', bg:'color.RGBA{R: 10, G: 16, B: 34, A: 255}', schema:'common.Sunset', call:'arts.NewCyclicAutomata(14, 120)', colors:['#a82062','#f8ba3a','#2ab0b2','#1a4e98'], zhDesc:'16 帧 360° 无缝循环 GIF：Belousov-Zhabotinsky 激振化学螺旋波随周期相位向外连续旋转涌动。', enDesc:'16-frame seamless 360° loop GIF of Belousov-Zhabotinsky 3D chemical reaction spiral waves.' },
+      { id:'gyroidsurface', title:'3D Gyroid TPMS (Loop GIF)', zh:'三周期极小曲面陀螺晶格无缝动图', cat:'anim', isNew:true, isGif:true, img:'gyroidsurface_loop.gif', bg:'color.RGBA{R: 10, G: 14, B: 26, A: 255}', schema:'common.Dunhuang', call:'arts.NewGyroidSurface(4.2, 0.085)', colors:['#f6b838','#d64430','#30bcba','#1a4494'], zhDesc:'16 帧 360° 无缝循环 GIF：3D SDF 光线步进 Schoen 陀螺极小曲面内部双色瓷釉迷宫随相位连续穿流演化。', enDesc:'16-frame seamless 360° loop GIF of a 3D raymarched Schoen Gyroid minimal surface morphing along its lattice wavevector.' },
+      { id:'mosaicsun', title:'Mosaic Sun & Waves (Loop GIF)', zh:'拜占庭镶嵌画烈日海浪无缝动图', cat:'anim', isNew:true, isGif:true, img:'mosaicsun_loop.gif', bg:'color.RGBA{R: 22, G: 26, B: 48, A: 255}', schema:'common.Sunset', call:'arts.NewMosaicSun(32, 1.0)', colors:['#ffbe0b','#fb5607','#ff006e','#3a86ff'], zhDesc:'16 帧 360° 无缝循环 GIF：拜占庭烈日光晕漩涡流转，底部钴蓝与洋红彩绘玻璃海浪砖块连续翻涌。', enDesc:'16-frame seamless 360° loop GIF of swirling Byzantine solar halo rings and rolling cobalt/magenta mosaic waves.' },
+      { id:'magneticdipole', title:'Magnetic Dipole (Loop GIF)', zh:'多极电磁偶极子律动无缝动图', cat:'anim', isNew:true, isGif:true, img:'magneticdipole_loop.gif', bg:'color.RGBA{R: 8, G: 11, B: 22, A: 255}', schema:'common.Cyberpunk', call:'arts.NewMagneticDipole(6, 28)', colors:['#f6802a','#30ccee','#c4263a','#122c60'], zhDesc:'16 帧 360° 无缝循环 GIF：6 枚正负等离子磁极沿本轮轨道呼吸摆动，正交磁力线与等势环实时重联。', enDesc:'16-frame seamless 360° loop GIF of orbiting electromagnetic dipoles with real-time reconnecting orthogonal field lines.' },
       // Latest Wave Artworks (Always prepend newest additions at the top)
       { id:'dunhuangapsara', title:'Dunhuang Caisson & Silk', zh:'敦煌盛唐藻井宝相花与飞天飘带', cat:'media', isNew:true, img:'dunhuangapsara.png', bg:'color.RGBA{R: 20, G: 14, B: 18, A: 255}', schema:'common.Dunhuang', call:'arts.NewDunhuangApsara(8, 5)', colors:['#c6382a','#eeb844','#3ab0a8','#1a428a'], zhDesc:'致敬莫高窟盛唐方井叠梲藻井，石青、石绿、朱砂与泥金层叠八瓣重层宝相花、联珠纹与八道吴带当风飞天长绸。', enDesc:'Tang-Dynasty Dunhuang Mogao caisson ceiling with recessed square-diamond coffers, Baoxianghua lotus, pearl chains, and flying silk ribbons.' },
       { id:'celticknotwork', title:'Book of Kells Knotwork', zh:'凯尔特福音书泥金盘长结编织', cat:'geom', isNew:true, img:'celticknotwork.png', bg:'color.RGBA{R: 14, G: 18, B: 26, A: 255}', schema:'common.Dunhuang', call:'arts.NewCelticKnotwork(8, 1.0)', colors:['#eeb840','#cc3a30','#2a9e8e','#2660ac'], zhDesc:'《凯尔斯书》泥金手抄本风格的闭环盘长结，严格遵循奇偶上下穿插拓扑并在每个交点投射真实遮蔽暗影。', enDesc:'Illuminated Book-of-Kells interlaced knotwork tapestry with exact alternating over-under crossings and umbral shadows.' },
@@ -519,11 +525,13 @@
     ];
 
     function buildGoSnippet(item) {
+      const drawCall = item.isGif
+        ? `\tc.DrawTimelapseFrames(${item.call}, 16)\n\tc.ToGIF("${item.img}", 7)`
+        : `\tc.Draw(${item.call})\n\tc.ToPNG("${item.img}")`;
       return `package main
 
 import (
-\t"math/rand"
-\t"time"
+\t"image/color"
 
 \t"github.com/jdxyw/generativeart"
 \t"github.com/jdxyw/generativeart/arts"
@@ -531,13 +539,12 @@ import (
 )
 
 func main() {
-\trand.Seed(time.Now().UnixNano())
 \tc := generativeart.NewCanva(600, 600)
+\tc.SetSeed(20261022)
 \tc.SetBackground(${item.bg})
 \tc.FillBackground()
 \tc.SetColorSchema(${item.schema})
-\tc.Draw(${item.call})
-\tc.ToPNG("${item.img}")
+${drawCall}
 }`;
     }
 
@@ -720,7 +727,11 @@ func main() {
       if (IS_REAL_BROWSER) {
         return "images/" + filename;
       }
-      return THUMB_DATA[filename] || ("images/" + filename);
+      if (filename.endsWith("_loop.gif")) {
+        const pngFallback = filename.replace("_loop.gif", ".png");
+        if (THUMB_DATA[pngFallback]) return THUMB_DATA[pngFallback];
+      }
+      return THUMB_DATA[filename] || "";
     }
 
     function renderGallery() {
@@ -760,7 +771,7 @@ func main() {
               <img src="${srcData}" width="300" height="300" alt="${item.title}" />
               <div class="card-badges">
                 <span class="badge cat-badge">${catLabel}</span>
-                ${item.isNew ? "<span class=\"badge new\">HDR NEW</span>" : ""}
+                ${item.isGif ? "<span class=\"badge new\">GIF LOOP</span>" : (item.isNew ? "<span class=\"badge new\">HDR NEW</span>" : "")}
               </div>
             </div>
             <div class="art-body">
