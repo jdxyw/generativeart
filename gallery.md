@@ -8,6 +8,13 @@ This gallery contains standalone `Go` usage examples and rendered outputs for `g
 
 ## Table of Contents
 
+- [Wave 11: Jovian Vortex Fluid, BZ Spiral Waves, Gilded PCB WFC, Cursive Calligraphy, Buddhabrot & Lyapunov](#wave-11-jovian-vortex-fluid-bz-spiral-waves-gilded-pcb-wfc-cursive-calligraphy-buddhabrot--lyapunov)
+  - [Vortex Fluid](#vortex-fluid)
+  - [Cyclic Automata](#cyclic-automata)
+  - [Circuit WFC](#circuit-wfc)
+  - [Asemic Calligraphy](#asemic-calligraphy)
+  - [Buddhabrot](#buddhabrot)
+  - [Lyapunov Fractal](#lyapunov-fractal)
 - [Wave 10: 8-Fold Quasicrystals, Sashiko Embroidery, Electromagnetic Dipoles & Complex Newton Fractals](#wave-10-8-fold-quasicrystals-sashiko-embroidery-electromagnetic-dipoles--complex-newton-fractals)
   - [Ammann Beenker](#ammann-beenker)
   - [Sashiko Weave](#sashiko-weave)
@@ -91,6 +98,106 @@ This gallery contains standalone `Go` usage examples and rendered outputs for `g
   - [Silk Sky](#silk-sky)
   - [Circle Move](#circle-move)
   - [Random Circle](#random-circle)
+
+---
+
+## Wave 11: Jovian Vortex Fluid, BZ Spiral Waves, Gilded PCB WFC, Cursive Calligraphy, Buddhabrot & Lyapunov
+
+### Vortex Fluid
+
+```go
+func main() {
+	rand.Seed(time.Now().Unix())
+	c := generativeart.NewCanva(600, 600)
+	c.SetBackground(color.RGBA{R: 12, G: 22, B: 46, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewVortexFluid(9, 18))
+	c.ToPNG("vortexfluid.png")
+}
+```
+
+![Vortex Fluid](images/vortexfluid.png)
+
+### Cyclic Automata
+
+```go
+func main() {
+	rand.Seed(time.Now().Unix())
+	c := generativeart.NewCanva(600, 600)
+	c.SetBackground(color.RGBA{R: 10, G: 16, B: 34, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Sunset)
+	c.Draw(arts.NewCyclicAutomata(14, 120))
+	c.ToPNG("cyclicautomata.png")
+}
+```
+
+![Cyclic Automata](images/cyclicautomata.png)
+
+### Circuit WFC
+
+```go
+func main() {
+	rand.Seed(time.Now().Unix())
+	c := generativeart.NewCanva(600, 600)
+	c.SetBackground(color.RGBA{R: 8, G: 20, B: 26, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Cyberpunk)
+	c.Draw(arts.NewCircuitWFC(28, 64))
+	c.ToPNG("circuitwfc.png")
+}
+```
+
+![Circuit WFC](images/circuitwfc.png)
+
+### Asemic Calligraphy
+
+```go
+func main() {
+	rand.Seed(time.Now().Unix())
+	c := generativeart.NewCanva(600, 600)
+	c.SetBackground(color.RGBA{R: 244, G: 236, B: 214, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.UkiyoE)
+	c.Draw(arts.NewAsemicCalligraphy(6, 5))
+	c.ToPNG("asemiccalligraphy.png")
+}
+```
+
+![Asemic Calligraphy](images/asemiccalligraphy.png)
+
+### Buddhabrot
+
+```go
+func main() {
+	rand.Seed(time.Now().Unix())
+	c := generativeart.NewCanva(600, 600)
+	c.SetBackground(color.RGBA{R: 4, G: 6, B: 14, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Inferno)
+	c.Draw(arts.NewBuddhabrot(450000, 360))
+	c.ToPNG("buddhabrot.png")
+}
+```
+
+![Buddhabrot](images/buddhabrot.png)
+
+### Lyapunov Fractal
+
+```go
+func main() {
+	rand.Seed(time.Now().Unix())
+	c := generativeart.NewCanva(600, 600)
+	c.SetBackground(color.RGBA{R: 8, G: 12, B: 26, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewLyapunovFractal("AABAB", 84))
+	c.ToPNG("lyapunovfractal.png")
+}
+```
+
+![Lyapunov Fractal](images/lyapunovfractal.png)
 
 ---
 
