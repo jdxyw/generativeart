@@ -168,6 +168,6 @@ Expand `arts/` from **94** to **100** generators with physical optics, caustics,
     go run ./cmd/genart poster -arts dunhuangapsara,celticknotwork,gyroidsurface,persiantilework -grid 2x2 -panel 420 -theme dark -title "WAVE XII EXHIBITION" -out images/poster_wave12.png
     ```
 
-### 5.4 Direction 4: High-Definition 600×600 Seamless Loop GIF Expansion (12 HD Loop GIFs — Implemented)
-- Expanded the `600×600` 18-bit LUT + K-Means quantized seamless 360° loop GIF collection to **12 HD animations**: `lissajousribbon_loop.gif`, `joydivision_loop.gif`, `marchingisolines_loop.gif`, `vortexfluid_loop.gif`, `dunhuangapsara_loop.gif`, `stainedrosewindow_loop.gif`, `newtonbasin_loop.gif`, `origamitessellation_loop.gif`, `cyclicautomata_loop.gif`, `gyroidsurface_loop.gif`, `mosaicsun_loop.gif`, and `magneticdipole_loop.gif`.
+### 5.4 Direction 4: High-Definition 600×600 Seamless Loop GIF Expansion (11 HD Loop GIFs — Implemented)
+- Expanded the `600×600` 18-bit LUT + K-Means quantized seamless 360° loop GIF collection to **11 HD animations**: `lissajousribbon_loop.gif`, `marchingisolines_loop.gif`, `vortexfluid_loop.gif`, `dunhuangapsara_loop.gif`, `stainedrosewindow_loop.gif`, `newtonbasin_loop.gif`, `origamitessellation_loop.gif`, `cyclicautomata_loop.gif`, `gyroidsurface_loop.gif`, `mosaicsun_loop.gif`, and `magneticdipole_loop.gif`.
 

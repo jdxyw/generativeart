@@ -29,13 +29,13 @@
 
 ### 🎞️ Seamless 600×600 HD Looping Animations (`DrawTimelapseFrames` + `ToGIF`)
 
-| 3D Lissajous Silk (`lissajousribbon`) | Pulsar Ridgelines (`joydivision`) | Karst Terraces (`marchingisolines`) | Jovian Vortex (`vortexfluid`) |
+| 3D Lissajous Silk (`lissajousribbon`) | Karst Terraces (`marchingisolines`) | Jovian Vortex (`vortexfluid`) | Dunhuang Caisson (`dunhuangapsara`) |
 | :---: | :---: | :---: | :---: |
-| ![Lissajous Ribbon Loop](images/lissajousribbon_loop.gif) | ![Joy Division Loop](images/joydivision_loop.gif) | ![Marching Isolines Loop](images/marchingisolines_loop.gif) | ![Vortex Fluid Loop](images/vortexfluid_loop.gif) |
-| **Dunhuang Caisson (`dunhuangapsara`)** | **Gothic Rose Window (`stainedrosewindow`)** | **Newton Fractal Silk (`newtonbasin`)** | **3D Miura-Ori (`origamitessellation`)** |
-| ![Dunhuang Caisson Loop](images/dunhuangapsara_loop.gif) | ![Gothic Rose Window Loop](images/stainedrosewindow_loop.gif) | ![Newton Basin Loop](images/newtonbasin_loop.gif) | ![Origami Tessellation Loop](images/origamitessellation_loop.gif) |
-| **BZ Spiral Waves (`cyclicautomata`)** | **3D Gyroid TPMS (`gyroidsurface`)** | **Mosaic Sun (`mosaicsun`)** | **Magnetic Dipole (`magneticdipole`)** |
-| ![BZ Spiral Waves Loop](images/cyclicautomata_loop.gif) | ![3D Gyroid Loop](images/gyroidsurface_loop.gif) | ![Mosaic Sun Loop](images/mosaicsun_loop.gif) | ![Magnetic Dipole Loop](images/magneticdipole_loop.gif) |
+| ![Lissajous Ribbon Loop](images/lissajousribbon_loop.gif) | ![Marching Isolines Loop](images/marchingisolines_loop.gif) | ![Vortex Fluid Loop](images/vortexfluid_loop.gif) | ![Dunhuang Caisson Loop](images/dunhuangapsara_loop.gif) |
+| **Gothic Rose Window (`stainedrosewindow`)** | **Newton Fractal Silk (`newtonbasin`)** | **3D Miura-Ori (`origamitessellation`)** | **BZ Spiral Waves (`cyclicautomata`)** |
+| ![Gothic Rose Window Loop](images/stainedrosewindow_loop.gif) | ![Newton Basin Loop](images/newtonbasin_loop.gif) | ![Origami Tessellation Loop](images/origamitessellation_loop.gif) | ![BZ Spiral Waves Loop](images/cyclicautomata_loop.gif) |
+| **3D Gyroid TPMS (`gyroidsurface`)** | **Mosaic Sun (`mosaicsun`)** | **Magnetic Dipole (`magneticdipole`)** | |
+| ![3D Gyroid Loop](images/gyroidsurface_loop.gif) | ![Mosaic Sun Loop](images/mosaicsun_loop.gif) | ![Magnetic Dipole Loop](images/magneticdipole_loop.gif) | |
 
 ### 🖼️ Museum Exhibition Posters & Multi-Panel Contact Sheets (`genart poster`)
 
