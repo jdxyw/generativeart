@@ -45,6 +45,13 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
 
 ## Table of Contents
 
+- [Wave 13: Kintsugi Ru-Ware, Water Caustics, Amethyst Geode, Celestial Armillary, Soap Iridescence & Botryoidal Malachite (100-Art Milestone)](#wave-13-kintsugi-ru-ware-water-caustics-amethyst-geode-celestial-armillary-soap-iridescence--botryoidal-malachite-100-art-milestone)
+  - [Kintsugi Porcelain](#kintsugi-porcelain)
+  - [Water Caustics](#water-caustics)
+  - [Agate Geode](#agate-geode)
+  - [Celestial Armillary](#celestial-armillary)
+  - [Soap Iridescence](#soap-iridescence)
+  - [Malachite Banding](#malachite-banding)
 - [Wave 12: Dunhuang Caisson, Celtic Knotwork, 3D Gyroid TPMS, Lichtenberg Plasma, Persian Muqarnas & Warring States Bronze](#wave-12-dunhuang-caisson-celtic-knotwork-3d-gyroid-tpms-lichtenberg-plasma-persian-muqarnas--warring-states-bronze)
   - [Dunhuang Apsara](#dunhuang-apsara)
   - [Celtic Knotwork](#celtic-knotwork)
@@ -142,6 +149,166 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
   - [Silk Sky](#silk-sky)
   - [Circle Move](#circle-move)
   - [Random Circle](#random-circle)
+
+---
+
+## Wave 13: Kintsugi Ru-Ware, Water Caustics, Amethyst Geode, Celestial Armillary, Soap Iridescence & Botryoidal Malachite (100-Art Milestone)
+
+### Kintsugi Porcelain
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261023)
+	c.SetBackground(color.RGBA{R: 12, G: 14, B: 20, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewKintsugiPorcelain(96, 5))
+	c.ToPNG("kintsugiporcelain.png")
+}
+```
+
+![Kintsugi Porcelain](images/kintsugiporcelain.png)
+
+### Water Caustics
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261023)
+	c.SetBackground(color.RGBA{R: 8, G: 28, B: 44, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Oceanic)
+	c.Draw(arts.NewWaterCaustics(28, 1.0))
+	c.ToPNG("watercaustics.png")
+}
+```
+
+![Water Caustics](images/watercaustics.png)
+
+### Agate Geode
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261023)
+	c.SetBackground(color.RGBA{R: 12, G: 11, B: 18, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Cyberpunk)
+	c.Draw(arts.NewAgateGeode(26, 36))
+	c.ToPNG("agategeode.png")
+}
+```
+
+![Agate Geode](images/agategeode.png)
+
+### Celestial Armillary
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261023)
+	c.SetBackground(color.RGBA{R: 8, G: 12, B: 24, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewCelestialArmillary(6, 12))
+	c.ToPNG("celestialarmillary.png")
+}
+```
+
+![Celestial Armillary](images/celestialarmillary.png)
+
+### Soap Iridescence
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261023)
+	c.SetBackground(color.RGBA{R: 6, G: 8, B: 16, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Cyberpunk)
+	c.Draw(arts.NewSoapIridescence(42, 480.0))
+	c.ToPNG("soapiridescence.png")
+}
+```
+
+![Soap Iridescence](images/soapiridescence.png)
+
+### Malachite Banding
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261023)
+	c.SetBackground(color.RGBA{R: 5, G: 28, B: 18, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Botanical)
+	c.Draw(arts.NewMalachiteBanding(14, 22))
+	c.ToPNG("malachitebanding.png")
+}
+```
+
+![Malachite Banding](images/malachitebanding.png)
 
 ---
 

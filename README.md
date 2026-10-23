@@ -4,7 +4,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/jdxyw/generativeart)](https://goreportcard.com/report/github.com/jdxyw/generativeart)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/jdxyw/generativeart/master/LICENSE)
 
-`generativeart` is a pure-`Go` generative art engine and algorithm collection supporting **94 generative art types** across flow fields, strange attractors, biological morphogenesis, 3D SDF raymarching, non-Euclidean geometry, quasicrystals, stained-glass mosaics, cloisonné enamel, 3D origami, and traditional printmaking.
+`generativeart` is a pure-`Go` generative art engine and algorithm collection supporting **100 generative art types** across flow fields, strange attractors, biological morphogenesis, 3D SDF raymarching, optical caustics, thin-film interference, non-Euclidean geometry, quasicrystals, stained-glass mosaics, cloisonné enamel, 3D origami, and traditional printmaking.
 
 - 🌐 **Live Interactive Web Gallery (GitHub Pages)**: **[https://jdxyw.github.io/generativeart/](https://jdxyw.github.io/generativeart/)**
 - 🖼️ **Full Code & Image Gallery (`gallery.md`)**: **[./gallery.md](./gallery.md)**
@@ -15,17 +15,17 @@
 
 ## Featured Gallery Highlights
 
-> Browse all **94 artworks**, full `Go` source snippets, and rendered previews in **[`gallery.md`](./gallery.md)** or on the **[Interactive GitHub Pages Gallery](https://jdxyw.github.io/generativeart/)**.
+> Browse all **100 artworks**, full `Go` source snippets, and rendered previews in **[`gallery.md`](./gallery.md)** or on the **[Interactive GitHub Pages Gallery](https://jdxyw.github.io/generativeart/)**.
 
-| [Dunhuang Apsara](./gallery.md#dunhuang-apsara) | [Celtic Knotwork](./gallery.md#celtic-knotwork) | [Gyroid Surface](./gallery.md#gyroid-surface) | [Lichtenberg Tree](./gallery.md#lichtenberg-tree) |
+| [Kintsugi Porcelain](./gallery.md#kintsugi-porcelain) | [Water Caustics](./gallery.md#water-caustics) | [Agate Geode](./gallery.md#agate-geode) | [Celestial Armillary](./gallery.md#celestial-armillary) |
 | :---: | :---: | :---: | :---: |
-| ![Dunhuang Apsara](images/dunhuangapsara.png) | ![Celtic Knotwork](images/celticknotwork.png) | ![Gyroid Surface](images/gyroidsurface.png) | ![Lichtenberg Tree](images/lichtenbergtree.png) |
-| **[Persian Tilework](./gallery.md#persian-tilework)** | **[Champlevé Enamel](./gallery.md#champleve-enamel)** | **[Vortex Fluid](./gallery.md#vortex-fluid)** | **[Cyclic Automata](./gallery.md#cyclic-automata)** |
-| ![Persian Tilework](images/persiantilework.png) | ![Champleve Enamel](images/champleveenamel.png) | ![Vortex Fluid](images/vortexfluid.png) | ![Cyclic Automata](images/cyclicautomata.png) |
-| **[Circuit WFC](./gallery.md#circuit-wfc)** | **[Asemic Calligraphy](./gallery.md#asemic-calligraphy)** | **[Buddhabrot](./gallery.md#buddhabrot)** | **[Lyapunov Fractal](./gallery.md#lyapunov-fractal)** |
-| ![Circuit WFC](images/circuitwfc.png) | ![Asemic Calligraphy](images/asemiccalligraphy.png) | ![Buddhabrot](images/buddhabrot.png) | ![Lyapunov Fractal](images/lyapunovfractal.png) |
+| ![Kintsugi Porcelain](images/kintsugiporcelain.png) | ![Water Caustics](images/watercaustics.png) | ![Agate Geode](images/agategeode.png) | ![Celestial Armillary](images/celestialarmillary.png) |
+| **[Soap Iridescence](./gallery.md#soap-iridescence)** | **[Malachite Banding](./gallery.md#malachite-banding)** | **[Dunhuang Apsara](./gallery.md#dunhuang-apsara)** | **[Celtic Knotwork](./gallery.md#celtic-knotwork)** |
+| ![Soap Iridescence](images/soapiridescence.png) | ![Malachite Banding](images/malachitebanding.png) | ![Dunhuang Apsara](images/dunhuangapsara.png) | ![Celtic Knotwork](images/celticknotwork.png) |
+| **[Gyroid Surface](./gallery.md#gyroid-surface)** | **[Lichtenberg Tree](./gallery.md#lichtenberg-tree)** | **[Persian Tilework](./gallery.md#persian-tilework)** | **[Champlevé Enamel](./gallery.md#champleve-enamel)** |
+| ![Gyroid Surface](images/gyroidsurface.png) | ![Lichtenberg Tree](images/lichtenbergtree.png) | ![Persian Tilework](images/persiantilework.png) | ![Champleve Enamel](images/champleveenamel.png) |
 
-👉 **[View All 94 Artworks & Code Examples in `gallery.md` →](./gallery.md)**
+👉 **[View All 100 Artworks & Code Examples in `gallery.md` →](./gallery.md)**
 
 ### 🎞️ Seamless 600×600 HD Looping Animations (`DrawTimelapseFrames` + `ToGIF`)
 
@@ -228,9 +228,17 @@ _ = poster.ToPNG("poster_dunhuang.png")
 
 ## Supported Art Types & Constructors
 
-All 94 generators implement `generativeart.Engine` under package `github.com/jdxyw/generativeart/arts` (see [gallery.md](./gallery.md) for visual examples and [docs/doc.md](./docs/doc.md) for parameter details):
+All 100 generators implement `generativeart.Engine` under package `github.com/jdxyw/generativeart/arts` (see [gallery.md](./gallery.md) for visual examples and [docs/doc.md](./docs/doc.md) for parameter details):
 
 ```go
+// Wave 13: Kintsugi Ru-Ware, Water Caustics, Amethyst Geode, Celestial Armillary, Soap Iridescence & Botryoidal Malachite (100-Art Milestone)
+NewKintsugiPorcelain(shards, goldVeins int)
+NewWaterCaustics(stonesN int, waveAmp float64)
+NewAgateGeode(bandCount, crystalClusters int)
+NewCelestialArmillary(rings, constellations int)
+NewSoapIridescence(cells int, filmNm float64)
+NewMalachiteBanding(nodes, rings int)
+
 // Wave 12: Dunhuang Caisson, Celtic Knotwork, 3D Gyroid TPMS, Lichtenberg Plasma, Persian Muqarnas & Warring States Bronze
 NewDunhuangApsara(ribbons, haloRings int)
 NewCelticKnotwork(gridSize int, ribbonWidth float64)

@@ -106,6 +106,50 @@ func paramString(p map[string]interface{}, key, def string) string {
 }
 
 var registry = []ArtDescriptor{
+	// Wave 13: Kintsugi Ru-Ware, Water Caustics, Amethyst Geode, Celestial Armillary, Soap Iridescence & Botryoidal Malachite (100-Art Milestone)
+	{
+		ID: "kintsugiporcelain", StructName: "kintsugiPorcelain", Category: "media",
+		DefaultBG: color.RGBA{12, 14, 20, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewKintsugiPorcelain(paramInt(p, "shards", 96), paramInt(p, "goldVeins", 5))
+		},
+	},
+	{
+		ID: "watercaustics", StructName: "waterCaustics", Category: "flow",
+		DefaultBG: color.RGBA{8, 28, 44, 255}, DefaultPal: "oceanic",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewWaterCaustics(paramInt(p, "stonesN", 28), paramFloat(p, "waveAmp", 1.0))
+		},
+	},
+	{
+		ID: "agategeode", StructName: "agateGeode", Category: "geom",
+		DefaultBG: color.RGBA{12, 11, 18, 255}, DefaultPal: "cyberpunk",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewAgateGeode(paramInt(p, "bandCount", 26), paramInt(p, "crystalClusters", 36))
+		},
+	},
+	{
+		ID: "celestialarmillary", StructName: "celestialArmillary", Category: "geom",
+		DefaultBG: color.RGBA{8, 12, 24, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewCelestialArmillary(paramInt(p, "rings", 6), paramInt(p, "constellations", 12))
+		},
+	},
+	{
+		ID: "soapiridescence", StructName: "soapIridescence", Category: "bio",
+		DefaultBG: color.RGBA{6, 8, 16, 255}, DefaultPal: "cyberpunk",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewSoapIridescence(paramInt(p, "cells", 42), paramFloat(p, "filmNm", 480.0))
+		},
+	},
+	{
+		ID: "malachitebanding", StructName: "malachiteBanding", Category: "media",
+		DefaultBG: color.RGBA{5, 28, 18, 255}, DefaultPal: "botanical",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewMalachiteBanding(paramInt(p, "nodes", 14), paramInt(p, "rings", 22))
+		},
+	},
+
 	// Wave 12: Dunhuang Caisson, Celtic Knotwork, 3D Gyroid TPMS, Lichtenberg Plasma, Persian Muqarnas & Warring States Bronze
 	{
 		ID: "dunhuangapsara", StructName: "dunhuangApsara", Category: "media",
