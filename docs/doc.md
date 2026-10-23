@@ -1394,95 +1394,93 @@ ce := arts.NewChampleveEnamel(8, 4)
 
 ![](../images/champleveenamel.png)
 
-## Kintsugi Porcelain
+## Halvorsen Attractor
 
-`Kintsugi Porcelain` renders a Song-Dynasty Ru-ware celadon mallow-rimmed porcelain plate (汝窑天青八瓣葵口盘) with Voronoi ice-crackle glaze (冰裂纹开片), incised lotus relief, and 3D 24K gold Kintsugi lacquer seams (金缮描金).
-
-### parameters
-
-- shards: The number of Voronoi ice-crackle ceramic glaze shards across the plate.
-- goldVeins: The number of primary 24K gold Kintsugi repair veins radiating from the fracture hubs.
-
-```go
-kp := arts.NewKintsugiPorcelain(96, 5)
-```
-
-![](../images/kintsugiporcelain.png)
-
-## Water Caustics
-
-`Water Caustics` renders a crystal-clear sunlit turquoise pond with submerged agate river pebbles, swimming koi fish, and refractive optical caustic networks with chromatic dispersion.
+`Halvorsen Attractor` integrates the 3D cyclic-symmetric Halvorsen chaotic strange attractor along its $(1,1,1)$ trisector axis with thin-lens depth-of-field bokeh and 3-channel spectral velocity density mapping.
 
 ### parameters
 
-- stonesN: The number of submerged banded agate pebbles on the pond bed.
-- waveAmp: Controls the amplitude of the surface gravity-capillary water waves.
+- pointsN: The number of 4th-order Runge-Kutta integration steps.
+- alpha: The damping parameter $a$ of the Halvorsen system (default `1.4`).
 
 ```go
-wc := arts.NewWaterCaustics(28, 1.0)
+ha := arts.NewHalvorsenAttractor(1200000, 1.4)
 ```
 
-![](../images/watercaustics.png)
+![](../images/halvorsenattractor.png)
 
-## Agate Geode
+## Hyperbolic Fuchsian
 
-`Agate Geode` renders a cross-sectioned Brazilian amethyst and fortification agate geode (紫水晶洞与缠丝玛瑙切面) with rhythmic chalcedony mineral bands, gold-leaf veins, and 3D inward-pointing hexagonal quartz crystal prisms.
+`Hyperbolic Fuchsian` renders an *Indra's Pearls* Kleinian/Fuchsian Schottky circle-inversion limit set with 2x2 SSAA, conformal derivative lighting, and 3D spherical orbit-trap pearls.
 
 ### parameters
 
-- bandCount: The number of concentric fortification agate mineral rings.
-- crystalClusters: The number of inward-pointing 3D hexagonal amethyst crystal spears around the central druzy cavity.
+- maxIter: The maximum circle-inversion word depth.
+- zoom: The complex-plane zoom multiplier.
 
 ```go
-ag := arts.NewAgateGeode(26, 36)
+hf := arts.NewHyperbolicFuchsian(36, 1.0)
 ```
 
-![](../images/agategeode.png)
+![](../images/hyperbolicfuchsian.png)
 
-## Celestial Armillary
+## Abelian Sandpile
 
-`Celestial Armillary` renders a classical brass equatorial armillary sphere and astrolabe (浑天仪与二十八宿赤道星盘) with 3D tilted ecliptic/horizon rings, toothed clockwork gears, and lunar mansion constellation charts.
+`Abelian Sandpile` computes the exact Bak-Tang-Wiesenfeld Abelian Sandpile self-organized criticality fractal and toppling odometer field with 3D surface normal shading and crystal facets.
 
 ### parameters
 
-- rings: The number of concentric declination graticule rings.
-- constellations: The number of star constellation graphs plotted across the celestial vault.
+- grains: The number of sand grains dropped onto the lattice before toppling relaxation.
 
 ```go
-ca := arts.NewCelestialArmillary(6, 12)
+as := arts.NewAbelianSandpile(260000)
 ```
 
-![](../images/celestialarmillary.png)
+![](../images/abeliansandpile.png)
 
-## Soap Iridescence
+## Kuramoto Wave
 
-`Soap Iridescence` renders a Plateau's-law soap foam lattice with physical thin-film optical interference (纳米薄膜干涉牛顿环与皂膜晶格), Marangoni convection swirls, and 3D spherical meniscus highlights.
+`Kuramoto Wave` simulates a 2D coupled phase-oscillator chimera field with topological vortex/antivortex defects, branch-cut-free cyclic Oklab shading, 3D Blinn-Phong phase ridges, and Jobard-Lefer evenly-spaced phase-gradient streamlines.
 
 ### parameters
 
-- cells: The target number of soap bubble cells in the foam lattice.
-- filmNm: The base soap film thickness in nanometers (controlling the interference spectrum).
+- defectsN: The number of topological vortex and antivortex phase singularities.
+- streamlines: Target streamline density parameter.
 
 ```go
-si := arts.NewSoapIridescence(42, 480.0)
+kw := arts.NewKuramotoWave(8, 180)
 ```
 
-![](../images/soapiridescence.png)
+![](../images/kuramotowave.png)
 
-## Malachite Banding
+## Ford Circles
 
-`Malachite Banding` renders a polished Congolese botryoidal malachite and azurite mineral cross-section (孔雀石与蓝铜矿钟乳状同心截面) with smooth-union stalactite nuclei and Kajiya-Kay chatoyant velvet sheen.
+`Ford Circles` renders a conformal modular-group Farey-sequence and Ford-circle tangency gasket where circles $C(p/q)$ of radius $1/(2q^2)$ are mutually tangent iff $|ps - qr| = 1$.
 
 ### parameters
 
-- nodes: The number of botryoidal stalactite growth nuclei.
-- rings: The frequency of the concentric Liesegang malachite growth rings.
+- maxDenom: The maximum Farey fraction denominator $Q$.
 
 ```go
-mb := arts.NewMalachiteBanding(14, 22)
+fc := arts.NewFordCircles(14)
 ```
 
-![](../images/malachitebanding.png)
+![](../images/fordcircles.png)
+
+## Quantum Billiard
+
+`Quantum Billiard` renders Berry-Heller quantum chaos random-wave eigenfunctions and scarred probability densities $\Psi(x,y) = \sum c_m e^{i \mathbf{k}_m \cdot \mathbf{r}}$ alongside Bohmian quantum probability-current streamlines $\mathbf{J} = \text{Im}(\Psi^* \nabla \Psi)$.
+
+### parameters
+
+- modesN: The number of superposed plane-wave eigenstates on the energy shell.
+- waveNumber: Multiplier for the de Broglie wavenumber $k_0$.
+
+```go
+qb := arts.NewQuantumBilliard(48, 1.0)
+```
+
+![](../images/quantumbilliard.png)
 
 
 
