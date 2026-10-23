@@ -106,47 +106,47 @@ func paramString(p map[string]interface{}, key, def string) string {
 }
 
 var registry = []ArtDescriptor{
-	// Wave 13: Kintsugi Ru-Ware, Water Caustics, Amethyst Geode, Celestial Armillary, Soap Iridescence & Botryoidal Malachite (100-Art Milestone)
+	// Wave 13: 3D Halvorsen Attractor, Kleinian Fuchsian Pearls, Abelian Sandpile, Kuramoto Phase Defects, Farey Ford Circles & Quantum Chaos Scars (100-Art Milestone)
 	{
-		ID: "kintsugiporcelain", StructName: "kintsugiPorcelain", Category: "media",
-		DefaultBG: color.RGBA{12, 14, 20, 255}, DefaultPal: "dunhuang",
+		ID: "halvorsenattractor", StructName: "halvorsenAttractor", Category: "chaos",
+		DefaultBG: color.RGBA{4, 6, 14, 255}, DefaultPal: "cyberpunk",
 		Build: func(p map[string]interface{}) generativeart.Engine {
-			return NewKintsugiPorcelain(paramInt(p, "shards", 96), paramInt(p, "goldVeins", 5))
+			return NewHalvorsenAttractor(paramInt(p, "pointsN", 1200000), paramFloat(p, "alpha", 1.4))
 		},
 	},
 	{
-		ID: "watercaustics", StructName: "waterCaustics", Category: "flow",
-		DefaultBG: color.RGBA{8, 28, 44, 255}, DefaultPal: "oceanic",
+		ID: "hyperbolicfuchsian", StructName: "hyperbolicFuchsian", Category: "chaos",
+		DefaultBG: color.RGBA{7, 9, 18, 255}, DefaultPal: "dunhuang",
 		Build: func(p map[string]interface{}) generativeart.Engine {
-			return NewWaterCaustics(paramInt(p, "stonesN", 28), paramFloat(p, "waveAmp", 1.0))
+			return NewHyperbolicFuchsian(paramInt(p, "maxIter", 36), paramFloat(p, "zoom", 1.0))
 		},
 	},
 	{
-		ID: "agategeode", StructName: "agateGeode", Category: "geom",
-		DefaultBG: color.RGBA{12, 11, 18, 255}, DefaultPal: "cyberpunk",
+		ID: "abeliansandpile", StructName: "abelianSandpile", Category: "geom",
+		DefaultBG: color.RGBA{8, 14, 32, 255}, DefaultPal: "dunhuang",
 		Build: func(p map[string]interface{}) generativeart.Engine {
-			return NewAgateGeode(paramInt(p, "bandCount", 26), paramInt(p, "crystalClusters", 36))
+			return NewAbelianSandpile(paramInt(p, "grains", 260000))
 		},
 	},
 	{
-		ID: "celestialarmillary", StructName: "celestialArmillary", Category: "geom",
-		DefaultBG: color.RGBA{8, 12, 24, 255}, DefaultPal: "dunhuang",
+		ID: "kuramotowave", StructName: "kuramotoWave", Category: "flow",
+		DefaultBG: color.RGBA{8, 11, 22, 255}, DefaultPal: "dunhuang",
 		Build: func(p map[string]interface{}) generativeart.Engine {
-			return NewCelestialArmillary(paramInt(p, "rings", 6), paramInt(p, "constellations", 12))
+			return NewKuramotoWave(paramInt(p, "defectsN", 8), paramInt(p, "streamlines", 180))
 		},
 	},
 	{
-		ID: "soapiridescence", StructName: "soapIridescence", Category: "bio",
-		DefaultBG: color.RGBA{6, 8, 16, 255}, DefaultPal: "cyberpunk",
+		ID: "fordcircles", StructName: "fordCircles", Category: "geom",
+		DefaultBG: color.RGBA{8, 10, 20, 255}, DefaultPal: "dunhuang",
 		Build: func(p map[string]interface{}) generativeart.Engine {
-			return NewSoapIridescence(paramInt(p, "cells", 42), paramFloat(p, "filmNm", 480.0))
+			return NewFordCircles(paramInt(p, "maxDenom", 14))
 		},
 	},
 	{
-		ID: "malachitebanding", StructName: "malachiteBanding", Category: "media",
-		DefaultBG: color.RGBA{5, 28, 18, 255}, DefaultPal: "botanical",
+		ID: "quantumbilliard", StructName: "quantumBilliard", Category: "flow",
+		DefaultBG: color.RGBA{6, 9, 20, 255}, DefaultPal: "cyberpunk",
 		Build: func(p map[string]interface{}) generativeart.Engine {
-			return NewMalachiteBanding(paramInt(p, "nodes", 14), paramInt(p, "rings", 22))
+			return NewQuantumBilliard(paramInt(p, "modesN", 48), paramFloat(p, "waveNumber", 1.0))
 		},
 	},
 

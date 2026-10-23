@@ -139,13 +139,13 @@ With Packages 1 & 2 in place, the following 12 generators are unlocked:
 ## Part V. Next-Phase Roadmap (Directions 1–4)
 
 ### 5.1 Direction 1: Wave 13 — Reaching the 100 Generative Art Engines Milestone (+6 Engines — Implemented)
-Expand `arts/` from **94** to **100** generators with physical optics, caustics, thin-film interference, and classical horology/ceramics:
-1. **`KintsugiPorcelain`** (`NewKintsugiPorcelain(cracks, goldBranches int)`): Song-Dynasty Ru-ware celadon ice-crackle glaze (`汝窑冰裂纹开片`) repaired with 3D specular 24K gold Kintsugi lacquer seams (`金缮描金`).
-2. **`WaterCaustics`** (`NewWaterCaustics(waveModes int, dispersion float64)`): Refractive water-surface optical caustic network ($\det(J)^{-1}$ Jacobian ray convergence) with chromatic dispersion over submerged river stones.
-3. **`AgateGeode`** (`NewAgateGeode(rings, crystalClusters int)`): Cross-sectioned Brazilian amethyst geode cavity with concentric fortification agate banding and inward-pointing hexagonal quartz crystal prisms.
-4. **`CelestialArmillary`** (`NewCelestialArmillary(rings, stars int)`): Brass equatorial armillary sphere and astrolabe gearwork (`浑天仪与二十八宿星官图`) with graduated degree ticks and constellation geometry.
-5. **`SoapIridescence`** (`NewSoapIridescence(cells int, filmNm float64)`): Plateau's law foam lattice rendered with physical thin-film optical interference ($2 n d \cos\theta = m\lambda$) spectral iridescence.
-6. **`MalachiteBanding`** (`NewMalachiteBanding(centers, rings int)`): Botryoidal stalactitic malachite mineral cross-section with chatoyant velvet-green concentric rings.
+Expand `arts/` from **94** to **100** generators with pure mathematical attractors, Kleinian limit sets, self-organized criticality, topological phase defects, number-theoretic Ford circles, and quantum chaos:
+1. **`HalvorsenAttractor`** (`NewHalvorsenAttractor(pointsN int, alpha float64)`): 3-fold cyclic-symmetric 3D Halvorsen strange attractor nebula projected along $(1,1,1)$ with thin-lens DoF bokeh and 3-channel spectral velocity coloring.
+2. **`HyperbolicFuchsian`** (`NewHyperbolicFuchsian(maxIter int, zoom float64)`): *Indra's Pearls* Kleinian/Fuchsian Schottky circle-inversion limit set with 2×2 SSAA and 3D spherical orbit-trap pearls.
+3. **`AbelianSandpile`** (`NewAbelianSandpile(grains int)`): Bak-Tang-Wiesenfeld Abelian Sandpile self-organized criticality fractal and toppling odometer relief.
+4. **`KuramotoWave`** (`NewKuramotoWave(defectsN, streamlines int)`): Coupled phase-oscillator topological defect field with branch-cut-free cyclic Oklab shading and Jobard-Lefer phase-gradient streamlines.
+5. **`FordCircles`** (`NewFordCircles(maxDenom int)`): Conformal modular-group Farey-sequence and Ford-circle tangency gasket ($|ps - qr| = 1$).
+6. **`QuantumBilliard`** (`NewQuantumBilliard(modesN int, waveNumber float64)`): Berry-Heller quantum chaos random-wave eigenfunction scars and Bohmian probability-current streamlines ($\mathbf{J} = \text{Im}(\Psi^* \nabla \Psi)$).
 
 ### 5.2 Direction 2: Pure-Go WebAssembly (WASM) Interactive Gallery Playground
 - **Architecture (`wasm/main.go`, `GOOS=js GOARCH=wasm`)**:

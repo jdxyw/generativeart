@@ -50,13 +50,13 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
 
 ## Table of Contents
 
-- [Wave 13: Kintsugi Ru-Ware, Water Caustics, Amethyst Geode, Celestial Armillary, Soap Iridescence & Botryoidal Malachite (100-Art Milestone)](#wave-13-kintsugi-ru-ware-water-caustics-amethyst-geode-celestial-armillary-soap-iridescence--botryoidal-malachite-100-art-milestone)
-  - [Kintsugi Porcelain](#kintsugi-porcelain)
-  - [Water Caustics](#water-caustics)
-  - [Agate Geode](#agate-geode)
-  - [Celestial Armillary](#celestial-armillary)
-  - [Soap Iridescence](#soap-iridescence)
-  - [Malachite Banding](#malachite-banding)
+- [Wave 13: 3D Halvorsen Attractor, Kleinian Fuchsian Pearls, Abelian Sandpile, Kuramoto Phase Defects, Farey Ford Circles & Quantum Chaos Scars (100-Art Milestone)](#wave-13-3d-halvorsen-attractor-kleinian-fuchsian-pearls-abelian-sandpile-kuramoto-phase-defects-farey-ford-circles--quantum-chaos-scars-100-art-milestone)
+  - [Halvorsen Attractor](#halvorsen-attractor)
+  - [Hyperbolic Fuchsian](#hyperbolic-fuchsian)
+  - [Abelian Sandpile](#abelian-sandpile)
+  - [Kuramoto Wave](#kuramoto-wave)
+  - [Ford Circles](#ford-circles)
+  - [Quantum Billiard](#quantum-billiard)
 - [Wave 12: Dunhuang Caisson, Celtic Knotwork, 3D Gyroid TPMS, Lichtenberg Plasma, Persian Muqarnas & Warring States Bronze](#wave-12-dunhuang-caisson-celtic-knotwork-3d-gyroid-tpms-lichtenberg-plasma-persian-muqarnas--warring-states-bronze)
   - [Dunhuang Apsara](#dunhuang-apsara)
   - [Celtic Knotwork](#celtic-knotwork)
@@ -157,35 +157,9 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
 
 ---
 
-## Wave 13: Kintsugi Ru-Ware, Water Caustics, Amethyst Geode, Celestial Armillary, Soap Iridescence & Botryoidal Malachite (100-Art Milestone)
+## Wave 13: 3D Halvorsen Attractor, Kleinian Fuchsian Pearls, Abelian Sandpile, Kuramoto Phase Defects, Farey Ford Circles & Quantum Chaos Scars (100-Art Milestone)
 
-### Kintsugi Porcelain
-
-```go
-package main
-
-import (
-	"image/color"
-
-	"github.com/jdxyw/generativeart"
-	"github.com/jdxyw/generativeart/arts"
-	"github.com/jdxyw/generativeart/common"
-)
-
-func main() {
-	c := generativeart.NewCanva(600, 600)
-	c.SetSeed(20261023)
-	c.SetBackground(color.RGBA{R: 12, G: 14, B: 20, A: 255})
-	c.FillBackground()
-	c.SetColorSchema(common.Dunhuang)
-	c.Draw(arts.NewKintsugiPorcelain(96, 5))
-	c.ToPNG("kintsugiporcelain.png")
-}
-```
-
-![Kintsugi Porcelain](images/kintsugiporcelain.png)
-
-### Water Caustics
+### Halvorsen Attractor
 
 ```go
 package main
@@ -201,43 +175,17 @@ import (
 func main() {
 	c := generativeart.NewCanva(600, 600)
 	c.SetSeed(20261023)
-	c.SetBackground(color.RGBA{R: 8, G: 28, B: 44, A: 255})
-	c.FillBackground()
-	c.SetColorSchema(common.Oceanic)
-	c.Draw(arts.NewWaterCaustics(28, 1.0))
-	c.ToPNG("watercaustics.png")
-}
-```
-
-![Water Caustics](images/watercaustics.png)
-
-### Agate Geode
-
-```go
-package main
-
-import (
-	"image/color"
-
-	"github.com/jdxyw/generativeart"
-	"github.com/jdxyw/generativeart/arts"
-	"github.com/jdxyw/generativeart/common"
-)
-
-func main() {
-	c := generativeart.NewCanva(600, 600)
-	c.SetSeed(20261023)
-	c.SetBackground(color.RGBA{R: 12, G: 11, B: 18, A: 255})
+	c.SetBackground(color.RGBA{R: 4, G: 6, B: 14, A: 255})
 	c.FillBackground()
 	c.SetColorSchema(common.Cyberpunk)
-	c.Draw(arts.NewAgateGeode(26, 36))
-	c.ToPNG("agategeode.png")
+	c.Draw(arts.NewHalvorsenAttractor(1200000, 1.4))
+	c.ToPNG("halvorsenattractor.png")
 }
 ```
 
-![Agate Geode](images/agategeode.png)
+![Halvorsen Attractor](images/halvorsenattractor.png)
 
-### Celestial Armillary
+### Hyperbolic Fuchsian
 
 ```go
 package main
@@ -253,17 +201,17 @@ import (
 func main() {
 	c := generativeart.NewCanva(600, 600)
 	c.SetSeed(20261023)
-	c.SetBackground(color.RGBA{R: 8, G: 12, B: 24, A: 255})
+	c.SetBackground(color.RGBA{R: 7, G: 9, B: 18, A: 255})
 	c.FillBackground()
 	c.SetColorSchema(common.Dunhuang)
-	c.Draw(arts.NewCelestialArmillary(6, 12))
-	c.ToPNG("celestialarmillary.png")
+	c.Draw(arts.NewHyperbolicFuchsian(36, 1.0))
+	c.ToPNG("hyperbolicfuchsian.png")
 }
 ```
 
-![Celestial Armillary](images/celestialarmillary.png)
+![Hyperbolic Fuchsian](images/hyperbolicfuchsian.png)
 
-### Soap Iridescence
+### Abelian Sandpile
 
 ```go
 package main
@@ -279,41 +227,93 @@ import (
 func main() {
 	c := generativeart.NewCanva(600, 600)
 	c.SetSeed(20261023)
-	c.SetBackground(color.RGBA{R: 6, G: 8, B: 16, A: 255})
+	c.SetBackground(color.RGBA{R: 8, G: 14, B: 32, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewAbelianSandpile(260000))
+	c.ToPNG("abeliansandpile.png")
+}
+```
+
+![Abelian Sandpile](images/abeliansandpile.png)
+
+### Kuramoto Wave
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261023)
+	c.SetBackground(color.RGBA{R: 8, G: 11, B: 22, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewKuramotoWave(8, 180))
+	c.ToPNG("kuramotowave.png")
+}
+```
+
+![Kuramoto Wave](images/kuramotowave.png)
+
+### Ford Circles
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261023)
+	c.SetBackground(color.RGBA{R: 8, G: 10, B: 20, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewFordCircles(14))
+	c.ToPNG("fordcircles.png")
+}
+```
+
+![Ford Circles](images/fordcircles.png)
+
+### Quantum Billiard
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261023)
+	c.SetBackground(color.RGBA{R: 6, G: 9, B: 20, A: 255})
 	c.FillBackground()
 	c.SetColorSchema(common.Cyberpunk)
-	c.Draw(arts.NewSoapIridescence(42, 480.0))
-	c.ToPNG("soapiridescence.png")
+	c.Draw(arts.NewQuantumBilliard(48, 1.0))
+	c.ToPNG("quantumbilliard.png")
 }
 ```
 
-![Soap Iridescence](images/soapiridescence.png)
-
-### Malachite Banding
-
-```go
-package main
-
-import (
-	"image/color"
-
-	"github.com/jdxyw/generativeart"
-	"github.com/jdxyw/generativeart/arts"
-	"github.com/jdxyw/generativeart/common"
-)
-
-func main() {
-	c := generativeart.NewCanva(600, 600)
-	c.SetSeed(20261023)
-	c.SetBackground(color.RGBA{R: 5, G: 28, B: 18, A: 255})
-	c.FillBackground()
-	c.SetColorSchema(common.Botanical)
-	c.Draw(arts.NewMalachiteBanding(14, 22))
-	c.ToPNG("malachitebanding.png")
-}
-```
-
-![Malachite Banding](images/malachitebanding.png)
+![Quantum Billiard](images/quantumbilliard.png)
 
 ---
 
