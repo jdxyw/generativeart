@@ -36,6 +36,12 @@ func NewJoyDivision(lineNum int, ampScale, freqScale float64) *joyDivision {
 
 // Generative renders the Pulsar Horizon-Occluded Ridgeline Wave artwork onto the canvas.
 func (jd *joyDivision) Generative(c *generativeart.Canva) {
+	jd.GenerativeFrame(c, 0, 1, 0.0)
+}
+
+// GenerativeFrame renders frame frameIdx of a seamless 360-degree phase loop (phase in [0, 1)).
+func (jd *joyDivision) GenerativeFrame(c *generativeart.Canva, frameIdx, totalFrames int, loopPhase float64) {
+	animPhase := loopPhase * 2.0 * math.Pi
 	lineNum := jd.lineNum
 	if lineNum <= 0 {
 		lineNum = 72
@@ -59,7 +65,10 @@ func (jd *joyDivision) Generative(c *generativeart.Canva) {
 		scale = 1.0
 	}
 
-	seed := rand.Int63()
+	seed := c.Seed()
+	if seed == 0 {
+		seed = 202604
+	}
 	rng := rand.New(rand.NewSource(seed))
 	noise := common.NewNoiseEngine(seed)
 
@@ -128,10 +137,12 @@ func (jd *joyDivision) Generative(c *generativeart.Canva) {
 		yBase := common.Lerp(0.16*fh, 0.88*fh, rowFrac)
 
 		// Per-row pulsar sub-pulse drift so successive radio pulses evolve organically down the stack.
+		ox := 0.15 * (1.0 - math.Cos(animPhase))
+		oy := 0.15 * math.Sin(animPhase)
 		rowSeedY := float64(i) * 0.31 * freqScale
-		subShift1 := 0.28 + 0.09*noise.Simplex2D(rowFrac*3.2, 1.7)
-		subShift2 := -0.32 + 0.09*noise.Simplex2D(rowFrac*3.2, 8.4)
-		rowBurst := 0.72 + 0.42*noise.Simplex2D01(rowFrac*5.5, 3.9)
+		subShift1 := 0.28 + 0.09*noise.Simplex2D(rowFrac*3.2+ox, 1.7+oy) + 0.035*math.Sin(animPhase-rowFrac*math.Pi*2.0)
+		subShift2 := -0.32 + 0.09*noise.Simplex2D(rowFrac*3.2-oy, 8.4+ox) - 0.035*math.Sin(animPhase-rowFrac*math.Pi*2.0)
+		rowBurst := (0.72 + 0.42*noise.Simplex2D01(rowFrac*5.5+ox, 3.9+oy)) * (1.0 + 0.08*math.Sin(animPhase-rowFrac*math.Pi*2.0))
 
 		ridgePts := make([]render.Point, samples)
 		elevNorms := make([]float64, samples)
@@ -154,9 +165,9 @@ func (jd *joyDivision) Generative(c *generativeart.Canva) {
 
 			// Multi-octave Ridged2D + FBM2D noise and high-frequency carrier ripples.
 			nx := u * 3.6 * freqScale
-			ridged := noise.Ridged2D(nx+1.9, rowSeedY, 4, 2.15, 0.52)
-			fbm := 0.5 * (noise.FBM2D(nx*1.6-2.4, rowSeedY*1.2+4.1, 4, 2.0, 0.5) + 1.0)
-			carrier := 0.5 + 0.5*math.Cos((u*18.0*freqScale+noise.Simplex2D(nx*2.0, rowSeedY)*1.8)*math.Pi)
+			ridged := noise.Ridged2D(nx+1.9+ox, rowSeedY+oy, 4, 2.15, 0.52)
+			fbm := 0.5 * (noise.FBM2D(nx*1.6-2.4-oy, rowSeedY*1.2+4.1+ox, 4, 2.0, 0.5) + 1.0)
+			carrier := 0.5 + 0.5*math.Cos((u*18.0*freqScale+noise.Simplex2D(nx*2.0, rowSeedY)*1.8)*math.Pi-animPhase)
 
 			// Dramatic sharp pulsar peaks in the center, calm baseline micro-waves on the flanks.
 			centerSignal := (0.58*math.Pow(ridged, 1.25) + 0.27*fbm + 0.15*carrier*ridged) * pulsarEnv * rowBurst

@@ -49,14 +49,16 @@ type ribbonSample struct {
 
 // evalHarmonograph3D evaluates the 3D phase-shifted harmonograph/Lissajous surface at (u, s)
 // and applies a smooth 3D rotation across the ribbon family.
-func (lr *lissajousRibbon) evalHarmonograph3D(u, s float64) (rx, ry, rz float64) {
-	x := math.Sin(lr.freqX*u+s*1.4)*math.Cos(u*0.5+s*0.3) + 0.35*math.Sin(7.0*u-s*2.1)
-	y := math.Sin(lr.freqY*u+s*0.9)*math.Sin(u*0.5+s*0.5) + 0.35*math.Cos(5.0*u+s*1.7)
-	z := math.Cos(lr.freqZ*u + s*1.2)
+func (lr *lissajousRibbon) evalHarmonograph3D(u, s, animPhase float64) (rx, ry, rz float64) {
+	slowWave := 0.32 * math.Sin(animPhase)
+	slowCos := 0.28 * (1.0 - math.Cos(animPhase))
+	x := math.Sin(lr.freqX*u+s*1.4+slowWave)*math.Cos(u*0.5+s*0.3) + 0.35*math.Sin(7.0*u-s*2.1-slowCos)
+	y := math.Sin(lr.freqY*u+s*0.9+slowCos)*math.Sin(u*0.5+s*0.5) + 0.35*math.Cos(5.0*u+s*1.7+slowWave)
+	z := math.Cos(lr.freqZ*u + s*1.2 + slowWave)
 
-	// Slow 3D rotation (yaw + pitch) across s in [0, 1]
-	yaw := -0.32 + s*0.64
-	pitch := 0.26 + 0.16*math.Sin(s*math.Pi)
+	// Gentle 3D rotation (yaw + pitch) across s in [0, 1]
+	yaw := -0.32 + s*0.64 + 0.16*math.Sin(animPhase)
+	pitch := 0.26 + 0.16*math.Sin(s*math.Pi) + 0.10*(1.0-math.Cos(animPhase))
 
 	cy, sy := math.Cos(yaw), math.Sin(yaw)
 	cp, sp := math.Cos(pitch), math.Sin(pitch)
@@ -71,6 +73,12 @@ func (lr *lissajousRibbon) evalHarmonograph3D(u, s float64) (rx, ry, rz float64)
 
 // Generative renders the 3D Iridescent Harmonic Silk Caustic Sculpture into c.
 func (lr *lissajousRibbon) Generative(c *generativeart.Canva) {
+	lr.GenerativeFrame(c, 0, 1, 0.0)
+}
+
+// GenerativeFrame renders frame frameIdx of a seamless 360-degree phase loop (phase in [0, 1)).
+func (lr *lissajousRibbon) GenerativeFrame(c *generativeart.Canva, frameIdx, totalFrames int, loopPhase float64) {
+	animPhase := loopPhase * 2.0 * math.Pi
 	curvesN := lr.curvesN
 	freqX, freqY, freqZ := lr.freqX, lr.freqY, lr.freqZ
 	if curvesN <= 0 {
@@ -131,7 +139,7 @@ func (lr *lissajousRibbon) Generative(c *generativeart.Canva) {
 		row := make([]ribbonSample, uSteps+1)
 		for i := 0; i <= uSteps; i++ {
 			u := (float64(i) / float64(uSteps)) * 2.0 * math.Pi
-			x3, y3, z3 := lr.evalHarmonograph3D(u, s)
+			x3, y3, z3 := lr.evalHarmonograph3D(u, s, animPhase)
 			persp := fov / math.Max(0.8, fov+z3)
 			px := cx + x3*projScale*persp
 			py := cy + y3*projScale*persp
@@ -198,7 +206,7 @@ func (lr *lissajousRibbon) Generative(c *generativeart.Canva) {
 		}
 	}
 
-	rng := rand.New(rand.NewSource(rand.Int63()))
+	rng := rand.New(rand.NewSource(202603))
 	rc.SetBlendMode(render.BlendAdd)
 
 	// 3. Draw delicate sub-pixel sand filaments (18 grains) connecting corresponding points

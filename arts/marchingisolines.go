@@ -33,9 +33,15 @@ func NewMarchingIsolines(levels int, noiseScale float64) *marchingIsolines {
 
 // Generative renders the stepped Marching Squares topographic travertine terraces.
 func (mi *marchingIsolines) Generative(c *generativeart.Canva) {
+	mi.GenerativeFrame(c, 0, 1, 0.0)
+}
+
+// GenerativeFrame renders frame frameIdx of a seamless 360-degree phase loop (phase in [0, 1)).
+func (mi *marchingIsolines) GenerativeFrame(c *generativeart.Canva, frameIdx, totalFrames int, loopPhase float64) {
 	rc := c.NewRenderCanvas()
 	w, h := float64(c.Width()), float64(c.Height())
 	scale := math.Min(w, h) / 600.0
+	animPhase := loopPhase * 2.0 * math.Pi
 
 	// Curated Huanglong Karst Travertine & Dunhuang Mineral Palette
 	abyssalNavy := color.RGBA{R: 12, G: 22, B: 42, A: 255}
@@ -60,17 +66,19 @@ func (mi *marchingIsolines) Generative(c *generativeart.Canva) {
 	freq := 2.4 * mi.noiseScale / math.Max(1.0, math.Min(w, h))
 
 	// Domain-warped scalar elevation field with 2 gentle caldera peaks for dramatic terraced pools
+	ox := 0.15 * (1.0 - math.Cos(animPhase))
+	oy := 0.15 * math.Sin(animPhase)
 	evalScalarField := func(x, y float64) float64 {
 		u := x * freq
 		v := y * freq
-		wx := ne.FBM2D(u+1.7, v+9.2, 3, 2.0, 0.5) * 0.55
-		wy := ne.FBM2D(u+8.3, v+2.8, 3, 2.0, 0.5) * 0.55
-		fbm := 0.5 + 0.5*ne.FBM2D(u+wx, v+wy, 4, 2.05, 0.5)
+		wx := ne.FBM2D(u+1.7+ox, v+9.2+oy, 3, 2.0, 0.5) * 0.55
+		wy := ne.FBM2D(u+8.3-oy, v+2.8+ox, 3, 2.0, 0.5) * 0.55
+		fbm := 0.5 + 0.5*ne.FBM2D(u+wx+ox*0.25, v+wy+oy*0.25, 4, 2.05, 0.5)
 
-		// Add two organic mountain/pool domes
-		d1 := math.Hypot((x-0.34*w)/w, (y-0.36*h)/h)
-		d2 := math.Hypot((x-0.68*w)/w, (y-0.66*h)/h)
-		dome := 0.32*math.Exp(-d1*d1*6.5) + 0.28*math.Exp(-d2*d2*7.5)
+		// Add two organic mountain/pool domes that gently breathe and orbit
+		d1 := math.Hypot((x-(0.34+0.014*math.Sin(animPhase))*w)/w, (y-(0.36+0.014*(1.0-math.Cos(animPhase)))*h)/h)
+		d2 := math.Hypot((x-(0.68-0.014*math.Sin(animPhase))*w)/w, (y-(0.66-0.014*(1.0-math.Cos(animPhase)))*h)/h)
+		dome := 0.32*(1.0+0.07*math.Sin(animPhase))*math.Exp(-d1*d1*6.5) + 0.28*(1.0-0.07*math.Sin(animPhase))*math.Exp(-d2*d2*7.5)
 
 		return common.Constrain(fbm*0.76+dome-0.06, 0, 1)
 	}
