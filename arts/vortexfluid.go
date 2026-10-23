@@ -3,6 +3,8 @@ package arts
 import (
 	"image/color"
 	"math"
+	"runtime"
+	"sync"
 
 	"github.com/jdxyw/generativeart"
 	"github.com/jdxyw/generativeart/common"
@@ -33,10 +35,16 @@ func NewVortexFluid(vorticesN, steps int) *vortexFluid {
 
 // Generative renders the Jovian vortex fluid bands and contour filaments.
 func (vf *vortexFluid) Generative(c *generativeart.Canva) {
+	vf.GenerativeFrame(c, 0, 1, 0.0)
+}
+
+// GenerativeFrame renders frame frameIdx of a seamless 360-degree phase loop (phase in [0, 1)).
+func (vf *vortexFluid) GenerativeFrame(c *generativeart.Canva, frameIdx, totalFrames int, loopPhase float64) {
 	rc := c.NewRenderCanvas()
 	w, h := c.Width(), c.Height()
 	fw, fh := float64(w), float64(h)
 	scale := math.Min(fw, fh) / 600.0
+	animPhase := loopPhase * 2.0 * math.Pi
 
 	// Curated NASA Juno Jovian Atmospheric Palette
 	deepAbyss := color.RGBA{R: 12, G: 22, B: 46, A: 255}
@@ -86,21 +94,23 @@ func (vf *vortexFluid) Generative(c *generativeart.Canva) {
 		}
 		rad := (42.0 + 24.0*math.Sin(float64(i)*1.9)) * scale
 		vortices = append(vortices, rankineVortex{
-			x:      vx,
-			y:      vy,
+			x:      vx + 3.2*scale*math.Sin(animPhase)*math.Cos(float64(i)*1.1),
+			y:      vy + 2.6*scale*(1.0-math.Cos(animPhase))*math.Sin(float64(i)*1.4),
 			radius: rad,
-			gamma:  sign * (125.0 + 35.0*math.Cos(float64(i)*1.3)) * scale,
+			gamma:  sign * (125.0 + 35.0*math.Cos(float64(i)*1.3)) * scale * (1.0 + 0.08*math.Sin(animPhase+float64(i))),
 		})
 	}
 
 	ne := common.NewNoiseEngine(202617)
+	ox := 0.14 * (1.0 - math.Cos(animPhase))
+	oy := 0.14 * math.Sin(animPhase)
 
 	// Velocity field combining zonal shear jets + Rankine vortices + curl turbulence
 	velocityAt := func(x, y float64) render.Point {
 		ny := y / fh
 		// Alternating east-west Jovian zonal jet streams
 		vx := 28.0 * scale * math.Cos(ny*2.0*math.Pi*3.0)
-		vy := 4.5 * scale * math.Sin((x/fw)*2.0*math.Pi*2.0)
+		vy := 4.5 * scale * math.Sin((x/fw)*2.0*math.Pi*2.0-animPhase)
 
 		for _, v := range vortices {
 			dx := x - v.x
@@ -115,7 +125,7 @@ func (vf *vortexFluid) Generative(c *generativeart.Canva) {
 			vy += dx * omega * 0.78
 		}
 
-		curl := ne.Curl2D(x/(190.0*scale), y/(190.0*scale), 1e-3)
+		curl := ne.Curl2D(x/(190.0*scale)+ox, y/(190.0*scale)+oy, 1e-3)
 		vx += curl.X * 14.0 * scale
 		vy += curl.Y * 14.0 * scale
 		return render.Pt(vx, vy)
@@ -141,10 +151,10 @@ func (vf *vortexFluid) Generative(c *generativeart.Canva) {
 			px -= (dt / 6.0) * (v1.X + 2.0*v2.X + 2.0*v3.X + v4.X)
 			py -= (dt / 6.0) * (v1.Y + 2.0*v2.Y + 2.0*v3.Y + v4.Y)
 		}
-		// Initial stratified latitude dye + fine harmonic bands
+		// Initial stratified latitude dye + gentle Rossby wave breathing
 		lat := py / fh
 		lon := px / fw
-		wave := 0.5 + 0.5*math.Sin(lat*2.0*math.Pi*2.6+0.35*math.Sin(lon*2.0*math.Pi*2.0))
+		wave := 0.5 + 0.5*math.Sin(lat*2.0*math.Pi*2.6+0.35*math.Sin(lon*2.0*math.Pi*2.0-0.45* math.Sin(animPhase)))
 		// Boost warm core inside primary Great Red Spot
 		dRed := math.Hypot((x-vortices[0].x)/(vortices[0].radius*1.15), (y-vortices[0].y)/(vortices[0].radius*0.88))
 		if dRed < 1.2 {
@@ -165,16 +175,30 @@ func (vf *vortexFluid) Generative(c *generativeart.Canva) {
 		greatRedSpot,
 	)
 
-	// 1. Evaluate Advected Dye Field on Full Pixel Grid & Compute Cloud-Top 3D Relief Shading
+	// 1. Evaluate Advected Dye Field on Full Pixel Grid in Parallel & Compute Cloud-Top 3D Relief Shading
 	scalarGrid := make([]float64, w*h)
-	for y := 0; y < h; y++ {
-		fy := float64(y) + 0.5
-		rowOff := y * w
-		for x := 0; x < w; x++ {
-			fx := float64(x) + 0.5
-			scalarGrid[rowOff+x] = traceDyeScalar(fx, fy)
-		}
+	workers := runtime.NumCPU()
+	if workers < 1 {
+		workers = 1
 	}
+	var wg sync.WaitGroup
+	for wIdx := 0; wIdx < workers; wIdx++ {
+		y0 := (wIdx * h) / workers
+		y1 := ((wIdx + 1) * h) / workers
+		wg.Add(1)
+		go func(rowStart, rowEnd int) {
+			defer wg.Done()
+			for y := rowStart; y < rowEnd; y++ {
+				fy := float64(y) + 0.5
+				rowOff := y * w
+				for x := 0; x < w; x++ {
+					fx := float64(x) + 0.5
+					scalarGrid[rowOff+x] = traceDyeScalar(fx, fy)
+				}
+			}
+		}(y0, y1)
+	}
+	wg.Wait()
 
 	for y := 0; y < h; y++ {
 		rowOff := y * w
