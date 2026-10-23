@@ -4,8 +4,8 @@ This document serves as the architectural blueprint for `generativeart`, coverin
 1. **Core Engine Refactoring & Performance Upgrades (Package 1 — Implemented)**
 2. **Computational Geometry, Topological Fields & 2D SDF Engine (Package 2 — Implemented)**
 3. **Platform & Export Foundations (Package 3 — Implemented: Dual Vector/HDR Backend, `DrawTimelapse` HD GIF, PNG `tEXt` Recipes & `cmd/genart` CLI)**
-4. **Waves 9–12 `arts/` Visual Paradigms (94 Art Engines + 8 HD 600×600 Loop GIFs — Implemented)**
-5. **Next-Phase Roadmap: Exhibition Poster & ContactSheet Engine, Wave 13 (100-Art Milestone), Pure-Go WASM Playground & HD GIF Expansion**
+4. **Waves 9–13 `arts/` Visual Paradigms (100 Art Engines + 8 HD 600×600 Loop GIFs — Implemented)**
+5. **Next-Phase Roadmap: Exhibition Poster & ContactSheet Engine (Implemented), Wave 13 100-Art Milestone (Implemented), Pure-Go WASM Playground & HD GIF Expansion**
 
 ---
 
@@ -138,7 +138,7 @@ With Packages 1 & 2 in place, the following 12 generators are unlocked:
 
 ## Part V. Next-Phase Roadmap (Directions 1–4)
 
-### 5.1 Direction 1: Wave 13 — Reaching the 100 Generative Art Engines Milestone (+6 Engines)
+### 5.1 Direction 1: Wave 13 — Reaching the 100 Generative Art Engines Milestone (+6 Engines — Implemented)
 Expand `arts/` from **94** to **100** generators with physical optics, caustics, thin-film interference, and classical horology/ceramics:
 1. **`KintsugiPorcelain`** (`NewKintsugiPorcelain(cracks, goldBranches int)`): Song-Dynasty Ru-ware celadon ice-crackle glaze (`汝窑冰裂纹开片`) repaired with 3D specular 24K gold Kintsugi lacquer seams (`金缮描金`).
 2. **`WaterCaustics`** (`NewWaterCaustics(waveModes int, dispersion float64)`): Refractive water-surface optical caustic network ($\det(J)^{-1}$ Jacobian ray convergence) with chromatic dispersion over submerged river stones.

@@ -122,7 +122,7 @@ The standalone CLI (`cmd/genart`) provides 5 subcommands for listing generators,
 
 ### 1. `genart list`
 
-Lists all 94 registered art generators (with category and default palette) and all 12+ built-in color palettes:
+Lists all 100 registered art generators (with category and default palette) and all 12+ built-in color palettes:
 
 ```bash
 go run ./cmd/genart list
@@ -1393,6 +1393,97 @@ ce := arts.NewChampleveEnamel(8, 4)
 ```
 
 ![](../images/champleveenamel.png)
+
+## Kintsugi Porcelain
+
+`Kintsugi Porcelain` renders a Song-Dynasty Ru-ware celadon mallow-rimmed porcelain plate (汝窑天青八瓣葵口盘) with Voronoi ice-crackle glaze (冰裂纹开片), incised lotus relief, and 3D 24K gold Kintsugi lacquer seams (金缮描金).
+
+### parameters
+
+- shards: The number of Voronoi ice-crackle ceramic glaze shards across the plate.
+- goldVeins: The number of primary 24K gold Kintsugi repair veins radiating from the fracture hubs.
+
+```go
+kp := arts.NewKintsugiPorcelain(96, 5)
+```
+
+![](../images/kintsugiporcelain.png)
+
+## Water Caustics
+
+`Water Caustics` renders a crystal-clear sunlit turquoise pond with submerged agate river pebbles, swimming koi fish, and refractive optical caustic networks with chromatic dispersion.
+
+### parameters
+
+- stonesN: The number of submerged banded agate pebbles on the pond bed.
+- waveAmp: Controls the amplitude of the surface gravity-capillary water waves.
+
+```go
+wc := arts.NewWaterCaustics(28, 1.0)
+```
+
+![](../images/watercaustics.png)
+
+## Agate Geode
+
+`Agate Geode` renders a cross-sectioned Brazilian amethyst and fortification agate geode (紫水晶洞与缠丝玛瑙切面) with rhythmic chalcedony mineral bands, gold-leaf veins, and 3D inward-pointing hexagonal quartz crystal prisms.
+
+### parameters
+
+- bandCount: The number of concentric fortification agate mineral rings.
+- crystalClusters: The number of inward-pointing 3D hexagonal amethyst crystal spears around the central druzy cavity.
+
+```go
+ag := arts.NewAgateGeode(26, 36)
+```
+
+![](../images/agategeode.png)
+
+## Celestial Armillary
+
+`Celestial Armillary` renders a classical brass equatorial armillary sphere and astrolabe (浑天仪与二十八宿赤道星盘) with 3D tilted ecliptic/horizon rings, toothed clockwork gears, and lunar mansion constellation charts.
+
+### parameters
+
+- rings: The number of concentric declination graticule rings.
+- constellations: The number of star constellation graphs plotted across the celestial vault.
+
+```go
+ca := arts.NewCelestialArmillary(6, 12)
+```
+
+![](../images/celestialarmillary.png)
+
+## Soap Iridescence
+
+`Soap Iridescence` renders a Plateau's-law soap foam lattice with physical thin-film optical interference (纳米薄膜干涉牛顿环与皂膜晶格), Marangoni convection swirls, and 3D spherical meniscus highlights.
+
+### parameters
+
+- cells: The target number of soap bubble cells in the foam lattice.
+- filmNm: The base soap film thickness in nanometers (controlling the interference spectrum).
+
+```go
+si := arts.NewSoapIridescence(42, 480.0)
+```
+
+![](../images/soapiridescence.png)
+
+## Malachite Banding
+
+`Malachite Banding` renders a polished Congolese botryoidal malachite and azurite mineral cross-section (孔雀石与蓝铜矿钟乳状同心截面) with smooth-union stalactite nuclei and Kajiya-Kay chatoyant velvet sheen.
+
+### parameters
+
+- nodes: The number of botryoidal stalactite growth nuclei.
+- rings: The frequency of the concentric Liesegang malachite growth rings.
+
+```go
+mb := arts.NewMalachiteBanding(14, 22)
+```
+
+![](../images/malachitebanding.png)
+
 
 
 
