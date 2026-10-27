@@ -50,6 +50,13 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
 
 ## Table of Contents
 
+- [Wave 14: Riemann Zeta Critical Strip, 3D Hopf Fibration, Thomas Labyrinth Attractor, 12-Fold Faraday Quasicrystal Waves, Conformal Möbius Loxodrome & FTLE Lagrangian Coherent Structures](#wave-14-riemann-zeta-critical-strip-3d-hopf-fibration-thomas-labyrinth-attractor-12-fold-faraday-quasicrystal-waves-conformal-möbius-loxodrome--ftle-lagrangian-coherent-structures)
+  - [Riemann Zeta](#riemann-zeta)
+  - [Hopf Fibration](#hopf-fibration)
+  - [Thomas Attractor](#thomas-attractor)
+  - [Faraday Waves](#faraday-waves)
+  - [Mobius Loxodrome](#mobius-loxodrome)
+  - [Lagrangian Coherent](#lagrangian-coherent)
 - [Wave 13: 3D Halvorsen Attractor, Kleinian Fuchsian Pearls, Abelian Sandpile, Kuramoto Phase Defects, Farey Ford Circles & Quantum Chaos Scars (100-Art Milestone)](#wave-13-3d-halvorsen-attractor-kleinian-fuchsian-pearls-abelian-sandpile-kuramoto-phase-defects-farey-ford-circles--quantum-chaos-scars-100-art-milestone)
   - [Halvorsen Attractor](#halvorsen-attractor)
   - [Hyperbolic Fuchsian](#hyperbolic-fuchsian)
@@ -154,6 +161,166 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
   - [Silk Sky](#silk-sky)
   - [Circle Move](#circle-move)
   - [Random Circle](#random-circle)
+
+---
+
+## Wave 14: Riemann Zeta Critical Strip, 3D Hopf Fibration, Thomas Labyrinth Attractor, 12-Fold Faraday Quasicrystal Waves, Conformal Möbius Loxodrome & FTLE Lagrangian Coherent Structures
+
+### Riemann Zeta
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261027)
+	c.SetBackground(color.RGBA{R: 6, G: 9, B: 18, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewRiemannZeta(26, 16))
+	c.ToPNG("riemannzeta.png")
+}
+```
+
+![Riemann Zeta](images/riemannzeta.png)
+
+### Hopf Fibration
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261027)
+	c.SetBackground(color.RGBA{R: 6, G: 8, B: 18, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewHopfFibration(4, 24))
+	c.ToPNG("hopffibration.png")
+}
+```
+
+![Hopf Fibration](images/hopffibration.png)
+
+### Thomas Attractor
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261027)
+	c.SetBackground(color.RGBA{R: 4, G: 7, B: 16, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewThomasAttractor(900000, 0.19))
+	c.ToPNG("thomasattractor.png")
+}
+```
+
+![Thomas Attractor](images/thomasattractor.png)
+
+### Faraday Waves
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261027)
+	c.SetBackground(color.RGBA{R: 7, G: 11, B: 24, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewFaradayWaves(12, 1.0))
+	c.ToPNG("faradaywaves.png")
+}
+```
+
+![Faraday Waves](images/faradaywaves.png)
+
+### Mobius Loxodrome
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261027)
+	c.SetBackground(color.RGBA{R: 7, G: 9, B: 18, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewMobiusLoxodrome(14, 44))
+	c.ToPNG("mobiusloxodrome.png")
+}
+```
+
+![Mobius Loxodrome](images/mobiusloxodrome.png)
+
+### Lagrangian Coherent
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261027)
+	c.SetBackground(color.RGBA{R: 5, G: 8, B: 18, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Cyberpunk)
+	c.Draw(arts.NewLagrangianCoherent(18, 1.0))
+	c.ToPNG("lagrangiancoherent.png")
+}
+```
+
+![Lagrangian Coherent](images/lagrangiancoherent.png)
 
 ---
 

@@ -1482,6 +1482,97 @@ qb := arts.NewQuantumBilliard(48, 1.0)
 
 ![](../images/quantumbilliard.png)
 
+## Riemann Zeta
+
+`Riemann Zeta` renders a complex phase portrait of the Riemann Zeta function $\zeta(s)$ across the critical strip $\text{Re}(s) = \frac{1}{2}$ using Borwein's Chebyshev-accelerated Dirichlet series, 3D log-modulus contour relief, $\text{Re}\,\zeta = 0 / \text{Im}\,\zeta = 0$ orthogonal contours, and Jobard-Lefer Newton-flow streamlines converging onto the non-trivial zeros.
+
+### parameters
+
+- termsN: The number of Borwein Chebyshev acceleration terms.
+- phaseRays: The number of iso-phase rays per $2\pi$ cycle.
+
+```go
+rz := arts.NewRiemannZeta(26, 16)
+```
+
+![](../images/riemannzeta.png)
+
+## Hopf Fibration
+
+`Hopf Fibration` renders the 3D stereographic projection of the $S^3 \to S^2$ Hopf fibration into linked Villarceau circles sweeping nested Clifford tori with true 3D depth-sorted occlusion and tubular shading.
+
+### parameters
+
+- toriN: The number of nested Clifford torus shells.
+- fibersPerTorus: The base number of linked Villarceau fiber circles per torus shell.
+
+```go
+hf := arts.NewHopfFibration(4, 24)
+```
+
+![](../images/hopffibration.png)
+
+## Thomas Attractor
+
+`Thomas Attractor` integrates René Thomas's 3D cyclically symmetric labyrinth chaotic strange attractor ($\dot{x} = \sin y - b x$) with 6-fold octahedral symmetry permutations, thin-lens DoF bokeh, and spectral density mapping.
+
+### parameters
+
+- pointsN: The total number of 4th-order Runge-Kutta integration steps.
+- dampingB: The dissipation constant $b$ (default `0.19`).
+
+```go
+ta := arts.NewThomasAttractor(900000, 0.19)
+```
+
+![](../images/thomasattractor.png)
+
+## Faraday Waves
+
+`Faraday Waves` simulates 12-fold dodecagonal quasicrystalline Faraday capillary standing waves with resonant triad coupling, analytical 3D normal Blinn-Phong liquid-metal shading, and Marching Squares contours.
+
+### parameters
+
+- symmetry: The rotational quasicrystal symmetry order (default `12`).
+- harmonicScale: Spatial frequency multiplier for the capillary wave vectors.
+
+```go
+fw := arts.NewFaradayWaves(12, 1.0)
+```
+
+![](../images/faradaywaves.png)
+
+## Mobius Loxodrome
+
+`Mobius Loxodrome` applies a conformal double-spiral Möbius transformation to a doubly-periodic hexagonal Doyle lattice, mapping cylinder circles to exact tangent 3D jewel spheres spiraling out of a source pole and plunging into a sink pole.
+
+### parameters
+
+- arms: The number of loxodromic spiral arms around the poles.
+- spheresPerArm: The number of conformal sphere steps along each spiral arm.
+
+```go
+ml := arts.NewMobiusLoxodrome(14, 44)
+```
+
+![](../images/mobiusloxodrome.png)
+
+## Lagrangian Coherent
+
+`Lagrangian Coherent` computes the forward and backward Finite-Time Lyapunov Exponent (FTLE) fields from the Cauchy-Green strain tensor $\mathbf{C} = (\nabla \Phi_0^T)^\top (\nabla \Phi_0^T)$ of a chaotic double-gyre vortex flow, revealing intersecting repelling and attracting Lagrangian Coherent Structures (homoclinic/heteroclinic tangles).
+
+### parameters
+
+- advSteps: The number of RK4 advection steps for the flow map $\Phi_0^T$.
+- ftlScale: Velocity and strain amplification multiplier.
+
+```go
+lc := arts.NewLagrangianCoherent(18, 1.0)
+```
+
+![](../images/lagrangiancoherent.png)
+
+
 
 
 

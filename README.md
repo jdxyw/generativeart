@@ -4,7 +4,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/jdxyw/generativeart)](https://goreportcard.com/report/github.com/jdxyw/generativeart)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/jdxyw/generativeart/master/LICENSE)
 
-`generativeart` is a pure-`Go` generative art engine and algorithm collection supporting **100 generative art types** across flow fields, strange attractors, biological morphogenesis, 3D SDF raymarching, optical caustics, thin-film interference, non-Euclidean geometry, quasicrystals, stained-glass mosaics, cloisonné enamel, 3D origami, and traditional printmaking.
+`generativeart` is a pure-`Go` generative art engine and algorithm collection supporting **106 generative art types** across flow fields, strange attractors, biological morphogenesis, 3D SDF raymarching, complex phase portraits, differential topology, non-Euclidean geometry, quasicrystals, stained-glass mosaics, cloisonné enamel, 3D origami, and traditional printmaking.
 
 - 🌐 **Live Interactive Web Gallery (GitHub Pages)**: **[https://jdxyw.github.io/generativeart/](https://jdxyw.github.io/generativeart/)**
 - 🖼️ **Full Code & Image Gallery (`gallery.md`)**: **[./gallery.md](./gallery.md)**
@@ -15,17 +15,17 @@
 
 ## Featured Gallery Highlights
 
-> Browse all **100 artworks**, full `Go` source snippets, and rendered previews in **[`gallery.md`](./gallery.md)** or on the **[Interactive GitHub Pages Gallery](https://jdxyw.github.io/generativeart/)**.
+> Browse all **106 artworks**, full `Go` source snippets, and rendered previews in **[`gallery.md`](./gallery.md)** or on the **[Interactive GitHub Pages Gallery](https://jdxyw.github.io/generativeart/)**.
 
-| [Halvorsen Attractor](./gallery.md#halvorsen-attractor) | [Hyperbolic Fuchsian](./gallery.md#hyperbolic-fuchsian) | [Abelian Sandpile](./gallery.md#abelian-sandpile) | [Kuramoto Wave](./gallery.md#kuramoto-wave) |
+| [Riemann Zeta](./gallery.md#riemann-zeta) | [Hopf Fibration](./gallery.md#hopf-fibration) | [Thomas Attractor](./gallery.md#thomas-attractor) | [Faraday Waves](./gallery.md#faraday-waves) |
 | :---: | :---: | :---: | :---: |
-| ![Halvorsen Attractor](images/halvorsenattractor.png) | ![Hyperbolic Fuchsian](images/hyperbolicfuchsian.png) | ![Abelian Sandpile](images/abeliansandpile.png) | ![Kuramoto Wave](images/kuramotowave.png) |
-| **[Ford Circles](./gallery.md#ford-circles)** | **[Quantum Billiard](./gallery.md#quantum-billiard)** | **[Dunhuang Apsara](./gallery.md#dunhuang-apsara)** | **[Celtic Knotwork](./gallery.md#celtic-knotwork)** |
-| ![Ford Circles](images/fordcircles.png) | ![Quantum Billiard](images/quantumbilliard.png) | ![Dunhuang Apsara](images/dunhuangapsara.png) | ![Celtic Knotwork](images/celticknotwork.png) |
-| **[Gyroid Surface](./gallery.md#gyroid-surface)** | **[Lichtenberg Tree](./gallery.md#lichtenberg-tree)** | **[Persian Tilework](./gallery.md#persian-tilework)** | **[Champlevé Enamel](./gallery.md#champleve-enamel)** |
-| ![Gyroid Surface](images/gyroidsurface.png) | ![Lichtenberg Tree](images/lichtenbergtree.png) | ![Persian Tilework](images/persiantilework.png) | ![Champleve Enamel](images/champleveenamel.png) |
+| ![Riemann Zeta](images/riemannzeta.png) | ![Hopf Fibration](images/hopffibration.png) | ![Thomas Attractor](images/thomasattractor.png) | ![Faraday Waves](images/faradaywaves.png) |
+| **[Möbius Loxodrome](./gallery.md#mobius-loxodrome)** | **[Lagrangian Coherent](./gallery.md#lagrangian-coherent)** | **[Hyperbolic Fuchsian](./gallery.md#hyperbolic-fuchsian)** | **[Abelian Sandpile](./gallery.md#abelian-sandpile)** |
+| ![Mobius Loxodrome](images/mobiusloxodrome.png) | ![Lagrangian Coherent](images/lagrangiancoherent.png) | ![Hyperbolic Fuchsian](images/hyperbolicfuchsian.png) | ![Abelian Sandpile](images/abeliansandpile.png) |
+| **[Kuramoto Wave](./gallery.md#kuramoto-wave)** | **[Halvorsen Attractor](./gallery.md#halvorsen-attractor)** | **[Ford Circles](./gallery.md#ford-circles)** | **[Quantum Billiard](./gallery.md#quantum-billiard)** |
+| ![Kuramoto Wave](images/kuramotowave.png) | ![Halvorsen Attractor](images/halvorsenattractor.png) | ![Ford Circles](images/fordcircles.png) | ![Quantum Billiard](images/quantumbilliard.png) |
 
-👉 **[View All 100 Artworks & Code Examples in `gallery.md` →](./gallery.md)**
+👉 **[View All 106 Artworks & Code Examples in `gallery.md` →](./gallery.md)**
 
 ### 🎞️ Seamless 600×600 HD Looping Animations (`DrawTimelapseFrames` + `ToGIF`)
 
@@ -230,9 +230,17 @@ _ = poster.ToPNG("poster_dunhuang.png")
 
 ## Supported Art Types & Constructors
 
-All 100 generators implement `generativeart.Engine` under package `github.com/jdxyw/generativeart/arts` (see [gallery.md](./gallery.md) for visual examples and [docs/doc.md](./docs/doc.md) for parameter details):
+All 106 generators implement `generativeart.Engine` under package `github.com/jdxyw/generativeart/arts` (see [gallery.md](./gallery.md) for visual examples and [docs/doc.md](./docs/doc.md) for parameter details):
 
 ```go
+// Wave 14: Riemann Zeta Critical Strip, 3D Hopf Fibration, Thomas Labyrinth Attractor, 12-Fold Faraday Quasicrystal Waves, Conformal Möbius Loxodrome & FTLE Lagrangian Coherent Structures
+NewRiemannZeta(termsN, phaseRays int)
+NewHopfFibration(toriN, fibersPerTorus int)
+NewThomasAttractor(pointsN int, dampingB float64)
+NewFaradayWaves(symmetry int, harmonicScale float64)
+NewMobiusLoxodrome(arms, spheresPerArm int)
+NewLagrangianCoherent(advSteps int, ftlScale float64)
+
 // Wave 13: 3D Halvorsen Attractor, Kleinian Fuchsian Pearls, Abelian Sandpile, Kuramoto Phase Defects, Farey Ford Circles & Quantum Chaos Scars (100-Art Milestone)
 NewHalvorsenAttractor(pointsN int, alpha float64)
 NewHyperbolicFuchsian(maxIter int, zoom float64)
