@@ -106,6 +106,50 @@ func paramString(p map[string]interface{}, key, def string) string {
 }
 
 var registry = []ArtDescriptor{
+	// Wave 14: Riemann Zeta Critical Strip, 3D Hopf Fibration, Thomas Labyrinth Attractor, 12-Fold Faraday Quasicrystal Waves, Conformal Möbius Loxodrome & FTLE Lagrangian Coherent Structures
+	{
+		ID: "riemannzeta", StructName: "riemannZeta", Category: "chaos",
+		DefaultBG: color.RGBA{6, 9, 18, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewRiemannZeta(paramInt(p, "termsN", 26), paramInt(p, "phaseRays", 16))
+		},
+	},
+	{
+		ID: "hopffibration", StructName: "hopfFibration", Category: "geom",
+		DefaultBG: color.RGBA{6, 8, 18, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewHopfFibration(paramInt(p, "toriN", 4), paramInt(p, "fibersPerTorus", 24))
+		},
+	},
+	{
+		ID: "thomasattractor", StructName: "thomasAttractor", Category: "chaos",
+		DefaultBG: color.RGBA{4, 7, 16, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewThomasAttractor(paramInt(p, "pointsN", 900000), paramFloat(p, "dampingB", 0.19))
+		},
+	},
+	{
+		ID: "faradaywaves", StructName: "faradayWaves", Category: "flow",
+		DefaultBG: color.RGBA{7, 11, 24, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewFaradayWaves(paramInt(p, "symmetry", 12), paramFloat(p, "harmonicScale", 1.0))
+		},
+	},
+	{
+		ID: "mobiusloxodrome", StructName: "mobiusLoxodrome", Category: "geom",
+		DefaultBG: color.RGBA{7, 9, 18, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewMobiusLoxodrome(paramInt(p, "arms", 14), paramInt(p, "spheresPerArm", 44))
+		},
+	},
+	{
+		ID: "lagrangiancoherent", StructName: "lagrangianCoherent", Category: "flow",
+		DefaultBG: color.RGBA{5, 8, 18, 255}, DefaultPal: "cyberpunk",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewLagrangianCoherent(paramInt(p, "advSteps", 18), paramFloat(p, "ftlScale", 1.0))
+		},
+	},
+
 	// Wave 13: 3D Halvorsen Attractor, Kleinian Fuchsian Pearls, Abelian Sandpile, Kuramoto Phase Defects, Farey Ford Circles & Quantum Chaos Scars (100-Art Milestone)
 	{
 		ID: "halvorsenattractor", StructName: "halvorsenAttractor", Category: "chaos",

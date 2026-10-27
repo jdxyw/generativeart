@@ -147,6 +147,14 @@ Expand `arts/` from **94** to **100** generators with pure mathematical attracto
 5. **`FordCircles`** (`NewFordCircles(maxDenom int)`): Conformal modular-group Farey-sequence and Ford-circle tangency gasket ($|ps - qr| = 1$).
 6. **`QuantumBilliard`** (`NewQuantumBilliard(modesN int, waveNumber float64)`): Berry-Heller quantum chaos random-wave eigenfunction scars and Bohmian probability-current streamlines ($\mathbf{J} = \text{Im}(\Psi^* \nabla \Psi)$).
 
+### 5.1b Wave 14 — Complex Phase Portraits, Differential Topology & Nonlinear Dynamics (+6 Engines, 106 Total — Implemented)
+7. **`RiemannZeta`** (`NewRiemannZeta(termsN, phaseRays int)`): Complex phase portrait of $\zeta(s)$ across the critical strip $\text{Re}(s)=\frac{1}{2}$ with Borwein Chebyshev acceleration, non-trivial zero vortices, and Newton streamlines.
+8. **`HopfFibration`** (`NewHopfFibration(toriN, fibersPerTorus int)`): 3D stereographic projection of the $S^3 \to S^2$ Hopf fibration into linked Villarceau circles sweeping nested Clifford tori.
+9. **`ThomasAttractor`** (`NewThomasAttractor(pointsN int, dampingB float64)`): 3D cyclically symmetric Thomas labyrinth strange attractor manifold family ($\dot{x} = \sin y - b x$).
+10. **`FaradayWaves`** (`NewFaradayWaves(symmetry int, harmonicScale float64)`): 12-fold dodecagonal quasicrystalline Faraday capillary standing waves with analytical 3D normal shading.
+11. **`MobiusLoxodrome`** (`NewMobiusLoxodrome(arms, spheresPerArm int)`): Conformal double-spiral Möbius transformation of a hexagonal Doyle sphere lattice.
+12. **`LagrangianCoherent`** (`NewLagrangianCoherent(advSteps int, ftlScale float64)`): Forward and backward Finite-Time Lyapunov Exponent (FTLE) ridges from the Cauchy-Green strain tensor $\mathbf{C} = (\nabla \Phi_0^T)^\top (\nabla \Phi_0^T)$.
+
 ### 5.2 Direction 2: Pure-Go WebAssembly (WASM) Interactive Gallery Playground
 - **Architecture (`wasm/main.go`, `GOOS=js GOARCH=wasm`)**:
   - Compile the pure-Go `generativeart` registry and HDR engine to WebAssembly.

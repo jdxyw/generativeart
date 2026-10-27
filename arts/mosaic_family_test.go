@@ -46,6 +46,12 @@ func TestMosaicFamilyGenerators(t *testing.T) {
 		{"KuramotoWave", NewKuramotoWave(6, 40)},
 		{"FordCircles", NewFordCircles(10)},
 		{"QuantumBilliard", NewQuantumBilliard(28, 1.0)},
+		{"RiemannZeta", NewRiemannZeta(20, 12)},
+		{"HopfFibration", NewHopfFibration(3, 14)},
+		{"ThomasAttractor", NewThomasAttractor(60000, 0.19)},
+		{"FaradayWaves", NewFaradayWaves(12, 1.0)},
+		{"MobiusLoxodrome", NewMobiusLoxodrome(10, 24)},
+		{"LagrangianCoherent", NewLagrangianCoherent(10, 1.0)},
 	}
 
 	for _, tc := range cases {
