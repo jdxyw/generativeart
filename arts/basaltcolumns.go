@@ -34,10 +34,16 @@ func NewBasaltColumns(hexRings int, pillarRelief float64) *basaltColumns {
 
 // Generative renders the 3D isometric hexagonal basalt column terrain.
 func (bc *basaltColumns) Generative(c *generativeart.Canva) {
+	bc.GenerativeFrame(c, 0, 1, 0.0)
+}
+
+// GenerativeFrame renders frame frameIdx of a seamless 360-degree phase loop (phase in [0, 1)).
+func (bc *basaltColumns) GenerativeFrame(c *generativeart.Canva, frameIdx, totalFrames int, loopPhase float64) {
 	rc := c.NewRenderCanvas()
 	w, h := float64(c.Width()), float64(c.Height())
 	scale := math.Min(w, h) / 600.0
 	cx, cy := 0.5*w, 0.58*h
+	animPhase := loopPhase * 2.0 * math.Pi
 
 	// Volcanic Magma Fissure, Seafoam Turquoise & Columnar Basalt Palette
 	abyssBg := color.RGBA{R: 8, G: 11, B: 20, A: 255}
@@ -74,6 +80,8 @@ func (bc *basaltColumns) Generative(c *generativeart.Canva) {
 	}
 
 	pillars := make([]hexPillar, 0, (2*rings+1)*(2*rings+1))
+	ox := 0.14 * (1.0 - math.Cos(animPhase))
+	oy := 0.14 * math.Sin(animPhase)
 
 	for q := -rings; q <= rings; q++ {
 		r1 := common.MaxInt(-rings, -q-rings)
@@ -92,18 +100,21 @@ func (bc *basaltColumns) Generative(c *generativeart.Canva) {
 			v := ry / (0.46 * h)
 
 			// S-curved volcanic fissure canyon cutting diagonally across the basalt plateau
-			fissureDist := math.Abs(u - 0.32*math.Sin(v*2.6))
+			fissureDist := math.Abs(u - 0.32*math.Sin(v*2.6-0.25*math.Sin(animPhase)))
 			canyonWall := common.Smoothstep(0.08, 0.52, fissureDist)
 
-			// Stepped terraced basalt column heights
-			nVal := 0.5 + 0.5*ne.FBM2D(u*2.8+1.5, v*2.8-1.2, 3, 2.0, 0.5)
-			ridged := ne.Ridged2D(u*3.4-0.8, v*3.4+2.1, 3, 2.0, 0.5)
-			rawElev := (0.15 + 0.85*canyonWall*(0.55*nVal+0.45*ridged)) * bc.pillarRelief
+			// Smoothly breathing basalt column heights (continuous C^infty wave so columns never pop)
+			nVal := 0.5 + 0.5*ne.FBM2D(u*2.8+1.5+ox, v*2.8-1.2+oy, 3, 2.0, 0.5)
+			ridged := ne.Ridged2D(u*3.4-0.8-oy, v*3.4+2.1+ox, 3, 2.0, 0.5)
+			rDist := math.Hypot(u, v)
+			breathWave := 1.0 + 0.18*math.Sin(animPhase-rDist*math.Pi*2.2+u*1.8)
+			rawElev := (0.15 + 0.85*canyonWall*(0.55*nVal+0.45*ridged)) * bc.pillarRelief * breathWave
 
-			// Quantize into crisp geological basalt tiers
-			quantElev := math.Floor(rawElev*14.0)/14.0*0.65 + rawElev*0.35
+			// Smooth staircase modulation (continuous derivative -> zero frame-to-frame step snapping)
+			smoothStep := rawElev - 0.011*math.Sin(rawElev*14.0*2.0*math.Pi)
 			if fissureDist < 0.14 {
-				quantElev = 0.04 + 0.06*nVal
+				magmaWave := 0.5 + 0.5*math.Sin(v*math.Pi*3.0-animPhase)
+				smoothStep = 0.03 + 0.07*(0.5*nVal+0.5*magmaWave)
 			}
 
 			pillars = append(pillars, hexPillar{
@@ -113,8 +124,8 @@ func (bc *basaltColumns) Generative(c *generativeart.Canva) {
 				wy:            ry,
 				sx:            cx + rx,
 				sy:            cy + ry*isoAspect,
-				height:        quantElev * 168.0 * scale,
-				elevNorm:      common.Clamp01(quantElev),
+				height:        smoothStep * 168.0 * scale,
+				elevNorm:      common.Clamp01(smoothStep),
 				isMagmaTrough: fissureDist < 0.16,
 			})
 		}
