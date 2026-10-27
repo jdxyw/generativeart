@@ -155,6 +155,13 @@ Expand `arts/` from **94** to **100** generators with pure mathematical attracto
 11. **`MobiusLoxodrome`** (`NewMobiusLoxodrome(arms, spheresPerArm int)`): Conformal double-spiral Möbius transformation of a hexagonal Doyle sphere lattice.
 12. **`LagrangianCoherent`** (`NewLagrangianCoherent(advSteps int, ftlScale float64)`): Forward and backward Finite-Time Lyapunov Exponent (FTLE) ridges from the Cauchy-Green strain tensor $\mathbf{C} = (\nabla \Phi_0^T)^\top (\nabla \Phi_0^T)$.
 
+### 5.1c Wave 15 — 3D Terrain Geomorphology, Hydraulic Erosion & Oceanographic Bathymetry (+5 Engines, 111 Total — Implemented)
+13. **`HydraulicErosion`** (`NewHydraulicErosion(dropletsN int, erosionStrength float64)`): 32,000-droplet physical hydraulic erosion simulator carving dendritic alpine gullies, alluvial fans, and glacial rivers rendered with 2×2 SSAA floating-horizon 3D projection.
+14. **`BasaltColumns`** (`NewBasaltColumns(hexRings int, pillarRelief float64)`): Giant's Causeway isometric 3D hexagonal basalt columnar jointing and volcanic magma fissure canyon.
+15. **`SandDunes`** (`NewSandDunes(dunesN int, windShear float64)`): 2×2 SSAA 3D Aeolian barchan & transverse desert sand dunes with C⁰ cusp knife-edge crests, windward ripples, and leeward slip-face shadows.
+16. **`BathymetricChart`** (`NewBathymetricChart(isobaths, seamounts int)`): 22-level abyssal subduction trench & volcanic island arc bathymetric chart with Marching Squares isobaths.
+17. **`WireframeTerrain`** (`NewWireframeTerrain(gridRes int, reliefScale float64)`): 3D perspective triangulated alpine glacier & fjord mesh with 3D facet normal lighting and glowing wireframe edges.
+
 ### 5.2 Direction 2: Pure-Go WebAssembly (WASM) Interactive Gallery Playground
 - **Architecture (`wasm/main.go`, `GOOS=js GOARCH=wasm`)**:
   - Compile the pure-Go `generativeart` registry and HDR engine to WebAssembly.

@@ -50,6 +50,12 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
 
 ## Table of Contents
 
+- [Wave 15: Hydraulic Erosion Alpine Peaks, Isometric Basalt Columns, Aeolian Sand Dunes, Bathymetric Trench Chart & 3D Wireframe Glacier Mesh](#wave-15-hydraulic-erosion-alpine-peaks-isometric-basalt-columns-aeolian-sand-dunes-bathymetric-trench-chart--3d-wireframe-glacier-mesh)
+  - [Hydraulic Erosion](#hydraulic-erosion)
+  - [Basalt Columns](#basalt-columns)
+  - [Sand Dunes](#sand-dunes)
+  - [Bathymetric Chart](#bathymetric-chart)
+  - [Wireframe Terrain](#wireframe-terrain)
 - [Wave 14: Riemann Zeta Critical Strip, 3D Hopf Fibration, Thomas Labyrinth Attractor, 12-Fold Faraday Quasicrystal Waves, Conformal Möbius Loxodrome & FTLE Lagrangian Coherent Structures](#wave-14-riemann-zeta-critical-strip-3d-hopf-fibration-thomas-labyrinth-attractor-12-fold-faraday-quasicrystal-waves-conformal-möbius-loxodrome--ftle-lagrangian-coherent-structures)
   - [Riemann Zeta](#riemann-zeta)
   - [Hopf Fibration](#hopf-fibration)
@@ -161,6 +167,140 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
   - [Silk Sky](#silk-sky)
   - [Circle Move](#circle-move)
   - [Random Circle](#random-circle)
+
+---
+
+## Wave 15: Hydraulic Erosion Alpine Peaks, Isometric Basalt Columns, Aeolian Sand Dunes, Bathymetric Trench Chart & 3D Wireframe Glacier Mesh
+
+### Hydraulic Erosion
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261027)
+	c.SetBackground(color.RGBA{R: 10, G: 16, B: 34, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Oceanic)
+	c.Draw(arts.NewHydraulicErosion(32000, 1.0))
+	c.ToPNG("hydraulicerosion.png")
+}
+```
+
+![Hydraulic Erosion](images/hydraulicerosion.png)
+
+### Basalt Columns
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261027)
+	c.SetBackground(color.RGBA{R: 8, G: 11, B: 20, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewBasaltColumns(16, 1.0))
+	c.ToPNG("basaltcolumns.png")
+}
+```
+
+![Basalt Columns](images/basaltcolumns.png)
+
+### Sand Dunes
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261027)
+	c.SetBackground(color.RGBA{R: 12, G: 14, B: 32, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Sunset)
+	c.Draw(arts.NewSandDunes(7, 1.0))
+	c.ToPNG("sanddunes.png")
+}
+```
+
+![Sand Dunes](images/sanddunes.png)
+
+### Bathymetric Chart
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261027)
+	c.SetBackground(color.RGBA{R: 5, G: 10, B: 28, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Oceanic)
+	c.Draw(arts.NewBathymetricChart(22, 7))
+	c.ToPNG("bathymetricchart.png")
+}
+```
+
+![Bathymetric Chart](images/bathymetricchart.png)
+
+### Wireframe Terrain
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261027)
+	c.SetBackground(color.RGBA{R: 6, G: 9, B: 22, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Cyberpunk)
+	c.Draw(arts.NewWireframeTerrain(76, 1.0))
+	c.ToPNG("wireframeterrain.png")
+}
+```
+
+![Wireframe Terrain](images/wireframeterrain.png)
 
 ---
 

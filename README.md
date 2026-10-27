@@ -4,7 +4,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/jdxyw/generativeart)](https://goreportcard.com/report/github.com/jdxyw/generativeart)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/jdxyw/generativeart/master/LICENSE)
 
-`generativeart` is a pure-`Go` generative art engine and algorithm collection supporting **106 generative art types** across flow fields, strange attractors, biological morphogenesis, 3D SDF raymarching, complex phase portraits, differential topology, non-Euclidean geometry, quasicrystals, stained-glass mosaics, cloisonné enamel, 3D origami, and traditional printmaking.
+`generativeart` is a pure-`Go` generative art engine and algorithm collection supporting **111 generative art types** across flow fields, strange attractors, 3D terrain geomorphology, biological morphogenesis, 3D SDF raymarching, complex phase portraits, differential topology, non-Euclidean geometry, quasicrystals, stained-glass mosaics, cloisonné enamel, 3D origami, and traditional printmaking.
 
 - 🌐 **Live Interactive Web Gallery (GitHub Pages)**: **[https://jdxyw.github.io/generativeart/](https://jdxyw.github.io/generativeart/)**
 - 🖼️ **Full Code & Image Gallery (`gallery.md`)**: **[./gallery.md](./gallery.md)**
@@ -15,17 +15,17 @@
 
 ## Featured Gallery Highlights
 
-> Browse all **106 artworks**, full `Go` source snippets, and rendered previews in **[`gallery.md`](./gallery.md)** or on the **[Interactive GitHub Pages Gallery](https://jdxyw.github.io/generativeart/)**.
+> Browse all **111 artworks**, full `Go` source snippets, and rendered previews in **[`gallery.md`](./gallery.md)** or on the **[Interactive GitHub Pages Gallery](https://jdxyw.github.io/generativeart/)**.
 
-| [Riemann Zeta](./gallery.md#riemann-zeta) | [Hopf Fibration](./gallery.md#hopf-fibration) | [Thomas Attractor](./gallery.md#thomas-attractor) | [Faraday Waves](./gallery.md#faraday-waves) |
+| [Hydraulic Erosion](./gallery.md#hydraulic-erosion) | [Basalt Columns](./gallery.md#basalt-columns) | [Sand Dunes](./gallery.md#sand-dunes) | [Bathymetric Chart](./gallery.md#bathymetric-chart) |
 | :---: | :---: | :---: | :---: |
-| ![Riemann Zeta](images/riemannzeta.png) | ![Hopf Fibration](images/hopffibration.png) | ![Thomas Attractor](images/thomasattractor.png) | ![Faraday Waves](images/faradaywaves.png) |
-| **[Möbius Loxodrome](./gallery.md#mobius-loxodrome)** | **[Lagrangian Coherent](./gallery.md#lagrangian-coherent)** | **[Hyperbolic Fuchsian](./gallery.md#hyperbolic-fuchsian)** | **[Abelian Sandpile](./gallery.md#abelian-sandpile)** |
-| ![Mobius Loxodrome](images/mobiusloxodrome.png) | ![Lagrangian Coherent](images/lagrangiancoherent.png) | ![Hyperbolic Fuchsian](images/hyperbolicfuchsian.png) | ![Abelian Sandpile](images/abeliansandpile.png) |
-| **[Kuramoto Wave](./gallery.md#kuramoto-wave)** | **[Halvorsen Attractor](./gallery.md#halvorsen-attractor)** | **[Ford Circles](./gallery.md#ford-circles)** | **[Quantum Billiard](./gallery.md#quantum-billiard)** |
-| ![Kuramoto Wave](images/kuramotowave.png) | ![Halvorsen Attractor](images/halvorsenattractor.png) | ![Ford Circles](images/fordcircles.png) | ![Quantum Billiard](images/quantumbilliard.png) |
+| ![Hydraulic Erosion](images/hydraulicerosion.png) | ![Basalt Columns](images/basaltcolumns.png) | ![Sand Dunes](images/sanddunes.png) | ![Bathymetric Chart](images/bathymetricchart.png) |
+| **[Wireframe Terrain](./gallery.md#wireframe-terrain)** | **[Riemann Zeta](./gallery.md#riemann-zeta)** | **[Hopf Fibration](./gallery.md#hopf-fibration)** | **[Thomas Attractor](./gallery.md#thomas-attractor)** |
+| ![Wireframe Terrain](images/wireframeterrain.png) | ![Riemann Zeta](images/riemannzeta.png) | ![Hopf Fibration](images/hopffibration.png) | ![Thomas Attractor](images/thomasattractor.png) |
+| **[Faraday Waves](./gallery.md#faraday-waves)** | **[Möbius Loxodrome](./gallery.md#mobius-loxodrome)** | **[Lagrangian Coherent](./gallery.md#lagrangian-coherent)** | **[Hyperbolic Fuchsian](./gallery.md#hyperbolic-fuchsian)** |
+| ![Faraday Waves](images/faradaywaves.png) | ![Mobius Loxodrome](images/mobiusloxodrome.png) | ![Lagrangian Coherent](images/lagrangiancoherent.png) | ![Hyperbolic Fuchsian](images/hyperbolicfuchsian.png) |
 
-👉 **[View All 106 Artworks & Code Examples in `gallery.md` →](./gallery.md)**
+👉 **[View All 111 Artworks & Code Examples in `gallery.md` →](./gallery.md)**
 
 ### 🎞️ Seamless 600×600 HD Looping Animations (`DrawTimelapseFrames` + `ToGIF`)
 
@@ -230,9 +230,16 @@ _ = poster.ToPNG("poster_dunhuang.png")
 
 ## Supported Art Types & Constructors
 
-All 106 generators implement `generativeart.Engine` under package `github.com/jdxyw/generativeart/arts` (see [gallery.md](./gallery.md) for visual examples and [docs/doc.md](./docs/doc.md) for parameter details):
+All 111 generators implement `generativeart.Engine` under package `github.com/jdxyw/generativeart/arts` (see [gallery.md](./gallery.md) for visual examples and [docs/doc.md](./docs/doc.md) for parameter details):
 
 ```go
+// Wave 15: Hydraulic Erosion Alpine Peaks, Isometric Basalt Columns, Aeolian Sand Dunes, Bathymetric Trench Chart & 3D Wireframe Glacier Mesh
+NewHydraulicErosion(dropletsN int, erosionStrength float64)
+NewBasaltColumns(hexRings int, pillarRelief float64)
+NewSandDunes(dunesN int, windShear float64)
+NewBathymetricChart(isobaths, seamounts int)
+NewWireframeTerrain(gridRes int, reliefScale float64)
+
 // Wave 14: Riemann Zeta Critical Strip, 3D Hopf Fibration, Thomas Labyrinth Attractor, 12-Fold Faraday Quasicrystal Waves, Conformal Möbius Loxodrome & FTLE Lagrangian Coherent Structures
 NewRiemannZeta(termsN, phaseRays int)
 NewHopfFibration(toriN, fibersPerTorus int)

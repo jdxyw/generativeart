@@ -1572,6 +1572,82 @@ lc := arts.NewLagrangianCoherent(18, 1.0)
 
 ![](../images/lagrangiancoherent.png)
 
+## Hydraulic Erosion
+
+`Hydraulic Erosion` simulates particle-based physical hydraulic erosion (32,000 rain droplets carving dendritic gullies, alluvial fans, and braided glacial river valleys) and renders the eroded heightfield with a 2x2 SSAA floating-horizon 3D renderer.
+
+### parameters
+
+- dropletsN: The number of simulated erosion rain droplets.
+- erosionStrength: Multiplier for sediment capacity and bedrock erosion rate.
+
+```go
+he := arts.NewHydraulicErosion(32000, 1.0)
+```
+
+![](../images/hydraulicerosion.png)
+
+## Basalt Columns
+
+`Basalt Columns` renders an isometric 3D hexagonal basalt columnar jointing cliff and volcanic magma fissure canyon (巨人堤道六棱玄武岩柱状节理与熔岩海蚀峡谷) with painter-sorted 3D hexagonal prisms.
+
+### parameters
+
+- hexRings: The radial ring count of the axial hexagonal column lattice.
+- pillarRelief: Vertical elevation multiplier for the basalt columns.
+
+```go
+bc := arts.NewBasaltColumns(16, 1.0)
+```
+
+![](../images/basaltcolumns.png)
+
+## Sand Dunes
+
+`Sand Dunes` renders a 2x2 SSAA 3D desert landscape of Aeolian barchan and star sand dunes (巴丹吉林新月形沙丘链与大漠风波纹) with knife-edge sinuous ridge crests, golden-hour windward ripples, and deep ultramarine leeward slip-face shadows.
+
+### parameters
+
+- dunesN: The number of primary barchan/transverse dune ridges.
+- windShear: Lateral FBM warp multiplier for the sinuous dune crests.
+
+```go
+sd := arts.NewSandDunes(7, 1.0)
+```
+
+![](../images/sanddunes.png)
+
+## Bathymetric Chart
+
+`Bathymetric Chart` renders an oceanographic bathymetric relief chart of an abyssal subduction trench, volcanic island arc, and coral atoll shelf with 22 stepped depth shelves, 3D underwater cast shadows, Marching Squares isobaths, and a nautical degree frame.
+
+### parameters
+
+- isobaths: The number of stepped bathymetric depth shelves and contour levels.
+- seamounts: The number of volcanic seamount centers along the island arc.
+
+```go
+bc := arts.NewBathymetricChart(22, 7)
+```
+
+![](../images/bathymetricchart.png)
+
+## Wireframe Terrain
+
+`Wireframe Terrain` renders a 3D perspective-projected triangulated alpine glacier and fjord mesh with analytical 3D facet normal shading, glowing wireframe edges, and aurora sky reflections.
+
+### parameters
+
+- gridRes: The resolution of the triangulated terrain mesh ($N \times N$).
+- reliefScale: Vertical elevation multiplier for the alpine peaks.
+
+```go
+wt := arts.NewWireframeTerrain(76, 1.0)
+```
+
+![](../images/wireframeterrain.png)
+
+
 
 
 

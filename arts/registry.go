@@ -106,6 +106,43 @@ func paramString(p map[string]interface{}, key, def string) string {
 }
 
 var registry = []ArtDescriptor{
+	// Wave 15: Hydraulic Erosion Alpine Peaks, Isometric Basalt Columns, Aeolian Sand Dunes, Bathymetric Trench Chart & 3D Wireframe Glacier Mesh
+	{
+		ID: "hydraulicerosion", StructName: "hydraulicErosion", Category: "geom",
+		DefaultBG: color.RGBA{10, 16, 34, 255}, DefaultPal: "oceanic",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewHydraulicErosion(paramInt(p, "dropletsN", 32000), paramFloat(p, "erosionStrength", 1.0))
+		},
+	},
+	{
+		ID: "basaltcolumns", StructName: "basaltColumns", Category: "geom",
+		DefaultBG: color.RGBA{8, 11, 20, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewBasaltColumns(paramInt(p, "hexRings", 16), paramFloat(p, "pillarRelief", 1.0))
+		},
+	},
+	{
+		ID: "sanddunes", StructName: "sandDunes", Category: "flow",
+		DefaultBG: color.RGBA{12, 14, 32, 255}, DefaultPal: "sunset",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewSandDunes(paramInt(p, "dunesN", 7), paramFloat(p, "windShear", 1.0))
+		},
+	},
+	{
+		ID: "bathymetricchart", StructName: "bathymetricChart", Category: "geom",
+		DefaultBG: color.RGBA{5, 10, 28, 255}, DefaultPal: "oceanic",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewBathymetricChart(paramInt(p, "isobaths", 22), paramInt(p, "seamounts", 7))
+		},
+	},
+	{
+		ID: "wireframeterrain", StructName: "wireframeTerrain", Category: "geom",
+		DefaultBG: color.RGBA{6, 9, 22, 255}, DefaultPal: "cyberpunk",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewWireframeTerrain(paramInt(p, "gridRes", 76), paramFloat(p, "reliefScale", 1.0))
+		},
+	},
+
 	// Wave 14: Riemann Zeta Critical Strip, 3D Hopf Fibration, Thomas Labyrinth Attractor, 12-Fold Faraday Quasicrystal Waves, Conformal Möbius Loxodrome & FTLE Lagrangian Coherent Structures
 	{
 		ID: "riemannzeta", StructName: "riemannZeta", Category: "chaos",
