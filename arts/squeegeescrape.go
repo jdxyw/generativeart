@@ -81,8 +81,15 @@ func buildOrganicDropletPath(cx, cy, rx, ry, angle float64) *canvas.Path {
 	return p
 }
 
-// Generative renders the SqueegeeScrape composition.
+// Generative renders the static SqueegeeScrape composition.
 func (ss *squeegeeScrape) Generative(c *generativeart.Canva) {
+	ss.GenerativeFrame(c, 0, 1, 0)
+}
+
+// GenerativeFrame renders frame frameIdx of a seamless 360-degree looping animation.
+// When totalFrames > 1, it switches to a Midnight Cyber-Noir & Sunset Neon Rain Reflection palette
+// and animates the horizontal squeegee oil ribbons, knife streaks, and bokeh droplets over phase in [0, 1).
+func (ss *squeegeeScrape) GenerativeFrame(c *generativeart.Canva, frameIdx, totalFrames int, phase float64) {
 	w, h := c.Width(), c.Height()
 	if w <= 0 || h <= 0 {
 		return
@@ -94,33 +101,57 @@ func (ss *squeegeeScrape) Generative(c *generativeart.Canva) {
 	}
 
 	seed := c.Seed()
+	if seed == 0 {
+		seed = 20261028
+	}
 	rng := rand.New(rand.NewSource(seed))
 	noise := common.NewNoiseEngine(seed)
+
+	isAnim := totalFrames > 1
+	phi := 2.0 * math.Pi * phase
 
 	rc := c.NewRenderCanvas()
 	rc.SetRecordVector(false)
 
-	// Palette colors matching Reference Image 5
-	asphaltCharcoal := color.RGBA{R: 28, G: 34, B: 38, A: 255}  // #1c2226
-	slateGrey := color.RGBA{R: 52, G: 63, B: 70, A: 255}        // #343f46
-	deepObsidian := color.RGBA{R: 16, G: 20, B: 23, A: 255}     // #101417
-	coolSteel := color.RGBA{R: 88, G: 100, B: 108, A: 255}      // #58646c
-
-	chartreuseGold := color.RGBA{R: 200, G: 212, B: 70, A: 255} // #c8d446
+	// Default static palette (Reference Image 5)
+	asphaltCharcoal := color.RGBA{R: 28, G: 34, B: 38, A: 255}    // #1c2226
+	slateGrey := color.RGBA{R: 52, G: 63, B: 70, A: 255}          // #343f46
+	deepObsidian := color.RGBA{R: 16, G: 20, B: 23, A: 255}       // #101417
+	coolSteel := color.RGBA{R: 88, G: 100, B: 108, A: 255}        // #58646c
+	chartreuseGold := color.RGBA{R: 200, G: 212, B: 70, A: 255}   // #c8d446
 	lemonChartreuse := color.RGBA{R: 232, G: 240, B: 120, A: 255} // #e8f078
-	darkOlive := color.RGBA{R: 66, G: 74, B: 36, A: 255}        // #424a24
+	darkOlive := color.RGBA{R: 66, G: 74, B: 36, A: 255}          // #424a24
+	crimsonRed := color.RGBA{R: 184, G: 29, B: 24, A: 255}        // #b81d18
+	brightVermilion := color.RGBA{R: 230, G: 59, B: 36, A: 255}   // #e63b24
+	deepMaroon := color.RGBA{R: 74, G: 16, B: 20, A: 255}         // #4a1014
+	cadmiumGold := color.RGBA{R: 245, G: 199, B: 50, A: 255}      // #f5c732
+	burntOrange := color.RGBA{R: 218, G: 104, B: 28, A: 255}      // #da681c
+	silverWhite := color.RGBA{R: 237, G: 242, B: 240, A: 255}     // #edf2f0
+	celadonGrey := color.RGBA{R: 124, G: 138, B: 128, A: 255}     // #7c8a80
+	sageTaupe := color.RGBA{R: 92, G: 102, B: 88, A: 255}         // #5c6658
+	turquoiseMint := color.RGBA{R: 50, G: 204, B: 184, A: 255}    // #32ccb8
+	deepEmerald := color.RGBA{R: 22, G: 98, B: 84, A: 255}        // #166254
 
-	crimsonRed := color.RGBA{R: 184, G: 29, B: 24, A: 255}      // #b81d18
-	brightVermilion := color.RGBA{R: 230, G: 59, B: 36, A: 255} // #e63b24
-	deepMaroon := color.RGBA{R: 74, G: 16, B: 20, A: 255}       // #4a1014
-	cadmiumGold := color.RGBA{R: 245, G: 199, B: 50, A: 255}    // #f5c732
-	burntOrange := color.RGBA{R: 218, G: 104, B: 28, A: 255}    // #da681c
-
-	silverWhite := color.RGBA{R: 237, G: 242, B: 240, A: 255}   // #edf2f0
-	celadonGrey := color.RGBA{R: 124, G: 138, B: 128, A: 255}   // #7c8a80
-	sageTaupe := color.RGBA{R: 92, G: 102, B: 88, A: 255}       // #5c6658
-	turquoiseMint := color.RGBA{R: 50, G: 204, B: 184, A: 255}  // #32ccb8
-	deepEmerald := color.RGBA{R: 22, G: 98, B: 84, A: 255}     // #166254
+	if isAnim {
+		// Alternative GIF Palette: Midnight Indigo Rain, Molten Amber-Gold, Neon Magenta-Rose & Cyber-Cyan Reflection
+		asphaltCharcoal = color.RGBA{R: 16, G: 22, B: 44, A: 255}    // #10162c (Midnight Indigo)
+		slateGrey = color.RGBA{R: 38, G: 52, B: 92, A: 255}          // #26345c (Twilight Sapphire)
+		deepObsidian = color.RGBA{R: 8, G: 10, B: 24, A: 255}        // #080a18 (Deep Void Night)
+		coolSteel = color.RGBA{R: 72, G: 98, B: 152, A: 255}         // #486298 (Steel Azure)
+		chartreuseGold = color.RGBA{R: 252, G: 168, B: 42, A: 255}   // #fca82a (Molten Sunset Amber)
+		lemonChartreuse = color.RGBA{R: 255, G: 228, B: 118, A: 255} // #ffe476 (Champagne Gold Glint)
+		darkOlive = color.RGBA{R: 68, G: 32, B: 82, A: 255}          // #442052 (Deep Violet Dusk)
+		crimsonRed = color.RGBA{R: 214, G: 28, B: 98, A: 255}        // #d61c62 (Neon Rose-Magenta)
+		brightVermilion = color.RGBA{R: 255, G: 86, B: 58, A: 255}   // #ff563a (Electric Sunset Coral)
+		deepMaroon = color.RGBA{R: 54, G: 12, B: 46, A: 255}         // #360c2e (Dark Plum Shadow)
+		cadmiumGold = color.RGBA{R: 255, G: 196, B: 48, A: 255}      // #ffc430 (Golden Neon Glint)
+		burntOrange = color.RGBA{R: 238, G: 108, B: 42, A: 255}      // #ee6c2a (Tangerine Glow)
+		silverWhite = color.RGBA{R: 236, G: 246, B: 255, A: 255}     // #ecf6ff (Platinum Ice Reflection)
+		celadonGrey = color.RGBA{R: 88, G: 158, B: 216, A: 255}     // #589ed8 (Cerulean Water Reflection)
+		sageTaupe = color.RGBA{R: 48, G: 94, B: 154, A: 255}         // #305e9a (Deep Cobalt Reflection)
+		turquoiseMint = color.RGBA{R: 0, G: 238, B: 216, A: 255}     // #00eed8 (Electric Cyber-Cyan)
+		deepEmerald = color.RGBA{R: 16, G: 108, B: 132, A: 255}      // #106c84 (Deep Ocean Cyan)
+	}
 
 	rc.FillBackground(asphaltCharcoal)
 
@@ -392,8 +423,11 @@ func (ss *squeegeeScrape) Generative(c *generativeart.Canva) {
 	pressureScale := common.Constrain(ss.scrapePressure, 0.35, 2.5)
 	for pIdx := 0; pIdx < ss.passes; pIdx++ {
 		pf := float64(pIdx)
+		// Lock vertical comb & high-frequency threshold geometry so horizontal ridges never strobe/pop between frames;
+		// animate a smooth horizontal reflection shimmer wave across the wet paint surface!
 		seedOffX := pf*3.7 + 1.1
 		seedOffY := pf*7.3 + 2.9
+		combPhase := pf * 1.9
 
 		for py := 0; py < h; py++ {
 			ny := float64(py) / fh
@@ -405,11 +439,17 @@ func (ss *squeegeeScrape) Generative(c *generativeart.Canva) {
 
 				// Horizontally-stretched anisotropic FBM + fine horizontal comb striations
 				hNoise := noise.FBM2D(nx*1.8+seedOffX, ny*28.0+seedOffY, 4, 2.1, 0.55)
-				comb := math.Sin(float64(py)*1.7 + pf*1.9 + noise.Simplex2D(nx*6.0+seedOffX, ny*40.0+seedOffY)*2.5)
+				comb := math.Sin(float64(py)*1.7 + combPhase + noise.Simplex2D(nx*6.0+seedOffX, ny*40.0+seedOffY)*2.5)
 
 				passCol, regionBoost, thresh, bAlpha := evalPassLayer(pIdx, nx, ny, hNoise, comb)
 				if regionBoost <= 0.01 {
 					continue
+				}
+
+				// Smooth travelling horizontal reflection wave in animated mode (soft threshold modulation, no scanline popping)
+				animShimmer := 0.0
+				if isAnim {
+					animShimmer = math.Sin(nx*math.Pi*3.0 - phi + pf*0.75 + ny*math.Pi*1.5)
 				}
 
 				effThresh := thresh - (regionBoost-0.25)*0.65*pressureScale
@@ -421,16 +461,16 @@ func (ss *squeegeeScrape) Generative(c *generativeart.Canva) {
 
 				// Evaluate vertical neighbors to detect scraped horizontal palette-knife ridge edges
 				hPrev := noise.FBM2D(nx*1.8+seedOffX, nyPrev*28.0+seedOffY, 4, 2.1, 0.55)
-				combPrev := math.Sin(float64(py-1)*1.7 + pf*1.9 + noise.Simplex2D(nx*6.0+seedOffX, nyPrev*40.0+seedOffY)*2.5)
+				combPrev := math.Sin(float64(py-1)*1.7 + combPhase + noise.Simplex2D(nx*6.0+seedOffX, nyPrev*40.0+seedOffY)*2.5)
 				contactPrev := hPrev + 0.18*combPrev
 
 				hNext := noise.FBM2D(nx*1.8+seedOffX, nyNext*28.0+seedOffY, 4, 2.1, 0.55)
-				combNext := math.Sin(float64(py+1)*1.7 + pf*1.9 + noise.Simplex2D(nx*6.0+seedOffX, nyNext*40.0+seedOffY)*2.5)
+				combNext := math.Sin(float64(py+1)*1.7 + combPhase + noise.Simplex2D(nx*6.0+seedOffX, nyNext*40.0+seedOffY)*2.5)
 				contactNext := hNext + 0.18*combNext
 
 				outCol := passCol
-				// Subtle internal horizontal bristle modulation
-				outCol = adjustOklabLightness(outCol, comb*0.035)
+				// Subtle internal horizontal bristle modulation + smooth travelling reflection sheen
+				outCol = adjustOklabLightness(outCol, comb*0.035+animShimmer*0.065)
 
 				if contactPrev <= effThresh {
 					// Upper transition boundary: specular palette-knife impasto ridge (+0.18 L)
@@ -452,6 +492,9 @@ func (ss *squeegeeScrape) Generative(c *generativeart.Canva) {
 		ny := rng.Float64()
 		x := nx * fw
 		y := ny * fh
+		if isAnim {
+			x += 12.0 * scale * math.Sin(phi+float64(i)*0.31)
+		}
 
 		stripW := (18.0 + 77.0*math.Pow(rng.Float64(), 1.3)) * scale
 		stripH := (1.2 + 3.3*math.Pow(rng.Float64(), 1.6)) * scale
@@ -544,7 +587,14 @@ func (ss *squeegeeScrape) Generative(c *generativeart.Canva) {
 		dx := nx * fw
 		dy := ny * fh
 
-		r := (1.1 + 3.6*math.Pow(rng.Float64(), 1.8)) * scale
+		baseR := (1.1 + 3.6*math.Pow(rng.Float64(), 1.8)) * scale
+		r := baseR
+		if isAnim {
+			dPhase := float64(i) * 0.43
+			dx += 2.2 * scale * math.Sin(phi+dPhase)
+			dy += 1.4 * scale * (1.0 - math.Cos(phi+dPhase))
+			r = baseR * (0.92 + 0.14*math.Sin(phi+dPhase*1.7))
+		}
 
 		var dropCol color.RGBA
 		cPick := rng.Float64()
@@ -559,10 +609,14 @@ func (ss *squeegeeScrape) Generative(c *generativeart.Canva) {
 			dropCol = paleAqua
 		}
 
-		// Slightly organic/elliptical shape (or short horizontal/diagonal dash for larger drops)
-		aspect := 1.0 + 0.35*rng.Float64()
-		if r > 2.6*scale && rng.Float64() < 0.42 {
-			aspect = 1.45 + 0.65*rng.Float64()
+		// Always draw fixed number of RNG values per droplet regardless of animated radius r
+		// so the PRNG sequence never desynchronizes across frames!
+		aspectRand1 := rng.Float64()
+		aspectRand2 := rng.Float64()
+		aspectRand3 := rng.Float64()
+		aspect := 1.0 + 0.35*aspectRand1
+		if baseR > 2.6*scale && aspectRand2 < 0.42 {
+			aspect = 1.45 + 0.65*aspectRand3
 		}
 		rx := r * aspect
 		ry := r / math.Sqrt(aspect)
