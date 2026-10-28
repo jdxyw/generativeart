@@ -4,7 +4,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/jdxyw/generativeart)](https://goreportcard.com/report/github.com/jdxyw/generativeart)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/jdxyw/generativeart/master/LICENSE)
 
-`generativeart` is a pure-`Go` generative art engine and algorithm collection supporting **111 generative art types** across flow fields, strange attractors, 3D terrain geomorphology, biological morphogenesis, 3D SDF raymarching, complex phase portraits, differential topology, non-Euclidean geometry, quasicrystals, stained-glass mosaics, cloisonné enamel, 3D origami, and traditional printmaking.
+`generativeart` is a pure-`Go` generative art engine and algorithm collection supporting **117 generative art types** across flow fields, strange attractors, 3D terrain geomorphology, biological morphogenesis, 3D SDF raymarching, complex phase portraits, differential topology, non-Euclidean geometry, quasicrystals, stained-glass mosaics, cloisonné enamel, 3D origami, and traditional printmaking.
 
 - 🌐 **Live Interactive Web Gallery (GitHub Pages)**: **[https://jdxyw.github.io/generativeart/](https://jdxyw.github.io/generativeart/)**
 - 🖼️ **Full Code & Image Gallery (`gallery.md`)**: **[./gallery.md](./gallery.md)**
@@ -15,17 +15,17 @@
 
 ## Featured Gallery Highlights
 
-> Browse all **111 artworks**, full `Go` source snippets, and rendered previews in **[`gallery.md`](./gallery.md)** or on the **[Interactive GitHub Pages Gallery](https://jdxyw.github.io/generativeart/)**.
+> Browse all **117 artworks**, full `Go` source snippets, and rendered previews in **[`gallery.md`](./gallery.md)** or on the **[Interactive GitHub Pages Gallery](https://jdxyw.github.io/generativeart/)**.
 
-| [Hydraulic Erosion](./gallery.md#hydraulic-erosion) | [Basalt Columns](./gallery.md#basalt-columns) | [Sand Dunes](./gallery.md#sand-dunes) | [Bathymetric Chart](./gallery.md#bathymetric-chart) |
+| [Concentric Morph](./gallery.md#concentric-morph) | [Vortex Impasto](./gallery.md#vortex-impasto) | [Sliced Pebbles](./gallery.md#sliced-pebbles) | [Hex Mandala](./gallery.md#hex-mandala) |
 | :---: | :---: | :---: | :---: |
-| ![Hydraulic Erosion](images/hydraulicerosion.png) | ![Basalt Columns](images/basaltcolumns.png) | ![Sand Dunes](images/sanddunes.png) | ![Bathymetric Chart](images/bathymetricchart.png) |
-| **[Wireframe Terrain](./gallery.md#wireframe-terrain)** | **[Riemann Zeta](./gallery.md#riemann-zeta)** | **[Hopf Fibration](./gallery.md#hopf-fibration)** | **[Thomas Attractor](./gallery.md#thomas-attractor)** |
-| ![Wireframe Terrain](images/wireframeterrain.png) | ![Riemann Zeta](images/riemannzeta.png) | ![Hopf Fibration](images/hopffibration.png) | ![Thomas Attractor](images/thomasattractor.png) |
-| **[Faraday Waves](./gallery.md#faraday-waves)** | **[Möbius Loxodrome](./gallery.md#mobius-loxodrome)** | **[Lagrangian Coherent](./gallery.md#lagrangian-coherent)** | **[Hyperbolic Fuchsian](./gallery.md#hyperbolic-fuchsian)** |
-| ![Faraday Waves](images/faradaywaves.png) | ![Mobius Loxodrome](images/mobiusloxodrome.png) | ![Lagrangian Coherent](images/lagrangiancoherent.png) | ![Hyperbolic Fuchsian](images/hyperbolicfuchsian.png) |
+| ![Concentric Morph](images/concentricmorph.png) | ![Vortex Impasto](images/vorteximpasto.png) | ![Sliced Pebbles](images/slicedpebbles.png) | ![Hex Mandala](images/hexmandala.png) |
+| **[Squeegee Scrape](./gallery.md#squeegee-scrape)** | **[Halftone Panels](./gallery.md#halftone-panels)** | **[Nautilus Spiral](./gallery.md#nautilus-spiral-3d-fluted-ribbon-edition)** | **[Hydraulic Erosion](./gallery.md#hydraulic-erosion)** |
+| ![Squeegee Scrape](images/squeegeescrape.png) | ![Halftone Panels](images/halftonepanels.png) | ![Nautilus Spiral](images/nautilusspiral.png) | ![Hydraulic Erosion](images/hydraulicerosion.png) |
+| **[Basalt Columns](./gallery.md#basalt-columns)** | **[Sand Dunes](./gallery.md#sand-dunes)** | **[Bathymetric Chart](./gallery.md#bathymetric-chart)** | **[Wireframe Terrain](./gallery.md#wireframe-terrain)** |
+| ![Basalt Columns](images/basaltcolumns.png) | ![Sand Dunes](images/sanddunes.png) | ![Bathymetric Chart](images/bathymetricchart.png) | ![Wireframe Terrain](images/wireframeterrain.png) |
 
-👉 **[View All 111 Artworks & Code Examples in `gallery.md` →](./gallery.md)**
+👉 **[View All 117 Artworks & Code Examples in `gallery.md` →](./gallery.md)**
 
 ### 🎞️ Seamless 600×600 HD Looping Animations (`DrawTimelapseFrames` + `ToGIF`)
 
@@ -230,9 +230,17 @@ _ = poster.ToPNG("poster_dunhuang.png")
 
 ## Supported Art Types & Constructors
 
-All 111 generators implement `generativeart.Engine` under package `github.com/jdxyw/generativeart/arts` (see [gallery.md](./gallery.md) for visual examples and [docs/doc.md](./docs/doc.md) for parameter details):
+All 117 generators implement `generativeart.Engine` under package `github.com/jdxyw/generativeart/arts` (see [gallery.md](./gallery.md) for visual examples and [docs/doc.md](./docs/doc.md) for parameter details):
 
 ```go
+// Wave 16: Molnár Order-to-Disorder Concentric Morph, Swirling Vortex Impasto, Mid-Century Sliced Pebbles, Hexagonal Mandala Honeycomb, Richter Squeegee Scrape & Retro Sci-Fi Halftone Panels
+NewConcentricMorph(gridCols, gridRows int, disorder float64)
+NewVortexImpasto(vortexCount, strokeCount int, curlStrength float64)
+NewSlicedPebbles(gridSize, maxCuts int, cornerRadius float64)
+NewHexMandala(cols, rows int, colorScale float64)
+NewSqueegeeScrape(passes, dropletCount int, scrapePressure float64)
+NewHalftonePanels(panelCount int, dotSpacing float64)
+
 // Wave 15: Hydraulic Erosion Alpine Peaks, Isometric Basalt Columns, Aeolian Sand Dunes, Bathymetric Trench Chart & 3D Wireframe Glacier Mesh
 NewHydraulicErosion(dropletsN int, erosionStrength float64)
 NewBasaltColumns(hexRings int, pillarRelief float64)

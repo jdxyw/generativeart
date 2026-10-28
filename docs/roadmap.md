@@ -162,6 +162,15 @@ Expand `arts/` from **94** to **100** generators with pure mathematical attracto
 16. **`BathymetricChart`** (`NewBathymetricChart(isobaths, seamounts int)`): 22-level abyssal subduction trench & volcanic island arc bathymetric chart with Marching Squares isobaths.
 17. **`WireframeTerrain`** (`NewWireframeTerrain(gridRes int, reliefScale float64)`): 3D perspective triangulated alpine glacier & fjord mesh with 3D facet normal lighting and glowing wireframe edges.
 
+### 5.1d Wave 16 — Order-to-Disorder Grids, Swirling Vortex Impasto, Tangential Pebble Filleting, Hexagonal Mandalas, Richter Squeegee & Sci-Fi Halftone Panels (+6 Engines + Nautilus Overhaul, 117 Total — Implemented)
+18. **`ConcentricMorph`** (`NewConcentricMorph(gridCols, gridRows int, disorder float64)`): Vera Molnár-inspired order-to-disorder grid morphing terracotta concentric squares into ivory circles and scattered cerulean/teal clouds.
+19. **`VortexImpasto`** (`NewVortexImpasto(vortexCount, strokeCount int, curlStrength float64)`): Ragged deckle-edged museum canvas with 22,000+ swirling micro-vortex bristle ribbons and vortex-eye specular pinpoints.
+20. **`SlicedPebbles`** (`NewSlicedPebbles(gridSize, maxCuts int, cornerRadius float64)`): Mid-century $6 \times 6$ grid of squares sliced by half-plane chords with uniform mortar gaps and exact tangential circular-arc corner fillets.
+21. **`HexMandala`** (`NewHexMandala(cols, rows int, colorScale float64)`): Flat-topped hexagonal honeycomb tessellation of $D_6 / D_{12}$ dihedral rosettes and hexagrams modulated by a cyan-nebula and burnished-gold macro field.
+22. **`SqueegeeScrape`** (`NewSqueegeeScrape(passes, dropletCount int, scrapePressure float64)`): Gerhard Richter-style horizontal squeegee oil-paint drag over a diagonally striated underpainting with specular droplet splatter.
+23. **`HalftonePanels`** (`NewHalftonePanels(panelCount int, dotSpacing float64)`): 22-panel retro sci-fi comic layout with ringed Saturns, crescent moons, and hexagonal Ben-Day halftone mountain ridges in mint, black, and white.
+24. **`NautilusSpiral` Overhaul** (`NewNautilusSpiral(turns, linesPerChamber int)`): Upgraded to pure single-direction 3D fluted radial chambers, overlapping longitudinal copper/gold/steel-blue S-ribbon plumes, and continuous multi-strand spiral cables.
+
 ### 5.2 Direction 2: Pure-Go WebAssembly (WASM) Interactive Gallery Playground
 - **Architecture (`wasm/main.go`, `GOOS=js GOARCH=wasm`)**:
   - Compile the pure-Go `generativeart` registry and HDR engine to WebAssembly.

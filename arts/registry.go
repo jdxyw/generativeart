@@ -106,6 +106,50 @@ func paramString(p map[string]interface{}, key, def string) string {
 }
 
 var registry = []ArtDescriptor{
+	// Wave 16: Molnár Order-to-Disorder Concentric Morph, Swirling Vortex Impasto, Mid-Century Sliced Pebbles, Hexagonal Mandala Honeycomb, Richter Squeegee Scrape & Retro Sci-Fi Halftone Panels
+	{
+		ID: "concentricmorph", StructName: "concentricMorph", Category: "geom",
+		DefaultBG: color.RGBA{22, 27, 34, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewConcentricMorph(paramInt(p, "gridCols", 18), paramInt(p, "gridRows", 18), paramFloat(p, "disorder", 1.0))
+		},
+	},
+	{
+		ID: "vorteximpasto", StructName: "vortexImpasto", Category: "media",
+		DefaultBG: color.RGBA{239, 232, 222, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewVortexImpasto(paramInt(p, "vortexCount", 46), paramInt(p, "strokeCount", 22000), paramFloat(p, "curlStrength", 1.0))
+		},
+	},
+	{
+		ID: "slicedpebbles", StructName: "slicedPebbles", Category: "geom",
+		DefaultBG: color.RGBA{15, 18, 24, 255}, DefaultPal: "sunset",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewSlicedPebbles(paramInt(p, "gridSize", 6), paramInt(p, "maxCuts", 3), paramFloat(p, "cornerRadius", 18.0))
+		},
+	},
+	{
+		ID: "hexmandala", StructName: "hexMandala", Category: "geom",
+		DefaultBG: color.RGBA{7, 6, 5, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewHexMandala(paramInt(p, "cols", 13), paramInt(p, "rows", 16), paramFloat(p, "colorScale", 1.0))
+		},
+	},
+	{
+		ID: "squeegeescrape", StructName: "squeegeeScrape", Category: "media",
+		DefaultBG: color.RGBA{24, 28, 32, 255}, DefaultPal: "sunset",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewSqueegeeScrape(paramInt(p, "passes", 8), paramInt(p, "dropletCount", 460), paramFloat(p, "scrapePressure", 1.0))
+		},
+	},
+	{
+		ID: "halftonepanels", StructName: "halftonePanels", Category: "media",
+		DefaultBG: color.RGBA{244, 247, 244, 255}, DefaultPal: "cyberpunk",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewHalftonePanels(paramInt(p, "panelCount", 22), paramFloat(p, "dotSpacing", 5.5))
+		},
+	},
+
 	// Wave 15: Hydraulic Erosion Alpine Peaks, Isometric Basalt Columns, Aeolian Sand Dunes, Bathymetric Trench Chart & 3D Wireframe Glacier Mesh
 	{
 		ID: "hydraulicerosion", StructName: "hydraulicErosion", Category: "geom",
