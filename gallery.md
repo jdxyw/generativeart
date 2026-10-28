@@ -52,6 +52,14 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
 
 ## Table of Contents
 
+- [Wave 16: Molnár Concentric Morph, Swirling Vortex Impasto, Mid-Century Sliced Pebbles, Hexagonal Mandala Honeycomb, Richter Squeegee Scrape, Retro Sci-Fi Halftone Panels & 3D Fluted Nautilus Spiral](#wave-16-molnár-concentric-morph-swirling-vortex-impasto-mid-century-sliced-pebbles-hexagonal-mandala-honeycomb-richter-squeegee-scrape-retro-sci-fi-halftone-panels--3d-fluted-nautilus-spiral)
+  - [Concentric Morph](#concentric-morph)
+  - [Vortex Impasto](#vortex-impasto)
+  - [Sliced Pebbles](#sliced-pebbles)
+  - [Hex Mandala](#hex-mandala)
+  - [Squeegee Scrape](#squeegee-scrape)
+  - [Halftone Panels](#halftone-panels)
+  - [Nautilus Spiral (3D Fluted Ribbon Edition)](#nautilus-spiral-3d-fluted-ribbon-edition)
 - [Wave 15: Hydraulic Erosion Alpine Peaks, Isometric Basalt Columns, Aeolian Sand Dunes, Bathymetric Trench Chart & 3D Wireframe Glacier Mesh](#wave-15-hydraulic-erosion-alpine-peaks-isometric-basalt-columns-aeolian-sand-dunes-bathymetric-trench-chart--3d-wireframe-glacier-mesh)
   - [Hydraulic Erosion](#hydraulic-erosion)
   - [Basalt Columns](#basalt-columns)
@@ -169,6 +177,192 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
   - [Silk Sky](#silk-sky)
   - [Circle Move](#circle-move)
   - [Random Circle](#random-circle)
+
+---
+
+## Wave 16: Molnár Concentric Morph, Swirling Vortex Impasto, Mid-Century Sliced Pebbles, Hexagonal Mandala Honeycomb, Richter Squeegee Scrape, Retro Sci-Fi Halftone Panels & 3D Fluted Nautilus Spiral
+
+### Concentric Morph
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261028)
+	c.SetBackground(color.RGBA{R: 22, G: 27, B: 34, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewConcentricMorph(18, 18, 1.0))
+	c.ToPNG("concentricmorph.png")
+}
+```
+
+![Concentric Morph](images/concentricmorph.png)
+
+### Vortex Impasto
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261028)
+	c.SetBackground(color.RGBA{R: 239, G: 232, B: 222, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewVortexImpasto(46, 22000, 1.0))
+	c.ToPNG("vorteximpasto.png")
+}
+```
+
+![Vortex Impasto](images/vorteximpasto.png)
+
+### Sliced Pebbles
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261028)
+	c.SetBackground(color.RGBA{R: 15, G: 18, B: 24, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Sunset)
+	c.Draw(arts.NewSlicedPebbles(6, 3, 18.0))
+	c.ToPNG("slicedpebbles.png")
+}
+```
+
+![Sliced Pebbles](images/slicedpebbles.png)
+
+### Hex Mandala
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261028)
+	c.SetBackground(color.RGBA{R: 7, G: 6, B: 5, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewHexMandala(13, 16, 1.0))
+	c.ToPNG("hexmandala.png")
+}
+```
+
+![Hex Mandala](images/hexmandala.png)
+
+### Squeegee Scrape
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261028)
+	c.SetBackground(color.RGBA{R: 24, G: 28, B: 32, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Sunset)
+	c.Draw(arts.NewSqueegeeScrape(8, 460, 1.0))
+	c.ToPNG("squeegeescrape.png")
+}
+```
+
+![Squeegee Scrape](images/squeegeescrape.png)
+
+### Halftone Panels
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261028)
+	c.SetBackground(color.RGBA{R: 244, G: 247, B: 244, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Cyberpunk)
+	c.Draw(arts.NewHalftonePanels(22, 5.5))
+	c.ToPNG("halftonepanels.png")
+}
+```
+
+![Halftone Panels](images/halftonepanels.png)
+
+### Nautilus Spiral (3D Fluted Ribbon Edition)
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261028)
+	c.SetBackground(color.RGBA{R: 18, G: 24, B: 34, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewNautilusSpiral(5, 68))
+	c.ToPNG("nautilusspiral.png")
+}
+```
+
+![Nautilus Spiral](images/nautilusspiral.png)
 
 ---
 

@@ -1647,6 +1647,103 @@ wt := arts.NewWireframeTerrain(76, 1.0)
 
 ![](../images/wireframeterrain.png)
 
+## Concentric Morph
+
+`Concentric Morph` renders a Vera Molnár-inspired order-to-disorder grid where terracotta concentric squares at the diagonal corners morph into warm ivory concentric circles and scatter into cerulean/teal geometric clouds along an anti-diagonal entropy trough.
+
+### parameters
+
+- gridCols: Number of horizontal grid columns.
+- gridRows: Number of vertical grid rows.
+- disorder: Multiplier for positional scatter and eccentric ring drift in the disordered band.
+
+```go
+cm := arts.NewConcentricMorph(18, 18, 1.0)
+```
+
+![](../images/concentricmorph.png)
+
+## Vortex Impasto
+
+`Vortex Impasto` renders a ragged deckle-edged museum canvas covered in 22,000+ swirling multi-vortex bristle strokes across golden-yellow, turquoise, cerulean, and dark forest-charcoal color domains, with tiny specular pinpoint highlights inside vortex eyes.
+
+### parameters
+
+- vortexCount: Number of micro-vortex eddy centers across the canvas.
+- strokeCount: Total number of layered curved bristle ribbons.
+- curlStrength: Multiplier for curl-noise and vortex spiral velocity.
+
+```go
+vi := arts.NewVortexImpasto(46, 22000, 1.0)
+```
+
+![](../images/vorteximpasto.png)
+
+## Sliced Pebbles
+
+`Sliced Pebbles` renders a mid-century modern $N \times N$ grid of rounded squares sliced by straight half-plane chords with uniform mortar gaps and exact tangential circular-arc corner fillets.
+
+### parameters
+
+- gridSize: Number of grid rows and columns ($N \times N$).
+- maxCuts: Maximum number of straight chord cuts per grid cell.
+- cornerRadius: Target tangential fillet radius for interior polygon vertices.
+
+```go
+sp := arts.NewSlicedPebbles(6, 3, 18.0)
+```
+
+![](../images/slicedpebbles.png)
+
+## Hex Mandala
+
+`Hex Mandala` renders a flat-topped hexagonal honeycomb tessellation where every cell contains a unique $D_6 / D_{12}$ dihedral mandala of hexagrams, lotus rosettes, radial spokes, and pearl medallions modulated by a luminous cyan-turquoise and burnished gold-bronze macro field.
+
+### parameters
+
+- cols: Approximate number of hexagonal columns across the canvas width.
+- rows: Approximate number of hexagonal rows across the canvas height.
+- colorScale: Spatial frequency multiplier for the macro cyan/gold FBM field.
+
+```go
+hm := arts.NewHexMandala(13, 16, 1.0)
+```
+
+![](../images/hexmandala.png)
+
+## Squeegee Scrape
+
+`Squeegee Scrape` renders a Gerhard Richter-style abstract oil painting combining a `-36°` diagonally striated underpainting, 8 horizontal anisotropic squeegee blade drag passes with skip-chatter ridges, and 460 organic bokeh paint droplets.
+
+### parameters
+
+- passes: Number of horizontal squeegee blade passes.
+- dropletCount: Number of scattered specular paint droplets.
+- scrapePressure: Blade contact threshold and ridge contrast multiplier.
+
+```go
+ss := arts.NewSqueegeeScrape(8, 460, 1.0)
+```
+
+![](../images/squeegeescrape.png)
+
+## Halftone Panels
+
+`Halftone Panels` renders a Moebius-inspired retro sci-fi comic-book page subdivided into 22 white-bordered panels of starry skies, tilted ringed Saturns, crescent moons, and angular alien mountain ridges shaded with hexagonal Ben-Day halftone dot screens.
+
+### parameters
+
+- panelCount: Number of comic panels to render (up to 22).
+- dotSpacing: Base spacing of the hexagonal Ben-Day halftone dot lattice.
+
+```go
+hp := arts.NewHalftonePanels(22, 5.5)
+```
+
+![](../images/halftonepanels.png)
+
+
+
 
 
 
