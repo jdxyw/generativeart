@@ -125,8 +125,15 @@ func buildBristleRibbonPath(pts []render.Point, halfWidth, dxOff, dyOff float64)
 	return p
 }
 
-// Generative renders the VortexImpasto composition.
+// Generative renders the static VortexImpasto composition.
 func (vi *vortexImpasto) Generative(c *generativeart.Canva) {
+	vi.GenerativeFrame(c, 0, 1, 0)
+}
+
+// GenerativeFrame renders frame frameIdx of a seamless 360-degree looping animation.
+// When totalFrames > 1, it switches to a luminous Twilight Aurora & Coral-Gold palette
+// and animates the 46 micro-vortices, curl streamlines, and starlight eyes smoothly over phase in [0, 1).
+func (vi *vortexImpasto) GenerativeFrame(c *generativeart.Canva, frameIdx, totalFrames int, phase float64) {
 	w, h := c.Width(), c.Height()
 	if w <= 0 || h <= 0 {
 		return
@@ -138,38 +145,67 @@ func (vi *vortexImpasto) Generative(c *generativeart.Canva) {
 	}
 
 	seed := c.Seed()
+	if seed == 0 {
+		seed = 20261028
+	}
 	rng := rand.New(rand.NewSource(seed))
 	noise := common.NewNoiseEngine(seed)
+
+	isAnim := totalFrames > 1
+	phi := 2.0 * math.Pi * phase
+	loopX := 0.08 * math.Sin(phi)
+	loopY := 0.08 * (1.0 - math.Cos(phi))
 
 	rc := c.NewRenderCanvas()
 	// Disable vector op recording so 22,000+ bristle paths rasterize directly into HDR buffer with zero memory overhead.
 	rc.SetRecordVector(false)
 
-	// Warm museum cream paper (#efe8de)
+	// Warm museum cream paper (#efe8de) for static, or warm ivory-linen for animated GIF
 	creamPaper := color.RGBA{R: 239, G: 232, B: 222, A: 255}
 	creamShadow := color.RGBA{R: 229, G: 220, B: 208, A: 255}
+	if isAnim {
+		creamPaper = color.RGBA{R: 242, G: 235, B: 226, A: 255}
+		creamShadow = color.RGBA{R: 230, G: 220, B: 208, A: 255}
+	}
 	rc.FillBackground(creamPaper)
 
-	// Palette colors matching Reference Image 2
-	tangerineOrange := color.RGBA{R: 232, G: 125, B: 40, A: 255} // #e87d28
-	coralAmber := color.RGBA{R: 240, G: 149, B: 38, A: 255}      // #f09526
-	cadmiumYellow := color.RGBA{R: 247, G: 202, B: 36, A: 255}   // #f7ca24
-	sunflowerGold := color.RGBA{R: 244, G: 181, B: 34, A: 255}   // #f4b522
-	lemonHighlight := color.RGBA{R: 250, G: 224, B: 86, A: 255}  // #fae056
-
+	// Default static palette (Reference Image 2: Golden-Yellow, Turquoise, Cerulean & Forest Charcoal)
+	tangerineOrange := color.RGBA{R: 232, G: 125, B: 40, A: 255}  // #e87d28
+	coralAmber := color.RGBA{R: 240, G: 149, B: 38, A: 255}       // #f09526
+	cadmiumYellow := color.RGBA{R: 247, G: 202, B: 36, A: 255}    // #f7ca24
+	sunflowerGold := color.RGBA{R: 244, G: 181, B: 34, A: 255}    // #f4b522
+	lemonHighlight := color.RGBA{R: 250, G: 224, B: 86, A: 255}   // #fae056
 	chartreuseGreen := color.RGBA{R: 110, G: 196, B: 104, A: 255} // #6ec468
 	seafoamTurq := color.RGBA{R: 32, G: 181, B: 170, A: 255}      // #20b5aa
 	brightCyan := color.RGBA{R: 28, G: 163, B: 176, A: 255}       // #1ca3b0
+	forestCharcoal := color.RGBA{R: 30, G: 41, B: 29, A: 255}     // #1e291d
+	oliveUmber := color.RGBA{R: 43, G: 56, B: 38, A: 255}         // #2b3826
+	charcoalBlack := color.RGBA{R: 21, G: 29, B: 21, A: 255}      // #151d15
+	deepTealForest := color.RGBA{R: 20, G: 72, B: 68, A: 255}     // transition around dark band
+	aquaTurquoise := color.RGBA{R: 38, G: 191, B: 181, A: 255}    // #26bfb5
+	richTurquoise := color.RGBA{R: 24, G: 156, B: 166, A: 255}    // #189ca6
+	deepCerulean := color.RGBA{R: 18, G: 107, B: 140, A: 255}     // #126b8c
+	prussianBlue := color.RGBA{R: 13, G: 74, B: 102, A: 255}      // #0d4a66
 
-	forestCharcoal := color.RGBA{R: 30, G: 41, B: 29, A: 255}  // #1e291d
-	oliveUmber := color.RGBA{R: 43, G: 56, B: 38, A: 255}      // #2b3826
-	charcoalBlack := color.RGBA{R: 21, G: 29, B: 21, A: 255}   // #151d15
-	deepTealForest := color.RGBA{R: 20, G: 72, B: 68, A: 255}  // transition around dark band
-
-	aquaTurquoise := color.RGBA{R: 38, G: 191, B: 181, A: 255} // #26bfb5
-	richTurquoise := color.RGBA{R: 24, G: 156, B: 166, A: 255} // #189ca6
-	deepCerulean := color.RGBA{R: 18, G: 107, B: 140, A: 255}  // #126b8c
-	prussianBlue := color.RGBA{R: 13, G: 74, B: 102, A: 255}   // #0d4a66
+	if isAnim {
+		// Alternative GIF Palette: Celestial Crimson-Coral, Molten Gold, Amethyst-Violet & Starlight Ultramarine
+		tangerineOrange = color.RGBA{R: 218, G: 38, B: 92, A: 255}   // #da265c (Crimson-Magenta)
+		coralAmber = color.RGBA{R: 242, G: 84, B: 68, A: 255}        // #f25444 (Fiery Coral)
+		cadmiumYellow = color.RGBA{R: 255, G: 182, B: 46, A: 255}    // #ffb62e (Molten Amber-Gold)
+		sunflowerGold = color.RGBA{R: 246, G: 136, B: 48, A: 255}    // #f68830 (Sunset Marigold)
+		lemonHighlight = color.RGBA{R: 255, G: 230, B: 128, A: 255}  // #ffe680 (Champagne Starlight)
+		chartreuseGreen = color.RGBA{R: 182, G: 96, B: 228, A: 255}  // #b660e4 (Orchid Violet transition)
+		seafoamTurq = color.RGBA{R: 56, G: 188, B: 236, A: 255}      // #38bcec (Luminous Sky-Cyan)
+		brightCyan = color.RGBA{R: 118, G: 108, B: 228, A: 255}      // #766ce4 (Periwinkle Indigo)
+		forestCharcoal = color.RGBA{R: 24, G: 16, B: 48, A: 255}     // #181030 (Deep Cosmic Aubergine)
+		oliveUmber = color.RGBA{R: 48, G: 26, B: 78, A: 255}         // #301a4e (Royal Plum Shadow)
+		charcoalBlack = color.RGBA{R: 12, G: 8, B: 28, A: 255}       // #0c081c (Midnight Void)
+		deepTealForest = color.RGBA{R: 62, G: 36, B: 108, A: 255}    // #3e246c (Amethyst Halo)
+		aquaTurquoise = color.RGBA{R: 72, G: 212, B: 242, A: 255}    // #48d4f2 (Electric Ice-Cyan)
+		richTurquoise = color.RGBA{R: 42, G: 124, B: 212, A: 255}    // #2a7cd4 (Cobalt Azure)
+		deepCerulean = color.RGBA{R: 26, G: 68, B: 158, A: 255}      // #1a449e (Deep Ultramarine)
+		prussianBlue = color.RGBA{R: 14, G: 34, B: 96, A: 255}       // #0e2260 (Midnight Sapphire)
+	}
 
 	useCustom := false
 	var customGrad *render.MultiStopGradient
@@ -182,9 +218,9 @@ func (vi *vortexImpasto) Generative(c *generativeart.Canva) {
 		nx = common.Clamp01(nx)
 		ny = common.Clamp01(ny)
 
-		w1 := noise.FBM2D(nx*2.4+1.3, ny*2.4+0.7, 3, 2.0, 0.5) * 0.11
-		w2 := noise.FBM2D(nx*4.5-0.9, ny*4.5+2.1, 2, 2.0, 0.5) * 0.05
-		fineN := 0.5 + 0.5*noise.Simplex2D(nx*6.5+3.1, ny*6.5-1.7)
+		w1 := noise.FBM2D(nx*2.4+1.3+loopX, ny*2.4+0.7+loopY, 3, 2.0, 0.5) * 0.11
+		w2 := noise.FBM2D(nx*4.5-0.9-loopX*0.8, ny*4.5+2.1+loopY*0.8, 2, 2.0, 0.5) * 0.05
+		fineN := 0.5 + 0.5*noise.Simplex2D(nx*6.5+3.1+loopX, ny*6.5-1.7+loopY)
 
 		if useCustom && customGrad != nil {
 			t := common.Clamp01(0.55*nx + 0.45*(1.0-ny) + w1 + w2)
@@ -358,7 +394,7 @@ func (vi *vortexImpasto) Generative(c *generativeart.Canva) {
 	evalVelocityAngle := func(x, y float64) float64 {
 		nx := x / fw
 		ny := y / fh
-		// Smooth curl-noise base angle
+		// Lock streamline geometry across frames to eliminate sub-pixel hair aliasing flicker
 		curlVec := noise.Curl2D(nx*2.6+0.5, ny*2.6-0.3, 0.01)
 		curlAng := math.Atan2(curlVec.Y, curlVec.X) * curlScale
 
@@ -384,6 +420,38 @@ func (vi *vortexImpasto) Generative(c *generativeart.Canva) {
 			}
 		}
 		return math.Atan2(vySum, vxSum)
+	}
+
+	// Coherent spiral luminescence wave around each vortex for silky-smooth, zero-flicker GIF animation
+	evalVortexSpiralWave := func(x, y float64) (dLum, dChroma float64) {
+		if !isAnim {
+			return 0, 0
+		}
+		for i := range vortices {
+			v := &vortices[i]
+			dx := x - v.x
+			dy := y - v.y
+			reach := 1.45 * v.radius
+			if math.Abs(dx) >= reach || math.Abs(dy) >= reach {
+				continue
+			}
+			d := math.Hypot(dx, dy)
+			if d < reach {
+				u := 1.0 - d/reach
+				env := u * u * (3.0 - 2.0*u)
+				theta := math.Atan2(dy, dx)
+				// 2-arm logarithmic spiral wave rotating smoothly with phi in the direction of v.spin
+				spiralPhase := 2.0*theta - v.spin*phi - (d/v.radius)*4.2 + float64(i)*0.73
+				w := math.Sin(spiralPhase)
+				dLum += env * w * 0.11
+				dChroma += env * math.Cos(spiralPhase) * 0.035
+			}
+		}
+		// Global gentle travelling aurora wave
+		nx, ny := x/fw, y/fh
+		globalWave := math.Sin(nx*math.Pi*2.5 - ny*math.Pi*2.0 - phi)
+		dLum += 0.035 * globalWave
+		return common.Constrain(dLum, -0.16, 0.16), common.Constrain(dChroma, -0.05, 0.05)
 	}
 
 	// 3. 22,000+ Fine Swirling Fur / Bristle Strokes & Ragged Edge Bleed
@@ -420,7 +488,7 @@ func (vi *vortexImpasto) Generative(c *generativeart.Canva) {
 		y0 := yMin + v*(yMax-yMin)
 		ny0 := common.Clamp01(y0 / fh)
 
-		// Trace 12 steps of 2.2*scale px along the vortex velocity field
+		// Trace 12 steps of 2.2*scale px along the locked vortex velocity field (zero sub-pixel hair jitter)
 		pts[0] = render.Pt(x0, y0)
 		cx, cy := x0, y0
 		strokeBend := (rng.Float64() - 0.5) * 0.055
@@ -431,13 +499,14 @@ func (vi *vortexImpasto) Generative(c *generativeart.Canva) {
 			pts[k] = render.Pt(cx, cy)
 		}
 
-		// Sample macro color at bristle root with Oklab lightness & subtle chroma/hue variation
+		// Sample macro color at bristle root with Oklab lightness & coherent spiral wave modulation
 		rootMacro := evalMacroColor(nx0, ny0)
 		lab := render.RGBAToOklab(rootMacro)
+		waveDL, waveDC := evalVortexSpiralWave(pts[traceSteps/2].X, pts[traceSteps/2].Y)
 
-		dL := -0.10 + 0.21*rng.Float64()
-		dA := (rng.Float64() - 0.5) * 0.032
-		dB := (rng.Float64() - 0.5) * 0.032
+		dL := -0.10 + 0.21*rng.Float64() + waveDL
+		dA := (rng.Float64()-0.5)*0.032 + waveDC
+		dB := (rng.Float64()-0.5)*0.032 - waveDC*0.6
 
 		litCol := render.OklabToRGBA(render.Oklab{
 			L: common.Constrain(lab.L+dL, 0.05, 0.97),
@@ -480,6 +549,9 @@ func (vi *vortexImpasto) Generative(c *generativeart.Canva) {
 		}
 		for k := 0; k < nSpots; k++ {
 			offAng := rng.Float64() * 2.0 * math.Pi
+			if isAnim {
+				offAng += v.spin * phi
+			}
 			offDist := (1.5 + 4.5*rng.Float64()) * scale
 			px := v.x + math.Cos(offAng)*offDist
 			py := v.y + math.Sin(offAng)*offDist

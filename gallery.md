@@ -8,15 +8,17 @@ This gallery contains standalone `Go` usage examples and rendered outputs for `g
 
 ## 🎞️ Seamless 600×600 HD Looping GIF Animations (`DrawTimelapseFrames` + `ToGIF`)
 
-| Hex Basalt Columns (`basaltcolumns`) | 3D Wireframe Glacier (`wireframeterrain`) | 3D Lissajous Silk (`lissajousribbon`) | Karst Terraces (`marchingisolines`) |
+| Vortex Impasto (`vorteximpasto`) | Squeegee Scrape (`squeegeescrape`) | Hex Basalt Columns (`basaltcolumns`) | 3D Wireframe Glacier (`wireframeterrain`) |
 | :---: | :---: | :---: | :---: |
-| ![Basalt Columns Loop](images/basaltcolumns_loop.gif) | ![Wireframe Terrain Loop](images/wireframeterrain_loop.gif) | ![Lissajous Ribbon Loop](images/lissajousribbon_loop.gif) | ![Marching Isolines Loop](images/marchingisolines_loop.gif) |
-| **Jovian Vortex (`vortexfluid`)** | **Dunhuang Caisson (`dunhuangapsara`)** | **Gothic Rose Window (`stainedrosewindow`)** | **Newton Fractal Silk (`newtonbasin`)** |
-| ![Vortex Fluid Loop](images/vortexfluid_loop.gif) | ![Dunhuang Caisson Loop](images/dunhuangapsara_loop.gif) | ![Gothic Rose Window Loop](images/stainedrosewindow_loop.gif) | ![Newton Basin Loop](images/newtonbasin_loop.gif) |
-| **3D Miura-Ori (`origamitessellation`)** | **BZ Spiral Waves (`cyclicautomata`)** | **3D Gyroid TPMS (`gyroidsurface`)** | **Mosaic Sun (`mosaicsun`)** |
-| ![Origami Tessellation Loop](images/origamitessellation_loop.gif) | ![BZ Spiral Waves Loop](images/cyclicautomata_loop.gif) | ![3D Gyroid Loop](images/gyroidsurface_loop.gif) | ![Mosaic Sun Loop](images/mosaicsun_loop.gif) |
+| ![Vortex Impasto Loop](images/vorteximpasto_loop.gif) | ![Squeegee Scrape Loop](images/squeegeescrape_loop.gif) | ![Basalt Columns Loop](images/basaltcolumns_loop.gif) | ![Wireframe Terrain Loop](images/wireframeterrain_loop.gif) |
+| **3D Lissajous Silk (`lissajousribbon`)** | **Karst Terraces (`marchingisolines`)** | **Jovian Vortex (`vortexfluid`)** | **Dunhuang Caisson (`dunhuangapsara`)** |
+| ![Lissajous Ribbon Loop](images/lissajousribbon_loop.gif) | ![Marching Isolines Loop](images/marchingisolines_loop.gif) | ![Vortex Fluid Loop](images/vortexfluid_loop.gif) | ![Dunhuang Caisson Loop](images/dunhuangapsara_loop.gif) |
+| **Gothic Rose Window (`stainedrosewindow`)** | **Newton Fractal Silk (`newtonbasin`)** | **3D Miura-Ori (`origamitessellation`)** | **BZ Spiral Waves (`cyclicautomata`)** |
+| ![Gothic Rose Window Loop](images/stainedrosewindow_loop.gif) | ![Newton Basin Loop](images/newtonbasin_loop.gif) | ![Origami Tessellation Loop](images/origamitessellation_loop.gif) | ![BZ Spiral Waves Loop](images/cyclicautomata_loop.gif) |
 
 ```bash
+go run ./cmd/genart render -art vorteximpasto       -w 600 -h 600 -frames 20 -delay 12 -out images/vorteximpasto_loop.gif
+go run ./cmd/genart render -art squeegeescrape      -w 600 -h 600 -frames 20 -delay 12 -out images/squeegeescrape_loop.gif
 go run ./cmd/genart render -art basaltcolumns       -w 600 -h 600 -frames 20 -delay 12 -out images/basaltcolumns_loop.gif
 go run ./cmd/genart render -art wireframeterrain    -w 600 -h 600 -frames 20 -delay 12 -out images/wireframeterrain_loop.gif
 go run ./cmd/genart render -art lissajousribbon     -w 600 -h 600 -frames 20 -delay 12 -out images/lissajousribbon_loop.gif
