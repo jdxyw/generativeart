@@ -1742,6 +1742,71 @@ hp := arts.NewHalftonePanels(22, 5.5)
 
 ![](../images/halftonepanels.png)
 
+## Nebula Plumes
+
+`Nebula Plumes` renders a macro-scale binary spiral galaxy collision with 2 colossal counter-rotating super-vortices, an S-shaped tidal bridge with 14 satellite eddies, and 23,000 long feathery bristle plumes over an antique parchment deckle border.
+
+### parameters
+
+- spiralArms: Number of logarithmic spiral luminescence arms per galactic core.
+- strokeCount: Total number of layered feathery bristle plumes.
+- swirlTightness: Multiplier for spiral inflow pitch and curl velocity.
+
+```go
+np := arts.NewNebulaPlumes(3, 23000, 1.0)
+```
+
+![](../images/nebulaplumes.png)
+
+## Abyssal Currents
+
+`Abyssal Currents` renders an obsidian-bordered meandering bioluminescent Kuroshio S-curve jet stream flanked by 18 alternating clockwise and counter-clockwise Kármán vortex street eddies in electric cyan, neon rose-magenta, and tangerine-gold.
+
+### parameters
+
+- jetBands: Number of flanking Kármán vortex street eddies along the shear boundary.
+- strokeCount: Total number of layered bristle ribbons.
+- meanderAmp: Lateral S-curve meander amplitude of the central jet stream.
+
+```go
+ac := arts.NewAbyssalCurrents(18, 23000, 1.0)
+```
+
+![](../images/abyssalcurrents.png)
+
+## Solar Prominence
+
+`Solar Prominence` renders a circular deckle-edged solar tondo medallion where 14 bipolar sunspot magnetic poles weave twisted white-gold, vermilion, carmine, and violet magnetic arcade loops with coronal prominence plumes splaying across the circular rim.
+
+### parameters
+
+- archCount: Number of bipolar sunspot magnetic poles inside the solar disc.
+- strokeCount: Total number of plasma bristle filaments.
+- magneticTwist: Helical Lorentz twist multiplier around sunspot poles.
+
+```go
+sp := arts.NewSolarProminence(14, 24000, 1.0)
+```
+
+![](../images/solarprominence.png)
+
+## Botanical Whorls
+
+`Botanical Whorls` renders 64 multi-scale Fibonacci golden-angle whorls cascading from giant 60px lotus rosettes to delicate 16px micro-buds in Monet celadon-jade, sakura peony-rose, apricot-gold, and twilight pond indigo.
+
+### parameters
+
+- whorlCount: Total number of hierarchical phyllotaxis whorls.
+- strokeCount: Total number of velvety petal-impasto bristle strokes.
+- phylloAngle: Golden divergence angle in degrees (default `137.507764`).
+
+```go
+bw := arts.NewBotanicalWhorls(64, 22000, 137.507764)
+```
+
+![](../images/botanicalwhorls.png)
+
+
 
 
 

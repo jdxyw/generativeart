@@ -4,7 +4,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/jdxyw/generativeart)](https://goreportcard.com/report/github.com/jdxyw/generativeart)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/jdxyw/generativeart/master/LICENSE)
 
-`generativeart` is a pure-`Go` generative art engine and algorithm collection supporting **117 generative art types** across flow fields, strange attractors, 3D terrain geomorphology, biological morphogenesis, 3D SDF raymarching, complex phase portraits, differential topology, non-Euclidean geometry, quasicrystals, stained-glass mosaics, cloisonné enamel, 3D origami, and traditional printmaking.
+`generativeart` is a pure-`Go` generative art engine and algorithm collection supporting **121 generative art types** across flow fields, strange attractors, 3D terrain geomorphology, biological morphogenesis, 3D SDF raymarching, complex phase portraits, differential topology, non-Euclidean geometry, quasicrystals, stained-glass mosaics, cloisonné enamel, 3D origami, and traditional printmaking.
 
 - 🌐 **Live Interactive Web Gallery (GitHub Pages)**: **[https://jdxyw.github.io/generativeart/](https://jdxyw.github.io/generativeart/)**
 - 🖼️ **Full Code & Image Gallery (`gallery.md`)**: **[./gallery.md](./gallery.md)**
@@ -15,27 +15,27 @@
 
 ## Featured Gallery Highlights
 
-> Browse all **117 artworks**, full `Go` source snippets, and rendered previews in **[`gallery.md`](./gallery.md)** or on the **[Interactive GitHub Pages Gallery](https://jdxyw.github.io/generativeart/)**.
+> Browse all **121 artworks**, full `Go` source snippets, and rendered previews in **[`gallery.md`](./gallery.md)** or on the **[Interactive GitHub Pages Gallery](https://jdxyw.github.io/generativeart/)**.
 
-| [Concentric Morph](./gallery.md#concentric-morph) | [Vortex Impasto](./gallery.md#vortex-impasto) | [Sliced Pebbles](./gallery.md#sliced-pebbles) | [Hex Mandala](./gallery.md#hex-mandala) |
+| [Nebula Plumes](./gallery.md#nebula-plumes) | [Abyssal Currents](./gallery.md#abyssal-currents) | [Solar Prominence](./gallery.md#solar-prominence) | [Botanical Whorls](./gallery.md#botanical-whorls) |
 | :---: | :---: | :---: | :---: |
+| ![Nebula Plumes](images/nebulaplumes.png) | ![Abyssal Currents](images/abyssalcurrents.png) | ![Solar Prominence](images/solarprominence.png) | ![Botanical Whorls](images/botanicalwhorls.png) |
+| **[Concentric Morph](./gallery.md#concentric-morph)** | **[Vortex Impasto](./gallery.md#vortex-impasto)** | **[Sliced Pebbles](./gallery.md#sliced-pebbles)** | **[Hex Mandala](./gallery.md#hex-mandala)** |
 | ![Concentric Morph](images/concentricmorph.png) | ![Vortex Impasto](images/vorteximpasto.png) | ![Sliced Pebbles](images/slicedpebbles.png) | ![Hex Mandala](images/hexmandala.png) |
 | **[Squeegee Scrape](./gallery.md#squeegee-scrape)** | **[Halftone Panels](./gallery.md#halftone-panels)** | **[Nautilus Spiral](./gallery.md#nautilus-spiral-3d-fluted-ribbon-edition)** | **[Hydraulic Erosion](./gallery.md#hydraulic-erosion)** |
 | ![Squeegee Scrape](images/squeegeescrape.png) | ![Halftone Panels](images/halftonepanels.png) | ![Nautilus Spiral](images/nautilusspiral.png) | ![Hydraulic Erosion](images/hydraulicerosion.png) |
-| **[Basalt Columns](./gallery.md#basalt-columns)** | **[Sand Dunes](./gallery.md#sand-dunes)** | **[Bathymetric Chart](./gallery.md#bathymetric-chart)** | **[Wireframe Terrain](./gallery.md#wireframe-terrain)** |
-| ![Basalt Columns](images/basaltcolumns.png) | ![Sand Dunes](images/sanddunes.png) | ![Bathymetric Chart](images/bathymetricchart.png) | ![Wireframe Terrain](images/wireframeterrain.png) |
 
-👉 **[View All 117 Artworks & Code Examples in `gallery.md` →](./gallery.md)**
+👉 **[View All 121 Artworks & Code Examples in `gallery.md` →](./gallery.md)**
 
 ### 🎞️ Seamless 600×600 HD Looping Animations (`DrawTimelapseFrames` + `ToGIF`)
 
-| Vortex Impasto (`vorteximpasto`) | Squeegee Scrape (`squeegeescrape`) | Hex Basalt Columns (`basaltcolumns`) | 3D Wireframe Glacier (`wireframeterrain`) |
+| Binary Nebula Plumes (`nebulaplumes`) | Abyssal Kuroshio Jet (`abyssalcurrents`) | Solar Prominence Tondo (`solarprominence`) | Botanical Lotus Whorls (`botanicalwhorls`) |
 | :---: | :---: | :---: | :---: |
+| ![Nebula Plumes Loop](images/nebulaplumes_loop.gif) | ![Abyssal Currents Loop](images/abyssalcurrents_loop.gif) | ![Solar Prominence Loop](images/solarprominence_loop.gif) | ![Botanical Whorls Loop](images/botanicalwhorls_loop.gif) |
+| **Vortex Impasto (`vorteximpasto`)** | **Squeegee Scrape (`squeegeescrape`)** | **Hex Basalt Columns (`basaltcolumns`)** | **3D Wireframe Glacier (`wireframeterrain`)** |
 | ![Vortex Impasto Loop](images/vorteximpasto_loop.gif) | ![Squeegee Scrape Loop](images/squeegeescrape_loop.gif) | ![Basalt Columns Loop](images/basaltcolumns_loop.gif) | ![Wireframe Terrain Loop](images/wireframeterrain_loop.gif) |
 | **3D Lissajous Silk (`lissajousribbon`)** | **Karst Terraces (`marchingisolines`)** | **Jovian Vortex (`vortexfluid`)** | **Dunhuang Caisson (`dunhuangapsara`)** |
 | ![Lissajous Ribbon Loop](images/lissajousribbon_loop.gif) | ![Marching Isolines Loop](images/marchingisolines_loop.gif) | ![Vortex Fluid Loop](images/vortexfluid_loop.gif) | ![Dunhuang Caisson Loop](images/dunhuangapsara_loop.gif) |
-| **Gothic Rose Window (`stainedrosewindow`)** | **Newton Fractal Silk (`newtonbasin`)** | **3D Miura-Ori (`origamitessellation`)** | **BZ Spiral Waves (`cyclicautomata`)** |
-| ![Gothic Rose Window Loop](images/stainedrosewindow_loop.gif) | ![Newton Basin Loop](images/newtonbasin_loop.gif) | ![Origami Tessellation Loop](images/origamitessellation_loop.gif) | ![BZ Spiral Waves Loop](images/cyclicautomata_loop.gif) |
 
 ### 🖼️ Museum Exhibition Posters & Multi-Panel Contact Sheets (`genart poster`)
 
@@ -230,9 +230,15 @@ _ = poster.ToPNG("poster_dunhuang.png")
 
 ## Supported Art Types & Constructors
 
-All 117 generators implement `generativeart.Engine` under package `github.com/jdxyw/generativeart/arts` (see [gallery.md](./gallery.md) for visual examples and [docs/doc.md](./docs/doc.md) for parameter details):
+All 121 generators implement `generativeart.Engine` under package `github.com/jdxyw/generativeart/arts` (see [gallery.md](./gallery.md) for visual examples and [docs/doc.md](./docs/doc.md) for parameter details):
 
 ```go
+// Wave 17: Tactile Bristle & Vortex Impasto Series (Binary Nebula Plumes, Abyssal Kuroshio Currents, Solar Prominence Tondo & Botanical Lotus Whorls)
+NewNebulaPlumes(spiralArms, strokeCount int, swirlTightness float64)
+NewAbyssalCurrents(jetBands, strokeCount int, meanderAmp float64)
+NewSolarProminence(archCount, strokeCount int, magneticTwist float64)
+NewBotanicalWhorls(whorlCount, strokeCount int, phylloAngle float64)
+
 // Wave 16: Molnár Order-to-Disorder Concentric Morph, Swirling Vortex Impasto, Mid-Century Sliced Pebbles, Hexagonal Mandala Honeycomb, Richter Squeegee Scrape & Retro Sci-Fi Halftone Panels
 NewConcentricMorph(gridCols, gridRows int, disorder float64)
 NewVortexImpasto(vortexCount, strokeCount int, curlStrength float64)

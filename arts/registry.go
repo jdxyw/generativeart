@@ -106,6 +106,36 @@ func paramString(p map[string]interface{}, key, def string) string {
 }
 
 var registry = []ArtDescriptor{
+	// Wave 17: Tactile Bristle & Vortex Impasto Series (Binary Nebula Plumes, Abyssal Kuroshio Currents, Solar Prominence Tondo & Botanical Phyllotaxis Whorls)
+	{
+		ID: "nebulaplumes", StructName: "nebulaPlumes", Category: "media",
+		DefaultBG: color.RGBA{243, 236, 225, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewNebulaPlumes(paramInt(p, "spiralArms", 3), paramInt(p, "strokeCount", 23000), paramFloat(p, "swirlTightness", 1.0))
+		},
+	},
+	{
+		ID: "abyssalcurrents", StructName: "abyssalCurrents", Category: "media",
+		DefaultBG: color.RGBA{13, 16, 24, 255}, DefaultPal: "cyberpunk",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewAbyssalCurrents(paramInt(p, "jetBands", 18), paramInt(p, "strokeCount", 23000), paramFloat(p, "meanderAmp", 1.0))
+		},
+	},
+	{
+		ID: "solarprominence", StructName: "solarProminence", Category: "media",
+		DefaultBG: color.RGBA{242, 235, 224, 255}, DefaultPal: "inferno",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewSolarProminence(paramInt(p, "archCount", 14), paramInt(p, "strokeCount", 24000), paramFloat(p, "magneticTwist", 1.0))
+		},
+	},
+	{
+		ID: "botanicalwhorls", StructName: "botanicalWhorls", Category: "media",
+		DefaultBG: color.RGBA{238, 235, 226, 255}, DefaultPal: "botanical",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewBotanicalWhorls(paramInt(p, "whorlCount", 64), paramInt(p, "strokeCount", 22000), paramFloat(p, "phylloAngle", 137.507764))
+		},
+	},
+
 	// Wave 16: Molnár Order-to-Disorder Concentric Morph, Swirling Vortex Impasto, Mid-Century Sliced Pebbles, Hexagonal Mandala Honeycomb, Richter Squeegee Scrape & Retro Sci-Fi Halftone Panels
 	{
 		ID: "concentricmorph", StructName: "concentricMorph", Category: "geom",

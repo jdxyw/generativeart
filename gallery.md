@@ -8,15 +8,19 @@ This gallery contains standalone `Go` usage examples and rendered outputs for `g
 
 ## 🎞️ Seamless 600×600 HD Looping GIF Animations (`DrawTimelapseFrames` + `ToGIF`)
 
-| Vortex Impasto (`vorteximpasto`) | Squeegee Scrape (`squeegeescrape`) | Hex Basalt Columns (`basaltcolumns`) | 3D Wireframe Glacier (`wireframeterrain`) |
+| Binary Nebula Plumes (`nebulaplumes`) | Abyssal Kuroshio Jet (`abyssalcurrents`) | Solar Prominence Tondo (`solarprominence`) | Botanical Lotus Whorls (`botanicalwhorls`) |
 | :---: | :---: | :---: | :---: |
+| ![Nebula Plumes Loop](images/nebulaplumes_loop.gif) | ![Abyssal Currents Loop](images/abyssalcurrents_loop.gif) | ![Solar Prominence Loop](images/solarprominence_loop.gif) | ![Botanical Whorls Loop](images/botanicalwhorls_loop.gif) |
+| **Vortex Impasto (`vorteximpasto`)** | **Squeegee Scrape (`squeegeescrape`)** | **Hex Basalt Columns (`basaltcolumns`)** | **3D Wireframe Glacier (`wireframeterrain`)** |
 | ![Vortex Impasto Loop](images/vorteximpasto_loop.gif) | ![Squeegee Scrape Loop](images/squeegeescrape_loop.gif) | ![Basalt Columns Loop](images/basaltcolumns_loop.gif) | ![Wireframe Terrain Loop](images/wireframeterrain_loop.gif) |
 | **3D Lissajous Silk (`lissajousribbon`)** | **Karst Terraces (`marchingisolines`)** | **Jovian Vortex (`vortexfluid`)** | **Dunhuang Caisson (`dunhuangapsara`)** |
 | ![Lissajous Ribbon Loop](images/lissajousribbon_loop.gif) | ![Marching Isolines Loop](images/marchingisolines_loop.gif) | ![Vortex Fluid Loop](images/vortexfluid_loop.gif) | ![Dunhuang Caisson Loop](images/dunhuangapsara_loop.gif) |
-| **Gothic Rose Window (`stainedrosewindow`)** | **Newton Fractal Silk (`newtonbasin`)** | **3D Miura-Ori (`origamitessellation`)** | **BZ Spiral Waves (`cyclicautomata`)** |
-| ![Gothic Rose Window Loop](images/stainedrosewindow_loop.gif) | ![Newton Basin Loop](images/newtonbasin_loop.gif) | ![Origami Tessellation Loop](images/origamitessellation_loop.gif) | ![BZ Spiral Waves Loop](images/cyclicautomata_loop.gif) |
 
 ```bash
+go run ./cmd/genart render -art nebulaplumes        -w 600 -h 600 -frames 20 -delay 12 -out images/nebulaplumes_loop.gif
+go run ./cmd/genart render -art abyssalcurrents     -w 600 -h 600 -frames 20 -delay 12 -out images/abyssalcurrents_loop.gif
+go run ./cmd/genart render -art solarprominence     -w 600 -h 600 -frames 20 -delay 12 -out images/solarprominence_loop.gif
+go run ./cmd/genart render -art botanicalwhorls     -w 600 -h 600 -frames 20 -delay 12 -out images/botanicalwhorls_loop.gif
 go run ./cmd/genart render -art vorteximpasto       -w 600 -h 600 -frames 20 -delay 12 -out images/vorteximpasto_loop.gif
 go run ./cmd/genart render -art squeegeescrape      -w 600 -h 600 -frames 20 -delay 12 -out images/squeegeescrape_loop.gif
 go run ./cmd/genart render -art basaltcolumns       -w 600 -h 600 -frames 20 -delay 12 -out images/basaltcolumns_loop.gif
@@ -54,6 +58,11 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
 
 ## Table of Contents
 
+- [Wave 17: Tactile Bristle & Vortex Impasto Series — Binary Nebula Plumes, Abyssal Kuroshio Currents, Solar Prominence Tondo & Botanical Lotus Whorls](#wave-17-tactile-bristle--vortex-impasto-series--binary-nebula-plumes-abyssal-kuroshio-currents-solar-prominence-tondo--botanical-lotus-whorls)
+  - [Nebula Plumes](#nebula-plumes)
+  - [Abyssal Currents](#abyssal-currents)
+  - [Solar Prominence](#solar-prominence)
+  - [Botanical Whorls](#botanical-whorls)
 - [Wave 16: Molnár Concentric Morph, Swirling Vortex Impasto, Mid-Century Sliced Pebbles, Hexagonal Mandala Honeycomb, Richter Squeegee Scrape, Retro Sci-Fi Halftone Panels & 3D Fluted Nautilus Spiral](#wave-16-molnár-concentric-morph-swirling-vortex-impasto-mid-century-sliced-pebbles-hexagonal-mandala-honeycomb-richter-squeegee-scrape-retro-sci-fi-halftone-panels--3d-fluted-nautilus-spiral)
   - [Concentric Morph](#concentric-morph)
   - [Vortex Impasto](#vortex-impasto)
@@ -179,6 +188,114 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
   - [Silk Sky](#silk-sky)
   - [Circle Move](#circle-move)
   - [Random Circle](#random-circle)
+
+---
+
+## Wave 17: Tactile Bristle & Vortex Impasto Series — Binary Nebula Plumes, Abyssal Kuroshio Currents, Solar Prominence Tondo & Botanical Lotus Whorls
+
+### Nebula Plumes
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261029)
+	c.SetBackground(color.RGBA{R: 243, G: 236, B: 225, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewNebulaPlumes(3, 23000, 1.0))
+	c.ToPNG("nebulaplumes.png")
+}
+```
+
+![Nebula Plumes](images/nebulaplumes.png)
+
+### Abyssal Currents
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261029)
+	c.SetBackground(color.RGBA{R: 13, G: 16, B: 24, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Cyberpunk)
+	c.Draw(arts.NewAbyssalCurrents(18, 23000, 1.0))
+	c.ToPNG("abyssalcurrents.png")
+}
+```
+
+![Abyssal Currents](images/abyssalcurrents.png)
+
+### Solar Prominence
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261029)
+	c.SetBackground(color.RGBA{R: 242, G: 235, B: 224, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Inferno)
+	c.Draw(arts.NewSolarProminence(14, 24000, 1.0))
+	c.ToPNG("solarprominence.png")
+}
+```
+
+![Solar Prominence](images/solarprominence.png)
+
+### Botanical Whorls
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261029)
+	c.SetBackground(color.RGBA{R: 238, G: 235, B: 226, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Botanical)
+	c.Draw(arts.NewBotanicalWhorls(64, 22000, 137.507764))
+	c.ToPNG("botanicalwhorls.png")
+}
+```
+
+![Botanical Whorls](images/botanicalwhorls.png)
 
 ---
 
