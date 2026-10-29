@@ -171,6 +171,12 @@ Expand `arts/` from **94** to **100** generators with pure mathematical attracto
 23. **`HalftonePanels`** (`NewHalftonePanels(panelCount int, dotSpacing float64)`): 22-panel retro sci-fi comic layout with ringed Saturns, crescent moons, and hexagonal Ben-Day halftone mountain ridges in mint, black, and white.
 24. **`NautilusSpiral` Overhaul** (`NewNautilusSpiral(turns, linesPerChamber int)`): Upgraded to pure single-direction 3D fluted radial chambers, overlapping longitudinal copper/gold/steel-blue S-ribbon plumes, and continuous multi-strand spiral cables.
 
+### 5.1e Wave 17 — Tactile Bristle & Vortex Impasto Series (+4 Engines + 4 HD Loop GIFs, 121 Total — Implemented)
+25. **`NebulaPlumes`** (`NewNebulaPlumes(spiralArms, strokeCount int, swirlTightness float64)`): Macro-scale binary spiral galaxy collision with 2 counter-rotating super-vortices, 14 satellite eddies, and 23,000 feathery bristle plumes over antique parchment.
+26. **`AbyssalCurrents`** (`NewAbyssalCurrents(jetBands, strokeCount int, meanderAmp float64)`): Obsidian-bordered meandering bioluminescent cyan Kuroshio jet stream flanked by 18 alternating neon rose-magenta and tangerine-gold Kármán vortex street eddies.
+27. **`SolarProminence`** (`NewSolarProminence(archCount, strokeCount int, magneticTwist float64)`): Circular deckle-edged solar tondo medallion with 14 bipolar sunspot poles, twisted magnetic arcade loops, and coronal prominence plumes.
+28. **`BotanicalWhorls`** (`NewBotanicalWhorls(whorlCount, strokeCount int, phylloAngle float64)`): 64 multi-scale Fibonacci golden-angle whorls cascading from giant lotus rosettes to micro-buds in Monet celadon-jade, sakura rose, and twilight pond indigo.
+
 ### 5.2 Direction 2: Pure-Go WebAssembly (WASM) Interactive Gallery Playground
 - **Architecture (`wasm/main.go`, `GOOS=js GOARCH=wasm`)**:
   - Compile the pure-Go `generativeart` registry and HDR engine to WebAssembly.
@@ -192,6 +198,6 @@ Expand `arts/` from **94** to **100** generators with pure mathematical attracto
     go run ./cmd/genart poster -arts dunhuangapsara,celticknotwork,gyroidsurface,persiantilework -grid 2x2 -panel 420 -theme dark -title "WAVE XII EXHIBITION" -out images/poster_wave12.png
     ```
 
-### 5.4 Direction 4: High-Definition 600×600 Seamless Loop GIF Expansion (15 HD Loop GIFs — Implemented)
-- Expanded the `600×600` 18-bit LUT + K-Means quantized seamless 360° loop GIF collection to **15 HD animations**: `vorteximpasto_loop.gif`, `squeegeescrape_loop.gif`, `basaltcolumns_loop.gif`, `wireframeterrain_loop.gif`, `lissajousribbon_loop.gif`, `marchingisolines_loop.gif`, `vortexfluid_loop.gif`, `dunhuangapsara_loop.gif`, `stainedrosewindow_loop.gif`, `newtonbasin_loop.gif`, `origamitessellation_loop.gif`, `cyclicautomata_loop.gif`, `gyroidsurface_loop.gif`, `mosaicsun_loop.gif`, and `magneticdipole_loop.gif`.
+### 5.4 Direction 4: High-Definition 600×600 Seamless Loop GIF Expansion (19 HD Loop GIFs — Implemented)
+- Expanded the `600×600` 18-bit LUT + K-Means quantized seamless 360° loop GIF collection to **19 HD animations**: `nebulaplumes_loop.gif`, `abyssalcurrents_loop.gif`, `solarprominence_loop.gif`, `botanicalwhorls_loop.gif`, `vorteximpasto_loop.gif`, `squeegeescrape_loop.gif`, `basaltcolumns_loop.gif`, `wireframeterrain_loop.gif`, `lissajousribbon_loop.gif`, `marchingisolines_loop.gif`, `vortexfluid_loop.gif`, `dunhuangapsara_loop.gif`, `stainedrosewindow_loop.gif`, `newtonbasin_loop.gif`, `origamitessellation_loop.gif`, `cyclicautomata_loop.gif`, `gyroidsurface_loop.gif`, `mosaicsun_loop.gif`, and `magneticdipole_loop.gif`.
 

@@ -63,6 +63,10 @@ func TestMosaicFamilyGenerators(t *testing.T) {
 		{"HexMandala", NewHexMandala(8, 8, 1.0)},
 		{"SqueegeeScrape", NewSqueegeeScrape(4, 80, 1.0)},
 		{"HalftonePanels", NewHalftonePanels(22, 6.0)},
+		{"NebulaPlumes", NewNebulaPlumes(3, 2000, 1.0)},
+		{"AbyssalCurrents", NewAbyssalCurrents(12, 2000, 1.0)},
+		{"SolarProminence", NewSolarProminence(10, 2000, 1.0)},
+		{"BotanicalWhorls", NewBotanicalWhorls(24, 2000, 137.507764)},
 	}
 
 	for _, tc := range cases {
