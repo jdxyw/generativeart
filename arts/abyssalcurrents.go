@@ -67,6 +67,7 @@ func (ac *abyssalCurrents) GenerativeFrame(c *generativeart.Canva, frameIdx, tot
 	rng := rand.New(rand.NewSource(seed))
 	noise := common.NewNoiseEngine(seed)
 
+	isAnim := totalFrames > 1
 	phi := 2.0 * math.Pi * phase
 	loopX := 0.07 * math.Sin(phi)
 	loopY := 0.07 * (1.0 - math.Cos(phi))
@@ -109,10 +110,13 @@ func (ac *abyssalCurrents) GenerativeFrame(c *generativeart.Canva, frameIdx, tot
 		// Transverse distance toward upper-left is negative of (dx*invSqrt2 + dy*invSqrt2)
 		trans := -(dx*invSqrt2 + dy*invSqrt2)
 		dCenter := 0.11 * ac.meanderAmp * math.Sin(sJet*math.Pi*2.2-0.4)
+		slope := (0.11 * ac.meanderAmp * math.Pi * 2.2 / axisSpan) * math.Cos(sJet*math.Pi*2.2-0.4)
+		if isAnim {
+			dCenter += 0.032 * math.Sin(sJet*math.Pi*3.0-phi)
+			slope += (0.032 * math.Pi * 3.0 / axisSpan) * math.Cos(sJet*math.Pi*3.0-phi)
+		}
 		dJet = trans - dCenter
 
-		// Derivative ddCenter/dsJet in world normal vs axis
-		slope := (0.11 * ac.meanderAmp * math.Pi * 2.2 / axisSpan) * math.Cos(sJet*math.Pi*2.2-0.4)
 		// Base jet direction is (-45 deg = -pi/4), deflected toward normal (-3*pi/4) by slope
 		tx := invSqrt2 - slope*invSqrt2
 		ty := -invSqrt2 - slope*invSqrt2
@@ -146,9 +150,16 @@ func (ac *abyssalCurrents) GenerativeFrame(c *generativeart.Canva, frameIdx, tot
 		ny := 0.92 - along*invSqrt2 - trans*invSqrt2
 
 		rad := (44.0 + 24.0*rng.Float64()) * scale
+		vx := common.Constrain(nx, 0.11, 0.89) * fw
+		vy := common.Constrain(ny, 0.11, 0.89) * fh
+		if isAnim {
+			vPhase := float64(i) * 1.1
+			vx += 7.0 * scale * math.Sin(phi+vPhase)
+			vy += 7.0 * scale * (1.0 - math.Cos(phi+vPhase))
+		}
 		vortices = append(vortices, karmanEddy{
-			x:          common.Constrain(nx, 0.11, 0.89) * fw,
-			y:          common.Constrain(ny, 0.11, 0.89) * fh,
+			x:          vx,
+			y:          vy,
 			radius:     rad,
 			spin:       spin,
 			strength:   0.95 + 0.35*rng.Float64(),
@@ -306,7 +317,12 @@ func (ac *abyssalCurrents) GenerativeFrame(c *generativeart.Canva, frameIdx, tot
 			if d < reach {
 				u := 1.0 - d/reach
 				wv := u * u * v.strength * 2.55
-				ang := math.Atan2(dy, dx) + v.spin*(math.Pi*0.44)
+				theta := math.Atan2(dy, dx)
+				ang := theta + v.spin*(math.Pi*0.44)
+				if isAnim {
+					spiralWave := 0.24 * math.Sin(2.0*theta-v.spin*phi-(d/v.radius)*3.5)
+					ang = theta + v.spin*(math.Pi*0.44+spiralWave)
+				}
 				vxSum += math.Cos(ang) * wv
 				vySum += math.Sin(ang) * wv
 			}
@@ -380,11 +396,24 @@ func (ac *abyssalCurrents) GenerativeFrame(c *generativeart.Canva, frameIdx, tot
 		y0 := yMin + v*(yMax-yMin)
 		ny0 := common.Clamp01(y0 / fh)
 
-		pts[0] = render.Pt(x0, y0)
 		cx, cy := x0, y0
+		var sJet, dJet float64
+		if isAnim {
+			sJet, dJet, _ = jetCoords(nx0, ny0)
+			ang0 := evalVelocityAngle(x0, y0)
+			adv := 9.5 * scale * math.Sin(sJet*math.Pi*4.0-phi+dJet*8.0)
+			cx = x0 + math.Cos(ang0)*adv
+			cy = y0 + math.Sin(ang0)*adv
+		}
+		pts[0] = render.Pt(cx, cy)
 		strokeBend := (rng.Float64() - 0.5) * 0.050
 		for k := 1; k <= traceSteps; k++ {
-			ang := evalVelocityAngle(cx, cy) + strokeBend*float64(k)
+			var whip float64
+			if isAnim {
+				tStep := float64(k) / float64(traceSteps)
+				whip = 0.28 * tStep * math.Cos(sJet*math.Pi*4.0-phi-1.8*tStep+dJet*6.0)
+			}
+			ang := evalVelocityAngle(cx, cy) + strokeBend*float64(k) + whip
 			cx += math.Cos(ang) * stepLen
 			cy += math.Sin(ang) * stepLen
 			pts[k] = render.Pt(cx, cy)
@@ -455,6 +484,9 @@ func (ac *abyssalCurrents) GenerativeFrame(c *generativeart.Canva, frameIdx, tot
 			sAnim += 1.0
 		}
 		dCenter := 0.11 * ac.meanderAmp * math.Sin(sAnim*math.Pi*2.2-0.4)
+		if isAnim {
+			dCenter += 0.032 * math.Sin(sAnim*math.Pi*3.0-phi)
+		}
 		trans := dCenter + dOff
 		along := sAnim * axisSpan
 		nx := 0.08 + along*invSqrt2 - trans*invSqrt2
