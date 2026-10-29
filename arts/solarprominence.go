@@ -168,6 +168,14 @@ func (sp *solarProminence) GenerativeFrame(c *generativeart.Canva, frameIdx, tot
 		})
 	}
 
+	if isAnim {
+		for i := range poles {
+			orbitPhase := phi + float64(i)*1.3
+			poles[i].x += 6.0 * scale * math.Sin(orbitPhase)
+			poles[i].y += 6.0 * scale * (1.0 - math.Cos(orbitPhase))
+		}
+	}
+
 	// Evaluate macro chromosphere color + sunspot umbra cores + flaring arcades + coronal rim shock fronts
 	evalSolarColor := func(x, y float64) (col color.RGBA, dipolePot float64) {
 		dx := x - cxDisc
@@ -277,11 +285,11 @@ func (sp *solarProminence) GenerativeFrame(c *generativeart.Canva, frameIdx, tot
 		}
 	}
 
-	// 2. Bipolar Magnetic Dipole + Helical Sunspot Rosette Velocity Field (locked across frames)
+	// 2. Bipolar Magnetic Dipole + Helical Sunspot Rosette Velocity Field (with breathing twist & dancing rim in animation)
 	twist := sp.magneticTwist
 	evalVelocityAngle := func(x, y float64) float64 {
 		nx, ny := x/fw, y/fh
-		curlVec := noise.Curl2D(nx*2.5+0.4, ny*2.5-0.6, 0.01)
+		curlVec := noise.Curl2D(nx*2.5+0.4+loopX*0.8, ny*2.5-0.6+loopY*0.8, 0.01)
 		vxSum := curlVec.X * 0.24
 		vySum := curlVec.Y * 0.24
 
@@ -302,8 +310,13 @@ func (sp *solarProminence) GenerativeFrame(c *generativeart.Canva, frameIdx, tot
 			ry := (dy / d) * p.charge
 
 			// Helical vortex twist around each sunspot pole so streamlines spiral into penumbra rosettes
-			tx := -(dy / d) * p.spin * twist
-			ty := (dx / d) * p.spin * twist
+			localTwist := twist
+			if isAnim {
+				theta := math.Atan2(dy, dx)
+				localTwist += 0.26 * math.Sin(2.0*theta-p.spin*phi-(d/p.radius)*3.5)
+			}
+			tx := -(dy / d) * p.spin * localTwist
+			ty := (dx / d) * p.spin * localTwist
 
 			rosetteEnv := math.Exp(-d / (1.35 * p.radius))
 			vxSum += radialWeight * (rx*0.72 + tx*0.68*rosetteEnv)
@@ -315,7 +328,12 @@ func (sp *solarProminence) GenerativeFrame(c *generativeart.Canva, frameIdx, tot
 			theta := math.Atan2(dyC, dxC)
 			rimFactor := common.Smoothstep(0.76*baseRadius, 1.04*baseRadius, rC)
 			// Arching prominence loops that erupt outward and curve back toward the chromosphere rim
-			archWave := math.Sin(theta*float64(rimCount)*0.5 + noise.Simplex2D(nx*3.0, ny*3.0)*1.2)
+			var archWave float64
+			if isAnim {
+				archWave = math.Sin(theta*float64(rimCount)*0.5 - phi + noise.Simplex2D(nx*3.0+loopX, ny*3.0+loopY)*1.2)
+			} else {
+				archWave = math.Sin(theta*float64(rimCount)*0.5 + noise.Simplex2D(nx*3.0, ny*3.0)*1.2)
+			}
 			outwardAng := theta + archWave*math.Pi*0.36
 			vxSum += math.Cos(outwardAng) * rimFactor * 0.65
 			vySum += math.Sin(outwardAng) * rimFactor * 0.65
@@ -380,11 +398,29 @@ func (sp *solarProminence) GenerativeFrame(c *generativeart.Canva, frameIdx, tot
 		x0 := cxDisc + math.Cos(theta)*rSpawn
 		y0 := cyDisc + math.Sin(theta)*rSpawn
 
-		pts[0] = render.Pt(x0, y0)
-		cx, cy := x0, y0
+		sx, sy := x0, y0
+		var spatialPsi, flareBoost float64
+		if isAnim {
+			rNorm := math.Hypot(x0-cxDisc, y0-cyDisc) / rDisc
+			thetaDisc := math.Atan2(y0-cyDisc, x0-cxDisc)
+			spatialPsi = 4.0*thetaDisc - rNorm*4.5
+			ang0 := evalVelocityAngle(x0, y0)
+			adv := 8.5 * scale * math.Sin(phi-spatialPsi)
+			sx += math.Cos(ang0) * adv
+			sy += math.Sin(ang0) * adv
+			flareBoost = 1.0 + 0.65*common.Smoothstep(0.70, 1.05, rNorm)
+		}
+
+		pts[0] = render.Pt(sx, sy)
+		cx, cy := sx, sy
 		strokeBend := (u3 - 0.5) * 0.065
 		for k := 1; k <= traceSteps; k++ {
 			ang := evalVelocityAngle(cx, cy) + strokeBend*float64(k)
+			if isAnim {
+				tStep := float64(k) / float64(traceSteps)
+				whip := 0.30 * flareBoost * tStep * math.Sin(phi-1.9*tStep-spatialPsi)
+				ang += whip
+			}
 			cx += math.Cos(ang) * stepLen
 			cy += math.Sin(ang) * stepLen
 			pts[k] = render.Pt(cx, cy)

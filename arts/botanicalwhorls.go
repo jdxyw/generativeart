@@ -185,6 +185,14 @@ func (bw *botanicalWhorls) GenerativeFrame(c *generativeart.Canva, frameIdx, tot
 		})
 	}
 
+	if isAnim {
+		for i := range whorls {
+			orbitPhase := phi + float64(i)*0.95
+			whorls[i].x += 5.0 * scale * math.Sin(orbitPhase)
+			whorls[i].y += 5.0 * scale * (1.0 - math.Cos(orbitPhase))
+		}
+	}
+
 	// Evaluate Monet Water-Lilies macro color + whorl blossom/succulent tinting
 	evalBotanicalColor := func(x, y float64) color.RGBA {
 		nx := common.Clamp01(x / fw)
@@ -286,10 +294,10 @@ func (bw *botanicalWhorls) GenerativeFrame(c *generativeart.Canva, frameIdx, tot
 		}
 	}
 
-	// 2. Multi-Scale Fibonacci Whorl Velocity Field (locked across frames)
+	// 2. Multi-Scale Fibonacci Whorl Velocity Field (with breathing petal curl & uncurl in animation)
 	evalVelocityAngle := func(x, y float64) float64 {
 		nx, ny := x/fw, y/fh
-		curlVec := noise.Curl2D(nx*2.2+0.6, ny*2.2-0.4, 0.01)
+		curlVec := noise.Curl2D(nx*2.2+0.6+loopX*0.8, ny*2.2-0.4+loopY*0.8, 0.01)
 		vxSum := curlVec.X * 0.22
 		vySum := curlVec.Y * 0.22
 
@@ -308,6 +316,9 @@ func (bw *botanicalWhorls) GenerativeFrame(c *generativeart.Canva, frameIdx, tot
 				// Petal whorl angle: spiral inward with a gentle 3-lobed botanical phyllotaxis modulation
 				theta := math.Atan2(dy, dx)
 				petalMod := 0.08 * math.Sin(3.0*theta+float64(wh.fibIdx)*0.5)
+				if isAnim {
+					petalMod += 0.25 * math.Sin(3.0*theta-wh.spin*phi-(d/wh.radius)*3.0+float64(i)*0.5)
+				}
 				ang := theta + wh.spin*(math.Pi*0.43+petalMod)
 				vxSum += math.Cos(ang) * wv
 				vySum += math.Sin(ang) * wv
@@ -379,11 +390,27 @@ func (bw *botanicalWhorls) GenerativeFrame(c *generativeart.Canva, frameIdx, tot
 		yMax := bottomEdge(nx0) + 3.0*scale
 		y0 := yMin + v*(yMax-yMin)
 
-		pts[0] = render.Pt(x0, y0)
-		cx, cy := x0, y0
+		sx, sy := x0, y0
+		var spatialPsi float64
+		if isAnim {
+			ny0 := common.Clamp01(y0 / fh)
+			spatialPsi = noise.Simplex2D(nx0*3.8+1.2, ny0*3.8-0.7)*math.Pi*2.0 + math.Hypot(nx0-0.56, ny0-0.54)*math.Pi*5.0
+			ang0 := evalVelocityAngle(x0, y0)
+			adv := 7.0 * scale * math.Sin(phi-spatialPsi)
+			sx += math.Cos(ang0) * adv
+			sy += math.Sin(ang0) * adv
+		}
+
+		pts[0] = render.Pt(sx, sy)
+		cx, cy := sx, sy
 		strokeBend := (rng.Float64() - 0.5) * 0.058
 		for k := 1; k <= traceSteps; k++ {
 			ang := evalVelocityAngle(cx, cy) + strokeBend*float64(k)
+			if isAnim {
+				tStep := float64(k) / float64(traceSteps)
+				whip := 0.28 * tStep * math.Cos(phi-1.8*tStep-spatialPsi)
+				ang += whip
+			}
 			cx += math.Cos(ang) * stepLen
 			cy += math.Sin(ang) * stepLen
 			pts[k] = render.Pt(cx, cy)

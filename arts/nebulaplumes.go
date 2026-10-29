@@ -68,6 +68,7 @@ func (np *nebulaPlumes) GenerativeFrame(c *generativeart.Canva, frameIdx, totalF
 	rng := rand.New(rand.NewSource(seed))
 	noise := common.NewNoiseEngine(seed)
 
+	isAnim := totalFrames > 1
 	phi := 2.0 * math.Pi * phase
 	loopX := 0.07 * math.Sin(phi)
 	loopY := 0.07 * (1.0 - math.Cos(phi))
@@ -98,10 +99,18 @@ func (np *nebulaPlumes) GenerativeFrame(c *generativeart.Canva, frameIdx, totalF
 	lapisUltra := color.RGBA{R: 34, G: 52, B: 136, A: 255}      // #223488
 	aubergineVoid := color.RGBA{R: 17, G: 12, B: 40, A: 255}    // #110c28
 
-	// 2 Colossal Counter-Rotating Super-Vortices + 14 Medium Satellite Eddies (locked across frames)
+	// 2 Colossal Counter-Rotating Super-Vortices + 14 Medium Satellite Eddies
 	eddies := make([]nebulaEddy, 0, 16)
-	galAX, galAY := 0.33*fw, 0.36*fh
-	galBX, galBY := 0.68*fw, 0.65*fh
+	baseGalAX, baseGalAY := 0.33*fw, 0.36*fh
+	baseGalBX, baseGalBY := 0.68*fw, 0.65*fh
+	galAX, galAY := baseGalAX, baseGalAY
+	galBX, galBY := baseGalBX, baseGalBY
+	if isAnim {
+		galAX += 4.5 * scale * math.Sin(phi)
+		galAY += 4.5 * scale * (1.0 - math.Cos(phi))
+		galBX -= 4.5 * scale * math.Sin(phi)
+		galBY -= 4.5 * scale * (1.0 - math.Cos(phi))
+	}
 	galARad := 215.0 * scale
 	galBRad := 205.0 * scale
 
@@ -147,10 +156,16 @@ func (np *nebulaPlumes) GenerativeFrame(c *generativeart.Canva, frameIdx, totalF
 		jx := (rng.Float64() - 0.5) * 0.035 * fw
 		jy := (rng.Float64() - 0.5) * 0.035 * fh
 		rad := (38.0 + 26.0*rng.Float64()) * scale
-		sx := satAnchors[i][0]*fw + jx
-		sy := satAnchors[i][1]*fh + jy
-		dA := math.Hypot(sx-galAX, sy-galAY)
-		dB := math.Hypot(sx-galBX, sy-galBY)
+		sx0 := satAnchors[i][0]*fw + jx
+		sy0 := satAnchors[i][1]*fh + jy
+		dA := math.Hypot(sx0-baseGalAX, sy0-baseGalAY)
+		dB := math.Hypot(sx0-baseGalBX, sy0-baseGalBY)
+		sx, sy := sx0, sy0
+		if isAnim {
+			ePhase := float64(i) * 1.2
+			sx += 7.5 * scale * math.Sin(phi+ePhase)
+			sy += 7.5 * scale * (1.0 - math.Cos(phi+ePhase))
+		}
 		eddies = append(eddies, nebulaEddy{
 			x:        sx,
 			y:        sy,
@@ -276,24 +291,27 @@ func (np *nebulaPlumes) GenerativeFrame(c *generativeart.Canva, frameIdx, totalF
 		}
 	}
 
-	// 2. Locked Binary Galaxy + 14 Satellite Eddy Velocity Field
-	inwardPitch := math.Pi * (0.43 + 0.03*common.Constrain(np.swirlTightness-1.0, -0.5, 1.0))
+	// 2. Binary Galaxy + 14 Satellite Eddy Velocity Field
+	pitchBase := math.Pi * (0.43 + 0.03*common.Constrain(np.swirlTightness-1.0, -0.5, 1.0))
 	evalVelocityAngle := func(x, y float64) float64 {
 		nx := x / fw
 		ny := y / fh
 		curlVec := noise.Curl2D(nx*2.4+0.7, ny*2.4-0.5, 0.01)
 		curlAng := math.Atan2(curlVec.Y, curlVec.X)
+		if isAnim {
+			curlAng += 0.20 * math.Sin(nx*math.Pi*2.5+ny*math.Pi*2.5-phi)
+		}
 
 		vxSum := math.Cos(curlAng) * 0.25
 		vySum := math.Sin(curlAng) * 0.25
 
 		for i := range eddies {
-			e := &eddies[i]
-			dx := x - e.x
-			dy := y - e.y
-			reach := 1.42 * e.radius
-			if e.isMacro {
-				reach = 1.65 * e.radius
+			v := &eddies[i]
+			dx := x - v.x
+			dy := y - v.y
+			reach := 1.42 * v.radius
+			if v.isMacro {
+				reach = 1.65 * v.radius
 			}
 			if math.Abs(dx) >= reach || math.Abs(dy) >= reach {
 				continue
@@ -301,8 +319,18 @@ func (np *nebulaPlumes) GenerativeFrame(c *generativeart.Canva, frameIdx, totalF
 			d := math.Hypot(dx, dy)
 			if d < reach {
 				u := 1.0 - d/reach
-				wv := u * u * e.strength * 2.35
-				ang := math.Atan2(dy, dx) + e.spin*inwardPitch
+				wv := u * u * v.strength * 2.35
+				theta := math.Atan2(dy, dx)
+				ang := theta + v.spin*pitchBase
+				if isAnim {
+					if v.isMacro {
+						spiralWave := math.Sin(float64(arms)*theta - v.spin*phi - (d/v.radius)*4.2)
+						ang = theta + v.spin*(pitchBase+0.26*spiralWave)
+					} else {
+						spiralWave := math.Sin(2.0*theta - v.spin*phi - (d/v.radius)*3.5 + float64(i)*0.7)
+						ang = theta + v.spin*(pitchBase+0.22*spiralWave)
+					}
+				}
 				vxSum += math.Cos(ang) * wv
 				vySum += math.Sin(ang) * wv
 			}
@@ -382,11 +410,26 @@ func (np *nebulaPlumes) GenerativeFrame(c *generativeart.Canva, frameIdx, totalF
 		y0 := yMin + v*(yMax-yMin)
 		ny0 := common.Clamp01(y0 / fh)
 
-		pts[0] = render.Pt(x0, y0)
 		cx, cy := x0, y0
+		var spatialPsi float64
+		if isAnim {
+			thetaA := math.Atan2(y0-galAY, x0-galAX)
+			rA := math.Hypot(x0-galAX, y0-galAY) / (215.0 * scale)
+			spatialPsi = float64(arms)*thetaA - rA*3.8
+			ang0 := evalVelocityAngle(x0, y0)
+			adv := 9.0 * scale * math.Sin(phi-spatialPsi)
+			cx = x0 + math.Cos(ang0)*adv
+			cy = y0 + math.Sin(ang0)*adv
+		}
+		pts[0] = render.Pt(cx, cy)
 		strokeBend := (rng.Float64() - 0.5) * 0.048
 		for k := 1; k <= traceSteps; k++ {
-			ang := evalVelocityAngle(cx, cy) + strokeBend*float64(k)
+			var whip float64
+			if isAnim {
+				tStep := float64(k) / float64(traceSteps)
+				whip = 0.30 * tStep * math.Cos(phi-1.9*tStep-spatialPsi)
+			}
+			ang := evalVelocityAngle(cx, cy) + strokeBend*float64(k) + whip
 			cx += math.Cos(ang) * stepLen
 			cy += math.Sin(ang) * stepLen
 			pts[k] = render.Pt(cx, cy)

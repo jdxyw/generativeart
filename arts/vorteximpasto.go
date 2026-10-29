@@ -379,6 +379,12 @@ func (vi *vortexImpasto) GenerativeFrame(c *generativeart.Canva, frameIdx, total
 			if rng.Float64() < 0.5 {
 				spin = -1.0
 			}
+			idx := len(vortices)
+			if isAnim {
+				vPhase := float64(idx) * 1.37
+				vx += 6.0 * scale * math.Sin(phi+vPhase)
+				vy += 6.0 * scale * (1.0 - math.Cos(phi+vPhase))
+			}
 			vortices = append(vortices, microVortex{
 				x:          vx,
 				y:          vy,
@@ -394,9 +400,11 @@ func (vi *vortexImpasto) GenerativeFrame(c *generativeart.Canva, frameIdx, total
 	evalVelocityAngle := func(x, y float64) float64 {
 		nx := x / fw
 		ny := y / fh
-		// Lock streamline geometry across frames to eliminate sub-pixel hair aliasing flicker
 		curlVec := noise.Curl2D(nx*2.6+0.5, ny*2.6-0.3, 0.01)
 		curlAng := math.Atan2(curlVec.Y, curlVec.X) * curlScale
+		if isAnim {
+			curlAng += 0.24 * math.Sin(nx*math.Pi*3.0+ny*math.Pi*2.5-phi)
+		}
 
 		// Accumulate weighted vortex tangent + inward spiral pull
 		vxSum := math.Cos(curlAng) * 0.28
@@ -414,7 +422,12 @@ func (vi *vortexImpasto) GenerativeFrame(c *generativeart.Canva, frameIdx, total
 			if d < reach {
 				u := 1.0 - d/reach
 				wv := u * u * v.strength * 2.2
-				ang := math.Atan2(dy, dx) + v.spin*(math.Pi*0.44)
+				theta := math.Atan2(dy, dx)
+				ang := theta + v.spin*(math.Pi*0.44)
+				if isAnim {
+					spiralWave := math.Sin(2.0*theta - v.spin*phi - (d/v.radius)*3.2 + float64(i)*0.7)
+					ang = theta + v.spin*(math.Pi*0.44+0.22*spiralWave)
+				}
 				vxSum += math.Cos(ang) * wv
 				vySum += math.Sin(ang) * wv
 			}
@@ -488,12 +501,25 @@ func (vi *vortexImpasto) GenerativeFrame(c *generativeart.Canva, frameIdx, total
 		y0 := yMin + v*(yMax-yMin)
 		ny0 := common.Clamp01(y0 / fh)
 
-		// Trace 12 steps of 2.2*scale px along the locked vortex velocity field (zero sub-pixel hair jitter)
-		pts[0] = render.Pt(x0, y0)
+		// Trace 12 steps of 2.2*scale px along the vortex velocity field with spatially coherent root advection & whip wave
 		cx, cy := x0, y0
+		var spatialPsi float64
+		if isAnim {
+			spatialPsi = noise.Simplex2D(nx0*4.2+1.7, ny0*4.2-0.9)*math.Pi*2.0 + (nx0-ny0)*math.Pi*3.0
+			ang0 := evalVelocityAngle(x0, y0)
+			adv := 7.5 * scale * math.Sin(phi-spatialPsi)
+			cx = x0 + math.Cos(ang0)*adv
+			cy = y0 + math.Sin(ang0)*adv
+		}
+		pts[0] = render.Pt(cx, cy)
 		strokeBend := (rng.Float64() - 0.5) * 0.055
 		for k := 1; k <= traceSteps; k++ {
-			ang := evalVelocityAngle(cx, cy) + strokeBend*float64(k)
+			var whip float64
+			if isAnim {
+				tStep := float64(k) / float64(traceSteps)
+				whip = 0.28 * tStep * math.Sin(phi-1.8*tStep-spatialPsi)
+			}
+			ang := evalVelocityAngle(cx, cy) + strokeBend*float64(k) + whip
 			cx += math.Cos(ang) * stepLen
 			cy += math.Sin(ang) * stepLen
 			pts[k] = render.Pt(cx, cy)
