@@ -115,6 +115,10 @@
 		- [parameters](#parameters-52)
 	- [Tangent Cones](#tangent-cones)
 		- [parameters](#parameters-53)
+	- [Jupiter Magnetosphere](#jupiter-magnetosphere)
+	- [Iridescent Nacre](#iridescent-nacre)
+	- [Schottky Kleinian](#schottky-kleinian)
+	- [Bismuth Hopper](#bismuth-hopper)
 
 ## CLI Tool (`cmd/genart`) & Exhibition Poster Reference
 
@@ -1805,6 +1809,70 @@ bw := arts.NewBotanicalWhorls(64, 22000, 137.507764)
 ```
 
 ![](../images/botanicalwhorls.png)
+
+## Jupiter Magnetosphere
+
+`Jupiter Magnetosphere` renders Juno-spacecraft perijove zonal shear jet streams, a Great Red Spot super-vortex, and Kármán vortex streets using Fast Line Integral Convolution (`ComputeLICField`), Jobard-Lefer magnetic streamlines, thin-film iridescent eyewalls, and 2.5D luminance relief.
+
+### parameters
+
+- bands: Number of alternating zonal shear jet bands.
+- vortices: Number of Kármán vortex street ovals and satellite eddies.
+- licLength: Streamline convolution half-length in pixels for Fast LIC.
+
+```go
+jm := arts.NewJupiterMagnetosphere(9, 16, 22.0)
+```
+
+![](../images/jupitermagnetosphere.png)
+
+## Iridescent Nacre
+
+`Iridescent Nacre` sculpts a 3D terraced abalone / mother-of-pearl logarithmic-spiral shell heightfield and aragonite silk-bristle plumes seeded via blue-noise Poisson-disk & Centroidal Voronoi relaxation, shaded with Airy thin-film interference, horizon soft shadows, jade subsurface scattering, and a torn deckle-edged border.
+
+### parameters
+
+- whorls: Number of Voronoi-relaxed spiral whorl centers and pearl cabochons.
+- fiberCount: Total number of 3D aragonite silk-bristle plumes.
+- filmThicknessNm: Base optical aragonite thin-film thickness in nanometers (default `410.0`).
+
+```go
+in := arts.NewIridescentNacre(7, 18000, 410.0)
+```
+
+![](../images/iridescentnacre.png)
+
+## Schottky Kleinian
+
+`Schottky Kleinian` renders an 8-fold *Indra's Pearls* Kissing-Schottky Kleinian group limit set with 3D thin-film iridescent orbit-trap pearls, recursive circle-inversion filigree rings, hyperbolic Poincaré geodesic astrolabe chords, holomorphic domain-coloring isolines, and radial optical chromatic dispersion.
+
+### parameters
+
+- maxDepth: Maximum recursive circle-inversion depth.
+- loxodromicTwist: Global Möbius loxodromic spiral twist multiplier.
+
+```go
+sk := arts.NewSchottkyKleinian(7, 1.0)
+```
+
+![](../images/schottkykleinian.png)
+
+## Bismuth Hopper
+
+`Bismuth Hopper` synthesizes a 3D architectural Bismuth (`[Bi]`) Hopper Crystal labyrinth with razor-straight rectangular stair-step cavities, 45° mitered bevel ledges, dual-sun horizon soft shadows, and first/second-order Airy thin-film interference across a $\text{Bi}_2\text{O}_3$ oxide layer.
+
+### parameters
+
+- terraces: Number of concentric stair-step hopper terraces per crystal.
+- crystals: Number of hierarchical interlocking hopper crystal towers.
+- oxideNm: Base oxide thin-film reference thickness parameter (default `420.0`).
+
+```go
+bh := arts.NewBismuthHopper(14, 9, 420.0)
+```
+
+![](../images/bismuthhopper.png)
+
 
 
 
