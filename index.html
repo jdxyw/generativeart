@@ -370,7 +370,12 @@
     <div class="pagination-bar" id="paginationBottom"></div>
   </main>
 
-  <!-- Modal Lightbox -->
+  <footer>
+    <p>Built with Go · <a href="https://github.com/jdxyw/generativeart" style="color:var(--accent);">github.com/jdxyw/generativeart</a> · MIT License</p>
+  </footer>
+  </div>
+
+  <!-- Modal Lightbox (outside .app-scroll so position:fixed is always anchored to the visible viewport) -->
   <div class="modal-backdrop" id="modalBackdrop" onclick="if(event.target===this)closeModal()">
     <div class="modal-dialog">
       <div class="modal-media">
@@ -391,9 +396,11 @@
           <button class="modal-close" onclick="closeModal()">✕</button>
         </div>
         <p id="modalDesc" style="color:var(--text); font-size:0.92rem;"></p>
-        <div class="meta-pills">
-          <span class="meta-pill" id="modalFilePill"></span>
-          <span class="meta-pill" id="modalExamplePill"></span>
+        <div style="display:flex; flex-direction:column; gap:0.5rem;">
+          <div class="meta-pills">
+            <span class="meta-pill" id="modalFilePill"></span>
+            <span class="meta-pill" id="modalExamplePill"></span>
+          </div>
         </div>
         <div style="display:flex; align-items:center; gap:0.5rem;">
           <span style="font-size:0.8rem; color:var(--muted);">Palette:</span>
@@ -405,11 +412,6 @@
         </div>
       </div>
     </div>
-  </div>
-
-  <footer>
-    <p>Built with Go · <a href="https://github.com/jdxyw/generativeart" style="color:var(--accent);">github.com/jdxyw/generativeart</a> · MIT License</p>
-  </footer>
   </div>
 
   <script>
@@ -828,8 +830,10 @@ ${drawCall}
     };
 
     const IS_REAL_BROWSER = (
-      window.location.protocol === "https:" &&
-      window.location.hostname.endsWith("github.io")
+      window.self === window.top &&
+      (window.location.protocol === "file:" ||
+       window.location.protocol === "http:" ||
+       window.location.protocol === "https:")
     );
 
     function getThumbSrc(filename) {
