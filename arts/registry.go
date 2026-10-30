@@ -106,6 +106,36 @@ func paramString(p map[string]interface{}, key, def string) string {
 }
 
 var registry = []ArtDescriptor{
+	// Wave 18: LIC Jovian Magnetosphere, Thin-Film Iridescent Nacre, Kissing-Schottky Kleinian Pearls & 3D Bismuth Hopper Crystals
+	{
+		ID: "jupitermagnetosphere", StructName: "jupiterMagnetosphere", Category: "flow",
+		DefaultBG: color.RGBA{9, 14, 28, 255}, DefaultPal: "oceanic",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewJupiterMagnetosphere(paramInt(p, "bands", 9), paramInt(p, "vortices", 16), paramFloat(p, "licLength", 22.0))
+		},
+	},
+	{
+		ID: "iridescentnacre", StructName: "iridescentNacre", Category: "bio",
+		DefaultBG: color.RGBA{14, 22, 30, 255}, DefaultPal: "oceanic",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewIridescentNacre(paramInt(p, "whorls", 7), paramInt(p, "fiberCount", 18000), paramFloat(p, "filmThicknessNm", 410.0))
+		},
+	},
+	{
+		ID: "schottkykleinian", StructName: "schottkyKleinian", Category: "chaos",
+		DefaultBG: color.RGBA{7, 9, 20, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewSchottkyKleinian(paramInt(p, "maxDepth", 7), paramFloat(p, "loxodromicTwist", 1.0))
+		},
+	},
+	{
+		ID: "bismuthhopper", StructName: "bismuthHopper", Category: "geom",
+		DefaultBG: color.RGBA{10, 12, 20, 255}, DefaultPal: "cyberpunk",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewBismuthHopper(paramInt(p, "terraces", 14), paramInt(p, "crystals", 9), paramFloat(p, "oxideNm", 420.0))
+		},
+	},
+
 	// Wave 17: Tactile Bristle & Vortex Impasto Series (Binary Nebula Plumes, Abyssal Kuroshio Currents, Solar Prominence Tondo & Botanical Phyllotaxis Whorls)
 	{
 		ID: "nebulaplumes", StructName: "nebulaPlumes", Category: "media",

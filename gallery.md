@@ -58,6 +58,11 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
 
 ## Table of Contents
 
+- [Wave 18: LIC Jovian Magnetosphere, Thin-Film Iridescent Nacre, Kissing-Schottky Kleinian Pearls & 3D Bismuth Hopper Crystals](#wave-18-lic-jovian-magnetosphere-thin-film-iridescent-nacre-kissing-schottky-kleinian-pearls--3d-bismuth-hopper-crystals)
+  - [Jupiter Magnetosphere](#jupiter-magnetosphere)
+  - [Iridescent Nacre](#iridescent-nacre)
+  - [Schottky Kleinian](#schottky-kleinian)
+  - [Bismuth Hopper](#bismuth-hopper)
 - [Wave 17: Tactile Bristle & Vortex Impasto Series — Binary Nebula Plumes, Abyssal Kuroshio Currents, Solar Prominence Tondo & Botanical Lotus Whorls](#wave-17-tactile-bristle--vortex-impasto-series--binary-nebula-plumes-abyssal-kuroshio-currents-solar-prominence-tondo--botanical-lotus-whorls)
   - [Nebula Plumes](#nebula-plumes)
   - [Abyssal Currents](#abyssal-currents)
@@ -188,6 +193,114 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
   - [Silk Sky](#silk-sky)
   - [Circle Move](#circle-move)
   - [Random Circle](#random-circle)
+
+---
+
+## Wave 18: LIC Jovian Magnetosphere, Thin-Film Iridescent Nacre, Kissing-Schottky Kleinian Pearls & 3D Bismuth Hopper Crystals
+
+### Jupiter Magnetosphere
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261030)
+	c.SetBackground(color.RGBA{R: 9, G: 14, B: 28, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Oceanic)
+	c.Draw(arts.NewJupiterMagnetosphere(9, 16, 22.0))
+	c.ToPNG("jupitermagnetosphere.png")
+}
+```
+
+![Jupiter Magnetosphere](images/jupitermagnetosphere.png)
+
+### Iridescent Nacre
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261030)
+	c.SetBackground(color.RGBA{R: 14, G: 22, B: 30, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Oceanic)
+	c.Draw(arts.NewIridescentNacre(7, 18000, 410.0))
+	c.ToPNG("iridescentnacre.png")
+}
+```
+
+![Iridescent Nacre](images/iridescentnacre.png)
+
+### Schottky Kleinian
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261030)
+	c.SetBackground(color.RGBA{R: 7, G: 9, B: 20, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewSchottkyKleinian(7, 1.0))
+	c.ToPNG("schottkykleinian.png")
+}
+```
+
+![Schottky Kleinian](images/schottkykleinian.png)
+
+### Bismuth Hopper
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261030)
+	c.SetBackground(color.RGBA{R: 10, G: 12, B: 20, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Cyberpunk)
+	c.Draw(arts.NewBismuthHopper(14, 9, 420.0))
+	c.ToPNG("bismuthhopper.png")
+}
+```
+
+![Bismuth Hopper](images/bismuthhopper.png)
 
 ---
 
