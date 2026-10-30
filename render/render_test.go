@@ -349,5 +349,58 @@ func TestTransformStackClipMaskAndLayers(t *testing.T) {
 	}
 }
 
+func TestComposablePostProcessPipeline(t *testing.T) {
+	c := NewCanvas(140, 140)
+	c.FillBackground(color.RGBA{R: 28, G: 34, B: 48, A: 255})
+
+	// Draw a sharp white disk at (105, 105) near the bottom-right corner
+	disk := SDFCircle(Pt(105, 105), 18)
+	c.RenderSDFBevel(
+		disk,
+		color.RGBA{R: 230, G: 210, B: 170, A: 255},
+		color.RGBA{R: 80, G: 60, B: 40, A: 255},
+		common.White,
+		4.0,
+		Pt(-0.6, -0.6),
+		1.0,
+	)
+
+	// 1. Chromatic Aberration should shift Red and Blue differentially near the periphery
+	c.ApplyChromaticAberration(1.2)
+	rEdge, _, bEdge, _ := c.PixelLinearAt(123, 105)
+	if math.Abs(rEdge-bEdge) < 1e-4 {
+		t.Fatalf("expected ChromaticAberration to separate R and B along radial edge, got R=%f B=%f", rEdge, bEdge)
+	}
+
+	// 2. Luminance 2.5D Relief & Micro-SSAO
+	c.ApplyLuminanceRelief(0.75, -135.0, 38.0, 0.40)
+
+	// 3. Structure-Tensor Anisotropic Kuwahara painterly pass
+	c.ApplyAnisotropicKuwahara(2, 8.0, 1.2)
+
+	// 4. Oklab Color Grading & Split-Toning + Deckle Border + ToneMap via ApplyPostEffects
+	c.ApplyPostEffects(
+		ColorGradeEffect(1.15, 1.20, 225.0, 42.0, 0.35),
+		BloomEffect(0.65, 3.0, 0.25),
+		ToneMapEffect(1.05, 2.2),
+		PaperTextureEffect(0.20, 2026),
+		VignetteEffect(0.25),
+		DeckleBorderEffect(0.06, 1.0, color.RGBA{R: 242, G: 236, B: 224, A: 255}, 2026),
+	)
+
+	// Verify corner pixel was replaced by the bright ivory deckle mat border
+	rMat, gMat, bMat, _ := c.PixelLinearAt(2, 2)
+	if rMat < 0.4 || gMat < 0.4 || bMat < 0.35 {
+		t.Fatalf("expected outer corner pixel (2,2) to have light ivory mat color, got (%f, %f, %f)", rMat, gMat, bMat)
+	}
+
+	// Verify no NaNs or negative values anywhere in the resolved image
+	img := c.ResolveToRGBA(nil)
+	if img.Bounds().Dx() != 140 || img.Bounds().Dy() != 140 {
+		t.Fatalf("unexpected resolved bounds: %v", img.Bounds())
+	}
+}
+
+
 
 

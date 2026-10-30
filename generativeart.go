@@ -29,6 +29,7 @@ type Canva struct {
 	rgbaTouched      bool
 	frames           []*image.RGBA
 	lastRecipe       *RecipeMetadata
+	postEffects      []render.PostEffect
 }
 
 func (c *Canva) Opts() Options {
@@ -179,9 +180,70 @@ func (c *Canva) SetAlpha(alpha int) {
 	c.opts.alpha = alpha
 }
 
+// AddPostEffect appends one or more composable HDR PostEffect passes to this Canva.
+// Registered post-effects run automatically after c.Draw(e) and after each frame in c.DrawTimelapseFrames.
+func (c *Canva) AddPostEffect(effects ...render.PostEffect) *Canva {
+	if c == nil {
+		return nil
+	}
+	for _, eff := range effects {
+		if eff != nil {
+			c.postEffects = append(c.postEffects, eff)
+		}
+	}
+	return c
+}
+
+// ClearPostEffects removes all registered HDR PostEffect passes from this Canva.
+func (c *Canva) ClearPostEffects() {
+	if c != nil {
+		c.postEffects = nil
+	}
+}
+
+// PostEffects returns a copy of the registered HDR PostEffect pipeline on this Canva.
+func (c *Canva) PostEffects() []render.PostEffect {
+	if c == nil || len(c.postEffects) == 0 {
+		return nil
+	}
+	out := make([]render.PostEffect, len(c.postEffects))
+	copy(out, c.postEffects)
+	return out
+}
+
+// ApplyPostEffects executes the provided PostEffect passes (or c.PostEffects() if none are
+// explicitly passed) directly on the Canva's 64-bit linear HDR buffer.
+func (c *Canva) ApplyPostEffects(effects ...render.PostEffect) {
+	if c == nil {
+		return
+	}
+	list := effects
+	if len(list) == 0 {
+		list = c.postEffects
+	}
+	if len(list) == 0 {
+		return
+	}
+	rc := c.NewRenderCanvas()
+	rc.ApplyPostEffects(list...)
+	c.MergeRenderCanvas(rc)
+	if c.lastRecipe != nil {
+		names := make([]string, 0, len(list))
+		for _, eff := range list {
+			if eff != nil {
+				names = append(names, eff.Name())
+			}
+		}
+		c.lastRecipe.PostEffects = names
+	}
+}
+
 func (c *Canva) Draw(e Engine) {
 	c.lastRecipe = captureEngineRecipe(c, e)
 	e.Generative(c)
+	if len(c.postEffects) > 0 {
+		c.ApplyPostEffects(c.postEffects...)
+	}
 }
 
 // DrawTimelapse renders a multi-frame timelapse or seamless loop sequence (using

@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"image/color"
+	"math"
 	"os"
 	"path/filepath"
 	"sort"
@@ -12,6 +14,7 @@ import (
 
 	"github.com/jdxyw/generativeart"
 	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/render"
 )
 
 func main() {
@@ -40,10 +43,78 @@ func main() {
 func printUsage() {
 	fmt.Println("Usage:")
 	fmt.Println("  genart list")
-	fmt.Println("  genart render -art <name> [-palette <name>] [-w 600] [-h 600] [-seed 20261021] [-frames 1] -out <file.(png|svg|pdf|gif|jpg)>")
+	fmt.Println("  genart render -art <name> [-palette <name>] [-w 600] [-h 600] [-seed 20261021] [-frames 1] [-bloom 0.35] [-chromatic 0.8] [-relief 0.6] [-kuwahara 3] [-paper 0.3] [-vignette 0.25] [-deckle 0.04] [-tonemap 1.1] -out <file.(png|svg|pdf|gif|jpg)>")
 	fmt.Println("  genart poster [-art <name> | -arts <a,b,c,d>] [-grid 2x2] [-panel 420] [-theme light|dark] [-title \"...\"] -out <file.(png|svg|pdf|jpg)>")
 	fmt.Println("  genart inspect <file.png>")
-	fmt.Println("  genart replay <input.png> [-w 2400] [-h 2400] -out <file.(png|svg|pdf|jpg)>")
+	fmt.Println("  genart replay <input.png> [-w 2400] [-h 2400] [-bloom ...] [-relief ...] -out <file.(png|svg|pdf|jpg)>")
+}
+
+type postFlags struct {
+	bloom      *float64
+	chromatic  *float64
+	relief     *float64
+	kuwahara   *int
+	contrast   *float64
+	saturation *float64
+	paper      *float64
+	vignette   *float64
+	deckle     *float64
+	tonemap    *float64
+}
+
+func registerPostFlags(fs *flag.FlagSet) postFlags {
+	return postFlags{
+		bloom:      fs.Float64("bloom", 0, "HDR Gaussian bloom strength (e.g. 0.35)"),
+		chromatic:  fs.Float64("chromatic", 0, "Radial optical chromatic aberration strength (e.g. 0.8)"),
+		relief:     fs.Float64("relief", 0, "Luminance 2.5D relief & micro-SSAO shading strength (e.g. 0.6)"),
+		kuwahara:   fs.Int("kuwahara", 0, "Anisotropic Kuwahara painterly filter radius in pixels (e.g. 3)"),
+		contrast:   fs.Float64("contrast", 1.0, "Oklab perceptual lightness contrast (default 1.0)"),
+		saturation: fs.Float64("saturation", 1.0, "Oklab perceptual chroma saturation multiplier (default 1.0)"),
+		paper:      fs.Float64("paper", 0, "Procedural cotton paper texture intensity (e.g. 0.3)"),
+		vignette:   fs.Float64("vignette", 0, "Smooth radial vignette strength (e.g. 0.25)"),
+		deckle:     fs.Float64("deckle", 0, "Torn deckle-edged museum mat border fraction (e.g. 0.045)"),
+		tonemap:    fs.Float64("tonemap", 0, "ACES filmic tone-mapping exposure (e.g. 1.05)"),
+	}
+}
+
+func (pf postFlags) buildEffects(seed int64) []render.PostEffect {
+	var effects []render.PostEffect
+	if pf.kuwahara != nil && *pf.kuwahara > 0 {
+		effects = append(effects, render.AnisotropicKuwaharaEffect(*pf.kuwahara, 8.0, 1.25))
+	}
+	if pf.relief != nil && *pf.relief > 0 {
+		effects = append(effects, render.LuminanceReliefEffect(*pf.relief, -135.0, 38.0, 0.38))
+	}
+	if pf.bloom != nil && *pf.bloom > 0 {
+		effects = append(effects, render.BloomEffect(0.62, 6.0, *pf.bloom))
+	}
+	if pf.chromatic != nil && math.Abs(*pf.chromatic) > 1e-5 {
+		effects = append(effects, render.ChromaticAberrationEffect(*pf.chromatic))
+	}
+	cVal := 1.0
+	sVal := 1.0
+	if pf.contrast != nil {
+		cVal = *pf.contrast
+	}
+	if pf.saturation != nil {
+		sVal = *pf.saturation
+	}
+	if math.Abs(cVal-1.0) > 1e-3 || math.Abs(sVal-1.0) > 1e-3 {
+		effects = append(effects, render.ColorGradeEffect(cVal, sVal, 225.0, 42.0, 0.0))
+	}
+	if pf.tonemap != nil && *pf.tonemap > 0 {
+		effects = append(effects, render.ToneMapEffect(*pf.tonemap, 2.2))
+	}
+	if pf.paper != nil && *pf.paper > 0 {
+		effects = append(effects, render.PaperTextureEffect(*pf.paper, seed))
+	}
+	if pf.vignette != nil && *pf.vignette > 0 {
+		effects = append(effects, render.VignetteEffect(*pf.vignette))
+	}
+	if pf.deckle != nil && *pf.deckle > 0 {
+		effects = append(effects, render.DeckleBorderEffect(*pf.deckle, 1.0, color.RGBA{R: 242, G: 236, B: 224, A: 255}, seed))
+	}
+	return effects
 }
 
 func runList() {
@@ -103,6 +174,7 @@ func runRender(args []string) {
 	frames := fs.Int("frames", 1, "Number of frames (for .gif timelapse)")
 	delay := fs.Int("delay", 8, "Frame delay in centiseconds (for .gif)")
 	out := fs.String("out", "output.png", "Output file path (.png, .svg, .pdf, .gif, .jpg)")
+	pf := registerPostFlags(fs)
 	_ = fs.Parse(args)
 
 	desc, ok := arts.Lookup(*artName)
@@ -122,6 +194,9 @@ func runRender(args []string) {
 	}
 	if schema, exists := arts.PaletteByName(chosenPal); exists {
 		c.SetColorSchema(schema)
+	}
+	if effects := pf.buildEffects(*seed); len(effects) > 0 {
+		c.AddPostEffect(effects...)
 	}
 
 	eng := desc.Build(nil)
@@ -151,6 +226,7 @@ func runReplay(args []string) {
 	w := fs.Int("w", 0, "Override width in pixels (0 keeps original width)")
 	h := fs.Int("h", 0, "Override height in pixels (0 keeps original height)")
 	out := fs.String("out", "replayed.png", "Output file path (.png, .svg, .pdf, .jpg)")
+	pf := registerPostFlags(fs)
 	// Allow input file before or after flags
 	var inputPath string
 	var flagArgs []string
@@ -174,6 +250,9 @@ func runReplay(args []string) {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "replay failed: %v\n", err)
 		os.Exit(1)
+	}
+	if effects := pf.buildEffects(meta.Seed); len(effects) > 0 {
+		c.ApplyPostEffects(effects...)
 	}
 	if err := saveCanvaByExt(c, nil, 1, 8, *out, true); err != nil {
 		fmt.Fprintf(os.Stderr, "save failed: %v\n", err)

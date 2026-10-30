@@ -4,8 +4,10 @@ This document serves as the architectural blueprint for `generativeart`, coverin
 1. **Core Engine Refactoring & Performance Upgrades (Package 1 — Implemented)**
 2. **Computational Geometry, Topological Fields & 2D SDF Engine (Package 2 — Implemented)**
 3. **Platform & Export Foundations (Package 3 — Implemented: Dual Vector/HDR Backend, `DrawTimelapse` HD GIF, PNG `tEXt` Recipes & `cmd/genart` CLI)**
-4. **Waves 9–13 `arts/` Visual Paradigms (100 Art Engines + 8 HD 600×600 Loop GIFs — Implemented)**
-5. **Next-Phase Roadmap: Exhibition Poster & ContactSheet Engine (Implemented), Wave 13 100-Art Milestone (Implemented), Pure-Go WASM Playground & HD GIF Expansion**
+4. **Waves 9–17 `arts/` Visual Paradigms (121 Art Engines + 19 HD 600×600 Loop GIFs — Implemented)**
+5. **Exhibition Poster & ContactSheet Engine (`poster.go` — Implemented) & HD GIF Expansion**
+6. **Next-Generation Architecture & Platform Roadmap (6 Directions, with Direction 4 Composable HDR Post-Processing Pipeline Implemented)**
+7. **Art-Empowering Rendering & Mathematical Foundations (Next-Tier Capabilities for Future `arts/`)**
 
 ---
 
@@ -200,4 +202,84 @@ Expand `arts/` from **94** to **100** generators with pure mathematical attracto
 
 ### 5.4 Direction 4: High-Definition 600×600 Seamless Loop GIF Expansion (19 HD Loop GIFs — Implemented)
 - Expanded the `600×600` 18-bit LUT + K-Means quantized seamless 360° loop GIF collection to **19 HD animations**: `nebulaplumes_loop.gif`, `abyssalcurrents_loop.gif`, `solarprominence_loop.gif`, `botanicalwhorls_loop.gif`, `vorteximpasto_loop.gif`, `squeegeescrape_loop.gif`, `basaltcolumns_loop.gif`, `wireframeterrain_loop.gif`, `lissajousribbon_loop.gif`, `marchingisolines_loop.gif`, `vortexfluid_loop.gif`, `dunhuangapsara_loop.gif`, `stainedrosewindow_loop.gif`, `newtonbasin_loop.gif`, `origamitessellation_loop.gif`, `cyclicautomata_loop.gif`, `gyroidsurface_loop.gif`, `mosaicsun_loop.gif`, and `magneticdipole_loop.gif`.
+
+---
+
+## Part VI. Next-Generation Architecture & Platform Roadmap (6 Directions)
+
+### 6.1 Direction 1: Lock-Free Parallel Multi-Frame Animation Engine (`platform.go`, `generativeart.go`)
+- **Problem**: `DrawTimelapseFrames` currently renders frames sequentially on a single goroutine, and `Canva.SetSeed` touches global `rand.Seed`, creating lock contention during concurrent panel/frame rendering.
+- **Architecture**:
+  - Add `c.CloneForWorker(seed int64) *Canva` to allocate isolated per-worker `Canva` instances sharing read-only options while keeping separate HDR/RGBA buffers and local `*rand.Rand` / `*common.NoiseEngine`.
+  - Parallelize `DrawTimelapseFrames` across `runtime.NumCPU()` workers (`5×–8×` speedup for 20-frame `600×600` HD GIFs).
+
+### 6.2 Direction 2: Full Recipe Introspection & Dynamic CLI Parameter Injection (`arts/registry.go`, `cmd/genart`)
+- **Problem**: `RecipeMetadata` currently omits `ColorSchema` and `Options` state (`LineWidth`, `NIters`, `Alpha`), causing `ReplayRecipe` to fall back to `DefaultPal`; `cmd/genart render` cannot override engine-specific parameters from the command line.
+- **Architecture**:
+  - Extend `RecipeMetadata` to persist exact `ColorSchema` RGBA stops, `PaletteName`, and `PostEffects`.
+  - Add `ParamSpec` metadata (`Name`, `Type`, `Default`, `Min`, `Max`, `Description`) to `ArtDescriptor`.
+  - Support `genart info <art>` and `genart render -art <name> -set key1=val1,key2=val2`.
+
+### 6.3 Direction 3: 2D Parameter-Sweep Phase Diagrams & Animated Exhibition Posters (`poster.go`)
+- **Architecture**:
+  - **2D Parameter-Space Contact Sheets (`RenderParameterSweepPoster`)**: Sweep parameter $X$ across columns and parameter $Y$ across rows (or sweep across all 12 curated palettes), automatically engraving exact coordinate captions (`SWIRL=1.25 · ARMS=4`) beneath each panel.
+  - **Animated Exhibition Poster GIFs (`RenderAnimatedPoster`)**: Synchronize `AnimatedEngine` frames across all $R \times C$ matted panels and export a museum-framed looping exhibition GIF.
+
+### 6.4 Direction 4: Composable HDR Post-Processing & Optical Shader Pipeline (`render/postprocess.go`, `generativeart.go`, `cmd/genart` — Implemented)
+- **Motivation**: Decouple optical, material, and relief post-processing from individual `arts/` generators into a declarative, chainable 64-bit linear HDR post-processing pipeline usable both programmatically (`c.AddPostEffect(...)`, `c.WithPostEffects(...)`) and from the CLI (`cmd/genart render` & `replay`).
+- **Architecture & Operators**:
+  1. **Unified `render.PostEffect` Interface & Pipeline**:
+     - `PostEffect` (`Apply(rc *Canvas)`), `PostEffectFunc`, and automatic execution on `Canva.Draw` / `Canva.DrawTimelapseFrames` when post-effects are attached to `Canva`.
+  2. **Radial Chromatic Aberration & Lens Dispersion (`ApplyChromaticAberration(strength float64)`, `ChromaticAberrationEffect`)**:
+     - Sub-pixel bilinear radial dispersion of R/G/B channels in 64-bit linear HDR space, adding authentic optical prism fringing to cosmic nebulae, attractors, and interference fields.
+  3. **Luminance 2.5D Relief & Micro-SSAO Shading (`ApplyLuminanceRelief(strength, azimuthDeg, elevationDeg, specStrength float64)`, `LuminanceReliefEffect`)**:
+     - Treats perceptual Oklab lightness $L(x,y)$ as a continuous 2.5D heightfield, computes $3\times 3$ Scharr surface normals, 8-tap micro-cavity ambient occlusion, and Blinn-Phong grazing illumination + specular highlights.
+  4. **Structure-Tensor Anisotropic Kuwahara Filter (`ApplyAnisotropicKuwahara(radius int, sharpness, anisotropy float64)`, `AnisotropicKuwaharaEffect`)**:
+     - Evaluates smoothed $2\times 2$ structure tensors $J = G_\sigma * (\nabla I \nabla I^\top)$ to align elliptical Kuwahara sectors along the dominant local flow tangent $\theta(x,y)$, turning noisy pixel fields into crisp, flow-coherent gouache/oil planes without blurring edges.
+  5. **Oklab Perceptual Color Grading & Split-Toning (`ApplyColorGrade(contrast, saturation, shadowHueDeg, highlightHueDeg, splitStrength float64)`, `ColorGradeEffect`)**:
+     - Performs linear-light filmic S-curve contrast, Oklab chroma scaling, and shadow/highlight split-toning without hue distortion.
+  6. **Archival Deckle-Edged Paper Border (`ApplyDeckleBorder(marginFrac, roughness float64, matCol color.RGBA, seed int64)`, `DeckleBorderEffect`)**:
+     - Multi-octave FBM torn cotton-rag deckle edge with soft recessed drop shadow, turning any full-bleed canvas into a museum float-mounted sheet.
+  7. **Tone-Mapping & Classic Passes as Composable `PostEffect`s**:
+     - `BloomEffect`, `PaperTextureEffect`, `VignetteEffect`, and `ToneMapEffect(exposure, gamma)` unified under the same interface and exposed in `cmd/genart` via `-bloom`, `-paper`, `-vignette`, `-chromatic`, `-relief`, `-kuwahara`, `-grade`, `-deckle`, and `-tonemap`.
+
+### 6.5 Direction 5: Pen-Plotter Vector Clipping & TSP Path Optimization (`render/vector_bridge.go`)
+- **Architecture**:
+  - Propagate `clipStack` geometry into `vecOps` (`<clipPath>` in SVG/PDF) so clipped vector strokes match HDR raster output 1:1.
+  - Group exported SVG paths by stroke color into `<g id="pen-layer-...">` layers and run greedy 2-opt Nearest-Neighbor path ordering to minimize plotter pen-up travel distance.
+
+### 6.6 Direction 6: Pure-Go WebAssembly (WASM) Interactive Studio (`wasm/main.go`, `index.html`)
+- **Architecture**:
+  - Compile the engine registry to WebAssembly (`GOOS=js GOARCH=wasm`) and add a Recipe Inspector / Live Parameter & Post-Effect Studio inside `index.html`.
+
+---
+
+## Part VII. Art-Empowering Rendering & Mathematical Foundations (For Future `arts/`)
+
+To elevate future generative artworks in `arts/` (especially mathematical topology, fluid dynamics, geomorphology, and tactile physical media), the following 5 foundational subsystems are planned in `render/` and `common/`:
+
+### 7.1 Fast Line Integral Convolution (LIC / OFLIC) & Anisotropic Texture Advection (`render/field_engine.go`)
+- **Capability**: Given any `VectorField2D` $\mathbf{v}(x,y)$ and a multi-scale pigment/noise seed buffer, integrate forward and backward along RK4 streamlines at every pixel with a Hann/Gaussian convolution kernel:
+  $$I_{\text{LIC}}(\mathbf{x}_0) = \int_{-L}^{L} k(s)\, T\bigl(\mathbf{\Phi}_s(\mathbf{x}_0)\bigr)\, ds$$
+- **Artistic Unlock**: Produces continuous, micro-fibrous silk, magnetic iron filings, planetary atmospheric bands, and phase-coherent fluid currents without discrete stroke gaps or overlapping alpha artifacts.
+
+### 7.2 Thin-Film Optical Iridescence & Spectral Interference (`render/canvas.go`, `render/gbuffer_engine.go`)
+- **Capability**: Analytical Airy thin-film interference shader `SampleThinFilmIridescence(cosTheta, filmThicknessNm, iorFilm float64) color.RGBA` computing optical path difference $\Delta = 2 n_{\text{film}} d \cos\theta_t + \frac{\lambda}{2}$ across R/G/B wavelengths (`650nm`, `532nm`, `460nm`) in linear HDR light.
+- **Artistic Unlock**: Enables physical structural color — iridescent beetle carapaces, bismuth hopper crystals, raku ceramic glazes, mother-of-pearl nacre chambers (`NautilusSpiral`), soap-film minimal surfaces (`GyroidSurface`), and oil-slick vortices.
+
+### 7.3 Heightfield Horizon-Mapped Soft Shadows & Subsurface Scattering (`render/gbuffer_engine.go`)
+- **Capability**: Upgrade `FiberGBuffer` and 2.5D terrain heightfields with multi-azimuth screen-space horizon raymarching (`ComputeHorizonShadows(lightDir, softness)`) and exponential thickness-based subsurface scattering (SSS).
+- **Artistic Unlock**: Casts true long-range self-shadows across alpine ridges, sand dunes, and overlapping impasto bristle bundles while giving jade, wax, marble, and botanical petals translucent internal glow.
+
+### 7.4 Weighted Blue-Noise Poisson-Disk & Centroidal Voronoi Stippling (`render/field_engine.go`)
+- **Capability**:
+  - `SamplePoissonDisk2D(w, h, minRadius float64, densityFn ScalarField2D, rng *rand.Rand) []Point`: Bridson's $O(N)$ spatial-grid blue-noise point generator with adaptive radius $r(x,y) \propto \rho(x,y)^{-1/2}$.
+  - `RelaxCentroidalVoronoi(pts []Point, w, h float64, densityFn ScalarField2D, iters int) []Point`: Weighted Lloyd's CVT relaxation.
+- **Artistic Unlock**: Eliminates random clumping and rigid grid artifacts in bristle root seeding, botanical phyllotaxis, cellular mosaics, stipple engravings, and Delaunay/Voronoi tessellations.
+
+### 7.5 Conformal, Hyperbolic & Modular Domain-Coloring Kernel (`common/conformal.go`)
+- **Capability**:
+  - First-class `Mobius2D` ($\frac{az+b}{cz+d}$), Poincaré disk geodesic arcs, Isometric Circle inversion trees, and `ShadeComplexPhasePortrait(z, fz complex128, pal *MultiStopGradient)` combining cyclic Oklab argument coloring with anti-aliased log-modulus isolines ($|\ln|f(z)|| \bmod \Delta$) and argument phase rays.
+- **Artistic Unlock**: Dramatically simplifies and enriches conformal fractals, Kleinian limit sets, modular forms, elliptic functions, and complex dynamical systems.
+
 
