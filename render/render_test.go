@@ -401,6 +401,66 @@ func TestComposablePostProcessPipeline(t *testing.T) {
 	}
 }
 
+func TestPartVIIFoundationsLICBlueNoiseAndIridescence(t *testing.T) {
+	// 1. Test Fast LIC & Periodic OFLIC Field (Section 7.1)
+	licCfg := DefaultLICConfig(12.0)
+	licCfg.AnimatedFreq = 0.55
+	licCfg.AnimatedPhase = 0.25
+	vortexField := func(x, y float64) Point {
+		return Pt(-(y - 32.0), x - 32.0)
+	}
+	c := NewCanvas(64, 64)
+	c.FillBackground(common.Black)
+	c.RenderLICField(licCfg, vortexField, func(x, y, licVal float64) color.RGBA {
+		v := uint8(math.Round(licVal * 255.0))
+		return color.RGBA{R: v, G: v, B: 255, A: 255}
+	}, 1.0, 2026)
+
+	rMid, _, bMid, _ := c.PixelLinearAt(16, 32)
+	if bMid < 0.8 || rMid < 0.0 || rMid > 1.0 {
+		t.Fatalf("unexpected LIC pixel values at (16,32): R=%f B=%f", rMid, bMid)
+	}
+
+	// 2. Test Weighted Blue-Noise Poisson-Disk & Lloyd CVT Relaxation (Section 7.4)
+	rng := rand.New(rand.NewSource(42))
+	pts := SamplePoissonDisk2D(100, 100, 8.0, func(x, y float64) float64 {
+		return 1.0 - math.Hypot(x-50.0, y-50.0)/75.0
+	}, rng)
+	if len(pts) < 40 {
+		t.Fatalf("expected at least 40 blue-noise Poisson-disk samples, got %d", len(pts))
+	}
+	relaxed := RelaxCentroidalVoronoi(pts, 100, 100, 64, nil, 3)
+	if len(relaxed) != len(pts) {
+		t.Fatalf("expected RelaxCentroidalVoronoi to preserve point count %d, got %d", len(pts), len(relaxed))
+	}
+
+	// 3. Test Thin-Film Optical Iridescence (Section 7.2)
+	iridNormal := SampleThinFilmIridescence(1.0, 380.0, 1.42)
+	iridGrazing := SampleThinFilmIridescence(0.25, 380.0, 1.42)
+	if iridNormal == iridGrazing {
+		t.Fatalf("expected viewing angle shift to alter thin-film interference color, got identical %+v", iridNormal)
+	}
+
+	// 4. Test Heightfield Horizon Soft Shadows, SSS & Iridescent GBuffer Shading (Section 7.3)
+	gb := NewFiberGBuffer(64, 64, color.RGBA{R: 16, G: 20, B: 28, A: 255})
+	gb.RasterizeFiber3D(
+		[]Point{Pt(12, 32), Pt(32, 28), Pt(52, 32)},
+		0.5, 6.0, 4.5,
+		color.RGBA{R: 30, G: 80, B: 140, A: 255},
+		color.RGBA{R: 60, G: 160, B: 210, A: 255},
+		color.RGBA{R: 220, G: 245, B: 255, A: 255},
+		0.55, 0.30,
+	)
+	matCfg := DefaultGBufferMaterialConfig([3]float64{-0.55, -0.55, 0.62})
+	gb.ResolveToCanvasAdvanced(c, matCfg)
+
+	rLit, gLit, bLit, _ := c.PixelLinearAt(32, 28)
+	if rLit+gLit+bLit <= 0.1 {
+		t.Fatalf("expected ResolveToCanvasAdvanced to shade elevated fiber at (32,28), got (%f,%f,%f)", rLit, gLit, bLit)
+	}
+}
+
+
 
 
 

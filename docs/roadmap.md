@@ -7,7 +7,7 @@ This document serves as the architectural blueprint for `generativeart`, coverin
 4. **Waves 9–17 `arts/` Visual Paradigms (121 Art Engines + 19 HD 600×600 Loop GIFs — Implemented)**
 5. **Exhibition Poster & ContactSheet Engine (`poster.go` — Implemented) & HD GIF Expansion**
 6. **Next-Generation Architecture & Platform Roadmap (6 Directions, with Direction 4 Composable HDR Post-Processing Pipeline Implemented)**
-7. **Art-Empowering Rendering & Mathematical Foundations (Next-Tier Capabilities for Future `arts/`)**
+7. **Art-Empowering Rendering & Mathematical Foundations (Next-Tier Capabilities for Future `arts/` — Implemented)**
 
 ---
 
@@ -254,32 +254,32 @@ Expand `arts/` from **94** to **100** generators with pure mathematical attracto
 
 ---
 
-## Part VII. Art-Empowering Rendering & Mathematical Foundations (For Future `arts/`)
+## Part VII. Art-Empowering Rendering & Mathematical Foundations (For Future `arts/` — Implemented)
 
-To elevate future generative artworks in `arts/` (especially mathematical topology, fluid dynamics, geomorphology, and tactile physical media), the following 5 foundational subsystems are planned in `render/` and `common/`:
+To elevate future generative artworks in `arts/` (especially mathematical topology, fluid dynamics, geomorphology, and tactile physical media), the following 5 foundational subsystems are implemented in `render/` and `common/`:
 
-### 7.1 Fast Line Integral Convolution (LIC / OFLIC) & Anisotropic Texture Advection (`render/field_engine.go`)
-- **Capability**: Given any `VectorField2D` $\mathbf{v}(x,y)$ and a multi-scale pigment/noise seed buffer, integrate forward and backward along RK4 streamlines at every pixel with a Hann/Gaussian convolution kernel:
+### 7.1 Fast Line Integral Convolution (LIC / OFLIC) & Anisotropic Texture Advection (`render/field_engine.go` — Implemented)
+- **Capability**: Given any `VectorField2D` $\mathbf{v}(x,y)$ and a multi-scale pigment/noise seed buffer (`ComputeLICField`, `RenderLICField`), integrate forward and backward along RK4 streamlines at every pixel with a Hann/Gaussian convolution kernel (plus phase-shifted periodic waves for seamless OFLIC animations):
   $$I_{\text{LIC}}(\mathbf{x}_0) = \int_{-L}^{L} k(s)\, T\bigl(\mathbf{\Phi}_s(\mathbf{x}_0)\bigr)\, ds$$
 - **Artistic Unlock**: Produces continuous, micro-fibrous silk, magnetic iron filings, planetary atmospheric bands, and phase-coherent fluid currents without discrete stroke gaps or overlapping alpha artifacts.
 
-### 7.2 Thin-Film Optical Iridescence & Spectral Interference (`render/canvas.go`, `render/gbuffer_engine.go`)
-- **Capability**: Analytical Airy thin-film interference shader `SampleThinFilmIridescence(cosTheta, filmThicknessNm, iorFilm float64) color.RGBA` computing optical path difference $\Delta = 2 n_{\text{film}} d \cos\theta_t + \frac{\lambda}{2}$ across R/G/B wavelengths (`650nm`, `532nm`, `460nm`) in linear HDR light.
+### 7.2 Thin-Film Optical Iridescence & Spectral Interference (`render/gbuffer_engine.go` — Implemented)
+- **Capability**: Analytical Airy thin-film interference shader `SampleThinFilmLinearRGB` & `SampleThinFilmIridescence(cosTheta, filmThicknessNm, iorFilm float64) color.RGBA` computing optical path difference $\Delta = 2 n_{\text{film}} d \cos\theta_t + \frac{\lambda}{2}$ across 3-tap R/G/B spectral sub-bands (`630–670nm`, `520–550nm`, `450–480nm`) in linear HDR light with natural high-order coherence decay.
 - **Artistic Unlock**: Enables physical structural color — iridescent beetle carapaces, bismuth hopper crystals, raku ceramic glazes, mother-of-pearl nacre chambers (`NautilusSpiral`), soap-film minimal surfaces (`GyroidSurface`), and oil-slick vortices.
 
-### 7.3 Heightfield Horizon-Mapped Soft Shadows & Subsurface Scattering (`render/gbuffer_engine.go`)
-- **Capability**: Upgrade `FiberGBuffer` and 2.5D terrain heightfields with multi-azimuth screen-space horizon raymarching (`ComputeHorizonShadows(lightDir, softness)`) and exponential thickness-based subsurface scattering (SSS).
+### 7.3 Heightfield Horizon-Mapped Soft Shadows & Subsurface Scattering (`render/gbuffer_engine.go` — Implemented)
+- **Capability**: Upgraded `FiberGBuffer` with multi-ray penumbra screen-space horizon raymarching (`ComputeHorizonShadows(lightDir, maxRadius, softness)`) and `ResolveToCanvasAdvanced(rc, cfg)` combining 12-tap SSAO, horizon soft shadows, translucent subsurface scattering (SSS), and thin-film iridescence.
 - **Artistic Unlock**: Casts true long-range self-shadows across alpine ridges, sand dunes, and overlapping impasto bristle bundles while giving jade, wax, marble, and botanical petals translucent internal glow.
 
-### 7.4 Weighted Blue-Noise Poisson-Disk & Centroidal Voronoi Stippling (`render/field_engine.go`)
+### 7.4 Weighted Blue-Noise Poisson-Disk & Centroidal Voronoi Stippling (`render/field_engine.go` — Implemented)
 - **Capability**:
-  - `SamplePoissonDisk2D(w, h, minRadius float64, densityFn ScalarField2D, rng *rand.Rand) []Point`: Bridson's $O(N)$ spatial-grid blue-noise point generator with adaptive radius $r(x,y) \propto \rho(x,y)^{-1/2}$.
-  - `RelaxCentroidalVoronoi(pts []Point, w, h float64, densityFn ScalarField2D, iters int) []Point`: Weighted Lloyd's CVT relaxation.
+  - `SamplePoissonDisk2D(w, h, minRadius float64, densityFn ScalarField2D, rng *rand.Rand) []Point`: Bridson's $O(N)$ spatial-grid blue-noise point generator with adaptive density-driven radius.
+  - `RelaxCentroidalVoronoi(pts []Point, w, h float64, gridRes int, densityFn ScalarField2D, iterations int) []Point`: Spatial-bucket accelerated weighted Lloyd's CVT relaxation.
 - **Artistic Unlock**: Eliminates random clumping and rigid grid artifacts in bristle root seeding, botanical phyllotaxis, cellular mosaics, stipple engravings, and Delaunay/Voronoi tessellations.
 
-### 7.5 Conformal, Hyperbolic & Modular Domain-Coloring Kernel (`common/conformal.go`)
+### 7.5 Conformal, Hyperbolic & Modular Domain-Coloring Kernel (`common/conformal.go` — Implemented)
 - **Capability**:
-  - First-class `Mobius2D` ($\frac{az+b}{cz+d}$), Poincaré disk geodesic arcs, Isometric Circle inversion trees, and `ShadeComplexPhasePortrait(z, fz complex128, pal *MultiStopGradient)` combining cyclic Oklab argument coloring with anti-aliased log-modulus isolines ($|\ln|f(z)|| \bmod \Delta$) and argument phase rays.
+  - First-class `Mobius2D` ($\frac{az+b}{cz+d}$, composition, inversion, determinant normalization, isometric circles, Poincaré disk automorphisms, Cayley transforms), `Circle2D` point/circle inversions, `PoincareGeodesicArc`, and `EvaluateDomainColoring(fz, logPeriod, phaseRays)` combining normalized argument phase with anti-aliased log-modulus isolines and stereographic Riemann-sphere shading.
 - **Artistic Unlock**: Dramatically simplifies and enriches conformal fractals, Kleinian limit sets, modular forms, elliptic functions, and complex dynamical systems.
 
 
