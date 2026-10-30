@@ -1,9 +1,11 @@
 package render
 
 import (
+	"bytes"
 	"image/color"
 	"math"
 	"math/rand"
+	"strings"
 	"testing"
 
 	"github.com/jdxyw/generativeart/common"
@@ -459,6 +461,62 @@ func TestPartVIIFoundationsLICBlueNoiseAndIridescence(t *testing.T) {
 		t.Fatalf("expected ResolveToCanvasAdvanced to shade elevated fiber at (32,28), got (%f,%f,%f)", rLit, gLit, bLit)
 	}
 }
+
+func TestVectorClippingAndPenPlotterTSPOptimization(t *testing.T) {
+	c := NewCanvas(200, 200)
+	c.FillBackground(common.White)
+
+	// 1. Verify ClipPolylineToPolygon trims a line crossing [50, 150]x[50, 150]
+	clipBox := []Point{Pt(50, 50), Pt(150, 50), Pt(150, 150), Pt(50, 150)}
+	clipped := ClipPolylineToPolygon([]Point{Pt(10, 100), Pt(190, 100)}, clipBox)
+	if len(clipped) != 1 {
+		t.Fatalf("expected 1 clipped segment inside box, got %d", len(clipped))
+	}
+	seg := clipped[0]
+	if math.Abs(seg[0].X-50.0) > 0.5 || math.Abs(seg[len(seg)-1].X-150.0) > 0.5 {
+		t.Fatalf("expected clipped segment endpoints at X=50 and X=150, got %+v", seg)
+	}
+
+	// 2. Push a circular clip mask and draw alternating far-apart strokes in worst-case zigzag order
+	c.PushClipCircle(100, 100, 75)
+	// A stroke completely outside the circle r=75 around (100,100) should be clipped out of vecOps
+	c.StrokePolyline([]Point{Pt(5, 5), Pt(20, 5)}, 1.2, common.Black, 1.0)
+	if c.VectorOpCount() != 0 {
+		t.Fatalf("expected out-of-clip stroke to be discarded from vecOps, got count=%d", c.VectorOpCount())
+	}
+
+	// Draw 16 strokes jumping back and forth between top-left and bottom-right inside the clip circle
+	penA := color.RGBA{R: 20, G: 60, B: 160, A: 255}
+	penB := color.RGBA{R: 200, G: 50, B: 40, A: 255}
+	for i := 0; i < 8; i++ {
+		yTop := 60.0 + float64(i)*3.0
+		yBot := 140.0 - float64(i)*3.0
+		c.StrokePolyline([]Point{Pt(65, yTop), Pt(85, yTop)}, 1.2, penA, 1.0)
+		c.StrokePolyline([]Point{Pt(135, yBot), Pt(115, yBot)}, 1.2, penA, 1.0)
+		c.StrokePolyline([]Point{Pt(70, yBot), Pt(90, yBot)}, 1.2, penB, 1.0)
+	}
+	c.PopClip()
+
+	// 3. Export Pen-Plotter SVG and verify 2-Opt TSP reduces pen-up travel distance significantly
+	var svgBuf bytes.Buffer
+	cfg := DefaultPlotterConfig()
+	stats, err := c.WritePlotterSVG(&svgBuf, cfg)
+	if err != nil {
+		t.Fatalf("WritePlotterSVG failed: %v", err)
+	}
+	if stats.LayerCount != 2 || stats.TotalPaths != 24 {
+		t.Fatalf("expected 2 pen layers and 24 paths, got %+v", stats)
+	}
+	if stats.PenUpAfterPx >= stats.PenUpBeforePx || stats.TravelReductionPct < 35.0 {
+		t.Fatalf("expected significant TSP pen-up travel reduction, got before=%.1f after=%.1f (-%.1f%%)",
+			stats.PenUpBeforePx, stats.PenUpAfterPx, stats.TravelReductionPct)
+	}
+	svgOut := svgBuf.String()
+	if !strings.Contains(svgOut, `inkscape:groupmode="layer"`) || !strings.Contains(svgOut, `id="pen-layer-1-`) {
+		t.Fatalf("expected Inkscape pen layers in plotter SVG output")
+	}
+}
+
 
 
 

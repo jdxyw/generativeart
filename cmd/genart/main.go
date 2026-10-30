@@ -60,6 +60,8 @@ type postFlags struct {
 	vignette   *float64
 	deckle     *float64
 	tonemap    *float64
+	plotter    *bool
+	pens       *int
 }
 
 func registerPostFlags(fs *flag.FlagSet) postFlags {
@@ -74,6 +76,8 @@ func registerPostFlags(fs *flag.FlagSet) postFlags {
 		vignette:   fs.Float64("vignette", 0, "Smooth radial vignette strength (e.g. 0.25)"),
 		deckle:     fs.Float64("deckle", 0, "Torn deckle-edged museum mat border fraction (e.g. 0.045)"),
 		tonemap:    fs.Float64("tonemap", 0, "ACES filmic tone-mapping exposure (e.g. 1.05)"),
+		plotter:    fs.Bool("plotter", false, "Export pen-plotter SVG with <g> color layers and 2-Opt TSP path optimization"),
+		pens:       fs.Int("pens", 0, "Maximum number of pen color layers for -plotter SVG (0 = exact colors)"),
 	}
 }
 
@@ -200,6 +204,21 @@ func runRender(args []string) {
 	}
 
 	eng := desc.Build(nil)
+	if strings.EqualFold(filepath.Ext(*out), ".svg") && ((pf.plotter != nil && *pf.plotter) || (pf.pens != nil && *pf.pens > 0)) {
+		c.Draw(eng)
+		pcfg := render.DefaultPlotterConfig()
+		if pf.pens != nil && *pf.pens > 0 {
+			pcfg.MaxPens = *pf.pens
+		}
+		stats, err := c.ToPlotterSVG(*out, pcfg)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "plotter svg failed: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Printf("Rendered Pen-Plotter SVG %s (%dx%d, layers=%d, paths=%d, pen-up: %.0fpx -> %.0fpx [-%.1f%%]) -> %s\n",
+			desc.ID, *w, *h, stats.LayerCount, stats.TotalPaths, stats.PenUpBeforePx, stats.PenUpAfterPx, stats.TravelReductionPct, *out)
+		return
+	}
 	if err := saveCanvaByExt(c, eng, *frames, *delay, *out, false); err != nil {
 		fmt.Fprintf(os.Stderr, "render failed: %v\n", err)
 		os.Exit(1)
@@ -253,6 +272,20 @@ func runReplay(args []string) {
 	}
 	if effects := pf.buildEffects(meta.Seed); len(effects) > 0 {
 		c.ApplyPostEffects(effects...)
+	}
+	if strings.EqualFold(filepath.Ext(*out), ".svg") && ((pf.plotter != nil && *pf.plotter) || (pf.pens != nil && *pf.pens > 0)) {
+		pcfg := render.DefaultPlotterConfig()
+		if pf.pens != nil && *pf.pens > 0 {
+			pcfg.MaxPens = *pf.pens
+		}
+		stats, err := c.ToPlotterSVG(*out, pcfg)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "plotter svg failed: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Printf("Replayed Pen-Plotter SVG %s (layers=%d, paths=%d, pen-up: %.0fpx -> %.0fpx [-%.1f%%]) -> %s\n",
+			meta.Engine, stats.LayerCount, stats.TotalPaths, stats.PenUpBeforePx, stats.PenUpAfterPx, stats.TravelReductionPct, *out)
+		return
 	}
 	if err := saveCanvaByExt(c, nil, 1, 8, *out, true); err != nil {
 		fmt.Fprintf(os.Stderr, "save failed: %v\n", err)

@@ -413,6 +413,31 @@ func (c *Canva) ToSVG(fpath string) error {
 	return rc.SaveSVG(fpath)
 }
 
+// WritePlotterSVG exports the canvas as an AxiDraw / Inkscape pen-plotter SVG with
+// color-grouped <g inkscape:groupmode="layer"> pen layers and Bidirectional 2-Opt TSP path ordering.
+func (c *Canva) WritePlotterSVG(w io.Writer, cfg render.PlotterConfig) (render.PlotterStats, error) {
+	if c == nil {
+		return render.PlotterStats{}, errors.New("nil Canva")
+	}
+	rc := c.lastRenderCanvas
+	if rc == nil {
+		rc = render.NewCanvasFromRGBA(c.img)
+	}
+	return rc.WritePlotterSVG(w, cfg)
+}
+
+// ToPlotterSVG saves the canvas as a pen-plotter-optimized SVG file at fpath and returns PlotterStats.
+func (c *Canva) ToPlotterSVG(fpath string, cfg render.PlotterConfig) (render.PlotterStats, error) {
+	if c == nil {
+		return render.PlotterStats{}, errors.New("nil Canva")
+	}
+	rc := c.lastRenderCanvas
+	if rc == nil {
+		rc = render.NewCanvasFromRGBA(c.img)
+	}
+	return rc.SavePlotterSVG(fpath, cfg)
+}
+
 // WritePDF exports the canvas as an archival vector PDF (or embedded raster fallback) to w.
 func (c *Canva) WritePDF(w io.Writer) error {
 	if c == nil {

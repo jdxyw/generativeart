@@ -356,6 +356,12 @@ func (c *Canvas) DrawTaperedSpline(
 		}
 	}
 
+	centerPath := &canvas.Path{}
+	centerPath.MoveTo(curve[0].X, curve[0].Y)
+	for i := 1; i < m; i++ {
+		centerPath.LineTo(curve[i].X, curve[i].Y)
+	}
+
 	// Fast, seam-free single-contour rasterization when the stroke color is uniform.
 	if uniformColor {
 		path := &canvas.Path{}
@@ -367,7 +373,7 @@ func (c *Canvas) DrawTaperedSpline(
 			path.LineTo(right[i].X, right[i].Y)
 		}
 		path.Close()
-		c.RasterizePath(path, firstCol, alpha)
+		c.rasterizePathInternal(path, centerPath, maxWidth*0.65, firstCol, alpha)
 		return
 	}
 
@@ -404,6 +410,10 @@ func (c *Canvas) DrawTaperedSpline(
 			}
 		}
 		path.Close()
-		c.RasterizePath(path, segColor, alpha)
+		var clSeg *canvas.Path
+		if i == 0 {
+			clSeg = centerPath
+		}
+		c.rasterizePathInternal(path, clSeg, maxWidth*0.65, segColor, alpha)
 	}
 }
