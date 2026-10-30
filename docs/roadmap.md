@@ -6,7 +6,7 @@ This document serves as the architectural blueprint for `generativeart`, coverin
 3. **Platform & Export Foundations (Package 3 — Implemented: Dual Vector/HDR Backend, `DrawTimelapse` HD GIF, PNG `tEXt` Recipes & `cmd/genart` CLI)**
 4. **Waves 9–18 `arts/` Visual Paradigms (125 Art Engines + 19 HD 600×600 Loop GIFs — Implemented)**
 5. **Exhibition Poster & ContactSheet Engine (`poster.go` — Implemented) & HD GIF Expansion**
-6. **Next-Generation Architecture & Platform Roadmap (6 Directions, with Direction 4 Composable HDR Post-Processing Pipeline Implemented)**
+6. **Next-Generation Architecture & Platform Roadmap (6 Directions, with Directions 4 & 5 Implemented)**
 7. **Art-Empowering Rendering & Mathematical Foundations (Next-Tier Capabilities for Future `arts/` — Implemented)**
 
 ---
@@ -249,10 +249,11 @@ Expand `arts/` from **94** to **100** generators with pure mathematical attracto
   7. **Tone-Mapping & Classic Passes as Composable `PostEffect`s**:
      - `BloomEffect`, `PaperTextureEffect`, `VignetteEffect`, and `ToneMapEffect(exposure, gamma)` unified under the same interface and exposed in `cmd/genart` via `-bloom`, `-paper`, `-vignette`, `-chromatic`, `-relief`, `-kuwahara`, `-grade`, `-deckle`, and `-tonemap`.
 
-### 6.5 Direction 5: Pen-Plotter Vector Clipping & TSP Path Optimization (`render/vector_bridge.go`)
+### 6.5 Direction 5: Pen-Plotter Vector Clipping & TSP Path Optimization (`render/vector_bridge.go`, `render/pipeline.go`, `cmd/genart` — Implemented)
 - **Architecture**:
-  - Propagate `clipStack` geometry into `vecOps` (`<clipPath>` in SVG/PDF) so clipped vector strokes match HDR raster output 1:1.
-  - Group exported SVG paths by stroke color into `<g id="pen-layer-...">` layers and run greedy 2-opt Nearest-Neighbor path ordering to minimize plotter pen-up travel distance.
+  - **Vector Clip Stack Propagation (`clipPolyStack`)**: Propagates `PushClipPath`, `PushClipPolygon`, `PushClipCircle`, and `PushClipSDF` geometry into vector recording (`clipFilledPathAgainstPolyStack`, `clipOpenPathAgainstPolyStack`, `ClipPolylineToPolygon`) so exported SVG/PDF vector paths respect active stencil masks 1:1 with the HDR raster canvas.
+  - **Centerline Recording & Multi-Pen Layer Grouping**: Records stroke centerlines on `StrokePath`, `StrokePolyline`, and `DrawTaperedSpline`, groups paths by color (or quantizes colors into `MaxPens` Oklab K-Means palette slots via `-pens N`), and emits `<g id="pen-layer-..." inkscape:groupmode="layer">` SVG layers ordered from lightest to darkest pen.
+  - **Bidirectional Nearest-Neighbor + 2-Opt TSP Tour Optimizer (`OptimizeVectorOpsTSP`, `WritePlotterSVG`, `ToPlotterSVG`)**: Reorders strokes and flips reversible path directions per layer to minimize non-drawing pen-up travel distance (`60%–85%` typical reduction), reporting `PlotterStats` (`LayerCount`, `TotalPaths`, `PenDownDistancePx`, `PenUpBeforePx`, `PenUpAfterPx`, `TravelReductionPct`) via `genart render -plotter -out file.svg`.
 
 ### 6.6 Direction 6: Pure-Go WebAssembly (WASM) Interactive Studio (`wasm/main.go`, `index.html`)
 - **Architecture**:

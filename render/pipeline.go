@@ -151,6 +151,9 @@ func (c *Canvas) PopClip() {
 		return
 	}
 	c.clipStack = c.clipStack[:len(c.clipStack)-1]
+	if len(c.clipPolyStack) > 0 {
+		c.clipPolyStack = c.clipPolyStack[:len(c.clipPolyStack)-1]
+	}
 }
 
 // ClearClips removes all stencil/clip masks from the canvas.
@@ -159,9 +162,48 @@ func (c *Canvas) ClearClips() {
 		return
 	}
 	c.clipStack = c.clipStack[:0]
+	c.clipPolyStack = c.clipPolyStack[:0]
 }
 
-func (c *Canvas) pushRawClipMask(newMask []uint8) {
+// extractPathRings flattens a canvas.Path into closed polygon vertex rings.
+func extractPathRings(p *canvas.Path) [][]Point {
+	if p == nil || p.Empty() {
+		return nil
+	}
+	flat := p.ReplaceArcs().Flatten(0.6)
+	var rings [][]Point
+	for _, sp := range flat.Split() {
+		d := sp.Data()
+		var pts []Point
+		for i := 0; i < len(d); {
+			switch d[i] {
+			case canvas.MoveToCmd, canvas.LineToCmd, canvas.CloseCmd:
+				pt := Pt(d[i+1], d[i+2])
+				if len(pts) == 0 || pts[len(pts)-1].Dist(pt) > 1e-4 {
+					pts = append(pts, pt)
+				}
+				i += 4
+			case canvas.QuadToCmd:
+				pts = append(pts, Pt(d[i+3], d[i+4]))
+				i += 6
+			case canvas.CubeToCmd:
+				pts = append(pts, Pt(d[i+5], d[i+6]))
+				i += 8
+			default:
+				i += 4
+			}
+		}
+		if len(pts) >= 2 && pts[0].Dist(pts[len(pts)-1]) < 1e-3 {
+			pts = pts[:len(pts)-1]
+		}
+		if len(pts) >= 3 {
+			rings = append(rings, pts)
+		}
+	}
+	return rings
+}
+
+func (c *Canvas) pushRawClipMask(newMask []uint8, polyRings [][]Point) {
 	if len(c.clipStack) > 0 {
 		prev := c.clipStack[len(c.clipStack)-1]
 		for i := range newMask {
@@ -169,6 +211,7 @@ func (c *Canvas) pushRawClipMask(newMask []uint8) {
 		}
 	}
 	c.clipStack = append(c.clipStack, newMask)
+	c.clipPolyStack = append(c.clipPolyStack, polyRings)
 }
 
 // PushClipPath rasterizes path p (respecting the active transform matrix) into an
@@ -191,7 +234,7 @@ func (c *Canvas) PushClipPath(p *canvas.Path) {
 			copy(fullMask[dstOff:dstOff+bw], pix[srcOff:srcOff+bw])
 		}
 	}
-	c.pushRawClipMask(fullMask)
+	c.pushRawClipMask(fullMask, extractPathRings(p))
 }
 
 // PushClipPolygon pushes a closed polygonal clip mask onto the clip stack.
@@ -210,13 +253,37 @@ func (c *Canvas) PushClipPolygon(pts []Point) {
 
 // PushClipCircle pushes an anti-aliased circular clip mask centered at (cx, cy) with radius r.
 func (c *Canvas) PushClipCircle(cx, cy, r float64) {
-	c.PushClipSDF(SDFCircle(Pt(cx, cy), r), false)
+	if c == nil || r <= 0 {
+		return
+	}
+	const segs = 64
+	ring := make([]Point, segs)
+	for i := 0; i < segs; i++ {
+		ang := 2.0 * math.Pi * float64(i) / float64(segs)
+		ring[i] = c.TransformPoint(Pt(cx+r*math.Cos(ang), cy+r*math.Sin(ang)))
+	}
+	c.pushClipSDFWithRings(SDFCircle(Pt(cx, cy), r), false, [][]Point{ring})
 }
 
 // PushClipSDF evaluates a 2D Signed Distance Field across the canvas with 1.5px smoothstep
 // anti-aliasing and pushes it onto the clip stack. If invert is true, only pixels outside
 // the SDF (d > 0) are kept.
 func (c *Canvas) PushClipSDF(sdf SDF2D, invert bool) {
+	if c == nil || c.Width <= 0 || c.Height <= 0 || sdf == nil {
+		return
+	}
+	evalFn := func(x, y float64) float64 {
+		d := sdf(Pt(x, y))
+		if invert {
+			return -d
+		}
+		return d
+	}
+	rings := ExtractMarchingSquares(48, 48, float64(c.Width), float64(c.Height), 0.0, evalFn)
+	c.pushClipSDFWithRings(sdf, invert, rings)
+}
+
+func (c *Canvas) pushClipSDFWithRings(sdf SDF2D, invert bool, rings [][]Point) {
 	if c == nil || c.Width <= 0 || c.Height <= 0 || sdf == nil {
 		return
 	}
@@ -243,7 +310,7 @@ func (c *Canvas) PushClipSDF(sdf SDF2D, invert bool) {
 			}
 		}
 	})
-	c.pushRawClipMask(fullMask)
+	c.pushRawClipMask(fullMask, rings)
 }
 
 // ============================================================================
@@ -292,10 +359,26 @@ func (c *Canvas) CompositeLayer(layer *Canvas, mode BlendMode, opacity float64) 
 
 	if c.recordVector && len(layer.vecOps) > 0 {
 		for _, op := range layer.vecOps {
+			pCopy := op.path.Copy()
+			var clCopy *canvas.Path
+			if op.centerline != nil {
+				clCopy = op.centerline.Copy()
+			}
+			if len(c.clipPolyStack) > 0 {
+				pCopy = clipFilledPathAgainstPolyStack(pCopy, c.clipPolyStack)
+				if clCopy != nil {
+					clCopy = clipOpenPathAgainstPolyStack(clCopy, c.clipPolyStack)
+				}
+			}
+			if (pCopy == nil || pCopy.Empty()) && (clCopy == nil || clCopy.Empty()) {
+				continue
+			}
 			c.vecOps = append(c.vecOps, vectorOp{
-				path:  op.path.Copy(),
-				col:   op.col,
-				alpha: op.alpha * opacity,
+				path:       pCopy,
+				centerline: clCopy,
+				strokeW:    op.strokeW,
+				col:        op.col,
+				alpha:      op.alpha * opacity,
 			})
 		}
 	}

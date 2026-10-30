@@ -442,6 +442,7 @@ type Canvas struct {
 	curMatrix          canvas.Matrix
 	transformStack     []canvas.Matrix
 	clipStack          [][]uint8
+	clipPolyStack      [][][]Point
 }
 
 // NewCanvas allocates a new HDR linear-RGB Canvas with dimensions w x h.
