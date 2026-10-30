@@ -174,3 +174,40 @@ func TestPersistentHDRCanvaAndReplayPNG(t *testing.T) {
 	}
 }
 
+func TestCanvaPostEffectPipelineAndRecipe(t *testing.T) {
+	tmpDir := t.TempDir()
+	outPNG := filepath.Join(tmpDir, "post_pipeline.png")
+
+	c := generativeart.NewCanva(120, 120)
+	c.SetSeed(20261030)
+	c.SetBackground(color.RGBA{R: 18, G: 22, B: 34, A: 255})
+	c.FillBackground()
+	c.AddPostEffect(
+		render.LuminanceReliefEffect(0.6, -135, 38, 0.35),
+		render.ChromaticAberrationEffect(0.8),
+		render.VignetteEffect(0.25),
+	)
+	if len(c.PostEffects()) != 3 {
+		t.Fatalf("expected 3 registered post-effects, got %d", len(c.PostEffects()))
+	}
+
+	c.Draw(arts.NewMosaicSun(14, 1.0))
+	if err := c.ToPNG(outPNG); err != nil {
+		t.Fatalf("ToPNG failed: %v", err)
+	}
+
+	meta, err := generativeart.ReadPNGRecipe(outPNG)
+	if err != nil {
+		t.Fatalf("ReadPNGRecipe failed: %v", err)
+	}
+	if len(meta.PostEffects) != 3 {
+		t.Fatalf("expected 3 post_effects recorded in PNG recipe metadata, got %+v", meta.PostEffects)
+	}
+
+	c.ClearPostEffects()
+	if len(c.PostEffects()) != 0 {
+		t.Fatalf("expected 0 post-effects after ClearPostEffects")
+	}
+}
+
+

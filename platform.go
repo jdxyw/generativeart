@@ -76,6 +76,9 @@ func (c *Canva) DrawTimelapseFrames(e Engine, totalFrames int) {
 			c.SetSeed(baseSeed + int64(i))
 			e.Generative(c)
 		}
+		if len(c.postEffects) > 0 {
+			c.ApplyPostEffects(c.postEffects...)
+		}
 
 		resolved := c.Img()
 		frameCopy := image.NewRGBA(resolved.Bounds())
@@ -437,12 +440,13 @@ func (c *Canva) ToPDF(fpath string) error {
 // RecipeMetadata holds the reproducible seed, dimensions, engine name, and parameters
 // embedded inside a generated PNG's tEXt chunk.
 type RecipeMetadata struct {
-	Engine     string                 `json:"engine"`
-	Width      int                    `json:"width"`
-	Height     int                    `json:"height"`
-	Seed       int64                  `json:"seed"`
-	Background [4]uint8               `json:"background"`
-	Params     map[string]interface{} `json:"params,omitempty"`
+	Engine      string                 `json:"engine"`
+	Width       int                    `json:"width"`
+	Height      int                    `json:"height"`
+	Seed        int64                  `json:"seed"`
+	Background  [4]uint8               `json:"background"`
+	Params      map[string]interface{} `json:"params,omitempty"`
+	PostEffects []string               `json:"post_effects,omitempty"`
 }
 
 // Recipe returns the RecipeMetadata captured from the most recent Draw call.
@@ -462,6 +466,13 @@ func captureEngineRecipe(c *Canva, e Engine) *RecipeMetadata {
 		Seed:       c.Seed(),
 		Background: [4]uint8{bg.R, bg.G, bg.B, bg.A},
 		Params:     make(map[string]interface{}),
+	}
+	if len(c.postEffects) > 0 {
+		for _, eff := range c.postEffects {
+			if eff != nil {
+				meta.PostEffects = append(meta.PostEffects, eff.Name())
+			}
+		}
 	}
 	if e == nil {
 		return meta
