@@ -58,6 +58,11 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
 
 ## Table of Contents
 
+- [Wave 19: Analytical Perlin & Gabor Noise Quartet — Fidenza Flow Blocks, 3D Laser-Cut Topographic Terraces, 3D Perlin Silk Ribbon Sculpture & Celestial Gabor-Curl Astrolabe](#wave-19-analytical-perlin--gabor-noise-quartet--fidenza-flow-blocks-3d-laser-cut-topographic-terraces-3d-perlin-silk-ribbon-sculpture--celestial-gabor-curl-astrolabe)
+  - [Perlin Malachite (Fidenza Flow Blocks)](#perlin-malachite)
+  - [Erosion Canyon (3D Topographic Terraces)](#erosion-canyon)
+  - [Analytical Curl Silk (3D Ribbon Sculpture)](#analytical-curl-silk)
+  - [Gabor Wave Interference (Celestial Astrolabe)](#gabor-wave-interference)
 - [Wave 18: LIC Jovian Magnetosphere, Thin-Film Iridescent Nacre, Kissing-Schottky Kleinian Pearls & 3D Bismuth Hopper Crystals](#wave-18-lic-jovian-magnetosphere-thin-film-iridescent-nacre-kissing-schottky-kleinian-pearls--3d-bismuth-hopper-crystals)
   - [Jupiter Magnetosphere](#jupiter-magnetosphere)
   - [Iridescent Nacre](#iridescent-nacre)
@@ -193,6 +198,114 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
   - [Silk Sky](#silk-sky)
   - [Circle Move](#circle-move)
   - [Random Circle](#random-circle)
+
+---
+
+## Wave 19: Analytical Perlin & Gabor Noise Quartet — Fidenza Flow Blocks, 3D Laser-Cut Topographic Terraces, 3D Perlin Silk Ribbon Sculpture & Celestial Gabor-Curl Astrolabe
+
+### Perlin Malachite
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261101)
+	c.SetBackground(color.RGBA{R: 7, G: 24, B: 18, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Botanical)
+	c.Draw(arts.NewPerlinMalachite(16, 5, 2.4))
+	c.ToPNG("perlinmalachite.png")
+}
+```
+
+![Perlin Malachite](images/perlinmalachite.png)
+
+### Erosion Canyon
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261101)
+	c.SetBackground(color.RGBA{R: 12, G: 16, B: 28, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Sunset)
+	c.Draw(arts.NewErosionCanyon(6, 1.8, 18.0))
+	c.ToPNG("erosioncanyon.png")
+}
+```
+
+![Erosion Canyon](images/erosioncanyon.png)
+
+### Analytical Curl Silk
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261101)
+	c.SetBackground(color.RGBA{R: 10, G: 18, B: 40, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewAnalyticalCurlSilk(420, 4, 2.2))
+	c.ToPNG("analyticalcurlsilk.png")
+}
+```
+
+![Analytical Curl Silk](images/analyticalcurlsilk.png)
+
+### Gabor Wave Interference
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261101)
+	c.SetBackground(color.RGBA{R: 8, G: 12, B: 24, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Cyberpunk)
+	c.Draw(arts.NewGaborWaveInterference(6, 3.2, 1.45))
+	c.ToPNG("gaborwaveinterference.png")
+}
+```
+
+![Gabor Wave Interference](images/gaborwaveinterference.png)
 
 ---
 

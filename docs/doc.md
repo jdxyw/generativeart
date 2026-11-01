@@ -119,6 +119,10 @@
 	- [Iridescent Nacre](#iridescent-nacre)
 	- [Schottky Kleinian](#schottky-kleinian)
 	- [Bismuth Hopper](#bismuth-hopper)
+	- [Perlin Malachite](#perlin-malachite)
+	- [Erosion Canyon](#erosion-canyon)
+	- [Analytical Curl Silk](#analytical-curl-silk)
+	- [Gabor Wave Interference](#gabor-wave-interference)
 
 ## CLI Tool (`cmd/genart`) & Exhibition Poster Reference
 
@@ -1872,6 +1876,71 @@ bh := arts.NewBismuthHopper(14, 9, 420.0)
 ```
 
 ![](../images/bismuthhopper.png)
+
+## Perlin Malachite
+
+`Perlin Malachite` renders a *Fidenza*-inspired Perlin flow-field curved color-block tapestry over warm cotton parchment, using `Perlin2DDeriv` to guide collision-free segmented beams with 3D drop shadows and dark ink/gold borders.
+
+### parameters
+
+- bands: Target segment subdivision factor along each curved beam.
+- octaves: Number of Perlin octaves for the flow angle field.
+- warpStrength: Flow curvature multiplier.
+
+```go
+pm := arts.NewPerlinMalachite(16, 5, 2.4)
+```
+
+![](../images/perlinmalachite.png)
+
+## Erosion Canyon
+
+`Erosion Canyon` renders a 16-tier 3D laser-cut Perlin topographic paper/lacquer relief driven by `ErosionFBM2D`, with directional paper-cut drop shadows, Marching Squares 24k gold contour rims, and an archival map border.
+
+### parameters
+
+- octaves: Number of octaves in `ErosionFBM2D`.
+- erosionStrength: Analytical gradient-damping multiplier.
+- strataFreq: Number of discrete topographic elevation plates.
+
+```go
+ec := arts.NewErosionCanyon(6, 1.8, 18.0)
+```
+
+![](../images/erosioncanyon.png)
+
+## Analytical Curl Silk
+
+`Analytical Curl Silk` renders a 3D depth-sorted Perlin silk and metallic ribbon wave sculpture floating in midnight-obsidian space, where 96 parallel cords weave across a 3D manifold deformed by `FBM2DDeriv` and `Perlin3D`.
+
+### parameters
+
+- streamlines: Ribbon density parameter.
+- octaves: Number of FBM derivative octaves.
+- curlScale: Spatial frequency of the 3D Perlin ribbon undulation.
+
+```go
+acs := arts.NewAnalyticalCurlSilk(420, 4, 2.2)
+```
+
+![](../images/analyticalcurlsilk.png)
+
+## Gabor Wave Interference
+
+`Gabor Wave Interference` renders a double-ringed 24k gold Celestial Astrolabe medallion enclosing a multi-harmonic `GaborNoise2D` + `FBM2DDeriv` Chladni caustic mandala and additive `Curl2DAnalytical` calligraphic trajectories.
+
+### parameters
+
+- vortexPoles: Dihedral rosette symmetry order and orbital jewel count.
+- gaborFreq: Spatial frequency of the anisotropic Gabor wavelets.
+- bandwidth: Gaussian envelope bandwidth of the Gabor kernel.
+
+```go
+gwi := arts.NewGaborWaveInterference(6, 3.2, 1.45)
+```
+
+![](../images/gaborwaveinterference.png)
+
 
 
 

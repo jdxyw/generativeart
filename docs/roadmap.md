@@ -4,7 +4,7 @@ This document serves as the architectural blueprint for `generativeart`, coverin
 1. **Core Engine Refactoring & Performance Upgrades (Package 1 — Implemented)**
 2. **Computational Geometry, Topological Fields & 2D SDF Engine (Package 2 — Implemented)**
 3. **Platform & Export Foundations (Package 3 — Implemented: Dual Vector/HDR Backend, `DrawTimelapse` HD GIF, PNG `tEXt` Recipes & `cmd/genart` CLI)**
-4. **Waves 9–18 `arts/` Visual Paradigms (125 Art Engines + 19 HD 600×600 Loop GIFs — Implemented)**
+4. **Waves 9–19 `arts/` Visual Paradigms (129 Art Engines + 19 HD 600×600 Loop GIFs — Implemented)**
 5. **Exhibition Poster & ContactSheet Engine (`poster.go` — Implemented) & HD GIF Expansion**
 6. **Next-Generation Architecture & Platform Roadmap (6 Directions, with Directions 4 & 5 Implemented)**
 7. **Art-Empowering Rendering & Mathematical Foundations (Next-Tier Capabilities for Future `arts/` — Implemented)**
@@ -189,6 +189,12 @@ Expand `arts/` from **94** to **100** generators with pure mathematical attracto
 30. **`IridescentNacre`** (`NewIridescentNacre(whorls, fiberCount int, filmThicknessNm float64)`): 3D abalone / mother-of-pearl logarithmic-spiral shell relief and 18,000 aragonite silk-bristle plumes seeded via blue-noise Poisson-disk + Lloyd CVT relaxation and shaded with `ResolveToCanvasAdvanced` (horizon soft shadows, jade SSS, Airy thin-film iridescence, and deckle border).
 31. **`SchottkyKleinian`** (`NewSchottkyKleinian(maxDepth int, loxodromicTwist float64)`): 8-fold Kissing-Schottky Kleinian limit set with 3D iridescent orbit-trap pearls, `Circle2D.InvertCircle` gilded sphere trees, `PoincareGeodesicArc` astrolabe chords, `EvaluateDomainColoring` conformal grids, and radial chromatic dispersion.
 32. **`BismuthHopper`** (`NewBismuthHopper(terraces, crystals int, oxideNm float64)`): 3D synthetic Bismuth (`[Bi]`) hopper crystal labyrinth with rectilinear stair-step cavities, 45° chamfered metallic bevels, dual-sun horizon soft shadows, and $\text{Bi}_2\text{O}_3$ Airy thin-film interference.
+
+### 5.1g Wave 19 — Analytical Perlin & Gabor Quartet: Fidenza Flow Blocks, 3D Topographic Lacquer Terraces, 3D Perlin Ribbon Sculpture & Celestial Gabor-Curl Astrolabe (+4 Engines, 129 Total — Implemented)
+33. **`PerlinMalachite`** (`NewPerlinMalachite(bands, octaves int, warpStrength float64)`): *Fidenza*-inspired Perlin flow-field curved color-block tapestry over warm cotton parchment with collision-free beam packing, 3D drop shadows, and gilded/ink borders.
+34. **`ErosionCanyon`** (`NewErosionCanyon(octaves int, erosionStrength, strataFreq float64)`): 16-tier 3D laser-cut Perlin topographic paper/lacquer relief driven by `ErosionFBM2D` with directional paper-cut shadows and 24k gold Marching-Squares contour rims.
+35. **`AnalyticalCurlSilk`** (`NewAnalyticalCurlSilk(streamlines, octaves int, curlScale float64)`): 3D depth-sorted Perlin silk and metallic ribbon wave sculpture (`FBM2DDeriv` + `Perlin3D`) floating over midnight-obsidian space.
+36. **`GaborWaveInterference`** (`NewGaborWaveInterference(vortexPoles int, gaborFreq, bandwidth float64)`): Double-ringed 24k gold Celestial Astrolabe medallion enclosing a multi-harmonic `GaborNoise2D` + `FBM2DDeriv` Chladni caustic mandala and `Curl2DAnalytical` filaments.
 
 ### 5.2 Direction 2: Pure-Go WebAssembly (WASM) Interactive Gallery Playground
 - **Architecture (`wasm/main.go`, `GOOS=js GOARCH=wasm`)**:

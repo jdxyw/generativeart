@@ -106,6 +106,36 @@ func paramString(p map[string]interface{}, key, def string) string {
 }
 
 var registry = []ArtDescriptor{
+	// Wave 19: Analytical Perlin & Gabor Noise Quartet (Botryoidal Perlin Malachite, Gradient-Damped Erosion Canyon, Analytical Curl Silk & Anisotropic Gabor Wave Interference)
+	{
+		ID: "perlinmalachite", StructName: "perlinMalachite", Category: "geom",
+		DefaultBG: color.RGBA{7, 24, 18, 255}, DefaultPal: "botanical",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewPerlinMalachite(paramInt(p, "bands", 16), paramInt(p, "octaves", 5), paramFloat(p, "warpStrength", 2.4))
+		},
+	},
+	{
+		ID: "erosioncanyon", StructName: "erosionCanyon", Category: "geom",
+		DefaultBG: color.RGBA{12, 16, 28, 255}, DefaultPal: "sunset",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewErosionCanyon(paramInt(p, "octaves", 6), paramFloat(p, "erosionStrength", 1.8), paramFloat(p, "strataFreq", 18.0))
+		},
+	},
+	{
+		ID: "analyticalcurlsilk", StructName: "analyticalCurlSilk", Category: "flow",
+		DefaultBG: color.RGBA{10, 18, 40, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewAnalyticalCurlSilk(paramInt(p, "streamlines", 420), paramInt(p, "octaves", 4), paramFloat(p, "curlScale", 2.2))
+		},
+	},
+	{
+		ID: "gaborwaveinterference", StructName: "gaborWaveInterference", Category: "flow",
+		DefaultBG: color.RGBA{8, 12, 24, 255}, DefaultPal: "cyberpunk",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewGaborWaveInterference(paramInt(p, "vortexPoles", 6), paramFloat(p, "gaborFreq", 3.2), paramFloat(p, "bandwidth", 1.45))
+		},
+	},
+
 	// Wave 18: LIC Jovian Magnetosphere, Thin-Film Iridescent Nacre, Kissing-Schottky Kleinian Pearls & 3D Bismuth Hopper Crystals
 	{
 		ID: "jupitermagnetosphere", StructName: "jupiterMagnetosphere", Category: "flow",

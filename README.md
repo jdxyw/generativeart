@@ -4,7 +4,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/jdxyw/generativeart)](https://goreportcard.com/report/github.com/jdxyw/generativeart)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/jdxyw/generativeart/master/LICENSE)
 
-`generativeart` is a pure-`Go` generative art engine and algorithm collection supporting **125 generative art types** across flow fields, strange attractors, 3D terrain geomorphology, biological morphogenesis, 3D SDF raymarching, complex phase portraits, differential topology, non-Euclidean geometry, quasicrystals, stained-glass mosaics, cloisonné enamel, 3D origami, and traditional printmaking.
+`generativeart` is a pure-`Go` generative art engine and algorithm collection supporting **129 generative art types** across flow fields, strange attractors, 3D terrain geomorphology, biological morphogenesis, 3D SDF raymarching, complex phase portraits, differential topology, non-Euclidean geometry, quasicrystals, stained-glass mosaics, cloisonné enamel, 3D origami, and traditional printmaking.
 
 - 🌐 **Live Interactive Web Gallery (GitHub Pages)**: **[https://jdxyw.github.io/generativeart/](https://jdxyw.github.io/generativeart/)**
 - 🖼️ **Full Code & Image Gallery (`gallery.md`)**: **[./gallery.md](./gallery.md)**
@@ -15,17 +15,17 @@
 
 ## Featured Gallery Highlights
 
-> Browse all **125 artworks**, full `Go` source snippets, and rendered previews in **[`gallery.md`](./gallery.md)** or on the **[Interactive GitHub Pages Gallery](https://jdxyw.github.io/generativeart/)**.
+> Browse all **129 artworks**, full `Go` source snippets, and rendered previews in **[`gallery.md`](./gallery.md)** or on the **[Interactive GitHub Pages Gallery](https://jdxyw.github.io/generativeart/)**.
 
-| [Jupiter Magnetosphere](./gallery.md#jupiter-magnetosphere) | [Iridescent Nacre](./gallery.md#iridescent-nacre) | [Schottky Kleinian](./gallery.md#schottky-kleinian) | [Bismuth Hopper](./gallery.md#bismuth-hopper) |
+| [Perlin Malachite](./gallery.md#perlin-malachite) | [Erosion Canyon](./gallery.md#erosion-canyon) | [Analytical Curl Silk](./gallery.md#analytical-curl-silk) | [Gabor Wave Interference](./gallery.md#gabor-wave-interference) |
 | :---: | :---: | :---: | :---: |
+| ![Perlin Malachite](images/perlinmalachite.png) | ![Erosion Canyon](images/erosioncanyon.png) | ![Analytical Curl Silk](images/analyticalcurlsilk.png) | ![Gabor Wave Interference](images/gaborwaveinterference.png) |
+| **[Jupiter Magnetosphere](./gallery.md#jupiter-magnetosphere)** | **[Iridescent Nacre](./gallery.md#iridescent-nacre)** | **[Schottky Kleinian](./gallery.md#schottky-kleinian)** | **[Bismuth Hopper](./gallery.md#bismuth-hopper)** |
 | ![Jupiter Magnetosphere](images/jupitermagnetosphere.png) | ![Iridescent Nacre](images/iridescentnacre.png) | ![Schottky Kleinian](images/schottkykleinian.png) | ![Bismuth Hopper](images/bismuthhopper.png) |
 | **[Nebula Plumes](./gallery.md#nebula-plumes)** | **[Abyssal Currents](./gallery.md#abyssal-currents)** | **[Solar Prominence](./gallery.md#solar-prominence)** | **[Botanical Whorls](./gallery.md#botanical-whorls)** |
 | ![Nebula Plumes](images/nebulaplumes.png) | ![Abyssal Currents](images/abyssalcurrents.png) | ![Solar Prominence](images/solarprominence.png) | ![Botanical Whorls](images/botanicalwhorls.png) |
-| **[Concentric Morph](./gallery.md#concentric-morph)** | **[Vortex Impasto](./gallery.md#vortex-impasto)** | **[Sliced Pebbles](./gallery.md#sliced-pebbles)** | **[Hex Mandala](./gallery.md#hex-mandala)** |
-| ![Concentric Morph](images/concentricmorph.png) | ![Vortex Impasto](images/vorteximpasto.png) | ![Sliced Pebbles](images/slicedpebbles.png) | ![Hex Mandala](images/hexmandala.png) |
 
-👉 **[View All 125 Artworks & Code Examples in `gallery.md` →](./gallery.md)**
+👉 **[View All 129 Artworks & Code Examples in `gallery.md` →](./gallery.md)**
 
 ### 🎞️ Seamless 600×600 HD Looping Animations (`DrawTimelapseFrames` + `ToGIF`)
 
@@ -230,9 +230,15 @@ _ = poster.ToPNG("poster_dunhuang.png")
 
 ## Supported Art Types & Constructors
 
-All 125 generators implement `generativeart.Engine` under package `github.com/jdxyw/generativeart/arts` (see [gallery.md](./gallery.md) for visual examples and [docs/doc.md](./docs/doc.md) for parameter details):
+All 129 generators implement `generativeart.Engine` under package `github.com/jdxyw/generativeart/arts` (see [gallery.md](./gallery.md) for visual examples and [docs/doc.md](./docs/doc.md) for parameter details):
 
 ```go
+// Wave 19: Analytical Perlin & Gabor Noise Quartet (Fidenza Flow Blocks, 3D Laser-Cut Topographic Terraces, 3D Perlin Silk Ribbon Sculpture & Celestial Gabor-Curl Astrolabe)
+NewPerlinMalachite(bands, octaves int, warpStrength float64)
+NewErosionCanyon(octaves int, erosionStrength, strataFreq float64)
+NewAnalyticalCurlSilk(streamlines, octaves int, curlScale float64)
+NewGaborWaveInterference(vortexPoles int, gaborFreq, bandwidth float64)
+
 // Wave 18: LIC Jovian Magnetosphere, Thin-Film Iridescent Nacre, Kissing-Schottky Kleinian Pearls & 3D Bismuth Hopper Crystals
 NewJupiterMagnetosphere(bands, vortices int, licLength float64)
 NewIridescentNacre(whorls, fiberCount int, filmThicknessNm float64)

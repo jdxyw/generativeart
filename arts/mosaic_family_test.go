@@ -71,6 +71,10 @@ func TestMosaicFamilyGenerators(t *testing.T) {
 		{"IridescentNacre", NewIridescentNacre(5, 1600, 410.0)},
 		{"SchottkyKleinian", NewSchottkyKleinian(5, 1.0)},
 		{"BismuthHopper", NewBismuthHopper(10, 6, 420.0)},
+		{"PerlinMalachite", NewPerlinMalachite(12, 4, 2.2)},
+		{"ErosionCanyon", NewErosionCanyon(5, 1.8, 14.0)},
+		{"AnalyticalCurlSilk", NewAnalyticalCurlSilk(120, 4, 2.2)},
+		{"GaborWaveInterference", NewGaborWaveInterference(6, 3.2, 1.45)},
 	}
 
 	for _, tc := range cases {
