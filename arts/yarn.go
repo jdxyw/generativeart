@@ -22,7 +22,7 @@ func (y *yarn) Generative(c *generativeart.Canva) {
 	ctex := gg.NewContextForRGBA(c.Img())
 	ctex.SetLineWidth(c.Opts().LineWidth())
 	ctex.SetColor(c.Opts().LineColor())
-	noise := common.NewPerlinNoise()
+	noise := common.NewPerlinNoiseWithSeed(c.Seed())
 
 	var offset = 0.0
 	var inc = 0.005

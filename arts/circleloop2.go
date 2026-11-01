@@ -22,6 +22,7 @@ func NewCircleLoop2(depth int) *circleLoop2 {
 
 // Generative draws a circle composed by many colored circles.
 func (cl *circleLoop2) Generative(c *generativeart.Canva) {
+	cl.noise = common.NewPerlinNoiseWithSeed(c.Seed())
 	ctex := gg.NewContextForRGBA(c.Img())
 	ctex.Translate(float64(c.Width())/2, float64(c.Height())/2)
 	cl.recursionDraw(ctex, c, float64(c.Width()), cl.depth)

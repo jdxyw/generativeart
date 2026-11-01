@@ -24,6 +24,7 @@ type Canva struct {
 	opts             Options
 	rng              *rand.Rand
 	noise            *common.NoiseEngine
+	perlin           *common.PerlinNoise
 	lastRenderCanvas *render.Canvas
 	hdrDirty         bool
 	rgbaTouched      bool
@@ -119,11 +120,12 @@ func NewCanva(w, h int) *Canva {
 }
 
 // SetSeed sets a deterministic random seed for this canvas, updating its local
-// *rand.Rand, NoiseEngine, and the package-level math/rand seed for legacy engines.
+// *rand.Rand, NoiseEngine, PerlinNoise, and the package-level math/rand seed for legacy engines.
 func (c *Canva) SetSeed(seed int64) {
 	c.opts.seed = seed
 	c.rng = rand.New(rand.NewSource(seed))
 	c.noise = common.NewNoiseEngine(seed)
+	c.perlin = common.NewPerlinNoiseWithSeed(seed)
 	rand.Seed(seed)
 }
 
@@ -146,6 +148,14 @@ func (c *Canva) Noise() *common.NoiseEngine {
 		c.noise = common.NewNoiseEngine(c.opts.seed)
 	}
 	return c.noise
+}
+
+// Perlin returns the canvas-scoped deterministic *common.PerlinNoise generator.
+func (c *Canva) Perlin() *common.PerlinNoise {
+	if c.perlin == nil {
+		c.perlin = common.NewPerlinNoiseWithSeed(c.opts.seed)
+	}
+	return c.perlin
 }
 
 func (c *Canva) SetOptions(opts Options) {

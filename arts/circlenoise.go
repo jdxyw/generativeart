@@ -40,7 +40,7 @@ func (cn *circleNoise) Generative(c *generativeart.Canva) {
 	//ctex.Clip()
 
 	var factor = 0.008
-	noise := common.NewPerlinNoise()
+	noise := common.NewPerlinNoiseWithSeed(c.Seed())
 
 	dots := make([]dot, 0)
 	for i := 0; i < cn.dotsN; i++ {

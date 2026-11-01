@@ -82,7 +82,7 @@ func (pp *perlinPearls) Generative(c *generativeart.Canva) {
 		ds = append(ds, dots)
 	}
 
-	noise := common.NewPerlinNoise()
+	noise := common.NewPerlinNoiseWithSeed(c.Seed())
 
 	for i := 0; i < pp.circleN; i++ {
 		ctex.SetLineWidth(0.5)

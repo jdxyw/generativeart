@@ -22,7 +22,7 @@ func NewCircleMove(circleNum int) *circleMove {
 func (cm *circleMove) Generative(c *generativeart.Canva) {
 	ctex := gg.NewContextForRGBA(c.Img())
 	ctex.SetLineWidth(0.3)
-	noise := common.NewPerlinNoise()
+	noise := common.NewPerlinNoiseWithSeed(c.Seed())
 	cl := rand.Intn(255)
 	for i := 0; i < cm.circleNum; i++ {
 		//var sx, sy float64

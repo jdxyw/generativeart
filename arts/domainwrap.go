@@ -47,6 +47,7 @@ func (d *domainWrap) SetDynamicParameter(xstep, ystep float64, n int, path strin
 // Generative draws a domain warp image.
 // Reference: https://www.iquilezles.org/www/articles/warp/warp.htm
 func (d *domainWrap) Generative(c *generativeart.Canva) {
+	d.noise = common.NewPerlinNoiseWithSeed(c.Seed())
 	if d.numImages == 0 && len(d.imgPath) == 0 {
 		d.generative(c)
 		return

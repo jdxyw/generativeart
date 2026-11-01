@@ -43,15 +43,20 @@ This document serves as the architectural blueprint for `generativeart`, coverin
 
 ## Part II. Computational Geometry, Topological Fields & 2D SDF Engine (Package 2)
 
-### 2.1 4D Simplex Noise & Seamless Time-Loop Fields (`common/noise.go`)
-- **`Simplex4D(x, y, z, w float64) float64`**:
-  - Full 4D Simplex lattice implementation over 5-cell pentatopes ($F_4 = (\sqrt{5}-1)/4$, $G_4 = (5-\sqrt{5})/20$) with 32 4D gradient vectors.
-- **`FBM4DLoop(x, y, phase, loopRadius float64, octaves int, lacunarity, gain float64) float64`**:
-  - Samples 4D FBM along a closed circle in the $(z, w)$ plane:
-    $$(z(\phi), w(\phi)) = (R \cos(2\pi \phi),\, R \sin(2\pi \phi)), \quad \phi \in [0, 1)$$
-    guaranteeing $C^\infty$ periodicity at $\phi = 0$ and $\phi = 1$ for seamless animations.
-- **`Curl4DLoop(x, y, phase, loopRadius, eps float64) Vector`**:
-  - Divergence-free 2D velocity field evolving smoothly over a periodic time loop $\phi \in [0, 1)$.
+### 2.1 4D Simplex Noise, Analytical-Derivative Gradient Perlin, Erosion FBM & Gabor Fields (`common/noise.go`, `common/perlinnoise.go`)
+- **`PerlinNoise` C² Quintic & Negative-Domain Upgrade (`common/perlinnoise.go`, `c.Perlin()`)**:
+  - Replaced $C^1$ `math.Cos` interpolation with Ken Perlin's $C^2$ quintic polynomial $u(t) = 6t^5 - 15t^4 + 10t^3$ (`4×–6×` faster, zero second-derivative Mach bands), fixed negative-coordinate mirroring via mathematical `fastFloor` + bitwise wrapping, added `SetDetail(octaves, falloff)`, and migrated all 12 legacy `PerlinNoise` engines to deterministic `c.Seed()`.
+- **Analytical Derivative Gradient Perlin & Curl (`Perlin2D`, `Perlin3D`, `Perlin2DDeriv`, `FBM2DDeriv`, `Curl2DAnalytical`)**:
+  - Evaluates $C^2$ 2D gradient Perlin noise and its exact analytical partial derivatives $\left(\frac{\partial N}{\partial x}, \frac{\partial N}{\partial y}\right)$ in a single pass using $u'(t) = 30t^2(t-1)^2$, powering single-pass divergence-free `Curl2DAnalytical`.
+- **Inigo Quilez Gradient-Damped Erosion FBM (`ErosionFBM2D`)**:
+  - Accumulates analytical octave gradients $\mathbf{d} = \sum \nabla n_i$ and damps high-frequency octaves by $\bigl(1 + \text{erosionStrength}\cdot \|\mathbf{d}\|^2\bigr)^{-1}$, naturally carving eroded alpine gullies on steep slopes while retaining micro-detail in valleys.
+- **Seamless Tileable Perlin/FBM, Iterative Domain Warping, Flow Noise & Anisotropic Gabor Noise**:
+  - `TileablePerlin2D` & `TileableFBM2D(x, y, periodX, periodY, ...)`: exact toroidal lattice wrapping for seamless patterns.
+  - `DomainWarp2D(x, y, warpStrength, octaves)`: two-stage $f(\mathbf{p} + w\,\mathbf{q}(\mathbf{p} + w\,\mathbf{r}(\mathbf{p})))$ returning both warped scalar and intermediate warp vectors $(q_x, q_y, r_x, r_y)$.
+  - `FlowNoise2D(x, y, spinPhase, octaves)`: Perlin-Neyret rotating-gradient swirling turbulence with exact $C^\infty$ periodicity over `spinPhase in [0, 1)`.
+  - `GaborNoise2D(x, y, freq, orientationRad, bandwidth)`: Lagae et al. sparse-convolution anisotropic harmonic wavelet noise.
+- **`Simplex4D`, `FBM4DLoop` & `Curl4DLoop`**:
+  - Full 4D Simplex lattice implementation over 5-cell pentatopes ($F_4 = (\sqrt{5}-1)/4$, $G_4 = (5-\sqrt{5})/20$) with 32 4D gradient vectors, sampling closed circles in $(z, w)$ for seamless time loops $\phi \in [0, 1)$.
 
 ### 2.2 Jobard-Lefer Evenly-Spaced Streamlines & Marching Squares (`render/field_engine.go`)
 - **`TraceEvenStreamlines(cfg StreamlineConfig, fieldFn VectorField2D) [][]Point`**:

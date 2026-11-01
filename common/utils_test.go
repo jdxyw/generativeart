@@ -143,3 +143,79 @@ func TestNoiseEngine(t *testing.T) {
 	assert.InDelta(t, c0.X, c1.X, 1e-9)
 	assert.InDelta(t, c0.Y, c1.Y, 1e-9)
 }
+
+func TestPerlinAndAnalyticalNoiseUpgrades(t *testing.T) {
+	// 1. Verify PerlinNoise no longer mirrors negative coordinates across (0, 0)
+	pn := NewPerlinNoiseWithSeed(2026)
+	posVal := pn.Noise2D(1.37, 2.41)
+	negVal := pn.Noise2D(-1.37, -2.41)
+	assert.NotEqual(t, posVal, negVal, "negative coordinates should not mirror positive coordinates")
+	assert.GreaterOrEqual(t, negVal, 0.0)
+	assert.LessOrEqual(t, negVal, 1.0)
+
+	pn.SetDetail(6, 0.55)
+	detVal := pn.Noise3D(-0.85, 1.92, -3.14)
+	assert.GreaterOrEqual(t, detVal, 0.0)
+	assert.LessOrEqual(t, detVal, 1.0)
+
+	// 2. Verify Perlin2DDeriv and FBM2DDeriv analytical derivatives match central finite differences
+	ne := NewNoiseEngine(20261101)
+	x0, y0 := 2.34, -1.73
+	eps := 1e-5
+	val, dIdx, dIdy := ne.Perlin2DDeriv(x0, y0)
+	numDx := (ne.Perlin2D(x0+eps, y0) - ne.Perlin2D(x0-eps, y0)) / (2.0 * eps)
+	numDy := (ne.Perlin2D(x0, y0+eps) - ne.Perlin2D(x0, y0-eps)) / (2.0 * eps)
+	assert.GreaterOrEqual(t, val, -1.0)
+	assert.LessOrEqual(t, val, 1.0)
+	assert.InDelta(t, numDx, dIdx, 1e-4)
+	assert.InDelta(t, numDy, dIdy, 1e-4)
+
+	fbmVal, fbmDx, fbmDy := ne.FBM2DDeriv(x0, y0, 4, 2.0, 0.5)
+	fPlusX, _, _ := ne.FBM2DDeriv(x0+eps, y0, 4, 2.0, 0.5)
+	fMinusX, _, _ := ne.FBM2DDeriv(x0-eps, y0, 4, 2.0, 0.5)
+	fPlusY, _, _ := ne.FBM2DDeriv(x0, y0+eps, 4, 2.0, 0.5)
+	fMinusY, _, _ := ne.FBM2DDeriv(x0, y0-eps, 4, 2.0, 0.5)
+	assert.GreaterOrEqual(t, fbmVal, -1.0)
+	assert.LessOrEqual(t, fbmVal, 1.0)
+	assert.InDelta(t, (fPlusX-fMinusX)/(2.0*eps), fbmDx, 1e-4)
+	assert.InDelta(t, (fPlusY-fMinusY)/(2.0*eps), fbmDy, 1e-4)
+
+	curlA := ne.Curl2DAnalytical(x0, y0, 4)
+	assert.InDelta(t, fbmDy, curlA.X, 1e-9)
+	assert.InDelta(t, -fbmDx, curlA.Y, 1e-9)
+
+	// 3. Verify Perlin3D and IQ Gradient-Damped ErosionFBM2D
+	p3 := ne.Perlin3D(1.4, -2.3, 0.8)
+	assert.GreaterOrEqual(t, p3, -1.0)
+	assert.LessOrEqual(t, p3, 1.0)
+
+	erH, erSx, erSy := ne.ErosionFBM2D(1.8, 2.6, 5, 2.0, 0.5, 1.5)
+	assert.GreaterOrEqual(t, erH, 0.0)
+	assert.LessOrEqual(t, erH, 1.0)
+	assert.False(t, math.IsNaN(erSx) || math.IsNaN(erSy))
+
+	// 4. Verify TileablePerlin2D & TileableFBM2D exact periodicity across period boundaries
+	px, py := 8.0, 6.0
+	t00 := ne.TileableFBM2D(1.35, 2.45, px, py, 4, 2.0, 0.5)
+	t10 := ne.TileableFBM2D(1.35+px, 2.45, px, py, 4, 2.0, 0.5)
+	t01 := ne.TileableFBM2D(1.35, 2.45+py, px, py, 4, 2.0, 0.5)
+	tNeg := ne.TileableFBM2D(1.35-px, 2.45-py, px, py, 4, 2.0, 0.5)
+	assert.InDelta(t, t00, t10, 1e-12)
+	assert.InDelta(t, t00, t01, 1e-12)
+	assert.InDelta(t, t00, tNeg, 1e-12)
+
+	// 5. Verify DomainWarp2D, FlowNoise2D (periodic over spinPhase in [0,1]), and GaborNoise2D
+	wVal, qx, qy, rx, ry := ne.DomainWarp2D(1.2, 2.3, 1.5, 4)
+	assert.GreaterOrEqual(t, wVal, -1.0)
+	assert.LessOrEqual(t, wVal, 1.0)
+	assert.False(t, math.IsNaN(qx+qy+rx+ry))
+
+	fn0 := ne.FlowNoise2D(1.75, -0.85, 0.0, 3)
+	fn1 := ne.FlowNoise2D(1.75, -0.85, 1.0, 3)
+	assert.InDelta(t, fn0, fn1, 1e-12)
+
+	gabor := ne.GaborNoise2D(2.3, 1.8, 3.0, math.Pi/4, 1.5)
+	assert.GreaterOrEqual(t, gabor, -1.0)
+	assert.LessOrEqual(t, gabor, 1.0)
+}
+

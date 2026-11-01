@@ -22,7 +22,7 @@ func NewNoiseLine(n int) *noiseLine {
 // Generative draws a noise line image.
 func (nl *noiseLine) Generative(c *generativeart.Canva) {
 	ctex := gg.NewContextForRGBA(c.Img())
-	noise := common.NewPerlinNoise()
+	noise := common.NewPerlinNoiseWithSeed(c.Seed())
 
 	ctex.SetColor(common.Black)
 	for i := 0; i < 80; i++ {

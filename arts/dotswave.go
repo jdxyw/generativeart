@@ -22,7 +22,7 @@ func NewDotsWave(dotsN int) *dotsWave {
 // Generative draws a dots wave images.
 func (d *dotsWave) Generative(c *generativeart.Canva) {
 	ctex := gg.NewContextForRGBA(c.Img())
-	noise := common.NewPerlinNoise()
+	noise := common.NewPerlinNoiseWithSeed(c.Seed())
 	for i := 0; i < d.dotsN; i++ {
 		x := common.RandomRangeFloat64(-0.1, 1.1) * float64(c.Width())
 		y := common.RandomRangeFloat64(-0.1, 1.1) * float64(c.Height())

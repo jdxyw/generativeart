@@ -25,7 +25,7 @@ func NewBlackHole(circleN int, density, circleGap float64) *blackHole {
 // Generative draws a black hole image.
 func (b *blackHole) Generative(c *generativeart.Canva) {
 	ctex := gg.NewContextForRGBA(c.Img())
-	noise := common.NewPerlinNoise()
+	noise := common.NewPerlinNoiseWithSeed(c.Seed())
 	kMax := common.RandomRangeFloat64(0.5, 1)
 	ctex.SetLineWidth(0.4)
 	ctex.SetColor(c.Opts().LineColor())

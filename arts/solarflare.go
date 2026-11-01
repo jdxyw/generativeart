@@ -24,7 +24,7 @@ func (o *solarFlare) Generative(c *generativeart.Canva) {
 	var inc = 1.0
 	var r = 1.0
 	var m = 1.005
-	noise := common.NewPerlinNoise()
+	noise := common.NewPerlinNoiseWithSeed(c.Seed())
 
 	for r < 200 {
 		for i := 0; i < 10; i++ {
