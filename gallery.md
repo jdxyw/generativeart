@@ -58,6 +58,10 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
 
 ## Table of Contents
 
+- [Wave 20: M.C. Escher Trio — Circle Limit Hyperbolic Tessellation, Print Gallery Droste Spiral & Isohedral Metamorphosis](#wave-20-mc-escher-trio--circle-limit-hyperbolic-tessellation-print-gallery-droste-spiral--isohedral-metamorphosis)
+  - [Escher Circle Limit](#escher-circle-limit)
+  - [Escher Droste Gallery](#escher-droste-gallery)
+  - [Escher Metamorphosis](#escher-metamorphosis)
 - [Wave 19: Analytical Perlin & Gabor Noise Quartet — Fidenza Flow Blocks, 3D Laser-Cut Topographic Terraces, 3D Perlin Silk Ribbon Sculpture & Celestial Gabor-Curl Astrolabe](#wave-19-analytical-perlin--gabor-noise-quartet--fidenza-flow-blocks-3d-laser-cut-topographic-terraces-3d-perlin-silk-ribbon-sculpture--celestial-gabor-curl-astrolabe)
   - [Perlin Malachite (Fidenza Flow Blocks)](#perlin-malachite)
   - [Erosion Canyon (3D Topographic Terraces)](#erosion-canyon)
@@ -198,6 +202,88 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
   - [Silk Sky](#silk-sky)
   - [Circle Move](#circle-move)
   - [Random Circle](#random-circle)
+
+---
+
+## Wave 20: M.C. Escher Trio — Circle Limit Hyperbolic Tessellation, Print Gallery Droste Spiral & Isohedral Metamorphosis
+
+### Escher Circle Limit
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261101)
+	c.SetBackground(color.RGBA{R: 243, G: 236, B: 224, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewEscherCircleLimit(6, 4, 2))
+	c.ToPNG("eschercirclelimit.png")
+}
+```
+
+![Escher Circle Limit](images/eschercirclelimit.png)
+
+### Escher Droste Gallery
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261101)
+	c.SetBackground(color.RGBA{R: 18, G: 22, B: 34, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewEscherDrosteGallery(1, 8, 16.0))
+	c.ToPNG("escherdrostegallery.png")
+}
+```
+
+![Escher Droste Gallery](images/escherdrostegallery.png)
+
+### Escher Metamorphosis
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20261101)
+	c.SetBackground(color.RGBA{R: 248, G: 242, B: 228, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewEscherMetamorphosis(10, 10, 1.0))
+	c.ToPNG("eschermetamorphosis.png")
+}
+```
+
+![Escher Metamorphosis](images/eschermetamorphosis.png)
 
 ---
 

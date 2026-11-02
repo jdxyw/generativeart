@@ -4,7 +4,7 @@ This document serves as the architectural blueprint for `generativeart`, coverin
 1. **Core Engine Refactoring & Performance Upgrades (Package 1 — Implemented)**
 2. **Computational Geometry, Topological Fields & 2D SDF Engine (Package 2 — Implemented)**
 3. **Platform & Export Foundations (Package 3 — Implemented: Dual Vector/HDR Backend, `DrawTimelapse` HD GIF, PNG `tEXt` Recipes & `cmd/genart` CLI)**
-4. **Waves 9–19 `arts/` Visual Paradigms (129 Art Engines + 19 HD 600×600 Loop GIFs — Implemented)**
+4. **Waves 9–20 `arts/` Visual Paradigms (132 Art Engines + 19 HD 600×600 Loop GIFs — Implemented)**
 5. **Exhibition Poster & ContactSheet Engine (`poster.go` — Implemented) & HD GIF Expansion**
 6. **Next-Generation Architecture & Platform Roadmap (6 Directions, with Directions 4 & 5 Implemented)**
 7. **Art-Empowering Rendering & Mathematical Foundations (Next-Tier Capabilities for Future `arts/` — Implemented)**
@@ -195,6 +195,11 @@ Expand `arts/` from **94** to **100** generators with pure mathematical attracto
 34. **`ErosionCanyon`** (`NewErosionCanyon(octaves int, erosionStrength, strataFreq float64)`): 16-tier 3D laser-cut Perlin topographic paper/lacquer relief driven by `ErosionFBM2D` with directional paper-cut shadows and 24k gold Marching-Squares contour rims.
 35. **`AnalyticalCurlSilk`** (`NewAnalyticalCurlSilk(streamlines, octaves int, curlScale float64)`): 3D depth-sorted Perlin silk and metallic ribbon wave sculpture (`FBM2DDeriv` + `Perlin3D`) floating over midnight-obsidian space.
 36. **`GaborWaveInterference`** (`NewGaborWaveInterference(vortexPoles int, gaborFreq, bandwidth float64)`): Double-ringed 24k gold Celestial Astrolabe medallion enclosing a multi-harmonic `GaborNoise2D` + `FBM2DDeriv` Chladni caustic mandala and `Curl2DAnalytical` filaments.
+
+### 5.1h Wave 20 — M.C. Escher Trio: Circle Limit Hyperbolic Tessellation, Print Gallery Droste Spiral & Isohedral Metamorphosis (+3 Engines + 4 Escher Mathematical Kernels, 132 Total — Implemented)
+37. **`EscherCircleLimit`** (`NewEscherCircleLimit(p, q, r int)`): *Circle Limit III / IV* hyperbolic Poincaré disk interlocking tessellation powered by `common.NewHyperbolicCoxeterGroup(p, q, r)` and `FoldToFundamentalDomain`.
+38. **`EscherDrosteGallery`** (`NewEscherDrosteGallery(branches, archesPerRing int, scaleRatio float64)`): Branch-cut-free Lenstra-de Smit *Print Gallery* conformal log-polar spiral arcade (`common.DrosteSpiralPullback`).
+39. **`EscherMetamorphosis`** (`NewEscherMetamorphosis(cols, rows int, morphStrength float64)`): Zero-gap isohedral tessellation (`render.BuildIsohedralMorphTile`) morphing 3D Necker cubes into interlocking Escher winged tiles.
 
 ### 5.2 Direction 2: Pure-Go WebAssembly (WASM) Interactive Gallery Playground
 - **Architecture (`wasm/main.go`, `GOOS=js GOARCH=wasm`)**:

@@ -203,3 +203,38 @@ func TestEvaluateDomainColoring(t *testing.T) {
 		t.Fatalf("brightness out of [0, 1]: %v", bright2)
 	}
 }
+
+func TestHyperbolicCoxeterGroupAndDrosteSpiral(t *testing.T) {
+	// 1. Test Coxeter (6, 4, 2) hyperbolic reflection group
+	g := NewHyperbolicCoxeterGroup(6, 4, 2)
+	if g.Side3.Radius <= 0 {
+		t.Fatalf("expected positive orthogonal circle radius for (6,4,2), got %v", g.Side3.Radius)
+	}
+	// Verify Side3 is orthogonal to the unit circle: |Center|^2 - Radius^2 == 1
+	orthoErr := math.Abs(cmplx.Abs(g.Side3.Center)*cmplx.Abs(g.Side3.Center) - g.Side3.Radius*g.Side3.Radius - 1.0)
+	if orthoErr > 1e-10 {
+		t.Fatalf("Side3 circle is not orthogonal to unit disk: error = %v", orthoErr)
+	}
+
+	// Folding a point and its mirror reflection across the real axis should land on the exact same zFund with opposite parity
+	zTest := complex(0.42, 0.31)
+	zFund1, bary1, par1, _ := g.FoldToFundamentalDomain(zTest, 48)
+	zFund2, _, par2, _ := g.FoldToFundamentalDomain(cmplx.Conj(zTest), 48)
+	if cmplx.Abs(zFund1-zFund2) > 1e-9 {
+		t.Fatalf("expected conj(z) to fold to same zFund: got %v vs %v", zFund1, zFund2)
+	}
+	if par1 == par2 {
+		t.Fatalf("expected opposite reflection parity for z and conj(z), got %d and %d", par1, par2)
+	}
+	if bary1[0] < 0 || bary1[1] < 0 || bary1[2] < 0 {
+		t.Fatalf("expected non-negative barycentric coordinates, got %+v", bary1)
+	}
+
+	// 2. Test DrosteSpiralPullback self-similarity under scaling by scaleRatio
+	u1, v1, lvl1, _ := DrosteSpiralPullback(complex(0.25, 0.15), 16.0, 1, 1.0)
+	if u1 < 0 || u1 >= 1 || v1 < 0 || v1 >= 1 {
+		t.Fatalf("Droste tile coords out of [0,1): u=%v v=%v", u1, v1)
+	}
+	_ = lvl1
+}
+

@@ -75,6 +75,9 @@ func TestMosaicFamilyGenerators(t *testing.T) {
 		{"ErosionCanyon", NewErosionCanyon(5, 1.8, 14.0)},
 		{"AnalyticalCurlSilk", NewAnalyticalCurlSilk(120, 4, 2.2)},
 		{"GaborWaveInterference", NewGaborWaveInterference(6, 3.2, 1.45)},
+		{"EscherCircleLimit", NewEscherCircleLimit(6, 4, 2)},
+		{"EscherDrosteGallery", NewEscherDrosteGallery(1, 8, 16.0)},
+		{"EscherMetamorphosis", NewEscherMetamorphosis(8, 8, 1.0)},
 	}
 
 	for _, tc := range cases {

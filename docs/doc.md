@@ -123,6 +123,9 @@
 	- [Erosion Canyon](#erosion-canyon)
 	- [Analytical Curl Silk](#analytical-curl-silk)
 	- [Gabor Wave Interference](#gabor-wave-interference)
+	- [Escher Circle Limit](#escher-circle-limit)
+	- [Escher Droste Gallery](#escher-droste-gallery)
+	- [Escher Metamorphosis](#escher-metamorphosis)
 
 ## CLI Tool (`cmd/genart`) & Exhibition Poster Reference
 
@@ -1940,6 +1943,55 @@ gwi := arts.NewGaborWaveInterference(6, 3.2, 1.45)
 ```
 
 ![](../images/gaborwaveinterference.png)
+
+## Escher Circle Limit
+
+`Escher Circle Limit` renders an M.C. Escher *Circle Limit III / IV* hyperbolic Poincaré disk interlocking tessellation using `common.NewHyperbolicCoxeterGroup(p, q, r)` and fundamental-domain folding at 2×2 SSAA.
+
+### parameters
+
+- p: Polygon order at the central origin vertex (default `6`).
+- q: Vertex order on the real axis (default `4`).
+- r: Third reflection triangle vertex order (default `2`, satisfying $1/p + 1/q + 1/r < 1$).
+
+```go
+ecl := arts.NewEscherCircleLimit(6, 4, 2)
+```
+
+![](../images/eschercirclelimit.png)
+
+## Escher Droste Gallery
+
+`Escher Droste Gallery` implements the Lenstra-de Smit conformal logarithmic spiral pullback (`common.DrosteSpiralPullback`) of Escher's *Print Gallery*, wrapping a Renaissance vaulted colonnade, checkered floor, and arched gallery windows into an infinite self-similar spiral vortex.
+
+### parameters
+
+- branches: Spiral winding branches per period (default `1`).
+- archesPerRing: Number of architectural arcade bays per revolution (default `8`).
+- scaleRatio: Radial self-similar zoom factor per revolution (default `16.0`).
+
+```go
+edg := arts.NewEscherDrosteGallery(1, 8, 16.0)
+```
+
+![](../images/escherdrostegallery.png)
+
+## Escher Metamorphosis
+
+`Escher Metamorphosis` renders a zero-gap isohedral tessellation (`render.BuildIsohedralMorphTile`) that continuously morphs 3D isometric Necker cubes at the perimeter into interlocking Escher winged bird/scroll tiles across the diagonal.
+
+### parameters
+
+- cols: Number of horizontal honeycomb columns.
+- rows: Number of vertical honeycomb rows.
+- morphStrength: Boundary curve deformation multiplier (default `1.0`).
+
+```go
+em := arts.NewEscherMetamorphosis(10, 10, 1.0)
+```
+
+![](../images/eschermetamorphosis.png)
+
 
 
 

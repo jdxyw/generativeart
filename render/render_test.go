@@ -515,7 +515,19 @@ func TestVectorClippingAndPenPlotterTSPOptimization(t *testing.T) {
 	if !strings.Contains(svgOut, `inkscape:groupmode="layer"`) || !strings.Contains(svgOut, `id="pen-layer-1-`) {
 		t.Fatalf("expected Inkscape pen layers in plotter SVG output")
 	}
+
+	// 4. Test Escher Isohedral Morph Tile & Isometric Block Face Primitives
+	hexTile := BuildIsohedralMorphTile(Pt(100, 100), 28.0, 0.0, 0.65, 6, 12)
+	if len(hexTile) != 72 {
+		t.Fatalf("expected 72 vertices on 6-sided isohedral morph tile, got %d", len(hexTile))
+	}
+	p00 := IsometricProject(0, 0, 0, 20, 100, 100)
+	p10 := IsometricProject(1, 0, 0, 20, 100, 100)
+	p11 := IsometricProject(1, 1, 0, 20, 100, 100)
+	p01 := IsometricProject(0, 1, 0, 20, 100, 100)
+	c.DrawIsometricBlockFace([4]Point{p00, p10, p11, p01}, common.White, common.Black, 0.35, 3.0, true, 1.0)
 }
+
 
 
 

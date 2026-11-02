@@ -106,6 +106,29 @@ func paramString(p map[string]interface{}, key, def string) string {
 }
 
 var registry = []ArtDescriptor{
+	// Wave 20: M.C. Escher Trio (Circle Limit Hyperbolic Tessellation, Print Gallery Droste Spiral & Isohedral Metamorphosis)
+	{
+		ID: "eschercirclelimit", StructName: "escherCircleLimit", Category: "geom",
+		DefaultBG: color.RGBA{243, 236, 224, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewEscherCircleLimit(paramInt(p, "p", 6), paramInt(p, "q", 4), paramInt(p, "r", 2))
+		},
+	},
+	{
+		ID: "escherdrostegallery", StructName: "escherDrosteGallery", Category: "geom",
+		DefaultBG: color.RGBA{18, 22, 34, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewEscherDrosteGallery(paramInt(p, "branches", 1), paramInt(p, "archesPerRing", 8), paramFloat(p, "scaleRatio", 16.0))
+		},
+	},
+	{
+		ID: "eschermetamorphosis", StructName: "escherMetamorphosis", Category: "geom",
+		DefaultBG: color.RGBA{248, 242, 228, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewEscherMetamorphosis(paramInt(p, "cols", 10), paramInt(p, "rows", 10), paramFloat(p, "morphStrength", 1.0))
+		},
+	},
+
 	// Wave 19: Analytical Perlin & Gabor Noise Quartet (Botryoidal Perlin Malachite, Gradient-Damped Erosion Canyon, Analytical Curl Silk & Anisotropic Gabor Wave Interference)
 	{
 		ID: "perlinmalachite", StructName: "perlinMalachite", Category: "geom",

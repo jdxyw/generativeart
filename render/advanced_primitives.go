@@ -803,4 +803,158 @@ func (c *Canvas) DrawStainedGlassCell(
 	c.StrokePath(path, leadWidth, canvas.RoundCap, canvas.RoundJoin, leadCol, 1.0)
 }
 
+// ============================================================================
+// Escher Graphic Kernels: Isohedral Interlocking Morph Tiles & Isometric
+// Woodcut Mezzotint Architecture Primitives
+// ============================================================================
+
+// BuildIsohedralMorphTile constructs an interlocking Escher isohedral tile centered at center
+// with circumradius radius and orientation rotationRad (symmetry = 4 for square/rhombus lattice
+// or symmetry = 6 for regular hexagonal honeycomb lattice).
+//
+// Each pair of opposite parallel edges k and k + symmetry/2 is deformed by the same C1 S-curve
+///winged profile scaled by morphT in [0, 1] with exact opposite traversal direction, guaranteeing
+// 0.00px gap between adjacent tiles across a continuous spatial metamorphosis!
+func BuildIsohedralMorphTile(center Point, radius, rotationRad, morphT float64, symmetry int, samplesPerEdge int) []Point {
+	if symmetry != 4 {
+		symmetry = 6
+	}
+	if samplesPerEdge < 4 {
+		samplesPerEdge = 16
+	}
+	morphT = common.Constrain(morphT, 0.0, 1.5)
+
+	// Base regular polygon vertices
+	verts := make([]Point, symmetry)
+	for k := 0; k < symmetry; k++ {
+		ang := rotationRad + float64(k)*2.0*math.Pi/float64(symmetry)
+		verts[k] = Pt(center.X+radius*math.Cos(ang), center.Y+radius*math.Sin(ang))
+	}
+
+	halfSym := symmetry / 2
+	out := make([]Point, 0, symmetry*samplesPerEdge)
+
+	// Evaluate the canonical edge deformation profile (tangential shift du, normal shift dn) for s in [0, 1]
+	evalEdgeProfile := func(edgeFamily int, s float64) (du, dn float64) {
+		env := math.Sin(math.Pi * s)
+		env2 := env * env
+		switch edgeFamily % 3 {
+		case 0:
+			// Asymmetric Escher winged/S-scroll interlock
+			dn = 0.28*math.Sin(2.0*math.Pi*s) + 0.11*math.Sin(4.0*math.Pi*s-0.5)
+			du = 0.10 * math.Sin(2.0*math.Pi*s-0.8) * env2
+		case 1:
+			// Double-lobed interlocking key/tail curve
+			dn = -0.25*math.Sin(2.0*math.Pi*s+0.4) + 0.12*math.Cos(3.0*math.Pi*s)*env
+			du = -0.09 * math.Sin(2.0*math.Pi*s) * env2
+		default:
+			// Sweeping crest-and-trough bird/wave edge
+			dn = 0.24*math.Sin(2.0*math.Pi*s-0.3) - 0.10*math.Sin(4.0*math.Pi*s)
+			du = 0.08 * math.Cos(2.0*math.Pi*s) * env2
+		}
+		return du * morphT, dn * morphT
+	}
+
+	for k := 0; k < symmetry; k++ {
+		a := verts[k]
+		b := verts[(k+1)%symmetry]
+		chord := b.Sub(a)
+		chordLen := chord.Len()
+		if chordLen < 1e-6 {
+			continue
+		}
+		tan := chord.Mul(1.0 / chordLen)
+		norm := tan.Perp()
+
+		family := k % halfSym
+		isOpposite := k >= halfSym
+
+		for i := 0; i < samplesPerEdge; i++ {
+			t := float64(i) / float64(samplesPerEdge)
+			var du, dn float64
+			if !isOpposite {
+				du, dn = evalEdgeProfile(family, t)
+			} else {
+				// Opposite parallel edge is traversed in reverse (1 - t) in world space,
+				// so negating both (du, dn) at (1 - t) makes the two shared edges 100% identical in world coordinates!
+				duRev, dnRev := evalEdgeProfile(family, 1.0-t)
+				du = -duRev
+				dn = -dnRev
+			}
+			pt := a.Lerp(b, t).
+				Add(tan.Mul(du * chordLen)).
+				Add(norm.Mul(dn * chordLen))
+			out = append(out, pt)
+		}
+	}
+	return out
+}
+
+// IsometricProject projects 3D isometric lattice coordinates (ix, iy, iz) into 2D screen coordinates
+// centered at (cx, cy) with unit edge length scale.
+func IsometricProject(ix, iy, iz, scale, cx, cy float64) Point {
+	const cos30 = 0.8660254037844386
+	const sin30 = 0.5000000000000000
+	x := cx + (ix-iy)*cos30*scale
+	y := cy + (ix+iy)*sin30*scale - iz*scale
+	return Pt(x, y)
+}
+
+// DrawIsometricBlockFace renders a 4-vertex isometric quad face (pts[0..3]) in Escher woodcut /
+// lithograph style: fills with tone-modulated baseCol, overlays parallel engraving hatch lines
+// whose density and weight scale with shadow depth (1 - lightIntensity), and strokes crisp ink borders.
+func (c *Canvas) DrawIsometricBlockFace(
+	pts [4]Point,
+	baseCol, inkCol color.RGBA,
+	lightIntensity float64,
+	hatchSpacing float64,
+	crossHatch bool,
+	borderWidth float64,
+) {
+	if c == nil {
+		return
+	}
+	lightIntensity = common.Constrain(lightIntensity, 0.0, 1.0)
+	faceCol := LerpOklab(inkCol, baseCol, 0.22+0.78*lightIntensity)
+	poly := []Point{pts[0], pts[1], pts[2], pts[3]}
+	c.FillPolygon(poly, faceCol, 1.0)
+
+	// Add woodcut engraving hatch lines on shaded faces (lightIntensity < 0.88)
+	shadeDepth := 1.0 - lightIntensity
+	if shadeDepth > 0.12 && hatchSpacing >= 1.5 {
+		e0Len := pts[0].Dist(pts[1])
+		e1Len := pts[1].Dist(pts[2])
+		nPrimary := int(math.Round(e0Len / hatchSpacing))
+		if nPrimary > 1 {
+			hatchW := (0.45 + 0.65*shadeDepth)
+			hatchAlpha := common.Constrain(0.28+0.58*shadeDepth, 0.15, 0.85)
+			for i := 1; i < nPrimary; i++ {
+				t := float64(i) / float64(nPrimary)
+				pA := pts[0].Lerp(pts[1], t)
+				pB := pts[3].Lerp(pts[2], t)
+				c.StrokePolyline([]Point{pA, pB}, hatchW, inkCol, hatchAlpha)
+			}
+		}
+		if crossHatch && shadeDepth > 0.45 {
+			nSecondary := int(math.Round(e1Len / (hatchSpacing * 1.25)))
+			if nSecondary > 1 {
+				hatchW := 0.42 + 0.45*shadeDepth
+				hatchAlpha := common.Constrain((shadeDepth-0.35)*0.75, 0.12, 0.65)
+				for j := 1; j < nSecondary; j++ {
+					u := float64(j) / float64(nSecondary)
+					qA := pts[1].Lerp(pts[2], u)
+					qB := pts[0].Lerp(pts[3], u)
+					c.StrokePolyline([]Point{qA, qB}, hatchW, inkCol, hatchAlpha)
+				}
+			}
+		}
+	}
+
+	if borderWidth > 0 {
+		closed := []Point{pts[0], pts[1], pts[2], pts[3], pts[0]}
+		c.StrokePolyline(closed, borderWidth, inkCol, 0.92)
+	}
+}
+
+
 
