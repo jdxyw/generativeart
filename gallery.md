@@ -20,7 +20,8 @@ This gallery contains standalone `Go` usage examples and rendered outputs for `g
 
 ```bash
 go run ./cmd/genart render -art eschercirclelimit     -w 600 -h 600 -frames 20 -delay 12 -out images/eschercirclelimit_loop.gif
-go run ./cmd/genart render -art escherdrostegallery   -w 600 -h 600 -frames 20 -delay 12 -out images/escherdrostegallery_loop.gif
+go run ./cmd/genart render -art escherdrostegallery   -w 600 -h 600 -seed 20262002 -frames 20 -delay 12 -out images/escherdrostegallery_loop.gif
+go run ./cmd/genart render -art escherdrostegallery   -w 600 -h 600 -seed 20262011 -frames 20 -delay 12 -out images/escherdrostewave_loop.gif
 go run ./cmd/genart render -art gaborwaveinterference -w 600 -h 600 -frames 20 -delay 12 -out images/gaborwaveinterference_loop.gif
 go run ./cmd/genart render -art analyticalcurlsilk    -w 600 -h 600 -frames 20 -delay 12 -out images/analyticalcurlsilk_loop.gif
 go run ./cmd/genart render -art nebulaplumes          -w 600 -h 600 -frames 20 -delay 12 -out images/nebulaplumes_loop.gif
