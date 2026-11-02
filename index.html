@@ -39,8 +39,11 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
       width: 100%;
-      height: 100%;
+      height: 840px;
+      min-height: 840px;
+      max-height: 840px;
       overflow: hidden;
+      contain: strict;
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
       background: var(--bg);
       color: var(--text);
@@ -48,7 +51,9 @@
     }
     .app-scroll {
       width: 100%;
-      height: 100%;
+      height: 840px;
+      min-height: 840px;
+      max-height: 840px;
       overflow-y: scroll;
       overflow-x: hidden;
       contain: strict;
@@ -250,7 +255,7 @@
 
     /* Lightbox Modal */
     .modal-backdrop {
-      position: fixed; inset: 0; z-index: 100;
+      position: fixed; left: 0; right: 0; top: 0; height: 840px; z-index: 100;
       background: rgba(3, 5, 10, 0.90);
       display: none; align-items: center; justify-content: center; padding: 1.5rem;
     }
@@ -329,7 +334,7 @@
 
   <header class="hero">
     <div class="hero-inner">
-      <div class="hero-eyebrow" id="heroEyebrow">✨ 132 Generative Art Engines · 19 HD 600×600 Loop GIFs · 64-Bit Linear HDR Canvas · Oklab Color Science</div>
+      <div class="hero-eyebrow" id="heroEyebrow">✨ 132 Generative Art Engines · 23 HD 600×600 Loop GIFs · 64-Bit Linear HDR Canvas · Oklab Color Science</div>
       <h1 id="heroTitle">Generative Art in Go</h1>
       <p id="heroSub">From divergence-free curl flows, strange attractor nebulae, and bioluminescent slime molds to traditional Shan-Shui ink landscapes — a high-precision generative art exhibition in Go.</p>
       <div class="install-bar">
@@ -450,6 +455,11 @@
       { id:'iridescentnacre', title:'Iridescent Abalone Nacre', zh:'三维鲍鱼贝母螺旋腔室与霰石薄膜干涉羽毛浮雕', cat:'bio', isNew:true, img:'iridescentnacre.png', bg:'color.RGBA{R: 14, G: 22, B: 30, A: 255}', schema:'common.Oceanic', call:'arts.NewIridescentNacre(7, 18000, 410.0)', colors:['#20e0d0','#e84494','#f4cc8e','#162248'], zhDesc:'由加权蓝噪声泊松盘与 Lloyd Voronoi 弛豫排布 7 枚珍珠螺心，在三维 G-Buffer 上雕刻对数螺旋珍珠层与 1.8 万根霰石丝羽，结合视平线软阴影、翡翠次表面散射与 Airy 薄膜干涉结构色。', enDesc:'3D abalone mother-of-pearl spiral relief and 18,000 aragonite silk-bristle plumes seeded via blue-noise Poisson-disk + Lloyd CVT relaxation, shaded with horizon soft shadows, jade SSS, and Airy thin-film iridescence.' },
       { id:'schottkykleinian', title:'Schottky Kleinian Pearls', zh:'因陀罗之网肖特基-克莱因双曲圆反演极限集与全纯相图', cat:'chaos', isNew:true, img:'schottkykleinian.png', bg:'color.RGBA{R: 7, G: 9, B: 20, A: 255}', schema:'common.Dunhuang', call:'arts.NewSchottkyKleinian(7, 1.0)', colors:['#fcc846','#38e2d8','#e84a96','#2a3e8c'], zhDesc:'八圆相切 Schottky-Kleinian 群圆反演极限集（因陀罗之珠），融合三维薄膜干涉玻璃宝珠、递归反演鎏金球环、Poincaré 双曲测地星盘弦线、全纯复变等高线相图与径向光学色散。', enDesc:'8-fold Kissing-Schottky Kleinian limit set with 3D thin-film iridescent Indra\'s Pearls, recursive circle-inversion gilded rings, Poincaré hyperbolic geodesic astrolabe chords, and radial chromatic dispersion.' },
       { id:'bismuthhopper', title:'3D Bismuth Hopper Crystal', zh:'三维人工铋晶体回字形阶梯骸晶迷宫与氧化膜干涉', cat:'geom', isNew:true, img:'bismuthhopper.png', bg:'color.RGBA{R: 10, G: 12, B: 20, A: 255}', schema:'common.Cyberpunk', call:'arts.NewBismuthHopper(14, 9, 420.0)', colors:['#22d6ee','#3a56e8','#f6b828','#e23868'], zhDesc:'合成金属铋 [Bi] 骸晶三维正交阶梯漏斗迷宫：45° 斜切金属倒角、双光源视平线步进软阴影与深井环境光遮蔽，表面 Bi₂O₃ 氧化膜按第一/二阶牛顿干涉呈现流金、深紫、电光青与祖母绿光泽。', enDesc:'3D synthetic Bismuth [Bi] hopper crystal labyrinth with rectilinear stair-step cavities, 45° chamfered metallic bevels, dual-sun horizon soft shadows, and Bi₂O₃ Airy thin-film spectral interference.' },
+      // Newly Added Wave 19–20 Mathematical & Optical 600x600 HD Seamless Loop GIFs
+      { id:'eschercirclelimit', title:'Escher Circle Limit (HD GIF)', zh:'埃舍尔《圆极限》双曲莫比乌斯测地流 600×600 动图', cat:'anim', isNew:true, isGif:true, img:'eschercirclelimit_loop.gif', bg:'color.RGBA{R: 243, G: 236, B: 224, A: 255}', schema:'common.Dunhuang', call:'arts.NewEscherCircleLimit(6, 4, 2)', colors:['#f6b830','#b82420','#42b8a6','#102248'], zhDesc:'600×600 高清 20 帧 360° 无缝循环 GIF：由庞加莱圆盘莫比乌斯双曲自同构群与 (7,3,2) 反射群驱动，四层色谱飞鸟与黄金测地干线沿双曲轨道丝滑流转。', enDesc:'600x600 HD 20-frame seamless 360° loop GIF of an M.C. Escher Circle Limit hyperbolic Poincaré disk tessellation gliding along a periodic Möbius disk automorphism.' },
+      { id:'escherdrostegallery', title:'Escher Droste Spiral (HD GIF)', zh:'埃舍尔德罗斯特全纯共形无限螺旋缩放 600×600 动图', cat:'anim', isNew:true, isGif:true, img:'escherdrostegallery_loop.gif', bg:'color.RGBA{R: 18, G: 22, B: 34, A: 255}', schema:'common.Dunhuang', call:'arts.NewEscherDrosteGallery(1, 8, 16.0)', colors:['#ecc052','#d84830','#228e84','#122444'], zhDesc:'600×600 高清 20 帧 360° 无缝循环 GIF：沿全纯共形对数螺旋晶格 W = K·ln(z) 连续指数缩放，八角星花、旋转四叶草风车与鎏金穿插绶带无限向中心坠入。', enDesc:'600x600 HD 20-frame seamless 360° loop GIF of a 100% holomorphic conformal Escher Droste spiral ornament zooming infinitely with spinning 4-fold pinwheels and golden guilloché strapwork.' },
+      { id:'gaborwaveinterference', title:'Celestial Gabor Astrolabe (HD GIF)', zh:'24K 鎏金星盘与克拉尼焦散干涉波 600×600 动图', cat:'anim', isNew:true, isGif:true, img:'gaborwaveinterference_loop.gif', bg:'color.RGBA{R: 5, G: 8, B: 20, A: 255}', schema:'common.Cyberpunk', call:'arts.NewGaborWaveInterference(6, 3.2, 1.45)', colors:['#ffbe38','#28e8e0','#f03878','#070d24'], zhDesc:'600×600 高清 20 帧 360° 无缝循环 GIF：双环 24K 鎏金刻度星盘与宝石游标匀速运转，内部六重对称 Gabor-Perlin 克拉尼驻波节线与薄膜干涉虹彩连续重组。', enDesc:'600x600 HD 20-frame seamless 360° loop GIF of a 24k gold Celestial Astrolabe with orbiting bezel jewels, breathing Chladni-Gabor standing waves, and Airy thin-film caustics.' },
+      { id:'analyticalcurlsilk', title:'3D Perlin Curl Silk (HD GIF)', zh:'三维景深排序 Perlin 金属丝带雕塑 600×600 动图', cat:'anim', isNew:true, isGif:true, img:'analyticalcurlsilk_loop.gif', bg:'color.RGBA{R: 6, G: 9, B: 19, A: 255}', schema:'common.Dunhuang', call:'arts.NewAnalyticalCurlSilk(420, 4, 2.2)', colors:['#f8c246','#e84838','#20d8e0','#2468d8'], zhDesc:'600×600 高清 20 帧 360° 无缝循环 GIF：深邃黑曜石太空中，三束共 96 股三维流金、珊瑚与电光青金属丝带随解析旋度波起伏穿插，虹彩高光沿丝缕流淌。', enDesc:'600x600 HD 20-frame seamless 360° loop GIF of 3 interwoven 3D depth-sorted Perlin silk and metallic ribbon wave manifolds undulating with Kajiya-Kay specular and thin-film iridescence.' },
       // Newly Added Wave 17 Vortex Impasto Family 600x600 HD Seamless Loop GIFs
       { id:'nebulaplumes', title:'Binary Nebula Plumes (HD GIF)', zh:'双子星旋碰撞星云毛发流场 600×600 动图', cat:'anim', isNew:true, isGif:true, img:'nebulaplumes_loop.gif', bg:'color.RGBA{R: 243, G: 236, B: 225, A: 255}', schema:'common.Dunhuang', call:'arts.NewNebulaPlumes(3, 23000, 1.0)', colors:['#ffaa2b','#e6482e','#22c8b0','#a252e0'], zhDesc:'600×600 高清 20 帧 360° 无缝循环 GIF：两枚巨型正反旋转的主星系涡核牵引 S 形潮汐羽桥与 14 枚伴星涡旋，三臂对数螺旋光波连续流转。', enDesc:'600x600 HD 20-frame seamless 360° loop GIF of colliding binary galaxy super-vortices and 14 satellite eddies in vermilion-gold, jade-emerald, and orchid-violet.' },
       { id:'abyssalcurrents', title:'Abyssal Kuroshio Jet (HD GIF)', zh:'黑曜石深海荧光黑潮与卡门涡街 600×600 动图', cat:'anim', isNew:true, isGif:true, img:'abyssalcurrents_loop.gif', bg:'color.RGBA{R: 13, G: 16, B: 24, A: 255}', schema:'common.Cyberpunk', call:'arts.NewAbyssalCurrents(18, 23000, 1.0)', colors:['#00eed8','#ff2a78','#ff9e1b','#0d1018'], zhDesc:'600×600 高清 20 帧 360° 无缝循环 GIF：深邃黑曜石画框之上，电光青蜿蜒黑潮急流高速奔涌，两侧 18 枚霓虹洋红与橘金卡门涡街同步卷曲旋转。', enDesc:'600x600 HD 20-frame seamless 360° loop GIF of a bioluminescent cyan Kuroshio jet stream flanked by 18 neon rose-magenta and tangerine-gold Kármán rollup vortices.' },
@@ -855,11 +865,19 @@ ${drawCall}
     };
 
     const IS_REAL_BROWSER = (
-      window.self === window.top &&
-      (window.location.protocol === "file:" ||
-       window.location.protocol === "http:" ||
-       window.location.protocol === "https:")
+      window.location.protocol === "https:" &&
+      window.location.hostname.endsWith("github.io")
     );
+    if (IS_REAL_BROWSER) {
+      document.documentElement.style.height = "100%";
+      document.documentElement.style.maxHeight = "none";
+      document.body.style.height = "100%";
+      document.body.style.maxHeight = "none";
+      const sc = document.querySelector(".app-scroll");
+      if (sc) { sc.style.height = "100%"; sc.style.maxHeight = "none"; }
+      const mb = document.getElementById("modalBackdrop");
+      if (mb) { mb.style.height = "100%"; }
+    }
 
     function getThumbSrc(filename) {
       if (IS_REAL_BROWSER) {

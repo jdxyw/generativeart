@@ -4,7 +4,7 @@ This document serves as the architectural blueprint for `generativeart`, coverin
 1. **Core Engine Refactoring & Performance Upgrades (Package 1 — Implemented)**
 2. **Computational Geometry, Topological Fields & 2D SDF Engine (Package 2 — Implemented)**
 3. **Platform & Export Foundations (Package 3 — Implemented: Dual Vector/HDR Backend, `DrawTimelapse` HD GIF, PNG `tEXt` Recipes & `cmd/genart` CLI)**
-4. **Waves 9–20 `arts/` Visual Paradigms (132 Art Engines + 19 HD 600×600 Loop GIFs — Implemented)**
+4. **Waves 9–20 `arts/` Visual Paradigms (132 Art Engines + 23 HD 600×600 Loop GIFs — Implemented)**
 5. **Exhibition Poster & ContactSheet Engine (`poster.go` — Implemented) & HD GIF Expansion**
 6. **Next-Generation Architecture & Platform Roadmap (6 Directions, with Directions 4 & 5 Implemented)**
 7. **Art-Empowering Rendering & Mathematical Foundations (Next-Tier Capabilities for Future `arts/` — Implemented)**
@@ -222,8 +222,8 @@ Expand `arts/` from **94** to **100** generators with pure mathematical attracto
     go run ./cmd/genart poster -arts dunhuangapsara,celticknotwork,gyroidsurface,persiantilework -grid 2x2 -panel 420 -theme dark -title "WAVE XII EXHIBITION" -out images/poster_wave12.png
     ```
 
-### 5.4 Direction 4: High-Definition 600×600 Seamless Loop GIF Expansion (19 HD Loop GIFs — Implemented)
-- Expanded the `600×600` 18-bit LUT + K-Means quantized seamless 360° loop GIF collection to **19 HD animations**: `nebulaplumes_loop.gif`, `abyssalcurrents_loop.gif`, `solarprominence_loop.gif`, `botanicalwhorls_loop.gif`, `vorteximpasto_loop.gif`, `squeegeescrape_loop.gif`, `basaltcolumns_loop.gif`, `wireframeterrain_loop.gif`, `lissajousribbon_loop.gif`, `marchingisolines_loop.gif`, `vortexfluid_loop.gif`, `dunhuangapsara_loop.gif`, `stainedrosewindow_loop.gif`, `newtonbasin_loop.gif`, `origamitessellation_loop.gif`, `cyclicautomata_loop.gif`, `gyroidsurface_loop.gif`, `mosaicsun_loop.gif`, and `magneticdipole_loop.gif`.
+### 5.4 Direction 4: High-Definition 600×600 Seamless Loop GIF Expansion (23 HD Loop GIFs — Implemented)
+- Expanded the `600×600` 18-bit LUT + K-Means quantized seamless 360° loop GIF collection to **23 HD animations**: `eschercirclelimit_loop.gif`, `escherdrostegallery_loop.gif`, `gaborwaveinterference_loop.gif`, `analyticalcurlsilk_loop.gif`, `nebulaplumes_loop.gif`, `abyssalcurrents_loop.gif`, `solarprominence_loop.gif`, `botanicalwhorls_loop.gif`, `vorteximpasto_loop.gif`, `squeegeescrape_loop.gif`, `basaltcolumns_loop.gif`, `wireframeterrain_loop.gif`, `lissajousribbon_loop.gif`, `marchingisolines_loop.gif`, `vortexfluid_loop.gif`, `dunhuangapsara_loop.gif`, `stainedrosewindow_loop.gif`, `newtonbasin_loop.gif`, `origamitessellation_loop.gif`, `cyclicautomata_loop.gif`, `gyroidsurface_loop.gif`, `mosaicsun_loop.gif`, and `magneticdipole_loop.gif`.
 
 ---
 

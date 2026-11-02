@@ -66,14 +66,14 @@ func (ecl *escherCircleLimit) GenerativeFrame(c *generativeart.Canva, frameIdx, 
 		triScale = 0.5
 	}
 
-	// Seamless animation: smooth hyperbolic rotation exp(i*phi) plus a gentle
-	// periodic Möbius disk automorphism when animated.
+	// Seamless animation: smooth hyperbolic rotation exp(i*phi/P) plus a constant-speed
+	// circular Möbius disk automorphism orbit when animated.
 	phi := 2.0 * math.Pi * phase
 	rotZ := cmplx.Rect(1.0, phi/float64(cg.P))
 	var diskMob common.Mobius2D
 	useMobius := totalFrames > 1 || math.Abs(phase) > 1e-9
 	if useMobius {
-		driftA := cmplx.Rect(0.085*math.Sin(phi), phi)
+		driftA := 0.075 * complex(1.0-math.Cos(phi), math.Sin(phi))
 		diskMob = common.DiskAutomorphism(driftA, phi/float64(cg.P)).Normalized()
 	}
 
@@ -195,7 +195,7 @@ func (ecl *escherCircleLimit) GenerativeFrame(c *generativeart.Canva, frameIdx, 
 								goldBand := lerp3(bronzeCol, giltCol, 0.35+0.55*bevel*math.Sin(tRim*math.Pi))
 
 								// Fine astrolabe degree graduations inside the gold bezel
-								ticks := 0.5 + 0.5*math.Cos(float64(cg.P*24)*thetaRim)
+								ticks := 0.5 + 0.5*math.Cos(float64(cg.P*24)*thetaRim-phi)
 								tickMask := common.Smoothstep(0.75, 0.95, ticks) *
 									common.Smoothstep(0.18, 0.26, tRim) *
 									common.Smoothstep(0.52, 0.42, tRim)
@@ -397,8 +397,8 @@ func (ecl *escherCircleLimit) GenerativeFrame(c *generativeart.Canva, frameIdx, 
 						lineScale := 1.0 - 0.25*rNorm
 
 						// Concentric wing-feather chevrons & scalloped body scales
-						featherPhase := 30.0*(v-wBary) + 12.0*u + 5.0*math.Sin(8.5*u)
-						chevronPhase := 22.0*v + 22.0*wBary - 14.0*u + 3.5*math.Cos(10.0*(v-wBary))
+						featherPhase := 30.0*(v-wBary) + 12.0*u + 5.0*math.Sin(8.5*u) + 0.45*math.Sin(phi)
+						chevronPhase := 22.0*v + 22.0*wBary - 14.0*u + 3.5*math.Cos(10.0*(v-wBary)) - 0.35*math.Sin(phi)
 						striation1 := 0.5 + 0.5*math.Sin(featherPhase)
 						striation2 := 0.5 + 0.5*math.Sin(chevronPhase)
 

@@ -8,8 +8,10 @@ This gallery contains standalone `Go` usage examples and rendered outputs for `g
 
 ## 🎞️ Seamless 600×600 HD Looping GIF Animations (`DrawTimelapseFrames` + `ToGIF`)
 
-| Binary Nebula Plumes (`nebulaplumes`) | Abyssal Kuroshio Jet (`abyssalcurrents`) | Solar Prominence Tondo (`solarprominence`) | Botanical Lotus Whorls (`botanicalwhorls`) |
+| Escher Circle Limit (`eschercirclelimit`) | Escher Droste Spiral (`escherdrostegallery`) | Celestial Gabor Astrolabe (`gaborwaveinterference`) | 3D Perlin Curl Silk (`analyticalcurlsilk`) |
 | :---: | :---: | :---: | :---: |
+| ![Escher Circle Limit Loop](images/eschercirclelimit_loop.gif) | ![Escher Droste Gallery Loop](images/escherdrostegallery_loop.gif) | ![Gabor Wave Interference Loop](images/gaborwaveinterference_loop.gif) | ![Analytical Curl Silk Loop](images/analyticalcurlsilk_loop.gif) |
+| **Binary Nebula Plumes (`nebulaplumes`)** | **Abyssal Kuroshio Jet (`abyssalcurrents`)** | **Solar Prominence Tondo (`solarprominence`)** | **Botanical Lotus Whorls (`botanicalwhorls`)** |
 | ![Nebula Plumes Loop](images/nebulaplumes_loop.gif) | ![Abyssal Currents Loop](images/abyssalcurrents_loop.gif) | ![Solar Prominence Loop](images/solarprominence_loop.gif) | ![Botanical Whorls Loop](images/botanicalwhorls_loop.gif) |
 | **Vortex Impasto (`vorteximpasto`)** | **Squeegee Scrape (`squeegeescrape`)** | **Hex Basalt Columns (`basaltcolumns`)** | **3D Wireframe Glacier (`wireframeterrain`)** |
 | ![Vortex Impasto Loop](images/vorteximpasto_loop.gif) | ![Squeegee Scrape Loop](images/squeegeescrape_loop.gif) | ![Basalt Columns Loop](images/basaltcolumns_loop.gif) | ![Wireframe Terrain Loop](images/wireframeterrain_loop.gif) |
@@ -17,7 +19,11 @@ This gallery contains standalone `Go` usage examples and rendered outputs for `g
 | ![Lissajous Ribbon Loop](images/lissajousribbon_loop.gif) | ![Marching Isolines Loop](images/marchingisolines_loop.gif) | ![Vortex Fluid Loop](images/vortexfluid_loop.gif) | ![Dunhuang Caisson Loop](images/dunhuangapsara_loop.gif) |
 
 ```bash
-go run ./cmd/genart render -art nebulaplumes        -w 600 -h 600 -frames 20 -delay 12 -out images/nebulaplumes_loop.gif
+go run ./cmd/genart render -art eschercirclelimit     -w 600 -h 600 -frames 20 -delay 12 -out images/eschercirclelimit_loop.gif
+go run ./cmd/genart render -art escherdrostegallery   -w 600 -h 600 -frames 20 -delay 12 -out images/escherdrostegallery_loop.gif
+go run ./cmd/genart render -art gaborwaveinterference -w 600 -h 600 -frames 20 -delay 12 -out images/gaborwaveinterference_loop.gif
+go run ./cmd/genart render -art analyticalcurlsilk    -w 600 -h 600 -frames 20 -delay 12 -out images/analyticalcurlsilk_loop.gif
+go run ./cmd/genart render -art nebulaplumes          -w 600 -h 600 -frames 20 -delay 12 -out images/nebulaplumes_loop.gif
 go run ./cmd/genart render -art abyssalcurrents     -w 600 -h 600 -frames 20 -delay 12 -out images/abyssalcurrents_loop.gif
 go run ./cmd/genart render -art solarprominence     -w 600 -h 600 -frames 20 -delay 12 -out images/solarprominence_loop.gif
 go run ./cmd/genart render -art botanicalwhorls     -w 600 -h 600 -frames 20 -delay 12 -out images/botanicalwhorls_loop.gif

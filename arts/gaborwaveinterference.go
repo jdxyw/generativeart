@@ -172,7 +172,7 @@ func (g *gaborWaveInterference) GenerativeFrame(c *generativeart.Canva, frameIdx
 					radialFreq := (3.2 + 0.45*g.gaborFreq) * math.Pi
 					chladniA := math.Cos(mFold*theta+1.15*g1+0.55*fbmVal) * math.Cos(radialFreq*rn-0.85*g2+phi)
 					chladniB := math.Sin(2.0*mFold*theta-1.05*g2+0.40*fbmVal) * math.Sin(radialFreq*0.68*rn+0.95*g1-phi)
-					ringHarmonic := math.Cos((radialFreq*1.45)*rn + 1.35*g1 + 0.65*fbmVal)
+					ringHarmonic := math.Cos((radialFreq*1.45)*rn + 1.35*g1 + 0.65*fbmVal - phi)
 
 					waveField := 0.54*chladniA + 0.30*chladniB + 0.16*ringHarmonic
 
@@ -180,7 +180,7 @@ func (g *gaborWaveInterference) GenerativeFrame(c *generativeart.Canva, frameIdx
 					primaryRidge := 1.0 / (1.0 + 38.0*waveField*waveField)
 					primaryRidge = math.Pow(primaryRidge, 1.55)
 
-					secondaryCarrier := math.Sin((mFold*theta + radialFreq*1.15*rn) + 1.85*g1 + 1.15*g2)
+					secondaryCarrier := math.Sin((mFold*theta + radialFreq*1.15*rn) + 1.85*g1 + 1.15*g2 - phi)
 					secondaryRidge := 1.0 / (1.0 + 52.0*secondaryCarrier*secondaryCarrier)
 					secondaryRidge = math.Pow(secondaryRidge, 1.75)
 
@@ -194,14 +194,14 @@ func (g *gaborWaveInterference) GenerativeFrame(c *generativeart.Canva, frameIdx
 
 					// Airy thin-film structural color along caustic ridges
 					cosTheta := common.Clamp01(0.88 - 0.34*rn + 0.14*primaryRidge)
-					filmNm := 165.0 + 235.0*(0.5+0.5*math.Sin(mFold*theta*0.5+2.6*rn+1.1*g1+0.7*fbmVal)) + 45.0*gradMag
+					filmNm := 165.0 + 235.0*(0.5+0.5*math.Sin(mFold*theta*0.5+2.6*rn+1.1*g1+0.7*fbmVal+phi)) + 45.0*gradMag
 					tfR, tfG, tfB := render.SampleThinFilmLinearRGB(cosTheta, filmNm, 1.92)
 					tfR = math.Pow(common.Clamp01(tfR), 1.45)
 					tfG = math.Pow(common.Clamp01(tfG), 1.45)
 					tfB = math.Pow(common.Clamp01(tfB), 1.45)
 
 					// Palette harmonic blending between electric cyan, solar gold, and neon rose-magenta
-					palPhase := 0.5 + 0.5*math.Sin(mFold*theta+3.8*rn+1.4*fbmVal+0.8*g2)
+					palPhase := 0.5 + 0.5*math.Sin(mFold*theta+3.8*rn+1.4*fbmVal+0.8*g2-phi)
 					var palR, palG, palB float64
 					if palPhase < 0.5 {
 						u := palPhase * 2.0
@@ -354,10 +354,7 @@ func (g *gaborWaveInterference) GenerativeFrame(c *generativeart.Canva, frameIdx
 	// Degree ticks & Vernier graduations around the astrolabe bezel
 	const totalTicks = 144
 	for t := 0; t < totalTicks; t++ {
-		ang := float64(t) * 2.0 * math.Pi / float64(totalTicks)
-		if isAnim {
-			ang += 0.04 * math.Sin(phi)
-		}
+		ang := (float64(t) + 12.0*phase) * 2.0 * math.Pi / float64(totalTicks)
 		cosA, sinA := math.Cos(ang), math.Sin(ang)
 
 		isMajor := t%12 == 0
@@ -427,7 +424,7 @@ func (g *gaborWaveInterference) GenerativeFrame(c *generativeart.Canva, frameIdx
 	// vortexPoles Orbital Jewel Nodes around the perimeter
 	rc.SetBlendMode(render.BlendAdd)
 	for p := 0; p < numPoles; p++ {
-		ang := (float64(p)+0.5)*2.0*math.Pi/float64(numPoles) + 0.08*math.Sin(phi)
+		ang := (float64(p)+0.5+2.0*phase)*2.0*math.Pi/float64(numPoles) + 0.04*math.Sin(phi)
 		jx := cx + midRingR*math.Cos(ang)
 		jy := cy + midRingR*math.Sin(ang)
 

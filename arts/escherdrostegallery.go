@@ -82,6 +82,7 @@ func (edg *escherDrosteGallery) GenerativeFrame(c *generativeart.Canva, frameIdx
 
 	kR := float64(numCellsAngular) / (2.0 * math.Pi)
 	kI := float64(spiralShiftB) / (2.0 * math.Pi)
+	phi := 2.0 * math.Pi * phase
 
 	// Sub-pixel 2x2 offsets for supersampled anti-aliasing
 	subOffsets := [4][2]float64{
@@ -135,7 +136,7 @@ func (edg *escherDrosteGallery) GenerativeFrame(c *generativeart.Canva, frameIdx
 			// MOTIF A (parity == 0): 8-Fold Alhambra Star-Polyhedron & Scalloped Lotus Compass
 			// =========================================================================
 			// 1. Cloisonné enamel background with radial woodcut guilloché waves
-			radialWave := 0.5 + 0.5*math.Sin(rCell*18.0-4.0* math.Cos(8.0*angCell))
+			radialWave := 0.5 + 0.5*math.Sin(rCell*18.0-4.0*math.Cos(8.0*angCell)-phi)
 			bgMix := 0.28 + 0.42*common.Smoothstep(0.25, 0.85, rCell)*radialWave
 			if ringParity != 0 {
 				bgMix = 0.35 + 0.40*(1.0-radialWave*0.5)
@@ -367,7 +368,7 @@ func (edg *escherDrosteGallery) GenerativeFrame(c *generativeart.Canva, frameIdx
 			if ringParity != 0 {
 				twistDir = -1.0
 			}
-			swirlAng := angCell + twistDir*1.35*rCell*math.Sin(rCell*math.Pi)
+			swirlAng := angCell + twistDir*(1.35*rCell*math.Sin(rCell*math.Pi)+0.5*phi)
 			bladeWave := math.Cos(4.0 * swirlAng)
 			bladeEnv := 0.62 * (0.68 + 0.32*math.Cos(4.0*angCell))
 
@@ -497,7 +498,7 @@ func (edg *escherDrosteGallery) GenerativeFrame(c *generativeart.Canva, frameIdx
 			bCov := 1.0 - common.Smoothstep(borderHalfW-0.010, borderHalfW, minBorder)
 			bNorm := minBorder / borderHalfW
 			// Guilloché cable wave along the spiral boundary
-			cableWave := 0.5 + 0.5*math.Sin(math.Pi*12.0*(fu+fv))
+			cableWave := 0.5 + 0.5*math.Sin(math.Pi*12.0*(fu+fv)-phi)
 			bLight := 0.62 + 0.38*math.Cos(bNorm*math.Pi*0.5)*(0.75+0.25*cableWave)
 			bInk := common.Smoothstep(0.76, 0.95, bNorm)
 
@@ -577,11 +578,12 @@ func (edg *escherDrosteGallery) GenerativeFrame(c *generativeart.Canva, frameIdx
 						if rScreen < 0.032 {
 							medCov := 1.0 - common.Smoothstep(0.026, 0.032, rScreen)
 							nr := rScreen / 0.029 // normalized radius in [0, 1.1]
+							thetaCompass := theta - phi/8.0
 
 							var medR, medG, medB float64
 							if nr > 0.84 {
 								// Outer 24k gold bezel ring with 32 engraved compass ticks
-								ticks := 0.5 + 0.5*math.Cos(32.0*theta)
+								ticks := 0.5 + 0.5*math.Cos(32.0*thetaCompass)
 								bezelShade := 0.72 + 0.32*ticks
 								medR = goldR * bezelShade
 								medG = goldG * bezelShade
@@ -591,7 +593,7 @@ func (edg *escherDrosteGallery) GenerativeFrame(c *generativeart.Canva, frameIdx
 								medR, medG, medB = indigoR, indigoG, indigoB
 							} else {
 								// 16-pointed gold & ivory compass star over celadon/indigo enamel
-								star16 := 0.48 + 0.22*math.Cos(8.0*theta) + 0.10*math.Cos(16.0*theta)
+								star16 := 0.48 + 0.22*math.Cos(8.0*thetaCompass) + 0.10*math.Cos(16.0*thetaCompass)
 								if nr < 0.22 {
 									// Central cabochon ruby/cinnabar jewel
 									dome := math.Sqrt(math.Max(0.0, 1.0-(nr/0.22)*(nr/0.22)))
@@ -599,7 +601,7 @@ func (edg *escherDrosteGallery) GenerativeFrame(c *generativeart.Canva, frameIdx
 									medG = cinnabarG*(0.55+0.55*dome) + goldG*0.20
 									medB = cinnabarB*(0.55+0.55*dome) + goldB*0.20
 								} else if nr < star16 {
-									sector := int(math.Floor((theta + math.Pi) / (2.0 * math.Pi) * 16.0))
+									sector := int(math.Floor((thetaCompass + 2.0*math.Pi) / (2.0 * math.Pi) * 16.0))
 									if sector%2 == 0 {
 										medR, medG, medB = goldR*1.05, goldG*1.05, goldB*1.05
 									} else {

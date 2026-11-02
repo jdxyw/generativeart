@@ -173,7 +173,7 @@ func (acs *analyticalCurlSilk) GenerativeFrame(c *generativeart.Canva, frameIdx,
 			taper := math.Sin(math.Pi * u)
 			env = 0.28 + 0.72*math.Pow(taper, 0.65)
 			halfWidth = 0.106 * env * (0.88 + 0.12*math.Cos(2.0*math.Pi*u))
-			twist = 1.42*math.Sin(2.0*math.Pi*u+0.35+0.5*phi) + 0.65*s
+			twist = 1.42*math.Sin(2.0*math.Pi*u+0.35+phi) + 0.65*s
 			return silkVec3{bx, by, bz}, halfWidth, twist, env
 
 		case 1:
@@ -189,7 +189,7 @@ func (acs *analyticalCurlSilk) GenerativeFrame(c *generativeart.Canva, frameIdx,
 			taper := math.Sin(math.Pi * u)
 			env = 0.28 + 0.72*math.Pow(taper, 0.65)
 			halfWidth = 0.098 * env * (0.88 + 0.12*math.Sin(2.0*math.Pi*u))
-			twist = -1.38*math.Cos(2.0*math.Pi*u-0.25-0.5*phi) - 0.60*s
+			twist = -1.38*math.Cos(2.0*math.Pi*u-0.25-phi) - 0.60*s
 			return silkVec3{bx, by, bz}, halfWidth, twist, env
 
 		default:
@@ -269,7 +269,7 @@ func (acs *analyticalCurlSilk) GenerativeFrame(c *generativeart.Canva, frameIdx,
 		)
 
 		// Coherent fluted silk pleats across lateral strand coordinate v
-		pleatPhase := v*math.Pi*3.5 + u*math.Pi*4.0 + 1.8*fbmVal
+		pleatPhase := v*math.Pi*3.5 + u*math.Pi*4.0 + 1.8*fbmVal - phi
 		pleat := math.Sin(pleatPhase)
 
 		latSpread := v * halfWidth * (1.0 + 0.16*fbmVal + 0.08*p3)
@@ -487,7 +487,7 @@ func (acs *analyticalCurlSilk) GenerativeFrame(c *generativeart.Canva, frameIdx,
 
 		// Thin-film interference in linear RGB from viewing angle cosTheta = n.z
 		cosTheta := common.Constrain(n.z, 0.08, 0.99)
-		filmNm := 360.0 + 140.0*math.Sin(seg.uParam*math.Pi*4.0+vNorm*math.Pi*2.0+float64(seg.bundleID)*1.4)
+		filmNm := 360.0 + 140.0*math.Sin(seg.uParam*math.Pi*4.0+vNorm*math.Pi*2.0+float64(seg.bundleID)*1.4-phi)
 		iridR, iridG, iridB := render.SampleThinFilmLinearRGB(cosTheta, filmNm, 1.50)
 		iridCol := color.RGBA{
 			R: uint8(common.Constrain(math.Sqrt(common.Constrain(iridR, 0.0, 1.0))*255.0, 0.0, 255.0)),
@@ -498,7 +498,7 @@ func (acs *analyticalCurlSilk) GenerativeFrame(c *generativeart.Canva, frameIdx,
 
 		// Select bundle base palette & shade with fold depth, diffuse, iridescence, and specular crest
 		var baseCol, crestCol color.RGBA
-		waveMix := 0.5 + 0.5*math.Sin(seg.uParam*math.Pi*5.0+vNorm*math.Pi*2.5)
+		waveMix := 0.5 + 0.5*math.Sin(seg.uParam*math.Pi*5.0+vNorm*math.Pi*2.5-phi)
 
 		switch seg.bundleID {
 		case 0:
@@ -519,7 +519,7 @@ func (acs *analyticalCurlSilk) GenerativeFrame(c *generativeart.Canva, frameIdx,
 
 		default:
 			// Bundle C: iridescent rose-gold and turquoise-pearl
-			midTone := render.LerpOklab(roseGold, turquoisePearl, 0.5+0.48*math.Sin(seg.uParam*math.Pi*6.0-vNorm*math.Pi*2.0))
+			midTone := render.LerpOklab(roseGold, turquoisePearl, 0.5+0.48*math.Sin(seg.uParam*math.Pi*6.0-vNorm*math.Pi*2.0-phi))
 			midTone = render.LerpOklab(midTone, warmAmberGold, 0.28*vSym)
 			midTone = render.LerpOklab(midTone, iridCol, 0.30)
 			foldFactor := common.Smoothstep(0.10, 0.86, diffuse*(0.48+0.52*depthNorm))

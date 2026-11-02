@@ -29,8 +29,10 @@
 
 ### 🎞️ Seamless 600×600 HD Looping Animations (`DrawTimelapseFrames` + `ToGIF`)
 
-| Binary Nebula Plumes (`nebulaplumes`) | Abyssal Kuroshio Jet (`abyssalcurrents`) | Solar Prominence Tondo (`solarprominence`) | Botanical Lotus Whorls (`botanicalwhorls`) |
+| Escher Circle Limit (`eschercirclelimit`) | Escher Droste Spiral (`escherdrostegallery`) | Celestial Gabor Astrolabe (`gaborwaveinterference`) | 3D Perlin Curl Silk (`analyticalcurlsilk`) |
 | :---: | :---: | :---: | :---: |
+| ![Escher Circle Limit Loop](images/eschercirclelimit_loop.gif) | ![Escher Droste Gallery Loop](images/escherdrostegallery_loop.gif) | ![Gabor Wave Interference Loop](images/gaborwaveinterference_loop.gif) | ![Analytical Curl Silk Loop](images/analyticalcurlsilk_loop.gif) |
+| **Binary Nebula Plumes (`nebulaplumes`)** | **Abyssal Kuroshio Jet (`abyssalcurrents`)** | **Solar Prominence Tondo (`solarprominence`)** | **Botanical Lotus Whorls (`botanicalwhorls`)** |
 | ![Nebula Plumes Loop](images/nebulaplumes_loop.gif) | ![Abyssal Currents Loop](images/abyssalcurrents_loop.gif) | ![Solar Prominence Loop](images/solarprominence_loop.gif) | ![Botanical Whorls Loop](images/botanicalwhorls_loop.gif) |
 | **Vortex Impasto (`vorteximpasto`)** | **Squeegee Scrape (`squeegeescrape`)** | **Hex Basalt Columns (`basaltcolumns`)** | **3D Wireframe Glacier (`wireframeterrain`)** |
 | ![Vortex Impasto Loop](images/vorteximpasto_loop.gif) | ![Squeegee Scrape Loop](images/squeegeescrape_loop.gif) | ![Basalt Columns Loop](images/basaltcolumns_loop.gif) | ![Wireframe Terrain Loop](images/wireframeterrain_loop.gif) |
