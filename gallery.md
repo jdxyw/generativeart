@@ -8,17 +8,19 @@ This gallery contains standalone `Go` usage examples and rendered outputs for `g
 
 ## 🎞️ Seamless 600×600 HD Looping GIF Animations (`DrawTimelapseFrames` + `ToGIF`)
 
-| Escher Circle Limit (`eschercirclelimit`) | Escher Droste Spiral (`escherdrostegallery`) | Celestial Gabor Astrolabe (`gaborwaveinterference`) | 3D Perlin Curl Silk (`analyticalcurlsilk`) |
+| Mœbius Desert Canyon (`moebiuscanyon`) | Mœbius L'Incal Sanctuary (`moebiusincal`) | Escher Circle Limit (`eschercirclelimit`) | Escher Droste Spiral (`escherdrostegallery`) |
 | :---: | :---: | :---: | :---: |
-| ![Escher Circle Limit Loop](images/eschercirclelimit_loop.gif) | ![Escher Droste Gallery Loop](images/escherdrostegallery_loop.gif) | ![Gabor Wave Interference Loop](images/gaborwaveinterference_loop.gif) | ![Analytical Curl Silk Loop](images/analyticalcurlsilk_loop.gif) |
-| **Binary Nebula Plumes (`nebulaplumes`)** | **Abyssal Kuroshio Jet (`abyssalcurrents`)** | **Solar Prominence Tondo (`solarprominence`)** | **Botanical Lotus Whorls (`botanicalwhorls`)** |
-| ![Nebula Plumes Loop](images/nebulaplumes_loop.gif) | ![Abyssal Currents Loop](images/abyssalcurrents_loop.gif) | ![Solar Prominence Loop](images/solarprominence_loop.gif) | ![Botanical Whorls Loop](images/botanicalwhorls_loop.gif) |
+| ![Moebius Canyon Loop](images/moebiuscanyon_loop.gif) | ![Moebius Incal Loop](images/moebiusincal_loop.gif) | ![Escher Circle Limit Loop](images/eschercirclelimit_loop.gif) | ![Escher Droste Gallery Loop](images/escherdrostegallery_loop.gif) |
+| **Celestial Gabor Astrolabe (`gaborwaveinterference`)** | **3D Perlin Curl Silk (`analyticalcurlsilk`)** | **Binary Nebula Plumes (`nebulaplumes`)** | **Abyssal Kuroshio Jet (`abyssalcurrents`)** |
+| ![Gabor Wave Interference Loop](images/gaborwaveinterference_loop.gif) | ![Analytical Curl Silk Loop](images/analyticalcurlsilk_loop.gif) | ![Nebula Plumes Loop](images/nebulaplumes_loop.gif) | ![Abyssal Currents Loop](images/abyssalcurrents_loop.gif) |
 | **Vortex Impasto (`vorteximpasto`)** | **Squeegee Scrape (`squeegeescrape`)** | **Hex Basalt Columns (`basaltcolumns`)** | **3D Wireframe Glacier (`wireframeterrain`)** |
 | ![Vortex Impasto Loop](images/vorteximpasto_loop.gif) | ![Squeegee Scrape Loop](images/squeegeescrape_loop.gif) | ![Basalt Columns Loop](images/basaltcolumns_loop.gif) | ![Wireframe Terrain Loop](images/wireframeterrain_loop.gif) |
 | **3D Lissajous Silk (`lissajousribbon`)** | **Karst Terraces (`marchingisolines`)** | **Jovian Vortex (`vortexfluid`)** | **Dunhuang Caisson (`dunhuangapsara`)** |
 | ![Lissajous Ribbon Loop](images/lissajousribbon_loop.gif) | ![Marching Isolines Loop](images/marchingisolines_loop.gif) | ![Vortex Fluid Loop](images/vortexfluid_loop.gif) | ![Dunhuang Caisson Loop](images/dunhuangapsara_loop.gif) |
 
 ```bash
+go run ./cmd/genart render -art moebiuscanyon         -w 600 -h 600 -frames 20 -delay 12 -out images/moebiuscanyon_loop.gif
+go run ./cmd/genart render -art moebiusincal          -w 600 -h 600 -frames 20 -delay 12 -out images/moebiusincal_loop.gif
 go run ./cmd/genart render -art eschercirclelimit     -w 600 -h 600 -frames 20 -delay 12 -out images/eschercirclelimit_loop.gif
 go run ./cmd/genart render -art escherdrostegallery   -w 600 -h 600 -seed 20262002 -frames 20 -delay 12 -out images/escherdrostegallery_loop.gif
 go run ./cmd/genart render -art escherdrostegallery   -w 600 -h 600 -seed 20262011 -frames 20 -delay 12 -out images/escherdrostewave_loop.gif
@@ -65,6 +67,11 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
 
 ## Table of Contents
 
+- [Wave 21: Jean "Mœbius" Giraud Ligne Claire Quartet — Stratified Desert Canyon, L'Incal Megastructure Sanctuary, Gardens of Edena Travertine Oasis & Starwatcher Dyson-Torus Citadel](#wave-21-jean-mœbius-giraud-ligne-claire-quartet--stratified-desert-canyon-lincal-megastructure-sanctuary-gardens-of-edena-travertine-oasis--starwatcher-dyson-torus-citadel)
+  - [Moebius Canyon](#moebius-canyon)
+  - [Moebius Incal](#moebius-incal)
+  - [Moebius Edena](#moebius-edena)
+  - [Moebius Starwatcher](#moebius-starwatcher)
 - [Wave 20: M.C. Escher Trio — Circle Limit Hyperbolic Tessellation, Print Gallery Droste Spiral & Isohedral Metamorphosis](#wave-20-mc-escher-trio--circle-limit-hyperbolic-tessellation-print-gallery-droste-spiral--isohedral-metamorphosis)
   - [Escher Circle Limit](#escher-circle-limit)
   - [Escher Droste Gallery](#escher-droste-gallery)
@@ -209,6 +216,114 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
   - [Silk Sky](#silk-sky)
   - [Circle Move](#circle-move)
   - [Random Circle](#random-circle)
+
+---
+
+## Wave 21: Jean "Mœbius" Giraud Ligne Claire Quartet — Stratified Desert Canyon, L'Incal Megastructure Sanctuary, Gardens of Edena Travertine Oasis & Starwatcher Dyson-Torus Citadel
+
+### Moebius Canyon
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20262101)
+	c.SetBackground(color.RGBA{R: 248, G: 241, B: 224, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewMoebiusCanyon(7, 18, 0.16))
+	c.ToPNG("moebiuscanyon.png")
+}
+```
+
+![Moebius Canyon](images/moebiuscanyon.png)
+
+### Moebius Incal
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20262102)
+	c.SetBackground(color.RGBA{R: 248, G: 241, B: 224, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Cyberpunk)
+	c.Draw(arts.NewMoebiusIncal(8, 3, 1.0))
+	c.ToPNG("moebiusincal.png")
+}
+```
+
+![Moebius Incal](images/moebiusincal.png)
+
+### Moebius Edena
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20262103)
+	c.SetBackground(color.RGBA{R: 248, G: 241, B: 224, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Botanical)
+	c.Draw(arts.NewMoebiusEdena(5, 16, 1.0))
+	c.ToPNG("moebiusedena.png")
+}
+```
+
+![Moebius Edena](images/moebiusedena.png)
+
+### Moebius Starwatcher
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20262104)
+	c.SetBackground(color.RGBA{R: 248, G: 241, B: 224, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Sunset)
+	c.Draw(arts.NewMoebiusStarwatcher(3, 4, -0.24))
+	c.ToPNG("moebiusstarwatcher.png")
+}
+```
+
+![Moebius Starwatcher](images/moebiusstarwatcher.png)
 
 ---
 

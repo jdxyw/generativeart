@@ -4,7 +4,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/jdxyw/generativeart)](https://goreportcard.com/report/github.com/jdxyw/generativeart)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/jdxyw/generativeart/master/LICENSE)
 
-`generativeart` is a pure-`Go` generative art engine and algorithm collection supporting **132 generative art types** across flow fields, strange attractors, 3D terrain geomorphology, biological morphogenesis, 3D SDF raymarching, complex phase portraits, differential topology, non-Euclidean geometry, quasicrystals, stained-glass mosaics, cloisonné enamel, 3D origami, and traditional printmaking.
+`generativeart` is a pure-`Go` generative art engine and algorithm collection supporting **136 generative art types** across flow fields, strange attractors, 3D terrain geomorphology, biological morphogenesis, 3D SDF raymarching, complex phase portraits, differential topology, non-Euclidean geometry, Jean "Mœbius" Giraud *Ligne Claire* sci-fi printmaking, quasicrystals, stained-glass mosaics, cloisonné enamel, 3D origami, and traditional printmaking.
 
 - 🌐 **Live Interactive Web Gallery (GitHub Pages)**: **[https://jdxyw.github.io/generativeart/](https://jdxyw.github.io/generativeart/)**
 - 🖼️ **Full Code & Image Gallery (`gallery.md`)**: **[./gallery.md](./gallery.md)**
@@ -15,25 +15,25 @@
 
 ## Featured Gallery Highlights
 
-> Browse all **132 artworks**, full `Go` source snippets, and rendered previews in **[`gallery.md`](./gallery.md)** or on the **[Interactive GitHub Pages Gallery](https://jdxyw.github.io/generativeart/)**.
+> Browse all **136 artworks**, full `Go` source snippets, and rendered previews in **[`gallery.md`](./gallery.md)** or on the **[Interactive GitHub Pages Gallery](https://jdxyw.github.io/generativeart/)**.
 
-| [Escher Circle Limit](./gallery.md#escher-circle-limit) | [Escher Droste Gallery](./gallery.md#escher-droste-gallery) | [Escher Metamorphosis](./gallery.md#escher-metamorphosis) | [Nebula Plumes](./gallery.md#nebula-plumes) |
+| [Moebius Canyon](./gallery.md#moebius-canyon) | [Moebius Incal](./gallery.md#moebius-incal) | [Moebius Edena](./gallery.md#moebius-edena) | [Moebius Starwatcher](./gallery.md#moebius-starwatcher) |
 | :---: | :---: | :---: | :---: |
+| ![Moebius Canyon](images/moebiuscanyon.png) | ![Moebius Incal](images/moebiusincal.png) | ![Moebius Edena](images/moebiusedena.png) | ![Moebius Starwatcher](images/moebiusstarwatcher.png) |
+| **[Escher Circle Limit](./gallery.md#escher-circle-limit)** | **[Escher Droste Gallery](./gallery.md#escher-droste-gallery)** | **[Escher Metamorphosis](./gallery.md#escher-metamorphosis)** | **[Nebula Plumes](./gallery.md#nebula-plumes)** |
 | ![Escher Circle Limit](images/eschercirclelimit.png) | ![Escher Droste Gallery](images/escherdrostegallery.png) | ![Escher Metamorphosis](images/eschermetamorphosis.png) | ![Nebula Plumes](images/nebulaplumes.png) |
 | **[Perlin Malachite](./gallery.md#perlin-malachite)** | **[Erosion Canyon](./gallery.md#erosion-canyon)** | **[Analytical Curl Silk](./gallery.md#analytical-curl-silk)** | **[Gabor Wave Interference](./gallery.md#gabor-wave-interference)** |
 | ![Perlin Malachite](images/perlinmalachite.png) | ![Erosion Canyon](images/erosioncanyon.png) | ![Analytical Curl Silk](images/analyticalcurlsilk.png) | ![Gabor Wave Interference](images/gaborwaveinterference.png) |
-| **[Jupiter Magnetosphere](./gallery.md#jupiter-magnetosphere)** | **[Iridescent Nacre](./gallery.md#iridescent-nacre)** | **[Schottky Kleinian](./gallery.md#schottky-kleinian)** | **[Bismuth Hopper](./gallery.md#bismuth-hopper)** |
-| ![Jupiter Magnetosphere](images/jupitermagnetosphere.png) | ![Iridescent Nacre](images/iridescentnacre.png) | ![Schottky Kleinian](images/schottkykleinian.png) | ![Bismuth Hopper](images/bismuthhopper.png) |
 
-👉 **[View All 132 Artworks & Code Examples in `gallery.md` →](./gallery.md)**
+👉 **[View All 136 Artworks & Code Examples in `gallery.md` →](./gallery.md)**
 
 ### 🎞️ Seamless 600×600 HD Looping Animations (`DrawTimelapseFrames` + `ToGIF`)
 
-| Escher Circle Limit (`eschercirclelimit`) | Escher Droste Spiral (`escherdrostegallery`) | Celestial Gabor Astrolabe (`gaborwaveinterference`) | 3D Perlin Curl Silk (`analyticalcurlsilk`) |
+| Mœbius Desert Canyon (`moebiuscanyon`) | Mœbius L'Incal Sanctuary (`moebiusincal`) | Escher Circle Limit (`eschercirclelimit`) | Escher Droste Spiral (`escherdrostegallery`) |
 | :---: | :---: | :---: | :---: |
-| ![Escher Circle Limit Loop](images/eschercirclelimit_loop.gif) | ![Escher Droste Gallery Loop](images/escherdrostegallery_loop.gif) | ![Gabor Wave Interference Loop](images/gaborwaveinterference_loop.gif) | ![Analytical Curl Silk Loop](images/analyticalcurlsilk_loop.gif) |
-| **Binary Nebula Plumes (`nebulaplumes`)** | **Abyssal Kuroshio Jet (`abyssalcurrents`)** | **Solar Prominence Tondo (`solarprominence`)** | **Botanical Lotus Whorls (`botanicalwhorls`)** |
-| ![Nebula Plumes Loop](images/nebulaplumes_loop.gif) | ![Abyssal Currents Loop](images/abyssalcurrents_loop.gif) | ![Solar Prominence Loop](images/solarprominence_loop.gif) | ![Botanical Whorls Loop](images/botanicalwhorls_loop.gif) |
+| ![Moebius Canyon Loop](images/moebiuscanyon_loop.gif) | ![Moebius Incal Loop](images/moebiusincal_loop.gif) | ![Escher Circle Limit Loop](images/eschercirclelimit_loop.gif) | ![Escher Droste Gallery Loop](images/escherdrostegallery_loop.gif) |
+| **Celestial Gabor Astrolabe (`gaborwaveinterference`)** | **3D Perlin Curl Silk (`analyticalcurlsilk`)** | **Binary Nebula Plumes (`nebulaplumes`)** | **Abyssal Kuroshio Jet (`abyssalcurrents`)** |
+| ![Gabor Wave Interference Loop](images/gaborwaveinterference_loop.gif) | ![Analytical Curl Silk Loop](images/analyticalcurlsilk_loop.gif) | ![Nebula Plumes Loop](images/nebulaplumes_loop.gif) | ![Abyssal Currents Loop](images/abyssalcurrents_loop.gif) |
 | **Vortex Impasto (`vorteximpasto`)** | **Squeegee Scrape (`squeegeescrape`)** | **Hex Basalt Columns (`basaltcolumns`)** | **3D Wireframe Glacier (`wireframeterrain`)** |
 | ![Vortex Impasto Loop](images/vorteximpasto_loop.gif) | ![Squeegee Scrape Loop](images/squeegeescrape_loop.gif) | ![Basalt Columns Loop](images/basaltcolumns_loop.gif) | ![Wireframe Terrain Loop](images/wireframeterrain_loop.gif) |
 | **3D Lissajous Silk (`lissajousribbon`)** | **Karst Terraces (`marchingisolines`)** | **Jovian Vortex (`vortexfluid`)** | **Dunhuang Caisson (`dunhuangapsara`)** |
@@ -232,9 +232,15 @@ _ = poster.ToPNG("poster_dunhuang.png")
 
 ## Supported Art Types & Constructors
 
-All 132 generators implement `generativeart.Engine` under package `github.com/jdxyw/generativeart/arts` (see [gallery.md](./gallery.md) for visual examples and [docs/doc.md](./docs/doc.md) for parameter details):
+All 136 generators implement `generativeart.Engine` under package `github.com/jdxyw/generativeart/arts` (see [gallery.md](./gallery.md) for visual examples and [docs/doc.md](./docs/doc.md) for parameter details):
 
 ```go
+// Wave 21: Jean "Mœbius" Giraud Ligne Claire Quartet (MoebiusCanyon, MoebiusIncal, MoebiusEdena, MoebiusStarwatcher)
+NewMoebiusCanyon(spires, strataLevels int, monolithTilt float64)
+NewMoebiusIncal(facets, ringLayers int, crystalScale float64)
+NewMoebiusEdena(domes, terraces int, floraScale float64)
+NewMoebiusStarwatcher(rings, sails int, orbitTilt float64)
+
 // Wave 20: M.C. Escher Trio (Circle Limit Hyperbolic Tessellation, Print Gallery Droste Spiral & Isohedral Metamorphosis)
 NewEscherCircleLimit(p, q, r int)
 NewEscherDrosteGallery(branches, archesPerRing int, scaleRatio float64)

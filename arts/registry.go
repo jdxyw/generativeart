@@ -106,6 +106,36 @@ func paramString(p map[string]interface{}, key, def string) string {
 }
 
 var registry = []ArtDescriptor{
+	// Wave 21: Jean "Mœbius" Giraud Ligne Claire Quartet (MoebiusCanyon, MoebiusIncal, MoebiusEdena, MoebiusStarwatcher)
+	{
+		ID: "moebiuscanyon", StructName: "moebiusCanyon", Category: "media",
+		DefaultBG: color.RGBA{248, 241, 224, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewMoebiusCanyon(paramInt(p, "spires", 7), paramInt(p, "strataLevels", 14), paramFloat(p, "monolithTilt", 0.22))
+		},
+	},
+	{
+		ID: "moebiusincal", StructName: "moebiusIncal", Category: "geom",
+		DefaultBG: color.RGBA{248, 241, 224, 255}, DefaultPal: "cyberpunk",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewMoebiusIncal(paramInt(p, "facets", 8), paramInt(p, "ringLayers", 3), paramFloat(p, "crystalScale", 1.0))
+		},
+	},
+	{
+		ID: "moebiusedena", StructName: "moebiusEdena", Category: "bio",
+		DefaultBG: color.RGBA{248, 241, 224, 255}, DefaultPal: "botanical",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewMoebiusEdena(paramInt(p, "domes", 5), paramInt(p, "terraces", 10), paramFloat(p, "floraScale", 1.0))
+		},
+	},
+	{
+		ID: "moebiusstarwatcher", StructName: "moebiusStarwatcher", Category: "geom",
+		DefaultBG: color.RGBA{248, 241, 224, 255}, DefaultPal: "sunset",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewMoebiusStarwatcher(paramInt(p, "rings", 3), paramInt(p, "sails", 4), paramFloat(p, "orbitTilt", -0.26))
+		},
+	},
+
 	// Wave 20: M.C. Escher Trio (Circle Limit Hyperbolic Tessellation, Print Gallery Droste Spiral & Isohedral Metamorphosis)
 	{
 		ID: "eschercirclelimit", StructName: "escherCircleLimit", Category: "geom",

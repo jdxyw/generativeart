@@ -126,6 +126,10 @@
 	- [Escher Circle Limit](#escher-circle-limit)
 	- [Escher Droste Gallery](#escher-droste-gallery)
 	- [Escher Metamorphosis](#escher-metamorphosis)
+	- [Moebius Canyon](#moebius-canyon)
+	- [Moebius Incal](#moebius-incal)
+	- [Moebius Edena](#moebius-edena)
+	- [Moebius Starwatcher](#moebius-starwatcher)
 
 ## CLI Tool (`cmd/genart`) & Exhibition Poster Reference
 
@@ -1991,6 +1995,71 @@ em := arts.NewEscherMetamorphosis(10, 10, 1.0)
 ```
 
 ![](../images/eschermetamorphosis.png)
+
+## Moebius Canyon
+
+`Moebius Canyon` renders a Jean "Mœbius" Giraud *Arzach* (1975) homage using `render.RenderMoebiusScene` and `render.EvaluateMoebiusStoneRelief`: an asymmetric petrified rock citadel with crenellated summit turrets, a diagonal flying-buttress stone bridge, domain-warped Voronoi boulder fissures, a continuous lemon-gold to vermilion-red to indigo-black gouache gradient, and a soaring white *Ptéroïde* glider.
+
+### parameters
+
+- spires: Number of craggy rock pinnacles and turret features (default `7`).
+- strataLevels: Sedimentary erosion groove density (default `18`).
+- monolithTilt: Tilt angle in radians (default `0.16`).
+
+```go
+mc := arts.NewMoebiusCanyon(7, 18, 0.16)
+```
+
+![](../images/moebiuscanyon.png)
+
+## Moebius Incal
+
+`Moebius Incal` renders an asymmetric *Panzer Dragoon* & *L'Incal* composition framed by a close-up carved ancient Mayan/Mœbius stone column and coffered temple soffit on the right, a sunlit stepped desert pyramid in the background, spirally-fluted biomechanical Nautilus airships on the left, and the luminous dual-pyramid Incal crystal with striped solar wings in the center.
+
+### parameters
+
+- facets: Polyhedral facet divisions across the Incal crystal (default `8`).
+- ringLayers: Concentric gyroscopic astrolabe rings (default `3`).
+- crystalScale: Scale multiplier for the central Incal assembly (default `1.0`).
+
+```go
+mi := arts.NewMoebiusIncal(8, 3, 1.0)
+```
+
+![](../images/moebiusincal.png)
+
+## Moebius Edena
+
+`Moebius Edena` renders a *Le Monde d'Edena* and *40 Days in the Desert B* vista featuring an asymmetric gnarled sandstone canyon overhang and natural rock arch on the left, sweeping wind-rippled desert sand dunes, a winding turquoise-jade oasis lagoon, and biomorphic alabaster sanctuary domes beneath a giant crescent planet.
+
+### parameters
+
+- domes: Number of oasis sanctuary domes (default `5`).
+- terraces: Number of terraced water cascades along the lagoon (default `16`).
+- floraScale: Scale factor for foreground/midground oasis structures (default `1.0`).
+
+```go
+me := arts.NewMoebiusEdena(5, 16, 1.0)
+```
+
+![](../images/moebiusedena.png)
+
+## Moebius Starwatcher
+
+`Moebius Starwatcher` renders a *Starwatcher* and *Chroniques Métalliques* cosmic scene with an asymmetric weathered bone-ivory and brass-ochre relic ring-citadel, fluted biomechanical carapace plates, a billowing coral-gold cosmic nebula veil, and jagged boulder-strewn desert badlands.
+
+### parameters
+
+- rings: Number of concentric relic rings (default `3`).
+- sails: Number of axial spire/strut assemblies (default `4`).
+- orbitTilt: Orbital tilt angle in radians (default `-0.24`).
+
+```go
+ms := arts.NewMoebiusStarwatcher(3, 4, -0.24)
+```
+
+![](../images/moebiusstarwatcher.png)
+
 
 
 

@@ -78,6 +78,10 @@ func TestMosaicFamilyGenerators(t *testing.T) {
 		{"EscherCircleLimit", NewEscherCircleLimit(6, 4, 2)},
 		{"EscherDrosteGallery", NewEscherDrosteGallery(1, 8, 16.0)},
 		{"EscherMetamorphosis", NewEscherMetamorphosis(8, 8, 1.0)},
+		{"MoebiusCanyon", NewMoebiusCanyon(7, 14, 0.22)},
+		{"MoebiusIncal", NewMoebiusIncal(8, 3, 1.0)},
+		{"MoebiusEdena", NewMoebiusEdena(5, 10, 1.0)},
+		{"MoebiusStarwatcher", NewMoebiusStarwatcher(3, 4, -0.26)},
 	}
 
 	for _, tc := range cases {
