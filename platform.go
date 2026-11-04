@@ -54,7 +54,8 @@ func (fa *funcAnimatedEngine) GenerativeFrame(c *Canva, frameIdx, totalFrames in
 	}
 }
 
-// DrawTimelapseFrames renders totalFrames frames of e into c.Frames().
+// DrawTimelapseFrames renders totalFrames frames of e into c.Frames() in parallel across
+// runtime.NumCPU() worker goroutines using isolated per-worker Canva clones.
 // If e implements AnimatedEngine, GenerativeFrame is invoked with phase = frameIdx / totalFrames.
 // Otherwise, each frame advances the canvas deterministic seed by +1 and invokes e.Generative(c).
 func (c *Canva) DrawTimelapseFrames(e Engine, totalFrames int) {
@@ -62,30 +63,157 @@ func (c *Canva) DrawTimelapseFrames(e Engine, totalFrames int) {
 		return
 	}
 	c.lastRecipe = captureEngineRecipe(c, e)
-	c.frames = make([]*image.RGBA, 0, totalFrames)
+	c.frames = make([]*image.RGBA, totalFrames)
 	baseSeed := c.Seed()
 	anim, isAnim := e.(AnimatedEngine)
 
-	for i := 0; i < totalFrames; i++ {
-		phase := float64(i) / float64(totalFrames)
-		c.FillBackground()
-		if isAnim {
-			c.SetSeed(baseSeed)
-			anim.GenerativeFrame(c, i, totalFrames, phase)
-		} else {
-			c.SetSeed(baseSeed + int64(i))
-			e.Generative(c)
+	if totalFrames == 1 || !isAnim {
+		// Sequential path for 1-frame renders or legacy non-AnimatedEngine generators that may touch package-level state
+		for i := 0; i < totalFrames; i++ {
+			phase := float64(i) / float64(totalFrames)
+			c.FillBackground()
+			if isAnim {
+				c.SetSeedLocal(baseSeed)
+				anim.GenerativeFrame(c, i, totalFrames, phase)
+			} else {
+				c.SetSeed(baseSeed + int64(i))
+				e.Generative(c)
+			}
+			if len(c.postEffects) > 0 {
+				c.ApplyPostEffects(c.postEffects...)
+			}
+			resolved := c.Img()
+			frameCopy := image.NewRGBA(resolved.Bounds())
+			copy(frameCopy.Pix, resolved.Pix)
+			c.frames[i] = frameCopy
 		}
-		if len(c.postEffects) > 0 {
-			c.ApplyPostEffects(c.postEffects...)
-		}
-
-		resolved := c.Img()
-		frameCopy := image.NewRGBA(resolved.Bounds())
-		copy(frameCopy.Pix, resolved.Pix)
-		c.frames = append(c.frames, frameCopy)
+		c.SetSeedLocal(baseSeed)
+		return
 	}
-	c.SetSeed(baseSeed)
+
+	// Lock-free parallel multi-core worker pool for AnimatedEngine
+	workers := runtime.NumCPU()
+	if workers < 1 {
+		workers = 1
+	}
+	if workers > totalFrames {
+		workers = totalFrames
+	}
+
+	var firstRC *render.Canvas
+	var wg sync.WaitGroup
+	for wIdx := 0; wIdx < workers; wIdx++ {
+		wg.Add(1)
+		go func(workerID int) {
+			defer wg.Done()
+			for i := workerID; i < totalFrames; i += workers {
+				phase := float64(i) / float64(totalFrames)
+				wCanva := c.CloneForWorker(baseSeed)
+				anim.GenerativeFrame(wCanva, i, totalFrames, phase)
+				if len(wCanva.postEffects) > 0 {
+					wCanva.ApplyPostEffects(wCanva.postEffects...)
+				}
+				resolved := wCanva.Img()
+				frameCopy := image.NewRGBA(resolved.Bounds())
+				copy(frameCopy.Pix, resolved.Pix)
+				c.frames[i] = frameCopy
+				if i == 0 {
+					firstRC = wCanva.LastRenderCanvas()
+				}
+			}
+		}(wIdx)
+	}
+	wg.Wait()
+
+	if len(c.frames) > 0 && c.frames[0] != nil {
+		copy(c.img.Pix, c.frames[0].Pix)
+		if firstRC != nil {
+			c.lastRenderCanvas = firstRC
+		}
+		c.hdrDirty = false
+		c.rgbaTouched = false
+	}
+	c.SetSeedLocal(baseSeed)
+}
+
+// DrawTimelapseFramesTemporalAA renders totalFrames frames of an AnimatedEngine with shutter-angle
+// temporal supersampling (motion blur). Each frame i integrates subSamples sub-frames across
+// phase in [i/totalFrames, (i + shutterFraction)/totalFrames) in 64-bit linear HDR space before
+// executing post-effects and resolving to 8-bit sRGB.
+func (c *Canva) DrawTimelapseFramesTemporalAA(e AnimatedEngine, totalFrames, subSamples int, shutterFraction float64) {
+	if c == nil || e == nil || totalFrames <= 0 {
+		return
+	}
+	if subSamples <= 1 || shutterFraction <= 0 {
+		c.DrawTimelapseFrames(e, totalFrames)
+		return
+	}
+	if shutterFraction > 1.0 {
+		shutterFraction = 1.0
+	}
+
+	c.lastRecipe = captureEngineRecipe(c, e)
+	c.frames = make([]*image.RGBA, totalFrames)
+	baseSeed := c.Seed()
+
+	workers := runtime.NumCPU()
+	if workers < 1 {
+		workers = 1
+	}
+	if workers > totalFrames {
+		workers = totalFrames
+	}
+
+	var firstRC *render.Canvas
+	var wg sync.WaitGroup
+	invSub := 1.0 / float64(subSamples)
+
+	for wIdx := 0; wIdx < workers; wIdx++ {
+		wg.Add(1)
+		go func(workerID int) {
+			defer wg.Done()
+			for i := workerID; i < totalFrames; i += workers {
+				accumRC := render.NewCanvas(c.width, c.height)
+				for s := 0; s < subSamples; s++ {
+					subOffset := (float64(s) / float64(subSamples)) * shutterFraction
+					phase := math.Mod((float64(i)+subOffset)/float64(totalFrames), 1.0)
+					subCanva := c.CloneForWorker(baseSeed)
+					e.GenerativeFrame(subCanva, i, totalFrames, phase)
+					srcRC := subCanva.NewRenderCanvas()
+					for y := 0; y < c.height; y++ {
+						for x := 0; x < c.width; x++ {
+							rL, gL, bL, aL := srcRC.PixelLinearAt(x, y)
+							ar, ag, ab, aa := accumRC.PixelLinearAt(x, y)
+							accumRC.SetPixelLinear(x, y, ar+rL*invSub, ag+gL*invSub, ab+bL*invSub, aa+aL*invSub)
+						}
+					}
+				}
+				wCanva := c.CloneForWorker(baseSeed)
+				wCanva.MergeRenderCanvas(accumRC)
+				if len(wCanva.postEffects) > 0 {
+					wCanva.ApplyPostEffects(wCanva.postEffects...)
+				}
+				resolved := wCanva.Img()
+				frameCopy := image.NewRGBA(resolved.Bounds())
+				copy(frameCopy.Pix, resolved.Pix)
+				c.frames[i] = frameCopy
+				if i == 0 {
+					firstRC = wCanva.LastRenderCanvas()
+				}
+			}
+		}(wIdx)
+	}
+	wg.Wait()
+
+	if len(c.frames) > 0 && c.frames[0] != nil {
+		copy(c.img.Pix, c.frames[0].Pix)
+		if firstRC != nil {
+			c.lastRenderCanvas = firstRC
+		}
+		c.hdrDirty = false
+		c.rgbaTouched = false
+	}
+	c.SetSeedLocal(baseSeed)
 }
 
 // Frames returns the sequence of frames recorded by DrawTimelapse / DrawTimelapseFrames.
@@ -101,6 +229,20 @@ func (c *Canva) Frames() []*image.RGBA {
 // and weighted K-Means centroid refinement, paired with an 18-bit (64x64x64 = 262,144) RGB
 // lookup table for O(1) flicker-free frame quantization.
 func buildSharedAnimationPalette(srcFrames []*image.RGBA) (color.Palette, *[262144]uint8, [][3]int) {
+	return buildSharedAnimationPaletteWithLimit(srcFrames, 31)
+}
+
+func buildSharedAnimationPaletteWithLimit(srcFrames []*image.RGBA, maxOpaque int) (color.Palette, *[262144]uint8, [][3]int) {
+	if maxOpaque <= 0 {
+		maxOpaque = 31
+	}
+	if maxOpaque < 2 {
+		maxOpaque = 2
+	}
+	if maxOpaque > 255 {
+		maxOpaque = 255
+	}
+
 	type bucket struct {
 		count            int
 		sumR, sumG, sumB int
@@ -109,10 +251,10 @@ func buildSharedAnimationPalette(srcFrames []*image.RGBA) (color.Palette, *[2621
 	}
 	var buckets [32768]bucket
 
-	// Sample up to 4 evenly-spaced frames across the animation to populate the color histogram
+	// Sample up to 8 evenly-spaced frames across the animation to populate the color histogram
 	stepFrame := 1
-	if len(srcFrames) > 4 {
-		stepFrame = len(srcFrames) / 4
+	if len(srcFrames) > 8 {
+		stepFrame = len(srcFrames) / 8
 	}
 	for fIdx := 0; fIdx < len(srcFrames); fIdx += stepFrame {
 		pix := srcFrames[fIdx].Pix
@@ -156,9 +298,8 @@ func buildSharedAnimationPalette(srcFrames []*image.RGBA) (color.Palette, *[2621
 		return active[i].weight > active[j].weight
 	})
 
-	// Multi-pass perceptual diversity seeding so all 31 opaque slots cover the full gamut without clumping
-	// (slot 31 is reserved for GIF89a inter-frame delta transparency; 32 total entries = 5-bit LZW root code size!)
-	const maxOpaque = 31
+	// Multi-pass perceptual diversity seeding so all opaque slots cover the full gamut without clumping
+	// (the final slot is reserved for GIF89a inter-frame delta transparency)
 	centers := make([][3]int, 0, maxOpaque)
 	used := make([]bool, len(active))
 	thresholds := []int{1400, 650, 260, 90, 0}
@@ -291,6 +432,12 @@ func buildSharedAnimationPalette(srcFrames []*image.RGBA) (color.Palette, *[2621
 // WriteGIF encodes the recorded timelapse frames (or the current canvas image if no
 // timelapse frames were recorded) as a flicker-free looping animated GIF to w.
 func (c *Canva) WriteGIF(w io.Writer, delayCentiseconds int) error {
+	return c.WriteGIFWithColors(w, delayCentiseconds, 31)
+}
+
+// WriteGIFWithColors encodes the recorded timelapse frames as a looping animated GIF to w
+// using up to maxOpaqueColors opaque palette entries (plus 1 transparent delta entry, in [2..255]).
+func (c *Canva) WriteGIFWithColors(w io.Writer, delayCentiseconds, maxOpaqueColors int) error {
 	if c == nil {
 		return errors.New("nil Canva")
 	}
@@ -305,7 +452,7 @@ func (c *Canva) WriteGIF(w io.Writer, delayCentiseconds int) error {
 		return errors.New("no frames available to encode")
 	}
 
-	sharedPal, lut, centers := buildSharedAnimationPalette(srcFrames)
+	sharedPal, lut, centers := buildSharedAnimationPaletteWithLimit(srcFrames, maxOpaqueColors)
 	transIdx := uint8(len(sharedPal) - 1)
 
 	outGIF := &gif.GIF{
@@ -433,11 +580,16 @@ func (c *Canva) WriteGIF(w io.Writer, delayCentiseconds int) error {
 
 // ToGIF saves the recorded timelapse frames (or current image) as an animated GIF at fpath.
 func (c *Canva) ToGIF(fpath string, delayCentiseconds int) error {
+	return c.ToGIFWithColors(fpath, delayCentiseconds, 31)
+}
+
+// ToGIFWithColors saves the recorded timelapse frames as an animated GIF at fpath with up to maxOpaqueColors.
+func (c *Canva) ToGIFWithColors(fpath string, delayCentiseconds, maxOpaqueColors int) error {
 	f, err := os.Create(fpath)
 	if err != nil {
 		return err
 	}
-	if err := c.WriteGIF(f, delayCentiseconds); err != nil {
+	if err := c.WriteGIFWithColors(f, delayCentiseconds, maxOpaqueColors); err != nil {
 		f.Close()
 		return err
 	}
@@ -518,14 +670,20 @@ func (c *Canva) ToPDF(fpath string) error {
 	return rc.SavePDF(fpath)
 }
 
-// RecipeMetadata holds the reproducible seed, dimensions, engine name, and parameters
-// embedded inside a generated PNG's tEXt chunk.
+// RecipeMetadata holds the reproducible seed, dimensions, engine name, color palette, options,
+// post-processing effects, and parameters embedded inside a generated PNG's tEXt chunk.
 type RecipeMetadata struct {
 	Engine      string                 `json:"engine"`
 	Width       int                    `json:"width"`
 	Height      int                    `json:"height"`
 	Seed        int64                  `json:"seed"`
 	Background  [4]uint8               `json:"background"`
+	Foreground  [4]uint8               `json:"foreground,omitempty"`
+	LineColor   [4]uint8               `json:"line_color,omitempty"`
+	LineWidth   float64                `json:"line_width,omitempty"`
+	NIters      int                    `json:"n_iters,omitempty"`
+	Alpha       int                    `json:"alpha,omitempty"`
+	Palette     [][4]uint8             `json:"palette,omitempty"`
 	Params      map[string]interface{} `json:"params,omitempty"`
 	PostEffects []string               `json:"post_effects,omitempty"`
 }
@@ -538,15 +696,65 @@ func (c *Canva) Recipe() *RecipeMetadata {
 	return c.lastRecipe
 }
 
+// InspectEngineParams extracts all scalar struct fields from an Engine instance via reflection.
+func InspectEngineParams(e Engine) map[string]interface{} {
+	params := make(map[string]interface{})
+	if e == nil {
+		return params
+	}
+	t := reflect.TypeOf(e)
+	v := reflect.ValueOf(e)
+	if t.Kind() == reflect.Ptr && !v.IsNil() {
+		t = t.Elem()
+		v = v.Elem()
+	}
+	if v.Kind() == reflect.Struct {
+		for i := 0; i < v.NumField(); i++ {
+			fType := t.Field(i)
+			fVal := v.Field(i)
+			switch fVal.Kind() {
+			case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+				params[fType.Name] = fVal.Int()
+			case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+				params[fType.Name] = fVal.Uint()
+			case reflect.Float32, reflect.Float64:
+				params[fType.Name] = fVal.Float()
+			case reflect.Bool:
+				params[fType.Name] = fVal.Bool()
+			case reflect.String:
+				params[fType.Name] = fVal.String()
+			}
+		}
+	}
+	return params
+}
+
 func captureEngineRecipe(c *Canva, e Engine) *RecipeMetadata {
-	bg := c.Opts().Background()
+	opts := c.Opts()
+	bg := opts.Background()
+	fg := opts.Foreground()
+	lc := opts.LineColor()
+	schema := opts.ColorSchema()
+	var palStops [][4]uint8
+	if len(schema) > 0 {
+		palStops = make([][4]uint8, len(schema))
+		for i, col := range schema {
+			palStops[i] = [4]uint8{col.R, col.G, col.B, col.A}
+		}
+	}
 	meta := &RecipeMetadata{
 		Engine:     "Custom",
 		Width:      c.Width(),
 		Height:     c.Height(),
 		Seed:       c.Seed(),
 		Background: [4]uint8{bg.R, bg.G, bg.B, bg.A},
-		Params:     make(map[string]interface{}),
+		Foreground: [4]uint8{fg.R, fg.G, fg.B, fg.A},
+		LineColor:  [4]uint8{lc.R, lc.G, lc.B, lc.A},
+		LineWidth:  opts.LineWidth(),
+		NIters:     opts.NIters(),
+		Alpha:      opts.Alpha(),
+		Palette:    palStops,
+		Params:     InspectEngineParams(e),
 	}
 	if len(c.postEffects) > 0 {
 		for _, eff := range c.postEffects {
@@ -563,7 +771,6 @@ func captureEngineRecipe(c *Canva, e Engine) *RecipeMetadata {
 	v := reflect.ValueOf(e)
 	if t.Kind() == reflect.Ptr && !v.IsNil() {
 		t = t.Elem()
-		v = v.Elem()
 	}
 	name := t.Name()
 	if idx := strings.LastIndex(name, "."); idx >= 0 {
@@ -571,25 +778,6 @@ func captureEngineRecipe(c *Canva, e Engine) *RecipeMetadata {
 	}
 	if name != "" {
 		meta.Engine = name
-	}
-
-	if v.Kind() == reflect.Struct {
-		for i := 0; i < v.NumField(); i++ {
-			fType := t.Field(i)
-			fVal := v.Field(i)
-			switch fVal.Kind() {
-			case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-				meta.Params[fType.Name] = fVal.Int()
-			case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-				meta.Params[fType.Name] = fVal.Uint()
-			case reflect.Float32, reflect.Float64:
-				meta.Params[fType.Name] = fVal.Float()
-			case reflect.Bool:
-				meta.Params[fType.Name] = fVal.Bool()
-			case reflect.String:
-				meta.Params[fType.Name] = fVal.String()
-			}
-		}
 	}
 	return meta
 }

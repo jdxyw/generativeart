@@ -210,4 +210,111 @@ func TestCanvaPostEffectPipelineAndRecipe(t *testing.T) {
 	}
 }
 
+func TestFullRecipeReplayAndDynamicParamIntrospection(t *testing.T) {
+	tmpDir := t.TempDir()
+	pngPath := filepath.Join(tmpDir, "full_recipe.png")
+
+	// 1. Render with custom non-default palette (Cyberpunk instead of Dunhuang), custom options, and post-effects
+	c := generativeart.NewCanva(96, 96)
+	c.SetSeed(20261104)
+	c.SetBackground(color.RGBA{R: 14, G: 18, B: 30, A: 255})
+	c.SetForeground(color.RGBA{R: 250, G: 210, B: 120, A: 255})
+	c.SetLineColor(color.RGBA{R: 80, G: 220, B: 255, A: 255})
+	c.SetLineWidth(2.75)
+	c.SetIterations(42)
+	c.SetAlpha(210)
+	c.SetColorSchema(common.Cyberpunk)
+	c.FillBackground()
+	c.AddPostEffect(
+		render.BloomEffect(0.62, 6.0, 0.35),
+		render.VignetteEffect(0.25),
+	)
+	c.Draw(arts.NewCloisonneEnamel(5, 10))
+	if err := c.ToPNG(pngPath); err != nil {
+		t.Fatalf("ToPNG failed: %v", err)
+	}
+
+	// 2. ReplayPNG and verify exact palette, options, and post-effects are restored
+	replayed, meta, err := arts.ReplayPNG(pngPath, 96, 96)
+	if err != nil {
+		t.Fatalf("ReplayPNG failed: %v", err)
+	}
+	if len(meta.Palette) != len(common.Cyberpunk) {
+		t.Fatalf("expected %d palette stops in recipe metadata, got %d", len(common.Cyberpunk), len(meta.Palette))
+	}
+	if replayed.Opts().LineWidth() != 2.75 || replayed.Opts().NIters() != 42 || replayed.Opts().Alpha() != 210 {
+		t.Fatalf("expected LineWidth=2.75, NIters=42, Alpha=210 restored on replay, got %+v", replayed.Opts())
+	}
+	if len(replayed.PostEffects()) != 2 {
+		t.Fatalf("expected 2 post-effects restored on replay, got %d", len(replayed.PostEffects()))
+	}
+
+	// 3. Test ParamSpecs, ParseParamOverrides, and ResolveParams
+	desc, ok := arts.Lookup("babellibrary")
+	if !ok {
+		t.Fatalf("expected babellibrary in registry")
+	}
+	specs := desc.ParamSpecs()
+	if len(specs) != 3 || specs[0].Name != "galleries" || specs[1].Name != "tiers" || specs[2].Name != "shaftScale" {
+		t.Fatalf("unexpected ParamSpecs for babellibrary: %+v", specs)
+	}
+	if !desc.SupportsAnimation() {
+		t.Fatalf("expected babellibrary to support animation")
+	}
+
+	overrides, err := arts.ParseParamOverrides("galleries=8,tiers=6,shaftscale=1.25")
+	if err != nil {
+		t.Fatalf("ParseParamOverrides failed: %v", err)
+	}
+	resolved, err := desc.ResolveParams(overrides)
+	if err != nil {
+		t.Fatalf("ResolveParams failed: %v", err)
+	}
+	eng := desc.Build(resolved)
+	inspected := generativeart.InspectEngineParams(eng)
+	if inspected["galleries"] != int64(8) || inspected["tiers"] != int64(6) || math.Abs(inspected["shaftScale"].(float64)-1.25) > 1e-6 {
+		t.Fatalf("unexpected built engine params after override: %+v", inspected)
+	}
+
+	// Unknown parameter key must return a descriptive error
+	if _, err := desc.ResolveParams(map[string]interface{}{"nonExistentParam": 123}); err == nil {
+		t.Fatalf("expected error for unknown parameter key")
+	}
+}
+
+func TestParallelTimelapseAndTemporalAA(t *testing.T) {
+	c := generativeart.NewCanva(80, 80)
+	c.SetSeed(9001)
+	c.SetBackground(color.RGBA{R: 10, G: 12, B: 20, A: 255})
+
+	anim := generativeart.NewAnimatedEngine(func(cv *generativeart.Canva, frameIdx, totalFrames int, phase float64) {
+		rc := cv.NewRenderCanvas()
+		angle := phase * 2.0 * math.Pi
+		cx := 40.0 + 20.0*math.Cos(angle)
+		cy := 40.0 + 20.0*math.Sin(angle)
+		rc.FillPolygon([]render.Point{
+			render.Pt(cx-8, cy-8),
+			render.Pt(cx+8, cy-8),
+			render.Pt(cx+8, cy+8),
+			render.Pt(cx-8, cy+8),
+		}, color.RGBA{R: 250, G: 190, B: 70, A: 255}, 1.0)
+		cv.MergeRenderCanvas(rc)
+	})
+
+	c.DrawTimelapseFramesTemporalAA(anim, 6, 3, 0.5)
+	if len(c.Frames()) != 6 {
+		t.Fatalf("expected 6 temporal-AA frames, got %d", len(c.Frames()))
+	}
+
+	var gifBuf bytes.Buffer
+	if err := c.WriteGIFWithColors(&gifBuf, 8, 64); err != nil {
+		t.Fatalf("WriteGIFWithColors failed: %v", err)
+	}
+	decoded, err := gif.DecodeAll(&gifBuf)
+	if err != nil || len(decoded.Image) != 6 {
+		t.Fatalf("expected 6 decoded GIF frames, err=%v", err)
+	}
+}
+
+
 

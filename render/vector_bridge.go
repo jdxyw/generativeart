@@ -377,6 +377,69 @@ func (c *Canvas) VectorOpCount() int {
 	return len(c.vecOps)
 }
 
+// CompositeSubCanvasVectors translates and appends all recorded vector operations (including
+// background fill) from sub into c at pixel offset (offsetX, offsetY), clipping any out-of-bounds
+// paths to sub's [0, Width] x [0, Height] aperture. This enables multi-panel exhibition posters
+// and contact sheets to retain 100% infinite-resolution vector paths when exported to SVG or PDF.
+func (c *Canvas) CompositeSubCanvasVectors(sub *Canvas, offsetX, offsetY float64) {
+	if c == nil || sub == nil || !c.recordVector {
+		return
+	}
+	fw, fh := float64(sub.Width), float64(sub.Height)
+	if fw <= 0 || fh <= 0 {
+		return
+	}
+	tr := canvas.Identity.Translate(offsetX, offsetY)
+	if sub.hasBg {
+		bgPath := &canvas.Path{}
+		bgPath.MoveTo(offsetX, offsetY)
+		bgPath.LineTo(offsetX+fw, offsetY)
+		bgPath.LineTo(offsetX+fw, offsetY+fh)
+		bgPath.LineTo(offsetX, offsetY+fh)
+		bgPath.Close()
+		c.vecOps = append(c.vecOps, vectorOp{
+			path:  bgPath,
+			col:   sub.bgCol,
+			alpha: 1.0,
+		})
+	}
+	clipStack := [][][]Point{{{Pt(0, 0), Pt(fw, 0), Pt(fw, fh), Pt(0, fh)}}}
+	for _, op := range sub.vecOps {
+		if op.path == nil || op.path.Empty() {
+			continue
+		}
+		p := op.path
+		fb := p.FastBounds()
+		if fb.X1 < 0 || fb.Y1 < 0 || fb.X0 > fw || fb.Y0 > fh {
+			continue
+		}
+		if fb.X0 < 0 || fb.Y0 < 0 || fb.X1 > fw || fb.Y1 > fh {
+			p = clipFilledPathAgainstPolyStack(p, clipStack)
+			if p == nil || p.Empty() {
+				continue
+			}
+		}
+		var cl *canvas.Path
+		if op.centerline != nil && !op.centerline.Empty() {
+			cPath := op.centerline
+			cfb := cPath.FastBounds()
+			if cfb.X0 < 0 || cfb.Y0 < 0 || cfb.X1 > fw || cfb.Y1 > fh {
+				cPath = clipOpenPathAgainstPolyStack(cPath, clipStack)
+			}
+			if cPath != nil && !cPath.Empty() {
+				cl = cPath.Transform(tr)
+			}
+		}
+		c.vecOps = append(c.vecOps, vectorOp{
+			path:       p.Transform(tr),
+			centerline: cl,
+			strokeW:    op.strokeW,
+			col:        op.col,
+			alpha:      op.alpha,
+		})
+	}
+}
+
 // RasterizePath takes a tdewolff/canvas Path (in pixel coordinates), converts its segments
 // (MoveTo, LineTo, QuadTo, CubeTo, ArcTo, Close) to golang.org/x/image/vector.Rasterizer,
 // and composites the anti-aliased alpha coverage mask directly into the HDR linear-RGB Canvas

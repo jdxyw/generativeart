@@ -25,7 +25,9 @@ func main() {
 
 	switch os.Args[1] {
 	case "list":
-		runList()
+		runList(os.Args[2:])
+	case "info", "describe":
+		runInfo(os.Args[2:])
 	case "render":
 		runRender(os.Args[2:])
 	case "poster":
@@ -42,11 +44,12 @@ func main() {
 
 func printUsage() {
 	fmt.Println("Usage:")
-	fmt.Println("  genart list")
-	fmt.Println("  genart render -art <name> [-palette <name>] [-w 600] [-h 600] [-seed 20261021] [-frames 1] [-bloom 0.35] [-chromatic 0.8] [-relief 0.6] [-kuwahara 3] [-paper 0.3] [-vignette 0.25] [-deckle 0.04] [-tonemap 1.1] -out <file.(png|svg|pdf|gif|jpg)>")
-	fmt.Println("  genart poster [-art <name> | -arts <a,b,c,d>] [-grid 2x2] [-panel 420] [-theme light|dark] [-title \"...\"] -out <file.(png|svg|pdf|jpg)>")
+	fmt.Println("  genart list [-v]")
+	fmt.Println("  genart info <art>")
+	fmt.Println("  genart render -art <name> [-set k1=v1,k2=v2] [-palette <name>] [-w 600] [-h 600] [-seed 20261021] [-frames 1] [-delay 8] [-shutter 0] [-subsamples 1] [-bloom 0.35] [-chromatic 0.8] [-relief 0.6] [-kuwahara 3] [-paper 0.3] [-vignette 0.25] [-deckle 0.04] [-tonemap 1.1] -out <file.(png|svg|pdf|gif|jpg)>")
+	fmt.Println("  genart poster [-art <name> | -arts <a,b,c,d>] [-set k1=v1,k2=v2] [-sweep-x name:min:max] [-sweep-y name:min:max] [-grid 2x2] [-panel 420] [-frames 1] [-delay 8] [-theme light|dark] [-title \"...\"] -out <file.(png|svg|pdf|gif|jpg)>")
 	fmt.Println("  genart inspect <file.png>")
-	fmt.Println("  genart replay <input.png> [-w 2400] [-h 2400] [-bloom ...] [-relief ...] -out <file.(png|svg|pdf|jpg)>")
+	fmt.Println("  genart replay <input.png> [-w 2400] [-h 2400] [-set k1=v1,k2=v2] [-palette <name>] [-seed 0] [-frames 1] [-delay 8] [-bloom ...] [-relief ...] -out <file.(png|svg|pdf|gif|jpg)>")
 }
 
 type postFlags struct {
@@ -121,16 +124,65 @@ func (pf postFlags) buildEffects(seed int64) []render.PostEffect {
 	return effects
 }
 
-func runList() {
+func runList(args []string) {
+	fs := flag.NewFlagSet("list", flag.ExitOnError)
+	verbose := fs.Bool("v", false, "Show tunable parameters and animation support for each art generator")
+	_ = fs.Parse(args)
+
 	descs := arts.ListDescriptors()
 	sort.Slice(descs, func(i, j int) bool { return descs[i].ID < descs[j].ID })
 	fmt.Printf("Available Art Generators (%d):\n", len(descs))
 	for _, d := range descs {
-		fmt.Printf("  - %-20s [%-6s] (default palette: %s)\n", d.ID, d.Category, d.DefaultPal)
+		if !*verbose {
+			fmt.Printf("  - %-22s [%-6s] (default palette: %s)\n", d.ID, d.Category, d.DefaultPal)
+			continue
+		}
+		animTag := "static"
+		if d.SupportsAnimation() {
+			animTag = "animated"
+		}
+		var pList []string
+		for _, sp := range d.ParamSpecs() {
+			pList = append(pList, fmt.Sprintf("%s:%s=%v", sp.Name, sp.Type, sp.Default))
+		}
+		fmt.Printf("  - %-22s [%-6s | %-8s] (palette: %-11s) params: {%s}\n",
+			d.ID, d.Category, animTag, d.DefaultPal, strings.Join(pList, ", "))
 	}
 
 	pNames := arts.PaletteNames()
 	fmt.Printf("\nAvailable Palettes (%d): %s\n", len(pNames), strings.Join(pNames, ", "))
+}
+
+func runInfo(args []string) {
+	if len(args) < 1 {
+		fmt.Fprintln(os.Stderr, "usage: genart info <art>")
+		os.Exit(1)
+	}
+	desc, ok := arts.Lookup(args[0])
+	if !ok {
+		fmt.Fprintf(os.Stderr, "unknown art generator %q (run 'genart list' to see supported generators)\n", args[0])
+		os.Exit(1)
+	}
+	specs := desc.ParamSpecs()
+	infoObj := struct {
+		ID                string           `json:"id"`
+		StructName        string           `json:"struct_name"`
+		Category          string           `json:"category"`
+		DefaultPalette    string           `json:"default_palette"`
+		DefaultBackground [4]uint8         `json:"default_background"`
+		SupportsAnimation bool             `json:"supports_animation"`
+		Parameters        []arts.ParamSpec `json:"parameters"`
+	}{
+		ID:                desc.ID,
+		StructName:        desc.StructName,
+		Category:          desc.Category,
+		DefaultPalette:    desc.DefaultPal,
+		DefaultBackground: [4]uint8{desc.DefaultBG.R, desc.DefaultBG.G, desc.DefaultBG.B, desc.DefaultBG.A},
+		SupportsAnimation: desc.SupportsAnimation(),
+		Parameters:        specs,
+	}
+	pretty, _ := json.MarshalIndent(infoObj, "", "  ")
+	fmt.Println(string(pretty))
 }
 
 func saveCanvaByExt(c *generativeart.Canva, eng generativeart.Engine, frames, delay int, outPath string, alreadyDrawn bool) error {
@@ -171,12 +223,16 @@ func saveCanvaByExt(c *generativeart.Canva, eng generativeart.Engine, frames, de
 func runRender(args []string) {
 	fs := flag.NewFlagSet("render", flag.ExitOnError)
 	artName := fs.String("art", "mosaicsun", "Art generator name")
+	setExpr := fs.String("set", "", "Override engine parameters (e.g. 'galleries=8,tiers=6,shaftScale=1.25' or JSON)")
 	palName := fs.String("palette", "", "Color palette name (optional override)")
 	w := fs.Int("w", 600, "Canvas width in pixels")
 	h := fs.Int("h", 600, "Canvas height in pixels")
 	seed := fs.Int64("seed", 20261021, "Deterministic random seed")
 	frames := fs.Int("frames", 1, "Number of frames (for .gif timelapse)")
 	delay := fs.Int("delay", 8, "Frame delay in centiseconds (for .gif)")
+	shutter := fs.Float64("shutter", 0, "Shutter-angle fraction in [0, 1] for temporal motion blur in .gif animations")
+	subsamples := fs.Int("subsamples", 1, "Number of temporal sub-samples per frame for motion blur (e.g. 4)")
+	colors := fs.Int("colors", 31, "Maximum opaque colors in shared GIF palette (2..255, default 31)")
 	out := fs.String("out", "output.png", "Output file path (.png, .svg, .pdf, .gif, .jpg)")
 	pf := registerPostFlags(fs)
 	_ = fs.Parse(args)
@@ -185,6 +241,21 @@ func runRender(args []string) {
 	if !ok {
 		fmt.Fprintf(os.Stderr, "unknown art generator %q (run 'genart list' to see supported generators)\n", *artName)
 		os.Exit(1)
+	}
+
+	var params map[string]interface{}
+	if strings.TrimSpace(*setExpr) != "" {
+		rawOverrides, err := arts.ParseParamOverrides(*setExpr)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "invalid -set expression: %v\n", err)
+			os.Exit(1)
+		}
+		resolved, err := desc.ResolveParams(rawOverrides)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "%v\n", err)
+			os.Exit(1)
+		}
+		params = resolved
 	}
 
 	c := generativeart.NewCanva(*w, *h)
@@ -203,7 +274,7 @@ func runRender(args []string) {
 		c.AddPostEffect(effects...)
 	}
 
-	eng := desc.Build(nil)
+	eng := desc.Build(params)
 	if strings.EqualFold(filepath.Ext(*out), ".svg") && ((pf.plotter != nil && *pf.plotter) || (pf.pens != nil && *pf.pens > 0)) {
 		c.Draw(eng)
 		pcfg := render.DefaultPlotterConfig()
@@ -217,6 +288,23 @@ func runRender(args []string) {
 		}
 		fmt.Printf("Rendered Pen-Plotter SVG %s (%dx%d, layers=%d, paths=%d, pen-up: %.0fpx -> %.0fpx [-%.1f%%]) -> %s\n",
 			desc.ID, *w, *h, stats.LayerCount, stats.TotalPaths, stats.PenUpBeforePx, stats.PenUpAfterPx, stats.TravelReductionPct, *out)
+		return
+	}
+	if strings.EqualFold(filepath.Ext(*out), ".gif") {
+		nFrames := *frames
+		if nFrames < 2 {
+			nFrames = 8
+		}
+		if anim, isAnim := eng.(generativeart.AnimatedEngine); isAnim && *subsamples > 1 && *shutter > 0 {
+			c.DrawTimelapseFramesTemporalAA(anim, nFrames, *subsamples, *shutter)
+		} else {
+			c.DrawTimelapseFrames(eng, nFrames)
+		}
+		if err := c.ToGIFWithColors(*out, *delay, *colors); err != nil {
+			fmt.Fprintf(os.Stderr, "gif encode failed: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Printf("Rendered %s (%dx%d, frames=%d, seed=%d) -> %s\n", desc.ID, *w, *h, nFrames, *seed, *out)
 		return
 	}
 	if err := saveCanvaByExt(c, eng, *frames, *delay, *out, false); err != nil {
@@ -244,7 +332,12 @@ func runReplay(args []string) {
 	fs := flag.NewFlagSet("replay", flag.ExitOnError)
 	w := fs.Int("w", 0, "Override width in pixels (0 keeps original width)")
 	h := fs.Int("h", 0, "Override height in pixels (0 keeps original height)")
-	out := fs.String("out", "replayed.png", "Output file path (.png, .svg, .pdf, .jpg)")
+	setExpr := fs.String("set", "", "Override recipe parameters (e.g. 'galleries=8,shaftScale=1.2')")
+	palName := fs.String("palette", "", "Override color palette name")
+	seedOverride := fs.Int64("seed", 0, "Override random seed (0 keeps original recipe seed)")
+	frames := fs.Int("frames", 1, "Number of frames (for replaying a recipe as a .gif animation)")
+	delay := fs.Int("delay", 8, "Frame delay in centiseconds (for .gif)")
+	out := fs.String("out", "replayed.png", "Output file path (.png, .svg, .pdf, .gif, .jpg)")
 	pf := registerPostFlags(fs)
 	// Allow input file before or after flags
 	var inputPath string
@@ -261,19 +354,42 @@ func runReplay(args []string) {
 		inputPath = fs.Arg(0)
 	}
 	if inputPath == "" {
-		fmt.Fprintln(os.Stderr, "usage: genart replay <input.png> [-w 2400] [-h 2400] -out <output.(png|svg|pdf|jpg)>")
+		fmt.Fprintln(os.Stderr, "usage: genart replay <input.png> [-w 2400] [-h 2400] [-set k=v] [-frames 20] -out <output.(png|svg|pdf|gif|jpg)>")
 		os.Exit(1)
 	}
 
-	c, meta, err := arts.ReplayPNG(inputPath, *w, *h)
+	meta, err := generativeart.ReadPNGRecipe(inputPath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "replay failed to read PNG recipe: %v\n", err)
+		os.Exit(1)
+	}
+	var overrides map[string]interface{}
+	if strings.TrimSpace(*setExpr) != "" {
+		overrides, err = arts.ParseParamOverrides(*setExpr)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "invalid -set expression: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	c, eng, err := arts.PrepareReplayCanva(meta, *w, *h, overrides)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "replay failed: %v\n", err)
 		os.Exit(1)
 	}
-	if effects := pf.buildEffects(meta.Seed); len(effects) > 0 {
-		c.ApplyPostEffects(effects...)
+	if *seedOverride != 0 {
+		c.SetSeed(*seedOverride)
 	}
+	if *palName != "" {
+		if schema, exists := arts.PaletteByName(*palName); exists {
+			c.SetColorSchema(schema)
+		}
+	}
+	if effects := pf.buildEffects(c.Seed()); len(effects) > 0 {
+		c.AddPostEffect(effects...)
+	}
+
 	if strings.EqualFold(filepath.Ext(*out), ".svg") && ((pf.plotter != nil && *pf.plotter) || (pf.pens != nil && *pf.pens > 0)) {
+		c.Draw(eng)
 		pcfg := render.DefaultPlotterConfig()
 		if pf.pens != nil && *pf.pens > 0 {
 			pcfg.MaxPens = *pf.pens
@@ -287,11 +403,11 @@ func runReplay(args []string) {
 			meta.Engine, stats.LayerCount, stats.TotalPaths, stats.PenUpBeforePx, stats.PenUpAfterPx, stats.TravelReductionPct, *out)
 		return
 	}
-	if err := saveCanvaByExt(c, nil, 1, 8, *out, true); err != nil {
+	if err := saveCanvaByExt(c, eng, *frames, *delay, *out, false); err != nil {
 		fmt.Fprintf(os.Stderr, "save failed: %v\n", err)
 		os.Exit(1)
 	}
-	fmt.Printf("Replayed %s (seed=%d) at %dx%d -> %s\n", meta.Engine, meta.Seed, c.Width(), c.Height(), *out)
+	fmt.Printf("Replayed %s (seed=%d) at %dx%d -> %s\n", meta.Engine, c.Seed(), c.Width(), c.Height(), *out)
 }
 
 func parseGridDim(gridStr string) (int, int) {
@@ -306,18 +422,66 @@ func parseGridDim(gridStr string) (int, int) {
 	return 2, 2
 }
 
+func parseSweepAxis(expr string, desc arts.ArtDescriptor) (generativeart.ParameterSweepAxis, error) {
+	s := strings.TrimSpace(expr)
+	if s == "" {
+		return generativeart.ParameterSweepAxis{}, nil
+	}
+	parts := strings.Split(s, ":")
+	if len(parts) != 3 {
+		return generativeart.ParameterSweepAxis{}, fmt.Errorf("expected sweep axis format 'paramName:min:max', got %q", expr)
+	}
+	rawName := strings.TrimSpace(parts[0])
+	minV, err1 := strconv.ParseFloat(strings.TrimSpace(parts[1]), 64)
+	maxV, err2 := strconv.ParseFloat(strings.TrimSpace(parts[2]), 64)
+	if err1 != nil || err2 != nil {
+		return generativeart.ParameterSweepAxis{}, fmt.Errorf("invalid numeric range in sweep axis %q", expr)
+	}
+	specs := desc.ParamSpecs()
+	canonName := rawName
+	isInt := false
+	found := false
+	for _, sp := range specs {
+		if strings.EqualFold(sp.Name, rawName) {
+			canonName = sp.Name
+			isInt = (sp.Type == "int" || sp.Type == "uint")
+			found = true
+			break
+		}
+	}
+	if !found && len(specs) > 0 {
+		var valid []string
+		for _, sp := range specs {
+			valid = append(valid, sp.Name)
+		}
+		return generativeart.ParameterSweepAxis{}, fmt.Errorf("unknown parameter %q for %s (valid: %s)", rawName, desc.ID, strings.Join(valid, ", "))
+	}
+	return generativeart.ParameterSweepAxis{
+		Name:  canonName,
+		Min:   minV,
+		Max:   maxV,
+		IsInt: isInt,
+	}, nil
+}
+
 func runPoster(args []string) {
 	fs := flag.NewFlagSet("poster", flag.ExitOnError)
-	artName := fs.String("art", "dunhuangapsara", "Single art generator name for multi-seed variation contact sheet")
+	artName := fs.String("art", "dunhuangapsara", "Single art generator name for variation or parameter-sweep contact sheet")
 	artsList := fs.String("arts", "", "Comma-separated list of art generator names for curated multi-engine poster")
+	setExpr := fs.String("set", "", "Override base engine parameters (e.g. 'galleries=8,tiers=6')")
+	sweepX := fs.String("sweep-x", "", "Sweep parameter across columns: 'paramName:min:max' (e.g. 'ribs:12:36')")
+	sweepY := fs.String("sweep-y", "", "Sweep parameter across rows: 'paramName:min:max' (e.g. 'ringTilt:0.15:0.55')")
 	palName := fs.String("palette", "", "Optional palette override")
 	gridStr := fs.String("grid", "2x2", "Grid layout RowsxCols (e.g. 1x1, 2x2, 3x3)")
 	panelSize := fs.Int("panel", 420, "Width/Height in pixels of each artwork panel")
+	frames := fs.Int("frames", 1, "Number of animation frames (when >1 or .gif output, renders an animated exhibition poster)")
+	delay := fs.Int("delay", 8, "Frame delay in centiseconds (for .gif poster)")
 	theme := fs.String("theme", "light", "Poster mat theme: 'light' (Museum Ivory Parchment) or 'dark' (Obsidian Gallery Gold)")
 	title := fs.String("title", "", "Custom poster main title")
 	subtitle := fs.String("subtitle", "", "Custom poster subtitle")
 	seed := fs.Int64("seed", 20261022, "Base deterministic random seed")
-	out := fs.String("out", "poster.png", "Output file path (.png, .svg, .pdf, .jpg)")
+	out := fs.String("out", "poster.png", "Output file path (.png, .svg, .pdf, .gif, .jpg)")
+	pf := registerPostFlags(fs)
 	_ = fs.Parse(args)
 
 	rows, cols := parseGridDim(*gridStr)
@@ -327,6 +491,23 @@ func runPoster(args []string) {
 	cfg.PanelSize = *panelSize
 	cfg.SeedBase = *seed
 	cfg.DarkTheme = strings.EqualFold(strings.TrimSpace(*theme), "dark")
+	cfg.PostEffects = pf.buildEffects(*seed)
+
+	isGIF := strings.EqualFold(filepath.Ext(*out), ".gif")
+	nFrames := *frames
+	if isGIF && nFrames < 2 {
+		nFrames = 8
+	}
+
+	var rawOverrides map[string]interface{}
+	if strings.TrimSpace(*setExpr) != "" {
+		var err error
+		rawOverrides, err = arts.ParseParamOverrides(*setExpr)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "invalid -set expression: %v\n", err)
+			os.Exit(1)
+		}
+	}
 
 	var posterCanva *generativeart.Canva
 
@@ -352,7 +533,7 @@ func runPoster(args []string) {
 			}
 			pSeed := *seed + int64(i)*137
 			panels[i] = generativeart.PosterPanelSpec{
-				Engine:     desc.Build(nil),
+				Engine:     desc.Build(rawOverrides),
 				Caption:    fmt.Sprintf("PLATE %02d  ·  %s  ·  SEED %d", i+1, strings.ToUpper(desc.ID), pSeed),
 				Seed:       pSeed,
 				Background: desc.DefaultBG,
@@ -371,13 +552,29 @@ func runPoster(args []string) {
 			cfg.Subtitle = strings.Join(upperNames, "  ·  ")
 		}
 		cfg.RecipeLabel = fmt.Sprintf("CURATED %dx%d EXHIBITION SHEET  ·  64-BIT LINEAR HDR  ·  BASE SEED %d", rows, cols, *seed)
-		posterCanva = generativeart.RenderGalleryPoster(panels, cfg)
+		if nFrames > 1 {
+			posterCanva = generativeart.RenderAnimatedGalleryPoster(panels, cfg, nFrames)
+		} else {
+			posterCanva = generativeart.RenderGalleryPoster(panels, cfg)
+		}
 	} else {
 		desc, ok := arts.Lookup(*artName)
 		if !ok {
 			fmt.Fprintf(os.Stderr, "unknown art generator %q\n", *artName)
 			os.Exit(1)
 		}
+		var baseParams map[string]interface{}
+		if len(rawOverrides) > 0 {
+			var err error
+			baseParams, err = desc.ResolveParams(rawOverrides)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "%v\n", err)
+				os.Exit(1)
+			}
+		} else {
+			baseParams = desc.DefaultParams()
+		}
+
 		chosenPalName := desc.DefaultPal
 		if *palName != "" {
 			chosenPalName = *palName
@@ -388,20 +585,47 @@ func runPoster(args []string) {
 		cfg.Background = desc.DefaultBG
 		if *title != "" {
 			cfg.Title = *title
-		} else {
-			cfg.Title = strings.ToUpper(desc.ID) + "  ·  VARIATION STUDY"
 		}
 		if *subtitle != "" {
 			cfg.Subtitle = *subtitle
-		} else {
-			cfg.Subtitle = fmt.Sprintf("CATEGORY: %s  ·  PALETTE: %s  ·  64-BIT LINEAR HDR", strings.ToUpper(desc.Category), strings.ToUpper(chosenPalName))
 		}
-		cfg.RecipeLabel = fmt.Sprintf("ENGINE: arts.New%s  ·  GRID: %dx%d  ·  PANEL: %dx%d  ·  SEED: %d",
-			strings.Title(desc.ID), rows, cols, *panelSize, *panelSize, *seed)
-		posterCanva = generativeart.RenderPoster(desc.Build(nil), cfg)
+
+		if strings.TrimSpace(*sweepX) != "" || strings.TrimSpace(*sweepY) != "" {
+			axX, err := parseSweepAxis(*sweepX, desc)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "invalid -sweep-x: %v\n", err)
+				os.Exit(1)
+			}
+			axY, err := parseSweepAxis(*sweepY, desc)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "invalid -sweep-y: %v\n", err)
+				os.Exit(1)
+			}
+			posterCanva = generativeart.RenderParameterSweepPoster(generativeart.ParameterSweepConfig{
+				EngineName: desc.ID,
+				Build:      desc.Build,
+				BaseParams: baseParams,
+				AxisX:      axX,
+				AxisY:      axY,
+			}, cfg)
+		} else {
+			if cfg.Title == "" {
+				cfg.Title = strings.ToUpper(desc.ID) + "  ·  VARIATION STUDY"
+			}
+			if cfg.Subtitle == "" {
+				cfg.Subtitle = fmt.Sprintf("CATEGORY: %s  ·  PALETTE: %s  ·  64-BIT LINEAR HDR", strings.ToUpper(desc.Category), strings.ToUpper(chosenPalName))
+			}
+			cfg.RecipeLabel = fmt.Sprintf("ENGINE: arts.New%s  ·  GRID: %dx%d  ·  PANEL: %dx%d  ·  SEED: %d",
+				strings.Title(desc.ID), rows, cols, *panelSize, *panelSize, *seed)
+			if nFrames > 1 {
+				posterCanva = generativeart.RenderAnimatedPoster(desc.Build(baseParams), cfg, nFrames)
+			} else {
+				posterCanva = generativeart.RenderPoster(desc.Build(baseParams), cfg)
+			}
+		}
 	}
 
-	if err := saveCanvaByExt(posterCanva, nil, 1, 8, *out, true); err != nil {
+	if err := saveCanvaByExt(posterCanva, nil, nFrames, *delay, *out, true); err != nil {
 		fmt.Fprintf(os.Stderr, "poster save failed: %v\n", err)
 		os.Exit(1)
 	}

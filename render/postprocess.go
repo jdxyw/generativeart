@@ -5,6 +5,8 @@ import (
 	"image/color"
 	"math"
 	"math/rand"
+	"strconv"
+	"strings"
 
 	"github.com/jdxyw/generativeart/common"
 )
@@ -122,6 +124,79 @@ func DeckleBorderEffect(marginFrac, roughness float64, matCol color.RGBA, seed i
 		fmt.Sprintf("deckle(%.3f,%.2f,%d)", marginFrac, roughness, seed),
 		func(c *Canvas) { c.ApplyDeckleBorder(marginFrac, roughness, matCol, seed) },
 	)
+}
+
+// ParsePostEffect reconstructs a composable PostEffect from its serialized Name() string
+// (e.g. "bloom(0.62,6.00,0.35)", "relief(0.60,-135,38,0.38)", "chromatic(0.80)", "vignette(0.25)")
+// or shorthand name ("bloom", "relief", "chromatic", "kuwahara", "vignette", "paper", "deckle", "tonemap").
+func ParsePostEffect(spec string) (PostEffect, bool) {
+	s := strings.TrimSpace(spec)
+	if s == "" {
+		return nil, false
+	}
+	name := s
+	var args []float64
+	if openIdx := strings.IndexByte(s, '('); openIdx >= 0 && strings.HasSuffix(s, ")") {
+		name = strings.ToLower(strings.TrimSpace(s[:openIdx]))
+		argStr := strings.TrimSpace(s[openIdx+1 : len(s)-1])
+		if argStr != "" {
+			for _, part := range strings.Split(argStr, ",") {
+				v, err := strconv.ParseFloat(strings.TrimSpace(part), 64)
+				if err != nil {
+					return nil, false
+				}
+				args = append(args, v)
+			}
+		}
+	} else {
+		name = strings.ToLower(name)
+	}
+
+	argAt := func(idx int, def float64) float64 {
+		if idx >= 0 && idx < len(args) {
+			return args[idx]
+		}
+		return def
+	}
+
+	switch name {
+	case "bloom":
+		if len(args) == 1 {
+			return BloomEffect(0.62, 6.0, args[0]), true
+		}
+		return BloomEffect(argAt(0, 0.62), argAt(1, 6.0), argAt(2, 0.35)), true
+	case "paper":
+		return PaperTextureEffect(argAt(0, 0.25), int64(argAt(1, 20261021))), true
+	case "vignette":
+		return VignetteEffect(argAt(0, 0.25)), true
+	case "tonemap":
+		return ToneMapEffect(argAt(0, 1.05), argAt(1, 2.2)), true
+	case "chromatic":
+		return ChromaticAberrationEffect(argAt(0, 0.8)), true
+	case "relief":
+		if len(args) == 1 {
+			return LuminanceReliefEffect(args[0], -135.0, 38.0, 0.38), true
+		}
+		return LuminanceReliefEffect(argAt(0, 0.55), argAt(1, -135.0), argAt(2, 38.0), argAt(3, 0.38)), true
+	case "kuwahara":
+		return AnisotropicKuwaharaEffect(int(math.Round(argAt(0, 3))), argAt(1, 8.0), argAt(2, 1.25)), true
+	case "grade":
+		return ColorGradeEffect(argAt(0, 1.1), argAt(1, 1.1), argAt(2, 225.0), argAt(3, 42.0), argAt(4, 0.0)), true
+	case "deckle":
+		matCol := color.RGBA{R: 242, G: 236, B: 224, A: 255}
+		if len(args) >= 7 {
+			matCol = color.RGBA{
+				R: uint8(common.Constrain(argAt(2, 242), 0, 255)),
+				G: uint8(common.Constrain(argAt(3, 236), 0, 255)),
+				B: uint8(common.Constrain(argAt(4, 224), 0, 255)),
+				A: uint8(common.Constrain(argAt(5, 255), 0, 255)),
+			}
+			return DeckleBorderEffect(argAt(0, 0.045), argAt(1, 1.0), matCol, int64(argAt(6, 20261021))), true
+		}
+		return DeckleBorderEffect(argAt(0, 0.045), argAt(1, 1.0), matCol, int64(argAt(2, 20261021))), true
+	default:
+		return nil, false
+	}
 }
 
 

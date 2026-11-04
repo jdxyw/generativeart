@@ -6,6 +6,7 @@ import (
 	"image/color"
 	"math"
 	"reflect"
+	"runtime"
 	"strings"
 	"sync"
 
@@ -30,12 +31,14 @@ func posterEngineName(e Engine) string {
 
 // PosterPanelSpec describes a single panel in a multi-panel exhibition poster or contact sheet.
 type PosterPanelSpec struct {
-	Engine     Engine
-	Caption    string
-	Seed       int64
-	Background color.RGBA
-	Palette    []color.RGBA
-	PreDrawn   *image.RGBA
+	Engine        Engine
+	Caption       string
+	Seed          int64
+	Background    color.RGBA
+	Palette       []color.RGBA
+	PostEffects   []render.PostEffect
+	PreDrawn      *image.RGBA
+	PreDrawnCanva *render.Canvas
 }
 
 // PosterConfig configures the layout, typography, framing, and theme of an exhibition poster.
@@ -51,6 +54,24 @@ type PosterConfig struct {
 	DarkTheme   bool
 	Background  color.RGBA
 	Palette     []color.RGBA
+	PostEffects []render.PostEffect
+}
+
+// ParameterSweepAxis defines a 1D parameter sweep axis across columns (X) or rows (Y).
+type ParameterSweepAxis struct {
+	Name  string
+	Min   float64
+	Max   float64
+	IsInt bool
+}
+
+// ParameterSweepConfig configures a 2D (or 1D) parameter-space phase diagram contact sheet.
+type ParameterSweepConfig struct {
+	EngineName  string
+	Build       func(params map[string]interface{}) Engine
+	BaseParams  map[string]interface{}
+	AxisX       ParameterSweepAxis
+	AxisY       ParameterSweepAxis
 }
 
 // DefaultPosterConfig returns a balanced museum poster configuration.
@@ -138,14 +159,313 @@ func (c *Canva) ToPosterPNG(fpath string, cfg PosterConfig) error {
 		cfg.Title = strings.ToUpper(c.lastRecipe.Engine)
 	}
 	panel := PosterPanelSpec{
-		Caption:    fmt.Sprintf("ARCHIVE PLATE  ·  SEED %d", cfg.SeedBase),
-		Seed:       cfg.SeedBase,
-		Background: cfg.Background,
-		Palette:    cfg.Palette,
-		PreDrawn:   c.Img(),
+		Caption:       fmt.Sprintf("ARCHIVE PLATE  ·  SEED %d", cfg.SeedBase),
+		Seed:          cfg.SeedBase,
+		Background:    cfg.Background,
+		Palette:       cfg.Palette,
+		PreDrawn:      c.Img(),
+		PreDrawnCanva: c.LastRenderCanvas(),
 	}
 	posterCanva := RenderGalleryPoster([]PosterPanelSpec{panel}, cfg)
 	return posterCanva.ToPNG(fpath)
+}
+
+func formatSweepVal(v float64, isInt bool) string {
+	if isInt || math.Abs(v-math.Round(v)) < 1e-6 {
+		return fmt.Sprintf("%d", int(math.Round(v)))
+	}
+	return strings.TrimRight(strings.TrimRight(fmt.Sprintf("%.2f", v), "0"), ".")
+}
+
+// RenderParameterSweepPoster renders a 2D (or 1D) parameter-space phase diagram contact sheet
+// sweeping sweep.AxisX across columns and sweep.AxisY across rows with a fixed seed (cfg.SeedBase),
+// automatically engraving per-panel parameter coordinate captions.
+func RenderParameterSweepPoster(sweep ParameterSweepConfig, cfg PosterConfig) *Canva {
+	if cfg.Rows <= 0 {
+		cfg.Rows = 2
+	}
+	if cfg.Cols <= 0 {
+		cfg.Cols = 2
+	}
+	if cfg.PanelSize <= 0 {
+		cfg.PanelSize = 420
+	}
+	if cfg.SeedBase == 0 {
+		cfg.SeedBase = 20261022
+	}
+	if cfg.Background.A == 0 {
+		cfg.Background = color.RGBA{R: 16, G: 20, B: 34, A: 255}
+	}
+	if len(cfg.Palette) == 0 {
+		cfg.Palette = common.Dunhuang
+	}
+
+	engTitle := strings.ToUpper(sweep.EngineName)
+	if engTitle == "" {
+		engTitle = "PARAMETER"
+	}
+	if cfg.Title == "" {
+		cfg.Title = engTitle + "  ·  PHASE DIAGRAM"
+	}
+	xLabel := strings.ToUpper(sweep.AxisX.Name)
+	yLabel := strings.ToUpper(sweep.AxisY.Name)
+	if cfg.Subtitle == "" {
+		if yLabel != "" {
+			cfg.Subtitle = fmt.Sprintf("2D PARAMETER SWEEP  ·  X: %s [%s .. %s]  ·  Y: %s [%s .. %s]",
+				xLabel, formatSweepVal(sweep.AxisX.Min, sweep.AxisX.IsInt), formatSweepVal(sweep.AxisX.Max, sweep.AxisX.IsInt),
+				yLabel, formatSweepVal(sweep.AxisY.Min, sweep.AxisY.IsInt), formatSweepVal(sweep.AxisY.Max, sweep.AxisY.IsInt))
+		} else if xLabel != "" {
+			cfg.Subtitle = fmt.Sprintf("1D PARAMETER SWEEP  ·  %s [%s .. %s]",
+				xLabel, formatSweepVal(sweep.AxisX.Min, sweep.AxisX.IsInt), formatSweepVal(sweep.AxisX.Max, sweep.AxisX.IsInt))
+		}
+	}
+	if cfg.RecipeLabel == "" {
+		cfg.RecipeLabel = fmt.Sprintf("GRID: %dX%d  ·  FIXED SEED: %d  ·  PANEL: %dX%d PX  ·  64-BIT LINEAR HDR",
+			cfg.Rows, cfg.Cols, cfg.SeedBase, cfg.PanelSize, cfg.PanelSize)
+	}
+
+	total := cfg.Rows * cfg.Cols
+	panels := make([]PosterPanelSpec, total)
+	for r := 0; r < cfg.Rows; r++ {
+		ty := 0.0
+		if cfg.Rows > 1 {
+			ty = float64(r) / float64(cfg.Rows-1)
+		}
+		for c := 0; c < cfg.Cols; c++ {
+			tx := 0.0
+			if cfg.Cols > 1 {
+				tx = float64(c) / float64(cfg.Cols-1)
+			} else if sweep.AxisY.Name == "" && total > 1 {
+				tx = float64(r*cfg.Cols+c) / float64(total-1)
+			}
+			idx := r*cfg.Cols + c
+			pMap := make(map[string]interface{}, len(sweep.BaseParams)+2)
+			for k, v := range sweep.BaseParams {
+				pMap[k] = v
+			}
+
+			var capParts []string
+			capParts = append(capParts, fmt.Sprintf("%02d", idx+1))
+			if sweep.AxisX.Name != "" {
+				vx := sweep.AxisX.Min + tx*(sweep.AxisX.Max-sweep.AxisX.Min)
+				if sweep.AxisX.IsInt {
+					iv := int(math.Round(vx))
+					pMap[sweep.AxisX.Name] = iv
+					capParts = append(capParts, fmt.Sprintf("%s=%d", xLabel, iv))
+				} else {
+					pMap[sweep.AxisX.Name] = vx
+					capParts = append(capParts, fmt.Sprintf("%s=%s", xLabel, formatSweepVal(vx, false)))
+				}
+			}
+			if sweep.AxisY.Name != "" {
+				vy := sweep.AxisY.Min + ty*(sweep.AxisY.Max-sweep.AxisY.Min)
+				if sweep.AxisY.IsInt {
+					iv := int(math.Round(vy))
+					pMap[sweep.AxisY.Name] = iv
+					capParts = append(capParts, fmt.Sprintf("%s=%d", yLabel, iv))
+				} else {
+					pMap[sweep.AxisY.Name] = vy
+					capParts = append(capParts, fmt.Sprintf("%s=%s", yLabel, formatSweepVal(vy, false)))
+				}
+			}
+
+			var eng Engine
+			if sweep.Build != nil {
+				eng = sweep.Build(pMap)
+			}
+			panels[idx] = PosterPanelSpec{
+				Engine:      eng,
+				Caption:     strings.Join(capParts, " · "),
+				Seed:        cfg.SeedBase,
+				Background:  cfg.Background,
+				Palette:     cfg.Palette,
+				PostEffects: cfg.PostEffects,
+			}
+		}
+	}
+	return RenderGalleryPoster(panels, cfg)
+}
+
+// RenderAnimatedPoster renders a multi-seed variation exhibition poster where all R x C panels
+// animate synchronously across totalFrames frames, ready for export via poster.ToGIF(path, delay).
+func RenderAnimatedPoster(e Engine, cfg PosterConfig, totalFrames int) *Canva {
+	if totalFrames <= 1 {
+		return RenderPoster(e, cfg)
+	}
+	if cfg.Rows <= 0 {
+		cfg.Rows = 2
+	}
+	if cfg.Cols <= 0 {
+		cfg.Cols = 2
+	}
+	if cfg.PanelSize <= 0 {
+		cfg.PanelSize = 420
+	}
+	if cfg.SeedBase == 0 {
+		cfg.SeedBase = 20261022
+	}
+	if cfg.Background.A == 0 {
+		cfg.Background = color.RGBA{R: 16, G: 20, B: 34, A: 255}
+	}
+	if len(cfg.Palette) == 0 {
+		cfg.Palette = common.Dunhuang
+	}
+	if cfg.Title == "" && e != nil {
+		cfg.Title = strings.ToUpper(posterEngineName(e))
+	}
+	if cfg.RecipeLabel == "" && e != nil {
+		cfg.RecipeLabel = fmt.Sprintf("ENGINE: arts.New%s  ·  BASE SEED: %d  ·  PANEL: %dx%d  ·  FRAMES: %d",
+			strings.Title(posterEngineName(e)), cfg.SeedBase, cfg.PanelSize, cfg.PanelSize, totalFrames)
+	}
+
+	total := cfg.Rows * cfg.Cols
+	panels := make([]PosterPanelSpec, total)
+	for i := 0; i < total; i++ {
+		pSeed := cfg.SeedBase + int64(i)*137
+		caption := fmt.Sprintf("PLATE %02d  ·  SEED %d", i+1, pSeed)
+		if total == 1 {
+			caption = fmt.Sprintf("ARCHIVE PLATE  ·  SEED %d", pSeed)
+		}
+		panels[i] = PosterPanelSpec{
+			Engine:      e,
+			Caption:     caption,
+			Seed:        pSeed,
+			Background:  cfg.Background,
+			Palette:     cfg.Palette,
+			PostEffects: cfg.PostEffects,
+		}
+	}
+	return RenderAnimatedGalleryPoster(panels, cfg, totalFrames)
+}
+
+// RenderAnimatedGalleryPoster renders an R x C exhibition poster across totalFrames animation frames.
+// Stationary museum mat, bevels, typography, palette swatches, and cotton-rag paper texture are rendered
+// once so inter-frame GIF89a delta transparency (DisposalNone) compresses the entire mat to zero delta bytes.
+func RenderAnimatedGalleryPoster(panels []PosterPanelSpec, cfg PosterConfig, totalFrames int) *Canva {
+	if totalFrames <= 1 {
+		return RenderGalleryPoster(panels, cfg)
+	}
+	basePoster := RenderGalleryPoster(panels, cfg)
+	baseRGBA := basePoster.Img()
+
+	ps := float64(cfg.PanelSize)
+	scale := ps / 420.0
+	if scale < 0.55 {
+		scale = 0.55
+	}
+	outerPad := int(math.Round(56.0 * scale))
+	gridGapX := int(math.Round(34.0 * scale))
+	captionH := int(math.Round(24.0 * scale))
+	gridGapY := gridGapX + captionH
+	headerH := int(math.Round(56.0 * scale))
+
+	totalPanels := cfg.Rows * cfg.Cols
+	if len(panels) < totalPanels {
+		totalPanels = len(panels)
+	}
+
+	// Render (frameIdx, panelIdx) tasks concurrently across CPU workers
+	panelFrames := make([][]*image.RGBA, totalFrames)
+	for f := 0; f < totalFrames; f++ {
+		panelFrames[f] = make([]*image.RGBA, totalPanels)
+	}
+
+	type framePanelTask struct {
+		fIdx int
+		pIdx int
+	}
+	tasks := make(chan framePanelTask, totalFrames*totalPanels)
+	for f := 0; f < totalFrames; f++ {
+		for p := 0; p < totalPanels; p++ {
+			tasks <- framePanelTask{fIdx: f, pIdx: p}
+		}
+	}
+	close(tasks)
+
+	workers := runtime.NumCPU()
+	if workers < 1 {
+		workers = 1
+	}
+	var wg sync.WaitGroup
+	for w := 0; w < workers; w++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for task := range tasks {
+				fIdx, pIdx := task.fIdx, task.pIdx
+				spec := panels[pIdx]
+				if fIdx == 0 && spec.PreDrawn != nil && spec.PreDrawn.Bounds().Dx() == cfg.PanelSize && spec.PreDrawn.Bounds().Dy() == cfg.PanelSize {
+					panelFrames[fIdx][pIdx] = spec.PreDrawn
+					continue
+				}
+				sub := NewCanva(cfg.PanelSize, cfg.PanelSize)
+				seed := spec.Seed
+				if seed == 0 {
+					seed = cfg.SeedBase + int64(pIdx)*137
+				}
+				bg := spec.Background
+				if bg.A == 0 {
+					bg = cfg.Background
+				}
+				if bg.A == 0 {
+					bg = color.RGBA{R: 14, G: 18, B: 28, A: 255}
+				}
+				sub.SetBackground(bg)
+				pal := spec.Palette
+				if len(pal) == 0 {
+					pal = cfg.Palette
+				}
+				if len(pal) > 0 {
+					sub.SetColorSchema(pal)
+				}
+				sub.AddPostEffect(cfg.PostEffects...)
+				sub.AddPostEffect(spec.PostEffects...)
+				sub.FillBackground()
+
+				if spec.Engine != nil {
+					phase := float64(fIdx) / float64(totalFrames)
+					if anim, ok := spec.Engine.(AnimatedEngine); ok {
+						sub.SetSeedLocal(seed)
+						anim.GenerativeFrame(sub, fIdx, totalFrames, phase)
+					} else {
+						sub.SetSeedLocal(seed + int64(fIdx))
+						spec.Engine.Generative(sub)
+					}
+					if len(sub.PostEffects()) > 0 {
+						sub.ApplyPostEffects(sub.PostEffects()...)
+					}
+				}
+				panelFrames[fIdx][pIdx] = sub.Img()
+			}
+		}()
+	}
+	wg.Wait()
+
+	frames := make([]*image.RGBA, totalFrames)
+	for fIdx := 0; fIdx < totalFrames; fIdx++ {
+		frameImg := image.NewRGBA(baseRGBA.Bounds())
+		copy(frameImg.Pix, baseRGBA.Pix)
+		for r := 0; r < cfg.Rows; r++ {
+			for c := 0; c < cfg.Cols; c++ {
+				pIdx := r*cfg.Cols + c
+				if pIdx >= totalPanels || panelFrames[fIdx][pIdx] == nil {
+					continue
+				}
+				pImg := panelFrames[fIdx][pIdx]
+				px := outerPad + c*(cfg.PanelSize+gridGapX)
+				py := outerPad + headerH + r*(cfg.PanelSize+gridGapY)
+				// Leave 1px border rim around the opening so the recessed mat shadow rim remains crisp
+				for y := 1; y < cfg.PanelSize-1; y++ {
+					srcOff := y*pImg.Stride + 4
+					dstOff := (py+y)*frameImg.Stride + (px+1)*4
+					copy(frameImg.Pix[dstOff:dstOff+(cfg.PanelSize-2)*4], pImg.Pix[srcOff:srcOff+(cfg.PanelSize-2)*4])
+				}
+			}
+		}
+		frames[fIdx] = frameImg
+	}
+	basePoster.frames = frames
+	return basePoster
 }
 
 // RenderGalleryPoster renders a grid of PosterPanelSpec entries onto an archival museum poster Canva.
@@ -199,6 +519,7 @@ func RenderGalleryPoster(panels []PosterPanelSpec, cfg PosterConfig) *Canva {
 	// Render all panel images concurrently
 	totalPanels := cfg.Rows * cfg.Cols
 	renderedPanels := make([]*image.RGBA, totalPanels)
+	renderedVectors := make([]*render.Canvas, totalPanels)
 	var wg sync.WaitGroup
 	for idx := 0; idx < totalPanels && idx < len(panels); idx++ {
 		wg.Add(1)
@@ -206,6 +527,7 @@ func RenderGalleryPoster(panels []PosterPanelSpec, cfg PosterConfig) *Canva {
 			defer wg.Done()
 			if spec.PreDrawn != nil && spec.PreDrawn.Bounds().Dx() == cfg.PanelSize && spec.PreDrawn.Bounds().Dy() == cfg.PanelSize {
 				renderedPanels[i] = spec.PreDrawn
+				renderedVectors[i] = spec.PreDrawnCanva
 				return
 			}
 			sub := NewCanva(cfg.PanelSize, cfg.PanelSize)
@@ -213,7 +535,7 @@ func RenderGalleryPoster(panels []PosterPanelSpec, cfg PosterConfig) *Canva {
 			if seed == 0 {
 				seed = cfg.SeedBase + int64(i)*137
 			}
-			sub.SetSeed(seed)
+			sub.SetSeedLocal(seed)
 			bg := spec.Background
 			if bg.A == 0 {
 				bg = cfg.Background
@@ -230,10 +552,13 @@ func RenderGalleryPoster(panels []PosterPanelSpec, cfg PosterConfig) *Canva {
 			if len(pal) > 0 {
 				sub.SetColorSchema(pal)
 			}
+			sub.AddPostEffect(cfg.PostEffects...)
+			sub.AddPostEffect(spec.PostEffects...)
 			if spec.Engine != nil {
 				sub.Draw(spec.Engine)
 			}
 			renderedPanels[i] = sub.Img()
+			renderedVectors[i] = sub.LastRenderCanvas()
 		}(idx, panels[idx])
 	}
 	wg.Wait()
@@ -368,7 +693,7 @@ func RenderGalleryPoster(panels []PosterPanelSpec, cfg PosterConfig) *Canva {
 			rc.FillPolygon(bottomBevel, bevelLight, 0.92)
 			rc.FillPolygon(rightBevel, render.LerpOklab(bevelLight, matRecess, 0.25), 0.92)
 
-			// Blit rendered artwork pixels at 1:1 native resolution
+			// Blit rendered artwork pixels at 1:1 native resolution and preserve sub-panel vector paths
 			if idx < len(renderedPanels) && renderedPanels[idx] != nil {
 				artImg := renderedPanels[idx]
 				for y := 0; y < cfg.PanelSize; y++ {
@@ -384,6 +709,9 @@ func RenderGalleryPoster(panels []PosterPanelSpec, cfg PosterConfig) *Canva {
 							1.0)
 					}
 				}
+			}
+			if idx < len(renderedVectors) && renderedVectors[idx] != nil {
+				rc.CompositeSubCanvasVectors(renderedVectors[idx], fpx, fpy)
 			}
 
 			// Inner crisp shadow rim along top/left of artwork opening
@@ -582,15 +910,18 @@ func glyphAdvanceRatio(r rune) float64 {
 	switch r {
 	case ' ':
 		return 0.42
-	case 'I', '1', ':', '.', ',', '\'', '|':
+	case 'I', '1', ':', ';', '.', ',', '\'', '"', '|', '!':
 		return 0.28
-	case 'J', 'L', 'F', 'T', 'E', 'Z', '7', '(', ')':
+	case '[', ']', '{', '}':
+		return 0.36
+	case 'J', 'L', 'F', 'T', 'E', 'Z', '7', '(', ')', '?':
 		return 0.56
-	case 'M', 'W':
+	case 'M', 'W', '%', 'Ω', 'ω':
 		return 0.78
-	case 'O', 'Q', 'G', 'C', 'D', 'H', 'N', 'U', 'A', 'V', 'X', 'Y', 'K', 'R', 'B', 'P', 'S':
+	case 'O', 'Q', 'G', 'C', 'D', 'H', 'N', 'U', 'A', 'V', 'X', 'Y', 'K', 'R', 'B', 'P', 'S',
+		'α', 'β', 'γ', 'Δ', 'δ', 'θ', 'λ', 'μ', 'π', 'σ', 'τ', 'φ':
 		return 0.64
-	case '·', '-', '+', '=', '/':
+	case '·', '-', '+', '=', '/', '*', '<', '>', '~':
 		return 0.45
 	default:
 		return 0.60
@@ -660,6 +991,152 @@ func appendEngraverGlyph(p *canvas.Path, r rune, x, y, w, h float64) {
 		p.LineTo(xm, y+h*0.78)
 		p.MoveTo(x+w*0.12, ym)
 		p.LineTo(x+w*0.88, ym)
+	case '=':
+		p.MoveTo(x+w*0.12, y+h*0.36)
+		p.LineTo(x+w*0.88, y+h*0.36)
+		p.MoveTo(x+w*0.12, y+h*0.64)
+		p.LineTo(x+w*0.88, y+h*0.64)
+	case '[':
+		p.MoveTo(x+w*0.78, y)
+		p.LineTo(x+w*0.22, y)
+		p.LineTo(x+w*0.22, y+h)
+		p.LineTo(x+w*0.78, y+h)
+	case ']':
+		p.MoveTo(x+w*0.22, y)
+		p.LineTo(x+w*0.78, y)
+		p.LineTo(x+w*0.78, y+h)
+		p.LineTo(x+w*0.22, y+h)
+	case '{':
+		p.MoveTo(x+w*0.78, y)
+		p.LineTo(x+w*0.45, y+h*0.12)
+		p.LineTo(x+w*0.45, y+h*0.42)
+		p.LineTo(x+w*0.18, ym)
+		p.LineTo(x+w*0.45, y+h*0.58)
+		p.LineTo(x+w*0.45, y+h*0.88)
+		p.LineTo(x+w*0.78, y+h)
+	case '}':
+		p.MoveTo(x+w*0.22, y)
+		p.LineTo(x+w*0.55, y+h*0.12)
+		p.LineTo(x+w*0.55, y+h*0.42)
+		p.LineTo(x+w*0.82, ym)
+		p.LineTo(x+w*0.55, y+h*0.58)
+		p.LineTo(x+w*0.55, y+h*0.88)
+		p.LineTo(x+w*0.22, y+h)
+	case '<':
+		p.MoveTo(x+w*0.82, y+h*0.18)
+		p.LineTo(x+w*0.18, ym)
+		p.LineTo(x+w*0.82, y+h*0.82)
+	case '>':
+		p.MoveTo(x+w*0.18, y+h*0.18)
+		p.LineTo(x+w*0.82, ym)
+		p.LineTo(x+w*0.18, y+h*0.82)
+	case '*':
+		p.MoveTo(xm, y+h*0.18)
+		p.LineTo(xm, y+h*0.82)
+		p.MoveTo(x+w*0.16, y+h*0.30)
+		p.LineTo(x+w*0.84, y+h*0.70)
+		p.MoveTo(x+w*0.84, y+h*0.30)
+		p.LineTo(x+w*0.16, y+h*0.70)
+	case '%':
+		p.MoveTo(x+w*0.85, y+h*0.08)
+		p.LineTo(x+w*0.15, y+h*0.92)
+		addEllipseArc(p, x+w*0.26, y+h*0.24, w*0.18, h*0.18, 0, 360, true)
+		addEllipseArc(p, x+w*0.74, y+h*0.76, w*0.18, h*0.18, 0, 360, true)
+	case ';':
+		addEllipseArc(p, xm, y+h*0.32, h*0.04, h*0.04, 0, 360, true)
+		p.MoveTo(xm, y+h*0.78)
+		p.LineTo(xm-w*0.25, y+h*1.04)
+	case '!':
+		p.MoveTo(xm, y)
+		p.LineTo(xm, y+h*0.72)
+		addEllipseArc(p, xm, y+h*0.92, h*0.04, h*0.04, 0, 360, true)
+	case '?':
+		addEllipseArc(p, xm, y+h*0.26, w*0.42, h*0.24, -160, 45, true)
+		p.LineTo(xm, y+h*0.62)
+		p.MoveTo(xm, y+h*0.62)
+		p.LineTo(xm, y+h*0.72)
+		addEllipseArc(p, xm, y+h*0.92, h*0.04, h*0.04, 0, 360, true)
+	case '\'':
+		p.MoveTo(xm, y)
+		p.LineTo(xm, y+h*0.28)
+	case '"':
+		p.MoveTo(x+w*0.30, y)
+		p.LineTo(x+w*0.30, y+h*0.28)
+		p.MoveTo(x+w*0.70, y)
+		p.LineTo(x+w*0.70, y+h*0.28)
+	case '|':
+		p.MoveTo(xm, y)
+		p.LineTo(xm, y+h)
+	case '~':
+		addEllipseArc(p, x+w*0.28, ym, w*0.20, h*0.14, 180, 0, true)
+		addEllipseArc(p, x+w*0.72, ym, w*0.20, h*0.14, 180, 360, false)
+	case 'α':
+		addEllipseArc(p, x+w*0.42, ym+h*0.08, w*0.34, h*0.34, 35, 325, true)
+		p.MoveTo(x+w*0.88, y+h*0.20)
+		p.LineTo(x+w*0.58, y+h*0.86)
+		p.MoveTo(x+w*0.58, y+h*0.26)
+		p.LineTo(x+w*0.92, y+h*0.90)
+	case 'β':
+		p.MoveTo(x+w*0.16, y+h*1.12)
+		p.LineTo(x+w*0.16, y)
+		addEllipseArc(p, x+w*0.48, y+h*0.24, w*0.32, h*0.24, -90, 90, false)
+		addEllipseArc(p, x+w*0.52, y+h*0.74, w*0.36, h*0.26, -90, 120, false)
+	case 'γ':
+		p.MoveTo(x+w*0.12, y+h*0.18)
+		p.LineTo(xm, y+h*0.72)
+		p.LineTo(x+w*0.88, y+h*0.18)
+		p.MoveTo(xm, y+h*0.72)
+		p.LineTo(xm-w*0.12, y+h*1.10)
+	case 'Δ', 'δ':
+		p.MoveTo(xm, y)
+		p.LineTo(x+w, y+h)
+		p.LineTo(x, y+h)
+		p.Close()
+	case 'θ':
+		addEllipseArc(p, xm, ym, rx, ry, 0, 360, true)
+		p.MoveTo(x+w*0.12, ym)
+		p.LineTo(x+w*0.88, ym)
+	case 'λ':
+		p.MoveTo(x+w*0.15, y)
+		p.LineTo(x+w*0.88, y+h)
+		p.MoveTo(xm, ym)
+		p.LineTo(x+w*0.12, y+h)
+	case 'μ':
+		p.MoveTo(x+w*0.15, y+h*1.12)
+		p.LineTo(x+w*0.15, y+h*0.22)
+		p.MoveTo(x+w*0.15, y+h*0.68)
+		addEllipseArc(p, xm, y+h*0.68, w*0.32, h*0.28, 180, 0, false)
+		p.MoveTo(x+w*0.82, y+h*0.22)
+		p.LineTo(x+w*0.82, y+h)
+	case 'π':
+		p.MoveTo(x+w*0.08, y+h*0.22)
+		p.LineTo(x+w*0.92, y+h*0.22)
+		p.MoveTo(x+w*0.30, y+h*0.22)
+		p.LineTo(x+w*0.24, y+h)
+		p.MoveTo(x+w*0.72, y+h*0.22)
+		p.LineTo(x+w*0.76, y+h)
+	case 'σ':
+		addEllipseArc(p, x+w*0.44, y+h*0.62, w*0.36, h*0.34, 0, 360, true)
+		p.MoveTo(x+w*0.44, y+h*0.28)
+		p.LineTo(x+w*0.95, y+h*0.28)
+	case 'τ':
+		p.MoveTo(x+w*0.12, y+h*0.22)
+		p.LineTo(x+w*0.88, y+h*0.22)
+		p.MoveTo(xm, y+h*0.22)
+		p.LineTo(xm, y+h)
+	case 'φ':
+		addEllipseArc(p, xm, ym, w*0.44, h*0.32, 0, 360, true)
+		p.MoveTo(xm, y)
+		p.LineTo(xm, y+h*1.08)
+	case 'ω':
+		addEllipseArc(p, x+w*0.28, y+h*0.58, w*0.22, h*0.38, 150, 0, true)
+		addEllipseArc(p, x+w*0.72, y+h*0.58, w*0.22, h*0.38, 180, 30, false)
+	case 'Ω':
+		addEllipseArc(p, xm, y+h*0.44, w*0.44, h*0.42, 135, 45, true)
+		p.MoveTo(x+w*0.06, y+h)
+		p.LineTo(x+w*0.34, y+h)
+		p.MoveTo(x+w*0.66, y+h)
+		p.LineTo(x+w*0.94, y+h)
 	case '&':
 		addEllipseArc(p, xm-w*0.06, y+h*0.24, w*0.34, h*0.22, 0, 360, true)
 		addEllipseArc(p, xm-w*0.08, y+h*0.72, w*0.40, h*0.28, 30, 310, true)

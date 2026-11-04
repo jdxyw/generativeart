@@ -9,6 +9,7 @@ This document serves as the architectural blueprint for `generativeart`, coverin
 6. **Next-Generation Architecture & Platform Roadmap (6 Directions, with Directions 4 & 5 Implemented)**
 7. **Art-Empowering Rendering & Mathematical Foundations (Part VII & Part VIII — Implemented)**
 8. **Wave 23 Master Architecture, Celestial Mechanics & Sci-Fi Megastructures + Part IX–XI Future Roadmap**
+9. **Part X. Underlying Infrastructure Audit & 3-Phase Core Engine Upgrade Roadmap (Phase 1 — Implementing)**
 
 ---
 
@@ -370,6 +371,72 @@ Leveraging Part VIII's 3D SDF raymarcher, 3D object-locked copperplate burin eng
 ### 9.4 Direction 4: Interactive Gallery Enhancements (`index.html`)
 - Inline **Static PNG / Animated GIF toggle badge** directly on dual-mode gallery cards.
 - **Museum Frame Fullscreen Mode** and interactive **Algorithm Lineage Graph** inside the exhibition lightbox.
+
+---
+
+## Part X. Underlying Infrastructure Audit & 3-Phase Core Engine Upgrade Roadmap
+
+A comprehensive technical audit across `generativeart.go`, `platform.go`, `poster.go`, `cmd/genart`, `arts/registry.go`, `render/`, and `common/` identified three major foundational upgrade tracks:
+
+### 10.1 Phase 1: Architecture, Concurrency, Full Recipe Introspection & CLI Toolchain Upgrade (Implemented)
+
+1. **Lock-Free Parallel Multi-Frame Animation Engine & Temporal Motion Blur (`generativeart.go`, `platform.go`)**:
+   - **Problem Solved**: `DrawTimelapseFrames` previously rendered frames sequentially on a single goroutine, and `Canva.SetSeed` mutated global `rand.Seed(seed)` causing lock contention during concurrent panel/frame rendering.
+   - **Upgrades**:
+     - `(*Canva).CloneForWorker(seed int64) *Canva`: Allocates an isolated worker `Canva` sharing read-only options, palette stops, and post-effect pipelines while maintaining independent 64-bit HDR/RGBA buffers and lock-free local `*rand.Rand`, `*common.NoiseEngine`, and `*common.PerlinNoise` instances without touching global `math/rand`.
+     - **Multi-Core Parallel `DrawTimelapseFrames`**: Automatically dispatches `AnimatedEngine` frame generation across `runtime.NumCPU()` worker goroutines (`5×–8×` speedup on multi-frame `600×600` HD GIFs).
+     - **Shutter-Angle Temporal Supersampling (`DrawTimelapseFramesTemporalAA(e, totalFrames, subSamples, shutterFraction)`)**: Integrates `subSamples` sub-frames across $[\phi_i, \phi_i + \Delta\phi_{\text{shutter}}]$ directly in 64-bit linear HDR space before tone-mapping/quantization, producing physically accurate cinematic motion blur.
+     - **Configurable GIF Palette Capacity (`WriteGIFWithColors(w, delayCs, maxColors)`)**: Allows callers to choose between compact 32-color (5-bit LZW root) and high-gamut 64/128/256-color shared K-Means palettes, while sampling up to 8 frames across the animation cycle.
+
+2. **100% Lossless PNG Recipe Introspection & PostEffect Serialization (`platform.go`, `arts/registry.go`, `render/postprocess.go`)**:
+   - **Problem Solved**: `RecipeMetadata` previously omitted `ColorSchema` (`[][4]uint8`), `PaletteName`, `Foreground`, `LineColor`, `LineWidth`, `NIters`, `Alpha`, and structured post-effect parameters, causing `arts.ReplayRecipe` to fall back to `desc.DefaultPal` and drop post-processing passes.
+   - **Upgrades**:
+     - Extended `RecipeMetadata` with `Palette [][4]uint8`, `Foreground [4]uint8`, `LineColor [4]uint8`, `LineWidth float64`, `NIters int`, and `Alpha int`.
+     - Added `render.ParsePostEffect(spec string) (render.PostEffect, bool)` to parse serialized post-effect descriptors (`bloom(0.62,6.00,0.35)`, `relief(0.60,-135,38,0.38)`, `chromatic(0.80)`, `kuwahara(3,8.0,1.25)`, `grade(...)`, `tonemap(...)`, `paper(...)`, `vignette(...)`, `deckle(...)`) back into live executable HDR `PostEffect` passes during `arts.ReplayRecipe` / `genart replay`.
+
+3. **Dynamic CLI Parameter Introspection (`genart info`) & Injection (`-set key=val`) (`arts/registry.go`, `cmd/genart/main.go`)**:
+   - **Problem Solved**: `cmd/genart` previously hardcoded `desc.Build(nil)` with no way to inspect or override generator parameters from the command line.
+   - **Upgrades**:
+     - Added `(*ArtDescriptor).DefaultParams() map[string]interface{}` and `(*ArtDescriptor).ParamSpecs() []ParamSpec` using reflection on `desc.Build(nil)` to expose parameter names, Go types (`int`, `float64`, `string`, `bool`), and default values.
+     - Added `arts.ParseParamOverrides(spec string) (map[string]interface{}, error)` supporting case-insensitive parameter matching and `key1=val1,key2=val2` syntax.
+     - Added `genart info <art>` subcommand and `-set key1=val1,key2=val2` flag across `genart render`, `genart replay`, and `genart poster`, plus `-frames` / `-delay` support on `genart replay` so any static PNG recipe can be replayed directly into a looping `.gif`.
+
+4. **2D Parameter-Sweep Phase Diagrams, Animated Exhibition Posters & Vector Sub-Panel Preservation (`poster.go`, `cmd/genart/main.go`)**:
+   - **Problem Solved**: `poster.go` could not sweep 2D parameter spaces, could not render animated multi-panel GIF posters, lacked mathematical/Greek engraver glyphs (`=`, `[`, `]`, `%`, `*`, `π`, `θ`, `φ`, `λ`, `σ`, `α`, `β`, `ω`), and discarded sub-panel vector paths when blitting onto the poster canvas.
+   - **Upgrades**:
+     - **`ParameterSweepSpec` & `RenderParameterSweepPoster`**: Sweeps parameter $X \in [x_{\min}, x_{\max}]$ across columns and parameter $Y \in [y_{\min}, y_{\max}]$ across rows with a fixed seed, automatically engraving exact coordinate captions (`X_NAME=VAL · Y_NAME=VAL`) beneath each panel (`genart poster -art <name> -sweep-x param:min:max -sweep-y param:min:max`).
+     - **`RenderAnimatedPoster` & `RenderAnimatedGalleryPoster`**: Synchronizes `AnimatedEngine` frames across all $R \times C$ matted panels in parallel and encodes a museum-framed looping exhibition GIF (`genart poster ... -frames 20 -delay 12 -out poster.gif`).
+     - **Sub-Panel Vector Path Preservation (`CompositeSubCanvasVectors`)**: Translates and clips sub-panel `vectorOp` paths directly into the poster's `render.Canvas` so exporting a poster to `.svg` or `.pdf` retains 100% native infinite-resolution vector paths alongside the museum mat frame.
+     - **Expanded Mathematical & Greek Engraver Typography (`appendEngraverGlyph`)**: Added vector stroke glyphs for `=`, `[`, `]`, `{`, `}`, `%`, `*`, `;`, `!`, `?`, `<`, `>`, `~`, and Greek symbols (`α`, `β`, `γ`, `Δ`, `θ`, `λ`, `μ`, `π`, `σ`, `τ`, `φ`, `ω`, `Ω`).
+
+---
+
+### 10.2 Phase 2: Core 3D, Optical & Rendering Pipeline Upgrades (Planned Next)
+
+1. **Edge-Adaptive 2×2 SSAA & Compact G-Buffer in `render/moebius_engine.go`**:
+   - Two-pass edge-adaptive supersampling: evaluate $1\times 1$ primary centers first, and only evaluate the remaining 3 sub-pixel rays where neighbor `ObjID`/`PartID`/`DetailID`, depth $|\Delta Z|$, normal $\|\Delta\mathbf{N}\|$, or illumination $|\Delta I|$ crosses an edge threshold (`60%–75%` raymarching reduction).
+   - Replace `math.Sin` in `EvaluateMoebiusStoneRelief`'s $3\times 3$ inner Voronoi loop with integer bit-mixing (`hash2D`), and parallelize Stage 3/4 hatching and borders.
+2. **Keinert Over-Relaxation Sphere Tracing & Bounding-Sphere Early-Out (`render/sdf3d.go`)**:
+   - Add bounding-sphere intersection pre-rejection and Keinert over-relaxation ($\omega \approx 1.35$) with secant root refinement in `RaymarchSDF3D`, plus smooth weight-blended triplanar projection in `EvaluateMoebiusStoneRelief3D`.
+3. **3D Dielectrics, Snell Refraction, Beer-Lambert Absorption & Spectral Dispersion (`render/sdf3d_optics.go`)**:
+   - Recursive interior/exterior signed-distance raymarching (`TraceSDF3DDielectric`), Schlick-Fresnel reflectance, total internal reflection (TIR), Beer-Lambert volume attenuation $\mathbf{T}(\ell) = \exp(-\boldsymbol{\sigma}_a \ell)$, and Abbe-number RGB chromatic dispersion ($\eta_R, \eta_G, \eta_B$).
+4. **Oklch Chroma-Preserving Gamut Mapping & Thin-Lens Polygonal Bokeh DoF (`render/canvas.go`, `render/postprocess.go`)**:
+   - Replace hard per-channel sRGB clipping in `OklabToRGBA` with binary-searched Oklch chroma reduction so bright gold/vermilion highlights preserve perceptual hue.
+   - Add `ApplyDepthOfField` / `DepthOfFieldEffect` with signed Circle-of-Confusion (CoC) and $N$-blade regular-polygon Vogel spiral aperture sampling.
+
+---
+
+### 10.3 Phase 3: Computational Geometry, Mathematical PDE Fields & Vector Hidden-Line Removal (Planned)
+
+1. **Unified Bowyer–Watson Delaunay Triangulation & Dual Clipped Voronoi Mesh (`render/geometry2d.go`)**:
+   - Consolidate ad-hoc Delaunay/Voronoi implementations into a single first-class kernel outputting triangles, half-edge adjacency, circumcenters, dual clipped Voronoi polygons, exact polygon-centroid Lloyd CVT relaxation, Gabriel graphs, and minimum spanning trees (MST).
+2. **Analytical 3D Noise Derivatives, `Curl3D` & Rich 2D/3D Cellular Voronoi (`common/noise.go`)**:
+   - Add `Perlin3DDeriv`, `FBM3D`, `Ridged3D`, divergence-free `Curl3D`, and `Voronoi2D` / `Voronoi3D` returning `VoronoiResult{F1, F2, EdgeDist, SmoothF1, Grad, CellID}` (with Inigo Quilez's exact distance-to-border metric).
+3. **Anisotropic Turing Reaction–Diffusion, Poisson/Helmholtz PDE Solvers & Spherical Harmonics (`render/field_engine.go`, `common/`)**:
+   - Reusable spatially-varying anisotropic diffusion tensor Gray–Scott / Turing solver, Red-Black Gauss–Seidel Screened-Poisson solver ($\nabla^2 u - \lambda u = f$), and orthonormal real Spherical Harmonics $Y_l^m(\theta,\phi)$ + Icosahedral Geodesic / Goldberg polyhedral grids.
+4. **2D & 3D Vector Hidden-Line Removal (HLR) & Plotter Polygon Hatching (`render/vector_bridge.go`, `render/sdf3d.go`)**:
+   - Automatic foreground-polygon occlusion culling (`ClipOutPolygon`) and lightness-driven polygon hatch fill generation (`PlotterConfig.HatchFills`) for physical pen plotters, plus 3D SDF silhouette & curvature vector extraction with raymarched visibility testing.
+
 
 
 

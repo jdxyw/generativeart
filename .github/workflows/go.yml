@@ -25,4 +25,4 @@ jobs:
       run: go build -v ./arts/*.go
 
     - name: Test
-      run: go test -v ./common/...
+      run: go test -v . ./common ./render ./arts

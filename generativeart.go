@@ -122,11 +122,47 @@ func NewCanva(w, h int) *Canva {
 // SetSeed sets a deterministic random seed for this canvas, updating its local
 // *rand.Rand, NoiseEngine, PerlinNoise, and the package-level math/rand seed for legacy engines.
 func (c *Canva) SetSeed(seed int64) {
+	c.SetSeedLocal(seed)
+	rand.Seed(seed)
+}
+
+// SetSeedLocal sets the deterministic random seed for this canvas's local *rand.Rand,
+// NoiseEngine, and PerlinNoise without mutating the global math/rand state.
+// Use SetSeedLocal or CloneForWorker inside concurrent worker goroutines.
+func (c *Canva) SetSeedLocal(seed int64) {
 	c.opts.seed = seed
 	c.rng = rand.New(rand.NewSource(seed))
 	c.noise = common.NewNoiseEngine(seed)
 	c.perlin = common.NewPerlinNoiseWithSeed(seed)
-	rand.Seed(seed)
+}
+
+// CloneForWorker creates an isolated worker *Canva with the same dimensions, Options,
+// ColorSchema, and PostEffects pipeline as c, initialized with seed via SetSeedLocal
+// (zero global lock contention) and a freshly filled background.
+func (c *Canva) CloneForWorker(seed int64) *Canva {
+	if c == nil {
+		return nil
+	}
+	optsCopy := c.opts
+	if len(c.opts.colorSchema) > 0 {
+		optsCopy.colorSchema = make([]color.RGBA, len(c.opts.colorSchema))
+		copy(optsCopy.colorSchema, c.opts.colorSchema)
+	}
+	var effectsCopy []render.PostEffect
+	if len(c.postEffects) > 0 {
+		effectsCopy = make([]render.PostEffect, len(c.postEffects))
+		copy(effectsCopy, c.postEffects)
+	}
+	w := &Canva{
+		height:      c.height,
+		width:       c.width,
+		img:         image.NewRGBA(image.Rect(0, 0, c.width, c.height)),
+		opts:        optsCopy,
+		postEffects: effectsCopy,
+	}
+	w.SetSeedLocal(seed)
+	w.FillBackground()
+	return w
 }
 
 // Seed returns the deterministic seed configured on this canvas.

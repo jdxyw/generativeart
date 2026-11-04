@@ -1,14 +1,26 @@
 package arts
 
 import (
+	"encoding/json"
 	"fmt"
 	"image/color"
+	"math"
+	"reflect"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/jdxyw/generativeart"
 	"github.com/jdxyw/generativeart/common"
+	"github.com/jdxyw/generativeart/render"
 )
+
+// ParamSpec describes a tunable scalar parameter exposed by a registered ArtDescriptor.
+type ParamSpec struct {
+	Name    string      `json:"name"`
+	Type    string      `json:"type"`
+	Default interface{} `json:"default"`
+}
 
 // ArtDescriptor describes a registered generative art engine, its default visual
 // configuration, and a parameter-aware factory capable of reconstructing an Engine
@@ -20,6 +32,128 @@ type ArtDescriptor struct {
 	DefaultBG  color.RGBA
 	DefaultPal string
 	Build      func(params map[string]interface{}) generativeart.Engine
+}
+
+// DefaultParams returns the map of default scalar parameter values for this ArtDescriptor.
+func (d ArtDescriptor) DefaultParams() map[string]interface{} {
+	if d.Build == nil {
+		return map[string]interface{}{}
+	}
+	return generativeart.InspectEngineParams(d.Build(nil))
+}
+
+// SupportsAnimation reports whether this ArtDescriptor's Engine implements AnimatedEngine.
+func (d ArtDescriptor) SupportsAnimation() bool {
+	if d.Build == nil {
+		return false
+	}
+	_, ok := d.Build(nil).(generativeart.AnimatedEngine)
+	return ok
+}
+
+// ParamSpecs returns the ordered list of tunable scalar parameters on this ArtDescriptor.
+func (d ArtDescriptor) ParamSpecs() []ParamSpec {
+	if d.Build == nil {
+		return nil
+	}
+	eng := d.Build(nil)
+	if eng == nil {
+		return nil
+	}
+	t := reflect.TypeOf(eng)
+	v := reflect.ValueOf(eng)
+	if t.Kind() == reflect.Ptr && !v.IsNil() {
+		t = t.Elem()
+		v = v.Elem()
+	}
+	if v.Kind() != reflect.Struct {
+		return nil
+	}
+	var specs []ParamSpec
+	for i := 0; i < v.NumField(); i++ {
+		fType := t.Field(i)
+		fVal := v.Field(i)
+		switch fVal.Kind() {
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			specs = append(specs, ParamSpec{Name: fType.Name, Type: "int", Default: fVal.Int()})
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+			specs = append(specs, ParamSpec{Name: fType.Name, Type: "uint", Default: fVal.Uint()})
+		case reflect.Float32, reflect.Float64:
+			specs = append(specs, ParamSpec{Name: fType.Name, Type: "float64", Default: fVal.Float()})
+		case reflect.Bool:
+			specs = append(specs, ParamSpec{Name: fType.Name, Type: "bool", Default: fVal.Bool()})
+		case reflect.String:
+			specs = append(specs, ParamSpec{Name: fType.Name, Type: "string", Default: fVal.String()})
+		}
+	}
+	return specs
+}
+
+// ResolveParams validates and merges user-supplied parameter overrides (matching keys case-insensitively)
+// onto the descriptor's default parameters. Returns an error if an unknown parameter key is provided.
+func (d ArtDescriptor) ResolveParams(overrides map[string]interface{}) (map[string]interface{}, error) {
+	defaults := d.DefaultParams()
+	out := make(map[string]interface{}, len(defaults))
+	canonKey := make(map[string]string, len(defaults))
+	for k, v := range defaults {
+		out[k] = v
+		canonKey[strings.ToLower(k)] = k
+	}
+	for k, v := range overrides {
+		ck, exists := canonKey[strings.ToLower(strings.TrimSpace(k))]
+		if !exists {
+			var valid []string
+			for _, sp := range d.ParamSpecs() {
+				valid = append(valid, fmt.Sprintf("%s (%s=%v)", sp.Name, sp.Type, sp.Default))
+			}
+			return nil, fmt.Errorf("unknown parameter %q for engine %q (valid parameters: %s)", k, d.ID, strings.Join(valid, ", "))
+		}
+		out[ck] = v
+	}
+	return out, nil
+}
+
+// ParseParamOverrides parses a CLI parameter override string such as "galleries=8,tiers=6,shaftScale=1.25"
+// or a JSON object string '{"galleries":8,"shaftScale":1.25}' into a parameter map.
+func ParseParamOverrides(expr string) (map[string]interface{}, error) {
+	s := strings.TrimSpace(expr)
+	if s == "" {
+		return nil, nil
+	}
+	if strings.HasPrefix(s, "{") {
+		var m map[string]interface{}
+		if err := json.Unmarshal([]byte(s), &m); err != nil {
+			return nil, fmt.Errorf("invalid JSON parameter overrides: %w", err)
+		}
+		return m, nil
+	}
+	out := make(map[string]interface{})
+	normalized := strings.ReplaceAll(s, ";", ",")
+	for _, token := range strings.Split(normalized, ",") {
+		token = strings.TrimSpace(token)
+		if token == "" {
+			continue
+		}
+		eq := strings.IndexByte(token, '=')
+		if eq <= 0 {
+			eq = strings.IndexByte(token, ':')
+		}
+		if eq <= 0 {
+			return nil, fmt.Errorf("expected key=value parameter pair, got %q", token)
+		}
+		k := strings.TrimSpace(token[:eq])
+		valStr := strings.TrimSpace(token[eq+1:])
+		if iVal, err := strconv.ParseInt(valStr, 10, 64); err == nil {
+			out[k] = iVal
+		} else if fVal, err := strconv.ParseFloat(valStr, 64); err == nil {
+			out[k] = fVal
+		} else if bVal, err := strconv.ParseBool(valStr); err == nil {
+			out[k] = bVal
+		} else {
+			out[k] = strings.Trim(valStr, `"'`)
+		}
+	}
+	return out, nil
 }
 
 var namedPalettes = map[string][]color.RGBA{
@@ -53,11 +187,23 @@ func PaletteNames() []string {
 	return out
 }
 
-func paramInt(p map[string]interface{}, key string, def int) int {
+func lookupParamValue(p map[string]interface{}, key string) (interface{}, bool) {
 	if p == nil {
-		return def
+		return nil, false
 	}
-	v, ok := p[key]
+	if v, ok := p[key]; ok {
+		return v, true
+	}
+	for k, v := range p {
+		if strings.EqualFold(k, key) {
+			return v, true
+		}
+	}
+	return nil, false
+}
+
+func paramInt(p map[string]interface{}, key string, def int) int {
+	v, ok := lookupParamValue(p, key)
 	if !ok {
 		return def
 	}
@@ -66,18 +212,27 @@ func paramInt(p map[string]interface{}, key string, def int) int {
 		return n
 	case int64:
 		return int(n)
-	case float64:
+	case uint64:
 		return int(n)
+	case float64:
+		return int(math.Round(n))
+	case float32:
+		return int(math.Round(float64(n)))
+	case string:
+		if i, err := strconv.Atoi(strings.TrimSpace(n)); err == nil {
+			return i
+		}
+		if f, err := strconv.ParseFloat(strings.TrimSpace(n), 64); err == nil {
+			return int(math.Round(f))
+		}
+		return def
 	default:
 		return def
 	}
 }
 
 func paramFloat(p map[string]interface{}, key string, def float64) float64 {
-	if p == nil {
-		return def
-	}
-	v, ok := p[key]
+	v, ok := lookupParamValue(p, key)
 	if !ok {
 		return def
 	}
@@ -90,16 +245,24 @@ func paramFloat(p map[string]interface{}, key string, def float64) float64 {
 		return float64(n)
 	case int64:
 		return float64(n)
+	case uint64:
+		return float64(n)
+	case string:
+		if f, err := strconv.ParseFloat(strings.TrimSpace(n), 64); err == nil {
+			return f
+		}
+		return def
 	default:
 		return def
 	}
 }
 
 func paramString(p map[string]interface{}, key, def string) string {
-	if p == nil {
+	v, ok := lookupParamValue(p, key)
+	if !ok {
 		return def
 	}
-	if s, ok := p[key].(string); ok && len(s) > 0 {
+	if s, ok := v.(string); ok && len(s) > 0 {
 		return s
 	}
 	return def
@@ -957,19 +1120,25 @@ func Lookup(nameOrStruct string) (ArtDescriptor, bool) {
 	return ArtDescriptor{}, false
 }
 
-// ReplayRecipe reconstructs and renders the artwork described by meta at the original
-// resolution (or overrideW x overrideH if both > 0).
-func ReplayRecipe(meta *generativeart.RecipeMetadata, overrideW, overrideH int) (*generativeart.Canva, error) {
+// PrepareReplayCanva constructs a configured *generativeart.Canva and Engine from meta,
+// restoring exact dimensions (or overrideW x overrideH), seed, background/foreground/line colors,
+// exact Palette stops, Options (LineWidth, NIters, Alpha), PostEffects, and optional parameter overrides
+// without immediately executing Draw.
+func PrepareReplayCanva(meta *generativeart.RecipeMetadata, overrideW, overrideH int, paramOverrides map[string]interface{}) (*generativeart.Canva, generativeart.Engine, error) {
 	if meta == nil {
-		return nil, fmt.Errorf("nil RecipeMetadata")
+		return nil, nil, fmt.Errorf("nil RecipeMetadata")
 	}
 	desc, ok := Lookup(meta.Engine)
 	if !ok {
-		return nil, fmt.Errorf("engine %q is not registered for automatic replay", meta.Engine)
+		return nil, nil, fmt.Errorf("engine %q is not registered for automatic replay", meta.Engine)
 	}
 	w, h := meta.Width, meta.Height
 	if overrideW > 0 && overrideH > 0 {
 		w, h = overrideW, overrideH
+	} else if overrideW > 0 {
+		w = overrideW
+	} else if overrideH > 0 {
+		h = overrideH
 	}
 	if w <= 0 || h <= 0 {
 		w, h = 600, 600
@@ -983,11 +1152,75 @@ func ReplayRecipe(meta *generativeart.RecipeMetadata, overrideW, overrideH int) 
 		B: meta.Background[2],
 		A: meta.Background[3],
 	})
-	if pal, exists := PaletteByName(desc.DefaultPal); exists {
+	if meta.Foreground != ([4]uint8{}) {
+		c.SetForeground(color.RGBA{
+			R: meta.Foreground[0],
+			G: meta.Foreground[1],
+			B: meta.Foreground[2],
+			A: meta.Foreground[3],
+		})
+	}
+	if meta.LineColor != ([4]uint8{}) {
+		c.SetLineColor(color.RGBA{
+			R: meta.LineColor[0],
+			G: meta.LineColor[1],
+			B: meta.LineColor[2],
+			A: meta.LineColor[3],
+		})
+	}
+	if meta.LineWidth > 0 {
+		c.SetLineWidth(meta.LineWidth)
+	}
+	if meta.NIters > 0 {
+		c.SetIterations(meta.NIters)
+	}
+	if meta.Alpha > 0 {
+		c.SetAlpha(meta.Alpha)
+	}
+	if len(meta.Palette) > 0 {
+		pal := make([]color.RGBA, len(meta.Palette))
+		for i, stop := range meta.Palette {
+			pal[i] = color.RGBA{R: stop[0], G: stop[1], B: stop[2], A: stop[3]}
+		}
+		c.SetColorSchema(pal)
+	} else if pal, exists := PaletteByName(desc.DefaultPal); exists {
 		c.SetColorSchema(pal)
 	}
+	for _, effSpec := range meta.PostEffects {
+		if eff, parsed := render.ParsePostEffect(effSpec); parsed && eff != nil {
+			c.AddPostEffect(eff)
+		}
+	}
 	c.FillBackground()
-	eng := desc.Build(meta.Params)
+
+	mergedParams := make(map[string]interface{}, len(meta.Params)+len(paramOverrides))
+	for k, v := range meta.Params {
+		mergedParams[k] = v
+	}
+	if len(paramOverrides) > 0 {
+		resolved, err := desc.ResolveParams(paramOverrides)
+		if err != nil {
+			return nil, nil, err
+		}
+		for k := range paramOverrides {
+			for rk, rv := range resolved {
+				if strings.EqualFold(k, rk) {
+					mergedParams[rk] = rv
+				}
+			}
+		}
+	}
+	eng := desc.Build(mergedParams)
+	return c, eng, nil
+}
+
+// ReplayRecipe reconstructs and renders the artwork described by meta at the original
+// resolution (or overrideW x overrideH if > 0).
+func ReplayRecipe(meta *generativeart.RecipeMetadata, overrideW, overrideH int) (*generativeart.Canva, error) {
+	c, eng, err := PrepareReplayCanva(meta, overrideW, overrideH, nil)
+	if err != nil {
+		return nil, err
+	}
 	c.Draw(eng)
 	return c, nil
 }
