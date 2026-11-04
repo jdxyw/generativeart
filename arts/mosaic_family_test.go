@@ -86,6 +86,10 @@ func TestMosaicFamilyGenerators(t *testing.T) {
 		{"MoebiusLeviathan", NewMoebiusLeviathan(14, 5, -0.18)},
 		{"DurerPolyhedron", NewDurerPolyhedron(12, 3, 0.32)},
 		{"MineralShanShui", NewMineralShanShui(5, 4, 1.0)},
+		{"BabelLibrary", NewBabelLibrary(6, 5, 1.0)},
+		{"KeplerHarmonices", NewKeplerHarmonices(5, 3, 0.26)},
+		{"MoebiusHermeticGarage", NewMoebiusHermeticGarage(24, 6, 0.36)},
+		{"CalabiYauManifold", NewCalabiYauManifold(5, 2, 0.35)},
 	}
 
 	for _, tc := range cases {

@@ -145,6 +145,112 @@ func SDF3DFlutedColumnY(p Vec3, radius, halfHeight float64, nFlutes int) float64
 	return math.Min(shaft, capital)
 }
 
+// SDF3DHexPrismY evaluates an exact 3D regular hexagonal prism centered on the Y axis
+// with flat-to-flat inradius and vertical half-height halfH.
+func SDF3DHexPrismY(p Vec3, inradius, halfH float64) float64 {
+	kx := -0.8660254037844386
+	kz := 0.5
+	kt := 0.5773502691896258
+	qx := math.Abs(p.X)
+	qz := math.Abs(p.Z)
+	dot := kx*qx + kz*qz
+	if dot < 0 {
+		qx -= 2.0 * dot * kx
+		qz -= 2.0 * dot * kz
+	}
+	clampedX := common.Constrain(qx, -kt*inradius, kt*inradius)
+	dHex := math.Hypot(qx-clampedX, qz-inradius)
+	if qz-inradius < 0 {
+		dHex = -dHex
+	}
+	dy := math.Abs(p.Y) - halfH
+	return math.Min(math.Max(dHex, dy), 0.0) + math.Hypot(math.Max(dHex, 0.0), math.Max(dy, 0.0))
+}
+
+// SDF3DPlatonicCage evaluates a hollow Renaissance polyhedral strut cage (Leonardo /
+// Jamnitzer / Kepler style) of radius r and strut thickness strutR:
+//   - kind == 0: Hollow Dodecahedron Cage (12 pentagonal windows, 30 struts, 5-fold Y axis)
+//   - kind == 1: Hollow Icosahedron Cage (20 triangular windows, 30 struts, 5-fold Y axis)
+//   - kind == 2: Hollow Octahedron Cage (8 triangular windows, 12 struts, 4-fold Y axis)
+//   - kind == 3: Hollow Cube / Hexahedron Cage (6 square windows, 12 struts, 4-fold Y axis)
+//   - kind == 4: Hollow Star-Tetrahedron / Stella Octangula Cage (4-fold Y axis)
+func SDF3DPlatonicCage(p Vec3, kind int, r, strutR float64) float64 {
+	wallT := strutR * 0.90
+	switch kind {
+	case 0:
+		// Hollow Dodecahedron / Icosahedron Cage (5-fold Y axis):
+		// In FoldIcosahedral, +Y is the face normal, and (X, Z) are tangential on the face!
+		q := FoldIcosahedral(AlignIcosahedral5FoldY(p))
+		dSolid := SDF3DRoundedBox(q, Vec3{r * 0.65, r, r * 0.65}, strutR*0.45)
+		dHollow := math.Max(dSolid, -SDF3DSphere(p, r*0.80))
+		dWindow := math.Hypot(q.X, q.Z) - r*0.25
+		return SDF3DSmoothSubtract(dWindow, dHollow, strutR*0.30)
+	case 1:
+		// Dual Slotted Icosahedral Cage (5-fold Y axis) with triangular aperture cutouts
+		q := FoldIcosahedral(AlignIcosahedral5FoldY(p))
+		dSolid := SDF3DRoundedBox(q, Vec3{r * 0.62, r, r * 0.62}, strutR*0.40)
+		dHollow := math.Max(dSolid, -SDF3DSphere(p, r*0.84))
+		dWindow := math.Max(q.X-strutR*1.1, q.Z-strutR*1.1)
+		return math.Max(dHollow, -dWindow)
+	case 2:
+		// Hollow Octahedron Cage (4-fold Y axis):
+		// Bound by SDF3DOctahedron(q, r), hollowed inside, with triangular window cutouts on each of the 8 faces!
+		q := FoldOctahedral(p)
+		dOct := SDF3DOctahedron(q, r)
+		dShell := math.Max(dOct, -(dOct + wallT*1.8))
+		// In sorted FoldOctahedral (x >= y >= z >= 0), the 3 edges of the octahedral face are z=0 and x+y+z=r;
+		// cutting where z > strutR*1.25 carves a clean triangular window on every octahedral face!
+		dWindow := q.Z - strutR*1.25
+		return math.Max(dShell, -dWindow)
+	case 3:
+		// Hollow Cube / Hexahedron Cage (4-fold Y axis):
+		// Bound by SDF3DRoundedBox(q, (r,r,r)), hollowed inside, with open square windows on all 6 faces!
+		q := FoldOctahedral(p)
+		dCube := SDF3DRoundedBox(q, Vec3{r, r, r}, strutR*0.45)
+		dShell := math.Max(dCube, -SDF3DBox(q, Vec3{r - wallT*1.6, r - wallT*1.6, r - wallT*1.6}))
+		// In sorted FoldOctahedral (x >= y >= z >= 0), the face is x = r and the face coordinates are (y, z);
+		// dWindow < 0 where max(y, z) < r - strutR*2.2 carves open square windows on all 6 cube faces!
+		dWindow := math.Max(q.Y, q.Z) - (r - strutR*2.2)
+		return SDF3DSmoothSubtract(dWindow, dShell, strutR*0.25)
+	default:
+		// Star-Octahedron / Keplerian Spiked Core (4-fold Y axis)
+		q := FoldOctahedral(p)
+		dStar := SDF3DOctahedron(q, r)
+		dSpikes := SDF3DCapsule(q, Vec3{0, 0, 0}, Vec3{r * 1.25, 0, 0}, strutR*1.15)
+		return SDF3DSmoothUnion(dStar, dSpikes, strutR*0.6)
+	}
+}
+
+// SDF3DClebschCalabiYau evaluates a bounded, smooth 3D algebraic-trigonometric
+// Calabi-Yau / Clebsch diagonal surface manifold with octahedral + 5-fold harmonic
+// saddles, hollowed genus-tunnel handles, and thin shell thickness shellT.
+func SDF3DClebschCalabiYau(p Vec3, radius, morphPhase, shellT float64) float64 {
+	if radius <= 1e-4 {
+		radius = 1.0
+	}
+	u := p.Scale(1.0 / radius)
+	r := u.Len()
+	if r > 1.45 {
+		return (r - 1.15) * radius
+	}
+	// Smooth octahedral + quintic Calabi-Yau trigonometric cross-section implicit field:
+	// Combines Clebsch cubic symmetry (x^3 + y^3 + z^3 - 3xyz) with 5-fold harmonic saddles
+	k := 3.141592653589793 * 1.35
+	cx, sx := math.Cos(u.X*k+morphPhase), math.Sin(u.X*k+morphPhase)
+	cy, sy := math.Cos(u.Y*k+morphPhase), math.Sin(u.Y*k+morphPhase)
+	cz, sz := math.Cos(u.Z*k+morphPhase), math.Sin(u.Z*k+morphPhase)
+
+	gyroid := sx*cy + sy*cz + sz*cx
+	schwarzP := cx + cy + cz
+	clebsch := (u.X*u.X*u.X + u.Y*u.Y*u.Y + u.Z*u.Z*u.Z - 3.0*u.X*u.Y*u.Z) * 1.45
+
+	iso := 0.52*gyroid + 0.34*schwarzP + 0.42*clebsch
+	// Lipschitz-bounded shell distance intersected smoothly with a bounding sphere
+	dSurface := (math.Abs(iso) / (k * 1.45)) * radius - shellT
+	dSphere := (r - 1.0) * radius
+	return SDF3DSmoothIntersect(dSurface, dSphere, 0.08*radius)
+}
+
 // SDF3DRomanArchZ evaluates a 3D vaulted Romanesque/Piranesi stone arch spanning X
 // with thickness along Z, opening width archRadius, and pier height pierH.
 func SDF3DRomanArchZ(p Vec3, outerW, totalH, depthZ, archRadius, pierH float64) float64 {

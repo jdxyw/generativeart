@@ -8,17 +8,21 @@ This gallery contains standalone `Go` usage examples and rendered outputs for `g
 
 ## 🎞️ Seamless 600×600 HD Looping GIF Animations (`DrawTimelapseFrames` + `ToGIF`)
 
-| Dürer 3D Polyhedron (`durerpolyhedron`) | Piranesi Carceri (`piranesicarceri`) | Mœbius Leviathan (`moebiusleviathan`) | Mœbius Arzach Citadel (`moebiuscanyon`) |
+| Babel Library (`babellibrary`) | Kepler Harmonices (`keplerharmonices`) | Mœbius Hermetic Garage (`moebiushermeticgarage`) | Calabi-Yau Manifold (`calabiyaumanifold`) |
 | :---: | :---: | :---: | :---: |
+| ![Babel Library Loop](images/babellibrary_loop.gif) | ![Kepler Harmonices Loop](images/keplerharmonices_loop.gif) | ![Moebius Hermetic Garage Loop](images/moebiushermeticgarage_loop.gif) | ![Calabi Yau Manifold Loop](images/calabiyaumanifold_loop.gif) |
+| **Dürer 3D Polyhedron (`durerpolyhedron`)** | **Piranesi Carceri (`piranesicarceri`)** | **Mœbius Leviathan (`moebiusleviathan`)** | **Mœbius Arzach Citadel (`moebiuscanyon`)** |
 | ![Durer Polyhedron Loop](images/durerpolyhedron_loop.gif) | ![Piranesi Carceri Loop](images/piranesicarceri_loop.gif) | ![Moebius Leviathan Loop](images/moebiusleviathan_loop.gif) | ![Moebius Canyon Loop](images/moebiuscanyon_loop.gif) |
 | **Escher Circle Limit (`eschercirclelimit`)** | **Escher Droste Spiral (`escherdrostegallery`)** | **Celestial Gabor Astrolabe (`gaborwaveinterference`)** | **3D Perlin Curl Silk (`analyticalcurlsilk`)** |
 | ![Escher Circle Limit Loop](images/eschercirclelimit_loop.gif) | ![Escher Droste Gallery Loop](images/escherdrostegallery_loop.gif) | ![Gabor Wave Interference Loop](images/gaborwaveinterference_loop.gif) | ![Analytical Curl Silk Loop](images/analyticalcurlsilk_loop.gif) |
 | **Binary Nebula Plumes (`nebulaplumes`)** | **Abyssal Kuroshio Jet (`abyssalcurrents`)** | **Vortex Impasto (`vorteximpasto`)** | **Squeegee Scrape (`squeegeescrape`)** |
 | ![Nebula Plumes Loop](images/nebulaplumes_loop.gif) | ![Abyssal Currents Loop](images/abyssalcurrents_loop.gif) | ![Vortex Impasto Loop](images/vorteximpasto_loop.gif) | ![Squeegee Scrape Loop](images/squeegeescrape_loop.gif) |
-| **3D Lissajous Silk (`lissajousribbon`)** | **Karst Terraces (`marchingisolines`)** | **Jovian Vortex (`vortexfluid`)** | **Dunhuang Caisson (`dunhuangapsara`)** |
-| ![Lissajous Ribbon Loop](images/lissajousribbon_loop.gif) | ![Marching Isolines Loop](images/marchingisolines_loop.gif) | ![Vortex Fluid Loop](images/vortexfluid_loop.gif) | ![Dunhuang Caisson Loop](images/dunhuangapsara_loop.gif) |
 
 ```bash
+go run ./cmd/genart render -art babellibrary          -w 600 -h 600 -frames 20 -delay 12 -out images/babellibrary_loop.gif
+go run ./cmd/genart render -art keplerharmonices      -w 600 -h 600 -frames 20 -delay 12 -out images/keplerharmonices_loop.gif
+go run ./cmd/genart render -art moebiushermeticgarage -w 600 -h 600 -frames 20 -delay 12 -out images/moebiushermeticgarage_loop.gif
+go run ./cmd/genart render -art calabiyaumanifold     -w 600 -h 600 -frames 20 -delay 12 -out images/calabiyaumanifold_loop.gif
 go run ./cmd/genart render -art durerpolyhedron       -w 600 -h 600 -frames 20 -delay 12 -out images/durerpolyhedron_loop.gif
 go run ./cmd/genart render -art piranesicarceri       -w 600 -h 600 -frames 20 -delay 12 -out images/piranesicarceri_loop.gif
 go run ./cmd/genart render -art moebiusleviathan      -w 600 -h 600 -frames 20 -delay 12 -out images/moebiusleviathan_loop.gif
@@ -70,6 +74,11 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
 
 ## Table of Contents
 
+- [Wave 23: Master Architecture, Celestial Mechanics & Sci-Fi Megastructures — Borges Library of Babel, Kepler Mysterium Cosmographicum, Mœbius Hermetic Garage & Calabi-Yau Algebraic Manifold](#wave-23-master-architecture-celestial-mechanics--sci-fi-megastructures--borges-library-of-babel-kepler-mysterium-cosmographicum-mœbius-hermetic-garage--calabi-yau-algebraic-manifold)
+  - [Babel Library](#babel-library)
+  - [Kepler Harmonices](#kepler-harmonices)
+  - [Moebius Hermetic Garage](#moebius-hermetic-garage)
+  - [Calabi Yau Manifold](#calabi-yau-manifold)
 - [Wave 22: Part VIII Flagship Quartet — Piranesi Carceri Vault Labyrinth, 3D SDF Mœbius Leviathan Airship, Dürer/Jamnitzer 3D Polyhedron & Kubelka-Munk Mineral Shan-Shui](#wave-22-part-viii-flagship-quartet--piranesi-carceri-vault-labyrinth-3d-sdf-mœbius-leviathan-airship-dürerjamnitzer-3d-polyhedron--kubelka-munk-mineral-shan-shui)
   - [Piranesi Carceri](#piranesi-carceri)
   - [Moebius Leviathan](#moebius-leviathan)
@@ -224,6 +233,114 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
   - [Silk Sky](#silk-sky)
   - [Circle Move](#circle-move)
   - [Random Circle](#random-circle)
+
+---
+
+## Wave 23: Master Architecture, Celestial Mechanics & Sci-Fi Megastructures — Borges Library of Babel, Kepler Mysterium Cosmographicum, Mœbius Hermetic Garage & Calabi-Yau Algebraic Manifold
+
+### Babel Library
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20262301)
+	c.SetBackground(color.RGBA{R: 248, G: 241, B: 224, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewBabelLibrary(6, 5, 1.0))
+	c.ToPNG("babellibrary.png")
+}
+```
+
+![Babel Library](images/babellibrary.png)
+
+### Kepler Harmonices
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20262302)
+	c.SetBackground(color.RGBA{R: 248, G: 241, B: 224, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewKeplerHarmonices(5, 3, 0.26))
+	c.ToPNG("keplerharmonices.png")
+}
+```
+
+![Kepler Harmonices](images/keplerharmonices.png)
+
+### Moebius Hermetic Garage
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20262303)
+	c.SetBackground(color.RGBA{R: 248, G: 241, B: 224, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Sunset)
+	c.Draw(arts.NewMoebiusHermeticGarage(24, 6, 0.36))
+	c.ToPNG("moebiushermeticgarage.png")
+}
+```
+
+![Moebius Hermetic Garage](images/moebiushermeticgarage.png)
+
+### Calabi Yau Manifold
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20262304)
+	c.SetBackground(color.RGBA{R: 248, G: 241, B: 224, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewCalabiYauManifold(5, 2, 0.35))
+	c.ToPNG("calabiyaumanifold.png")
+}
+```
+
+![Calabi Yau Manifold](images/calabiyaumanifold.png)
 
 ---
 

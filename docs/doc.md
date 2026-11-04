@@ -134,6 +134,10 @@
 	- [Moebius Leviathan](#moebius-leviathan)
 	- [Durer Polyhedron](#durer-polyhedron)
 	- [Mineral Shan Shui](#mineral-shan-shui)
+	- [Babel Library](#babel-library)
+	- [Kepler Harmonices](#kepler-harmonices)
+	- [Moebius Hermetic Garage](#moebius-hermetic-garage)
+	- [Calabi Yau Manifold](#calabi-yau-manifold)
 
 ## CLI Tool (`cmd/genart`) & Exhibition Poster Reference
 
@@ -2127,6 +2131,71 @@ ms := arts.NewMineralShanShui(5, 4, 1.0)
 ```
 
 ![](../images/mineralshanshui.png)
+
+## Babel Library
+
+`Babel Library` renders a 3D perspective & SDF raymarched infinite hexagonal library chasm inspired by Jorge Luis Borges's *The Library of Babel*, Piranesi's *Carceri*, and Escher's hexagonal galleries: receding hexagonal gallery tiers lined with 5 arched book-alcoves per wall, leather-and-mineral codex spines, oak balustrades, and a central suspended brass astrolabe & lamp orb, shaded with Kubelka-Munk pigments and object-locked 3D copperplate burin cross-hatching.
+
+### parameters
+
+- galleries: Hexagonal symmetry order (default `6`).
+- tiers: Number of visible receding hexagonal gallery stories (default `5`).
+- shaftScale: Logarithmic perspective depth scale along the central ventilation shaft (default `1.0`).
+
+```go
+bl := arts.NewBabelLibrary(6, 5, 1.0)
+```
+
+![](../images/babellibrary.png)
+
+## Kepler Harmonices
+
+`Kepler Harmonices` renders a 3D SDF raymarched Renaissance astronomical monument inspired by Johannes Kepler's *Mysterium Cosmographicum* (1596, Tabula III) and *Harmonices Mundi* (1619): nested hollow Platonic polyhedron cages (Cube, Dodecahedron, Octahedron) and zodiacal armillary rings counter-rotating around a central solar sphere atop a fluted pedestal, shaded with Kubelka-Munk mineral pigments and 3D object-locked copperplate burin cross-hatching.
+
+### parameters
+
+- shells: Number of nested Platonic polyhedral shells (default `5`).
+- rings: Number of zodiacal and meridian armillary rings (default `3`).
+- inclination: Axial tilt in radians (default `0.26`).
+
+```go
+kh := arts.NewKeplerHarmonices(5, 3, 0.26)
+```
+
+![](../images/keplerharmonices.png)
+
+## Moebius Hermetic Garage
+
+`Moebius Hermetic Garage` renders a Jean "Mœbius" Giraud *Le Garage Hermétique* (1976) sci-fi cavern drydock: inside an overhanging weathered asteroid arch, a 3D SDF raymarched bone-ivory and vermilion-striped toroidal mothership ring with 24 carapace ribs, 6 brass docking spokes, and a counter-rotating turquoise reactor core hovers above faceted crystal spires and a shimmering subterranean lagoon, accompanied by 3 orbiting reconnaissance pods.
+
+### parameters
+
+- ribs: Number of radial carapace ribs around the toroidal mothership (default `24`).
+- spires: Number of subterranean mineral crystal spires (default `6`).
+- ringTilt: Perspective tilt of the toroidal station (default `0.36`).
+
+```go
+hg := arts.NewMoebiusHermeticGarage(24, 6, 0.36)
+```
+
+![](../images/moebiushermeticgarage.png)
+
+## Calabi Yau Manifold
+
+`Calabi Yau Manifold` raymarches a 3D string-theory Calabi-Yau / Clebsch algebraic surface manifold (`render.SDF3DClebschCalabiYau`) with hollowed genus-tunnel handles, nested inside twin orthogonal gilded geodesic astrolabe rings and orbited by 4 topological monopole spheres, combining two-sided Kubelka-Munk Gold-Leaf/Cinnabar/Azurite/Malachite glazes with 3D object-locked copperplate burin cross-hatching.
+
+### parameters
+
+- foldOrder: Symmetry fold order (default `5`).
+- rings: Number of nested geodesic astrolabe rings (default `2`).
+- phaseMorph: Algebraic saddle harmonic morph phase (default `0.35`).
+
+```go
+cy := arts.NewCalabiYauManifold(5, 2, 0.35)
+```
+
+![](../images/calabiyaumanifold.png)
+
 
 
 

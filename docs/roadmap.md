@@ -7,7 +7,8 @@ This document serves as the architectural blueprint for `generativeart`, coverin
 4. **Waves 9–22 `arts/` Visual Paradigms (140 Art Engines + 29 HD 600×600 Loop GIFs — Implemented)**
 5. **Exhibition Poster & ContactSheet Engine (`poster.go` — Implemented) & HD GIF Expansion**
 6. **Next-Generation Architecture & Platform Roadmap (6 Directions, with Directions 4 & 5 Implemented)**
-7. **Art-Empowering Rendering & Mathematical Foundations (Next-Tier Capabilities for Future `arts/` — Implemented)**
+7. **Art-Empowering Rendering & Mathematical Foundations (Part VII & Part VIII — Implemented)**
+8. **Wave 23 Master Architecture, Celestial Mechanics & Sci-Fi Megastructures + Part IX–XI Future Roadmap**
 
 ---
 
@@ -316,5 +317,59 @@ To elevate future generative artworks in `arts/` (especially mathematical topolo
 - **Capability**:
   - First-class `Mobius2D` ($\frac{az+b}{cz+d}$, composition, inversion, determinant normalization, isometric circles, Poincaré disk automorphisms, Cayley transforms), `Circle2D` point/circle inversions, `PoincareGeodesicArc`, and `EvaluateDomainColoring(fz, logPeriod, phaseRays)` combining normalized argument phase with anti-aliased log-modulus isolines and stereographic Riemann-sphere shading.
 - **Artistic Unlock**: Dramatically simplifies and enriches conformal fractals, Kleinian limit sets, modular forms, elliptic functions, and complex dynamical systems.
+
+---
+
+## Part VIII. Physical Subtractive Pigments, 3D SDF Raymarching & Principal-Curvature Copperplate Engraving (`render/` — Implemented)
+
+### 8.1 Two-Flux Kubelka-Munk Subtractive Pigment Mixing & Watercolor Granulation (`render/pigment_engine.go` — Implemented)
+- **Capability**:
+  - Models spectral absorption $K(\lambda)$ and scattering $S(\lambda)$ across R/G/B bands with無限光学厚度反射率 $R_\infty = 1 + \frac{K}{S} - \sqrt{\left(\frac{K}{S}\right)^2 + 2\frac{K}{S}}$ and Saunderson surface-reflection correction (`MixKubelkaMunk`, `LerpKubelkaMunk`, `GlazeKubelkaMunk`).
+  - Curated 15 historical mineral & traditional pigments (`PigmentAzurite`, `PigmentMalachite`, `PigmentCinnabar`, `PigmentYellowOchre`, `PigmentBurntSienna`, `PigmentRawUmber`, `PigmentUltramarine`, `PigmentIndigo`, `PigmentGoldLeaf`, `PigmentPineSootInk`, `PigmentTitaniumWhite`, etc.) plus `EvaluateWatercolorWash` for capillary coffee-ring edge darkening and cold-pressed paper valley granulation.
+
+### 8.2 3D Signed Distance Field (SDF) Raymarching & Polyhedral Symmetry Folding (`render/sdf3d.go` — Implemented)
+- **Capability**:
+  - Analytical 3D primitives (`SDF3DSphere`, `SDF3DBox`, `SDF3DTorus`, `SDF3DCylinderY`, `SDF3DOctahedron`, `SDF3DFlutedColumnY`, `SDF3DRomanArchZ`, `SDF3DHexPrismY`, `SDF3DPlatonicCage`, `SDF3DClebschCalabiYau`), smooth CSG booleans (`SDF3DSmoothUnion`, `SDF3DSmoothSubtract`, `SDF3DSmoothIntersect`), and symmetry folding (`FoldPolarModXZ`, `FoldOctahedral`, `FoldIcosahedral`, `AlignIcosahedral5FoldY`).
+  - Tetrahedral finite-difference normal & 3D mean curvature solver (`CalcSDF3DNormalAndCurvature`), penumbra soft shadows (`CalcSDF3DSoftShadow`), 5-tap exponential 3D AO (`CalcSDF3DAO`), `RaymarchSDF3D`, and 3D object-locked stone relief (`EvaluateMoebiusStoneRelief3D`).
+
+### 8.3 Hessian Principal-Curvature & 3D Object-Locked Copperplate Burin Engraving (`render/engraving_engine.go` — Implemented)
+- **Capability**:
+  - 2nd-order Hessian principal curvature eigenvector solver (`ComputePrincipalCurvature2D`), variable-width Jobard-Lefer intaglio burin cross-hatching (`RenderCurvatureEngraving`), and 3D object-locked triplanar/cylindrical facet burin hatching (`Evaluate3DBurinEngraving`) that rotates rigidly with 3D geometry without 2D screen-space swimming.
+
+---
+
+## Part IX. Next-Horizon Roadmap: 4 Strategic Directions (Waves 23–26)
+
+### 9.1 Direction 1: Master Architecture, Celestial Mechanics & Sci-Fi Megastructures (Wave 23 — Implementing)
+Leveraging Part VIII's 3D SDF raymarcher, 3D object-locked copperplate burin engraving, Kubelka-Munk mineral pigments, and Mœbius *Ligne Claire* gouache pipeline:
+1. **`BabelLibrary`** (`NewBabelLibrary(galleries, tiers int, shaftScale float64)`):
+   - Inspired by Jorge Luis Borges's *The Library of Babel*, Piranesi, and Escher: 3D SDF raymarched infinite hexagonal book-alcove galleries, spiral staircases, suspended brass lanterns, and receding hexagonal ventilation shafts with Kubelka-Munk ochre/sienna/umber glazes and 3D object-locked burin cross-hatching (`images/babellibrary.png` + `images/babellibrary_loop.gif`).
+2. **`KeplerHarmonices`** (`NewKeplerHarmonices(shells, rings int, inclination float64)`):
+   - Homage to Johannes Kepler's 1596 *Mysterium Cosmographicum* & 1619 *Harmonices Mundi*: nested 3D SDF hollow Platonic polyhedron cages (Dodecahedron, Icosahedron, Octahedron, Cube, Star-Tetrahedron) interleaved with zodiacal armillary spheres around a central solar core, counter-rotating seamlessly along their 5-fold and 4-fold symmetry axes (`images/keplerharmonices.png` + `images/keplerharmonices_loop.gif`).
+3. **`MoebiusHermeticGarage`** (`NewMoebiusHermeticGarage(ribs, spires int, ringTilt float64)`):
+   - Homage to Jean "Mœbius" Giraud's *Le Garage Hermétique* (1976): inside a colossal weathered asteroid cavern, a bone-ivory and vermilion-striped toroidal mothership dock with ribbed mechanical struts and brass conduits hovers above an emerald-turquoise subterranean drydock, flanked by crystalline mineral spires, an observation catwalk, and orbiting shuttle pods (`images/moebiushermeticgarage.png` + `images/moebiushermeticgarage_loop.gif`).
+4. **`CalabiYauManifold`** (`NewCalabiYauManifold(foldOrder, rings int, phaseMorph float64)`):
+   - String-theory Calabi-Yau / Clebsch algebraic surface manifold raymarched in 3D with hollowed genus-tunnel handles and orbiting golden geodesic rings, combining Kubelka-Munk Lapis Lazuli, Malachite, Vermilion, and 24k Gold Leaf glazes with 3D object-locked principal-curvature burin cross-hatching (`images/calabiyaumanifold.png` + `images/calabiyaumanifold_loop.gif`).
+
+### 9.2 Direction 2: Part IX Optical Upgrade — 3D Dielectrics, Snell Refraction, Beer-Lambert Absorption & Volumetric Caustics (`render/sdf3d_optics.go`)
+- **Underlying Engine**:
+  - Extend `sdf3d.go` with multi-bounce Snell refraction ($\eta_1 \sin\theta_1 = \eta_2 \sin\theta_2$), Schlick-Fresnel reflectance, internal total reflection, Beer-Lambert spectral volume attenuation $T(\lambda) = e^{-\sigma_a(\lambda)\, d}$, and spectral index-of-refraction dispersion ($\eta_R, \eta_G, \eta_B$).
+- **Target Masterpieces**:
+  - **`MuranoGlassNautilus`**: Venetian Murano blown-glass nautilus with gold-leaf *Aventurine* inclusions and internal caustic light pipes.
+  - **`DispersionPrism`**: Newton optical prism array splitting collimated beams into dispersed spectral caustics.
+  - **`AmberInclusion`**: Baltic amber cabochon with Beer-Lambert honey-gold internal absorption enclosing fractal dendritic inclusions.
+
+### 9.3 Direction 3: Part X Biological Upgrade — 3D Morphogenesis, Biomineralization & Ernst Haeckel *Kunstformen der Natur* (`render/morphogenesis3d.go`)
+- **Underlying Engine**:
+  - 3D spherical-harmonic and polyhedral-lattice reaction-diffusion / Voronoi skeletal operators generating perforated siliceous endoskeletons and calcareous plates in 3D SDF space, paired with 19th-century chromolithograph & copperplate engraving shaders.
+- **Target Masterpieces**:
+  - **`HaeckelRadiolaria`**: Ernst Haeckel (1904) *Phaeodaria / Acantharia* concentric perforated geodesic silica shells and radial spicules.
+  - **`DiatomFrustule`**: Multi-scale hierarchical sieve-pore (*areolae*) microscopic glass frustules.
+  - **`BrainCoral3D`**: True 3D surface-extruded gyroid/meandroid brain-coral labyrinth with abyssal bioluminescence.
+
+### 9.4 Direction 4: Interactive Gallery Enhancements (`index.html`)
+- Inline **Static PNG / Animated GIF toggle badge** directly on dual-mode gallery cards.
+- **Museum Frame Fullscreen Mode** and interactive **Algorithm Lineage Graph** inside the exhibition lightbox.
+
 
 

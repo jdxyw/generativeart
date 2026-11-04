@@ -106,6 +106,36 @@ func paramString(p map[string]interface{}, key, def string) string {
 }
 
 var registry = []ArtDescriptor{
+	// Wave 23: Master Architecture, Celestial Mechanics & Sci-Fi Megastructures Quartet (BabelLibrary, KeplerHarmonices, MoebiusHermeticGarage, CalabiYauManifold)
+	{
+		ID: "babellibrary", StructName: "babelLibrary", Category: "geom",
+		DefaultBG: color.RGBA{248, 241, 224, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewBabelLibrary(paramInt(p, "galleries", 6), paramInt(p, "tiers", 5), paramFloat(p, "shaftScale", 1.0))
+		},
+	},
+	{
+		ID: "keplerharmonices", StructName: "keplerHarmonices", Category: "geom",
+		DefaultBG: color.RGBA{248, 241, 224, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewKeplerHarmonices(paramInt(p, "shells", 5), paramInt(p, "rings", 3), paramFloat(p, "inclination", 0.26))
+		},
+	},
+	{
+		ID: "moebiushermeticgarage", StructName: "moebiusHermeticGarage", Category: "media",
+		DefaultBG: color.RGBA{248, 241, 224, 255}, DefaultPal: "sunset",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewMoebiusHermeticGarage(paramInt(p, "ribs", 24), paramInt(p, "spires", 6), paramFloat(p, "ringTilt", 0.36))
+		},
+	},
+	{
+		ID: "calabiyaumanifold", StructName: "calabiYauManifold", Category: "chaos",
+		DefaultBG: color.RGBA{248, 241, 224, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewCalabiYauManifold(paramInt(p, "foldOrder", 5), paramInt(p, "rings", 2), paramFloat(p, "phaseMorph", 0.35))
+		},
+	},
+
 	// Wave 22: Part VIII Flagship Quartet (PiranesiCarceri, MoebiusLeviathan, DurerPolyhedron, MineralShanShui)
 	{
 		ID: "piranesicarceri", StructName: "piranesiCarceri", Category: "geom",
