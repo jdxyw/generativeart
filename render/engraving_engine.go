@@ -286,3 +286,47 @@ func Evaluate3DBurinEngraving(pLocal, nLocal Vec3, illum, freq float64) (inkWeig
 
 	return common.Clamp01(inkWeight), common.Clamp01(chalkWeight)
 }
+
+// Evaluate3DWeingartenEngraving evaluates intrinsic 3D principal-curvature copperplate
+// burin cross-hatching on an arbitrary 3D SDF surface at pLocal by diagonalizing the
+// tangent-plane Weingarten shape operator CalcSDF3DWeingartenCurvature.
+// Primary burin lines wrap along the direction of maximum principal curvature (E1),
+// while orthogonal cross-hatching wraps along minimum principal curvature (E2).
+func Evaluate3DWeingartenEngraving(
+	sdf SDF3D,
+	pLocal Vec3,
+	illum, freq float64,
+) (inkWeight, chalkWeight float64, pc SDF3DPrincipalCurvature) {
+	if sdf == nil {
+		return 0, 0, SDF3DPrincipalCurvature{}
+	}
+	if freq <= 1.0 {
+		freq = 72.0
+	}
+	pc = CalcSDF3DWeingartenCurvature(sdf, pLocal, 0.004)
+	u := pLocal.Dot(pc.E1) * freq
+	v := pLocal.Dot(pc.E2) * freq
+
+	if illum < 0.58 {
+		shadowStrength := common.Smoothstep(0.58, 0.16, illum)
+		w1 := 0.5 + 0.5*math.Cos(u)
+		thresh1 := 0.08 + 0.24*shadowStrength
+		inkWeight = (1.0 - common.Smoothstep(thresh1-0.06, thresh1+0.06, w1)) * (0.45 + 0.48*shadowStrength)
+
+		if illum < 0.34 {
+			deepStrength := common.Smoothstep(0.34, 0.08, illum)
+			w2 := 0.5 + 0.5*math.Cos(v)
+			thresh2 := 0.07 + 0.20*deepStrength
+			line2 := (1.0 - common.Smoothstep(thresh2-0.06, thresh2+0.06, w2)) * 0.78 * deepStrength
+			inkWeight = math.Max(inkWeight, line2)
+		}
+	}
+	if illum > 0.74 {
+		hiStrength := common.Smoothstep(0.74, 0.96, illum)
+		wHi := 0.5 + 0.5*math.Cos(u*0.85+0.4*v)
+		threshHi := 0.06 + 0.14*hiStrength
+		chalkWeight = (1.0 - common.Smoothstep(threshHi-0.05, threshHi+0.05, wHi)) * 0.68 * hiStrength
+	}
+
+	return common.Clamp01(inkWeight), common.Clamp01(chalkWeight), pc
+}

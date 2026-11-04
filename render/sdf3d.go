@@ -473,6 +473,105 @@ func CalcSDF3DNormalAndCurvatureAtHit(sdf SDF3D, p Vec3, dCenter, eps float64) (
 	return norm, curv
 }
 
+// SDF3DPrincipalCurvature stores the intrinsic 3D differential geometry of an SDF surface
+// at a point p, computed via the tangent-plane Weingarten shape operator S = -(I - n n^T) nabla^2 f:
+//   - Normal: unit outward surface normal n
+//   - E1, E2: orthonormal 3D principal curvature tangent directions in T_p M (E1 = max bending, E2 = min bending)
+//   - K1, K2: principal curvatures (1/R_1, 1/R_2; >0 convex, <0 concave)
+//   - MeanH: mean curvature H = 0.5 * (K1 + K2)
+//   - GaussianK: Gaussian curvature K = K1 * K2 (>0 elliptic dome, <0 hyperbolic saddle, 0 developable cylinder/cone)
+type SDF3DPrincipalCurvature struct {
+	Normal    Vec3
+	E1        Vec3
+	E2        Vec3
+	K1        float64
+	K2        float64
+	MeanH     float64
+	GaussianK float64
+}
+
+// CalcSDF3DWeingartenCurvature evaluates the 2x2 Weingarten shape operator (second fundamental form)
+// directly in the orthonormal tangent plane (t1, t2) orthogonal to the surface normal at p,
+// diagonalizing it to return the exact 3D principal curvature directions (E1, E2) and curvatures (K1, K2, MeanH, GaussianK).
+func CalcSDF3DWeingartenCurvature(sdf SDF3D, p Vec3, eps float64) SDF3DPrincipalCurvature {
+	if eps <= 0 {
+		eps = 0.004
+	}
+	dC := sdf(p)
+	k0 := Vec3{1, -1, -1}
+	k1 := Vec3{-1, -1, 1}
+	k2 := Vec3{-1, 1, -1}
+	k3 := Vec3{1, 1, 1}
+
+	d0 := sdf(p.Add(k0.Scale(eps)))
+	d1 := sdf(p.Add(k1.Scale(eps)))
+	d2 := sdf(p.Add(k2.Scale(eps)))
+	d3 := sdf(p.Add(k3.Scale(eps)))
+
+	gradRaw := k0.Scale(d0).Add(k1.Scale(d1)).Add(k2.Scale(d2)).Add(k3.Scale(d3))
+	// For a unit-gradient SDF, ||gradRaw|| = 4 * eps
+	gradMag := gradRaw.Len() / (4.0 * eps)
+	if gradMag < 1e-6 {
+		gradMag = 1.0
+	}
+	norm := gradRaw.Normalize()
+
+	// Construct orthonormal tangent basis (t1, t2) spanning T_p M
+	ref := Vec3{0, 1, 0}
+	if math.Abs(norm.Y) > 0.88 {
+		ref = Vec3{1, 0, 0}
+	}
+	t1 := norm.Cross(ref).Normalize()
+	t2 := norm.Cross(t1).Normalize()
+
+	// Directional second derivatives of sdf in the tangent plane (t1, t2)
+	uStep := t1.Scale(eps)
+	vStep := t2.Scale(eps)
+	invEpsSq := 1.0 / (eps * eps * gradMag)
+
+	fUPlus := sdf(p.Add(uStep))
+	fUMinus := sdf(p.Sub(uStep))
+	fVPlus := sdf(p.Add(vStep))
+	fVMinus := sdf(p.Sub(vStep))
+
+	fPP := sdf(p.Add(uStep).Add(vStep))
+	fPM := sdf(p.Add(uStep).Sub(vStep))
+	fMP := sdf(p.Sub(uStep).Add(vStep))
+	fMM := sdf(p.Sub(uStep).Sub(vStep))
+
+	w11 := (fUPlus - 2.0*dC + fUMinus) * invEpsSq
+	w22 := (fVPlus - 2.0*dC + fVMinus) * invEpsSq
+	w12 := (fPP - fPM - fMP + fMM) * (0.25 * invEpsSq)
+
+	trace := w11 + w22
+	diff := w11 - w22
+	disc := math.Hypot(diff, 2.0*w12)
+
+	kap1 := 0.5 * (trace + disc)
+	kap2 := 0.5 * (trace - disc)
+
+	var e1, e2 Vec3
+	if disc > 1e-7 {
+		theta := 0.5 * math.Atan2(2.0*w12, diff)
+		c, s := math.Cos(theta), math.Sin(theta)
+		e1 = t1.Scale(c).Add(t2.Scale(s)).Normalize()
+		e2 = t1.Scale(-s).Add(t2.Scale(c)).Normalize()
+	} else {
+		e1 = t1
+		e2 = t2
+	}
+
+	return SDF3DPrincipalCurvature{
+		Normal:    norm,
+		E1:        e1,
+		E2:        e2,
+		K1:        kap1,
+		K2:        kap2,
+		MeanH:     0.5 * (kap1 + kap2),
+		GaussianK: kap1 * kap2,
+	}
+}
+
 // IntersectBoundingSphere analytically intersects ray (ro, rd) with a sphere at center of radius r.
 // Returns [tMin, tMax] along the ray and hit=true if the ray enters the sphere ahead of ro.
 func IntersectBoundingSphere(ro, rd, center Vec3, radius float64) (tMin, tMax float64, hit bool) {

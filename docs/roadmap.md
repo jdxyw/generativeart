@@ -9,7 +9,7 @@ This document serves as the architectural blueprint for `generativeart`, coverin
 6. **Next-Generation Architecture & Platform Roadmap (6 Directions, with Directions 4 & 5 Implemented)**
 7. **Art-Empowering Rendering & Mathematical Foundations (Part VII & Part VIII — Implemented)**
 8. **Wave 23 Master Architecture, Celestial Mechanics & Sci-Fi Megastructures + Part IX–XI Future Roadmap**
-9. **Part X. Underlying Infrastructure Audit & 6-Phase Core Engine Upgrade Roadmap (Phases 1–4 — Implemented)**
+9. **Part X. Underlying Infrastructure Audit & 6-Phase Core Engine Upgrade Roadmap (Phases 1–5 — Implemented)**
 
 ---
 
@@ -456,12 +456,14 @@ A comprehensive technical audit across `generativeart.go`, `platform.go`, `poste
 
 ---
 
-### 10.5 Phase 5: 8-Band Spectral Kubelka-Munk, Wet-on-Wet Fluid Bleed & 3D Weingarten Curvature Tensor (Planned)
+### 10.5 Phase 5: 8-Band Spectral Kubelka-Munk, Wet-on-Wet Fluid Bleed & 3D Weingarten Curvature Tensor (Implemented)
 
 1. **8-Wavelength Spectral Kubelka-Munk & Wet-on-Wet Capillary Fluid Diffusion (`render/pigment_engine.go`)**:
-   - Upgrade pigment mixing to 8 visible spectral bands ($380\text{nm}..730\text{nm}$) with CIE 1931 observer integration, plus a 2D water-pigment advection-diffusion solver (`SimulateWetWatercolorBleed`) for wet-on-wet paper fiber bleeding and capillary coffee-ring deposition.
+   - Upgraded `PigmentKM` with 8 visible spectral bands (`K8`, `S8` across `405nm..685nm`), `LinearRGBToSpectrum8`, `Spectrum8ToLinearRGB`, `MixSpectralKubelkaMunk`, `LerpSpectralKubelkaMunk`, and `GlazeSpectralKubelkaMunk`.
+   - Added a 2D coupled water-pigment capillary advection-diffusion solver (`WetWatercolorDeposit`, `WetWatercolorConfig`, `SimulateWetWatercolorBleed`, `(*Canvas).RenderWetWatercolorBleed`) simulating wet-on-wet multi-pigment cross-bleeding, outward coffee-ring perimeter drying, and cold-pressed paper valley granulation.
 2. **3D Surface Weingarten Shape Operator & Principal Curvature Directions (`render/sdf3d.go`, `render/engraving_engine.go`)**:
-   - Evaluate the $3\times 3$ 3D Hessian $\nabla^2 f(\mathbf{p})$ and tangent-plane Weingarten shape operator $\mathbf{S} = -(\mathbf{I}-\mathbf{n}\mathbf{n}^\top)\nabla^2 f$ directly on any `SDF3D` to extract intrinsic 3D principal curvature eigenvectors $(\mathbf{e}_1, \mathbf{e}_2, \kappa_1, \kappa_2)$.
+   - Added `SDF3DPrincipalCurvature` and `CalcSDF3DWeingartenCurvature` to diagonalize the $2\times 2$ tangent-plane Weingarten shape operator $\mathbf{S} = -(\mathbf{I}-\mathbf{n}\mathbf{n}^\top)\nabla^2 f$ directly on any `SDF3D`, extracting exact 3D principal curvature eigenvectors $(\mathbf{E}_1, \mathbf{E}_2)$, principal curvatures $(\kappa_1, \kappa_2)$, mean curvature $H$, and Gaussian curvature $K = \kappa_1\kappa_2$.
+   - Added `Evaluate3DWeingartenEngraving` in `render/engraving_engine.go` for intrinsic 3D principal-curvature copperplate burin cross-hatching.
 
 ---
 

@@ -297,4 +297,77 @@ func TestPhase3DelaunayVoronoiPDEAndVectorHLR(t *testing.T) {
 	}
 }
 
+func TestPhase5SpectralKubelkaMunkWetBleedAndWeingarten3D(t *testing.T) {
+	// 1. Verify 8-band spectral uplift/integration round-trip
+	inRGB := [3]float64{0.72, 0.38, 0.19}
+	spec8 := LinearRGBToSpectrum8(inRGB[0], inRGB[1], inRGB[2])
+	outRGB := Spectrum8ToLinearRGB(spec8)
+	if math.Abs(outRGB[0]-inRGB[0]) > 1e-4 || math.Abs(outRGB[1]-inRGB[1]) > 1e-4 || math.Abs(outRGB[2]-inRGB[2]) > 1e-4 {
+		t.Fatalf("8-band spectral round-trip error: in=%v out=%v", inRGB, outRGB)
+	}
+
+	// Verify MixSpectralKubelkaMunk on Ultramarine + Cadmium Yellow produces vivid green
+	specGreen := MixSpectralKubelkaMunk(PW(PigmentUltramarine, 0.45), PW(PigmentCadmiumYellow, 0.55))
+	if specGreen[1] <= specGreen[0] || specGreen[1] <= specGreen[2] {
+		t.Fatalf("expected 8-band spectral blue+yellow mix to have dominant green channel, got %v", specGreen)
+	}
+	paper := [3]float64{0.93, 0.89, 0.80}
+	glazed := GlazeSpectralKubelkaMunk(paper, PigmentMalachite, 1.2)
+	if glazed[1] <= glazed[0] {
+		t.Fatalf("expected spectral malachite glaze to preserve green over red, got %v", glazed)
+	}
+
+	// 2. Verify 2D Wet-on-Wet Capillary Fluid Bleed solver
+	rc := NewCanvas(48, 48)
+	rc.FillBackground(color.RGBA{245, 240, 230, 255})
+	wetCfg := DefaultWetWatercolorConfig(48, 48, 2026)
+	wetCfg.Steps = 12
+	deposits := []WetWatercolorDeposit{
+		{
+			Pigment:   PigmentAzurite,
+			SDF:       SDFCircle(Pt(18, 24), 12),
+			Wetness:   1.2,
+			Thickness: 1.0,
+		},
+		{
+			Pigment:   PigmentCadmiumYellow,
+			SDF:       SDFCircle(Pt(30, 24), 12),
+			Wetness:   1.2,
+			Thickness: 1.0,
+		},
+	}
+	rc.RenderWetWatercolorBleed(wetCfg, deposits, 1.0)
+	rMid, gMid, bMid, _ := rc.PixelLinearAt(24, 24)
+	if rMid >= paper[0] && gMid >= paper[1] && bMid >= paper[2] {
+		t.Fatalf("expected wet watercolor bleed at overlap center (24,24) to deposit pigment, got (%f,%f,%f)", rMid, gMid, bMid)
+	}
+
+	// 3. Verify 3D Weingarten Shape Operator on a sphere (R=2 -> K1=K2=0.5, K=0.25) and cylinder (R=2 -> K1=0.5, K2=0, K=0)
+	sphereR2 := func(p Vec3) float64 {
+		return SDF3DSphere(p, 2.0)
+	}
+	pcSphere := CalcSDF3DWeingartenCurvature(sphereR2, V3(0, 0, 2.0), 0.005)
+	if math.Abs(pcSphere.K1-0.5) > 0.03 || math.Abs(pcSphere.K2-0.5) > 0.03 || math.Abs(pcSphere.GaussianK-0.25) > 0.03 {
+		t.Fatalf("expected sphere R=2 principal curvatures K1=0.5, K2=0.5, K=0.25, got %+v", pcSphere)
+	}
+
+	cylR2 := func(p Vec3) float64 {
+		return math.Hypot(p.X, p.Z) - 2.0
+	}
+	pcCyl := CalcSDF3DWeingartenCurvature(cylR2, V3(0, 0.5, 2.0), 0.005)
+	if math.Abs(pcCyl.K1-0.5) > 0.03 || math.Abs(pcCyl.K2) > 0.03 || math.Abs(pcCyl.GaussianK) > 0.02 {
+		t.Fatalf("expected cylinder R=2 principal curvatures K1=0.5, K2=0.0, K=0.0, got %+v", pcCyl)
+	}
+	// Minimum curvature direction E2 on a Y-axis cylinder must align with +/- Y=(0,1,0)
+	if math.Abs(pcCyl.E2.Y) < 0.98 {
+		t.Fatalf("expected cylinder minimum curvature eigenvector E2 along Y axis, got %+v", pcCyl.E2)
+	}
+
+	inkW, chalkW, _ := Evaluate3DWeingartenEngraving(cylR2, V3(0, 0.5, 2.0), 0.25, 64.0)
+	if inkW < 0 || inkW > 1 || chalkW != 0 {
+		t.Fatalf("unexpected Evaluate3DWeingartenEngraving weights: ink=%f chalk=%f", inkW, chalkW)
+	}
+}
+
+
 
