@@ -9,7 +9,7 @@ This document serves as the architectural blueprint for `generativeart`, coverin
 6. **Next-Generation Architecture & Platform Roadmap (6 Directions, with Directions 4 & 5 Implemented)**
 7. **Art-Empowering Rendering & Mathematical Foundations (Part VII & Part VIII — Implemented)**
 8. **Wave 23 Master Architecture, Celestial Mechanics & Sci-Fi Megastructures + Part IX–XI Future Roadmap**
-9. **Part X. Underlying Infrastructure Audit & 3-Phase Core Engine Upgrade Roadmap (Phase 1 — Implementing)**
+9. **Part X. Underlying Infrastructure Audit & 3-Phase Core Engine Upgrade Roadmap (Phases 1–3 — Implemented)**
 
 ---
 
@@ -427,16 +427,20 @@ A comprehensive technical audit across `generativeart.go`, `platform.go`, `poste
 
 ---
 
-### 10.3 Phase 3: Computational Geometry, Mathematical PDE Fields & Vector Hidden-Line Removal (Planned)
+### 10.3 Phase 3: Computational Geometry, Mathematical PDE Fields & Vector Hidden-Line Removal (Implemented)
 
 1. **Unified Bowyer–Watson Delaunay Triangulation & Dual Clipped Voronoi Mesh (`render/geometry2d.go`)**:
-   - Consolidate ad-hoc Delaunay/Voronoi implementations into a single first-class kernel outputting triangles, half-edge adjacency, circumcenters, dual clipped Voronoi polygons, exact polygon-centroid Lloyd CVT relaxation, Gabriel graphs, and minimum spanning trees (MST).
+   - Implemented `DelaunayTriangle`, `VoronoiCell2D`, `DelaunayVoronoiMesh2D`, and `BuildDelaunayVoronoi2D(sites, boundsMin, boundsMax)` outputting exact Delaunay triangles, circumcenters, unique undirected Delaunay edges, and Sutherland–Hodgman half-plane clipped dual Voronoi polygons with exact Green's-theorem shoelace area and centroid (`PolygonAreaAndCentroid2D`, `ClipPolygonHalfPlane2D`).
+   - Added exact geometric polygon-centroid Lloyd CVT relaxation (`RelaxVoronoiPolygonCVT`), Gabriel Graph extraction (`ExtractGabrielGraph`), and $O(E \log E)$ Kruskal Euclidean Minimum Spanning Tree (`ExtractMinimumSpanningTree`).
 2. **Analytical 3D Noise Derivatives, `Curl3D` & Rich 2D/3D Cellular Voronoi (`common/noise.go`)**:
-   - Add `Perlin3DDeriv`, `FBM3D`, `Ridged3D`, divergence-free `Curl3D`, and `Voronoi2D` / `Voronoi3D` returning `VoronoiResult{F1, F2, EdgeDist, SmoothF1, Grad, CellID}` (with Inigo Quilez's exact distance-to-border metric).
-3. **Anisotropic Turing Reaction–Diffusion, Poisson/Helmholtz PDE Solvers & Spherical Harmonics (`render/field_engine.go`, `common/`)**:
-   - Reusable spatially-varying anisotropic diffusion tensor Gray–Scott / Turing solver, Red-Black Gauss–Seidel Screened-Poisson solver ($\nabla^2 u - \lambda u = f$), and orthonormal real Spherical Harmonics $Y_l^m(\theta,\phi)$ + Icosahedral Geodesic / Goldberg polyhedral grids.
-4. **2D & 3D Vector Hidden-Line Removal (HLR) & Plotter Polygon Hatching (`render/vector_bridge.go`, `render/sdf3d.go`)**:
-   - Automatic foreground-polygon occlusion culling (`ClipOutPolygon`) and lightness-driven polygon hatch fill generation (`PlotterConfig.HatchFills`) for physical pen plotters, plus 3D SDF silhouette & curvature vector extraction with raymarched visibility testing.
+   - Added `Perlin3DDeriv(x, y, z)` (single-pass 3D $C^2$ gradient Perlin noise + exact analytical $\nabla N$), `FBM3D`, `FBM3DDeriv`, `Ridged3D`, and divergence-free `Curl3D(x, y, z, octaves)` ($\nabla \times \vec{\Psi}$).
+   - Added `Voronoi2D` and `Voronoi3D` returning `F1`, `F2`, Inigo Quilez's exact bisector distance `EdgeDist`, log-sum-exp `SmoothF1`, analytical gradient `(GradX, GradY)`, and `CellID`.
+3. **Spherical Harmonics $Y_l^m(\theta,\phi)$, Geodesic Polyhedra & Anisotropic PDE Solvers (`common/spherical_harmonics.go`, `render/field_engine.go`)**:
+   - Added `NormalizedAssociatedLegendre`, real orthonormal `SphericalHarmonicYlm(l, m, theta, phi)`, `SphericalHarmonicCartesian`, and `BuildGeodesicSphere(subdivisions)` generating both subdivided icosahedral geodesic triangles and dual **Goldberg Polyhedron** hexagonal/pentagonal cells on $S^2$.
+   - Upgraded `ExtractMarchingSquares` segment stitching to an $O(M)$ spatial endpoint hash map, and added `SolveAnisotropicReactionDiffusion2D` (flow-tensor Gray–Scott / Turing solver) and `SolveScreenedPoisson2D` (Red-Black Gauss–Seidel SOR Helmholtz/Poisson solver).
+4. **2D & 3D Vector Hidden-Line Removal (HLR) & Plotter Polygon Hatching (`render/vector_bridge.go`, `render/sdf3d.go`, `cmd/genart`)**:
+   - Extended `PlotterConfig` with `HiddenLineRemoval` (`-hlr` in `cmd/genart`, occlusion-culling background strokes against foreground opaque polygons via `clipOpenPathOutsideRings`) and `HatchFills` (`-hatch-fills` in `cmd/genart`, converting filled polygons into Oklab lightness-driven parallel and cross-hatched pen strokes).
+   - Added `ExtractSDF3DVectorContours` and `(*Canvas).RenderSDF3DVectorContours` in `render/sdf3d.go` to extract visible 3D silhouettes, occlusion creases, and 3D topographic cross-section iso-contours with raymarched hidden-line removal.
 
 
 

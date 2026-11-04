@@ -889,4 +889,360 @@ func (ne *NoiseEngine) GaborNoise2D(x, y, freq, orientationRad, bandwidth float6
 	return Constrain(sum*0.48, -1.0, 1.0)
 }
 
+// ============================================================================
+// Phase 3: Analytical 3D Noise Derivatives, Curl3D & Rich 2D/3D Voronoi Kernels
+// ============================================================================
+
+// Perlin3DDeriv evaluates 3D C2-continuous gradient Perlin noise at (x, y, z) in [-1, 1]
+// together with its exact analytical partial derivatives (dIdx, dIdy, dIdz) in a single pass.
+func (ne *NoiseEngine) Perlin3DDeriv(x, y, z float64) (val, dIdx, dIdy, dIdz float64) {
+	ix := fastFloor(x)
+	iy := fastFloor(y)
+	iz := fastFloor(z)
+	xf := x - float64(ix)
+	yf := y - float64(iy)
+	zf := z - float64(iz)
+
+	X0, X1 := ix&255, (ix+1)&255
+	Y0, Y1 := iy&255, (iy+1)&255
+	Z0, Z1 := iz&255, (iz+1)&255
+
+	u := quinticFade(xf)
+	v := quinticFade(yf)
+	w := quinticFade(zf)
+	du := quinticFadeDeriv(xf)
+	dv := quinticFadeDeriv(yf)
+	dw := quinticFadeDeriv(zf)
+
+	g000 := grad3[ne.perm12[X0+int(ne.perm[Y0+int(ne.perm[Z0])])]]
+	g100 := grad3[ne.perm12[X1+int(ne.perm[Y0+int(ne.perm[Z0])])]]
+	g010 := grad3[ne.perm12[X0+int(ne.perm[Y1+int(ne.perm[Z0])])]]
+	g110 := grad3[ne.perm12[X1+int(ne.perm[Y1+int(ne.perm[Z0])])]]
+	g001 := grad3[ne.perm12[X0+int(ne.perm[Y0+int(ne.perm[Z1])])]]
+	g101 := grad3[ne.perm12[X1+int(ne.perm[Y0+int(ne.perm[Z1])])]]
+	g011 := grad3[ne.perm12[X0+int(ne.perm[Y1+int(ne.perm[Z1])])]]
+	g111 := grad3[ne.perm12[X1+int(ne.perm[Y1+int(ne.perm[Z1])])]]
+
+	va := dot3(g000, xf, yf, zf)
+	vb := dot3(g100, xf-1.0, yf, zf)
+	vc := dot3(g010, xf, yf-1.0, zf)
+	vd := dot3(g110, xf-1.0, yf-1.0, zf)
+	ve := dot3(g001, xf, yf, zf-1.0)
+	vf := dot3(g101, xf-1.0, yf, zf-1.0)
+	vg := dot3(g011, xf, yf-1.0, zf-1.0)
+	vh := dot3(g111, xf-1.0, yf-1.0, zf-1.0)
+
+	k0 := va
+	k1 := vb - va
+	k2 := vc - va
+	k3 := ve - va
+	k4 := va - vb - vc + vd
+	k5 := va - vc - ve + vg
+	k6 := va - vb - ve + vf
+	k7 := -va + vb + vc - vd + ve - vf - vg + vh
+
+	const norm3 = 1.15470053838
+	val = Constrain(norm3*(k0+u*k1+v*k2+w*k3+u*v*k4+v*w*k5+w*u*k6+u*v*w*k7), -1.0, 1.0)
+
+	// Interpolate corner gradient vectors + product-rule quintic fade derivative terms
+	interpGrad := func(idx int) float64 {
+		ga := g000[idx]
+		gb := g100[idx]
+		gc := g010[idx]
+		gd := g110[idx]
+		ge := g001[idx]
+		gf := g101[idx]
+		gg := g011[idx]
+		gh := g111[idx]
+		return ga + u*(gb-ga) + v*(gc-ga) + w*(ge-ga) +
+			u*v*(ga-gb-gc+gd) + v*w*(ga-gc-ge+gg) + w*u*(ga-gb-ge+gf) +
+			u*v*w*(-ga+gb+gc-gd+ge-gf-gg+gh)
+	}
+
+	dIdx = norm3 * (interpGrad(0) + du*(k1+v*k4+w*k6+v*w*k7))
+	dIdy = norm3 * (interpGrad(1) + dv*(k2+u*k4+w*k5+w*u*k7))
+	dIdz = norm3 * (interpGrad(2) + dw*(k3+v*k5+u*k6+u*v*k7))
+	return val, dIdx, dIdy, dIdz
+}
+
+// FBM3D evaluates multi-octave 3D Fractional Brownian Motion at (x, y, z) in [-1, 1].
+func (ne *NoiseEngine) FBM3D(x, y, z float64, octaves int, lacunarity, gain float64) float64 {
+	v, _, _, _ := ne.FBM3DDeriv(x, y, z, octaves, lacunarity, gain)
+	return v
+}
+
+// FBM3DDeriv evaluates multi-octave 3D FBM along with its exact analytical partial derivatives (dIdx, dIdy, dIdz).
+func (ne *NoiseEngine) FBM3DDeriv(x, y, z float64, octaves int, lacunarity, gain float64) (val, dIdx, dIdy, dIdz float64) {
+	if octaves < 1 {
+		octaves = 1
+	}
+	if lacunarity <= 0 {
+		lacunarity = 2.0
+	}
+	if gain <= 0 {
+		gain = 0.5
+	}
+	var sum, sumDx, sumDy, sumDz, norm float64
+	amp := 1.0
+	freq := 1.0
+	for i := 0; i < octaves; i++ {
+		v, gx, gy, gz := ne.Perlin3DDeriv(x*freq, y*freq, z*freq)
+		sum += amp * v
+		sumDx += amp * freq * gx
+		sumDy += amp * freq * gy
+		sumDz += amp * freq * gz
+		norm += amp
+		amp *= gain
+		freq *= lacunarity
+	}
+	if norm == 0 {
+		return 0, 0, 0, 0
+	}
+	invNorm := 1.0 / norm
+	return Constrain(sum*invNorm, -1.0, 1.0), sumDx * invNorm, sumDy * invNorm, sumDz * invNorm
+}
+
+// Ridged3D evaluates multi-octave 3D ridged multifractal noise in [0, 1].
+func (ne *NoiseEngine) Ridged3D(x, y, z float64, octaves int, lacunarity, gain float64) float64 {
+	if octaves < 1 {
+		octaves = 1
+	}
+	if lacunarity <= 0 {
+		lacunarity = 2.0
+	}
+	if gain <= 0 {
+		gain = 0.5
+	}
+	var sum, norm float64
+	amp := 1.0
+	freq := 1.0
+	weight := 1.0
+	for i := 0; i < octaves; i++ {
+		n := 1.0 - math.Abs(ne.Perlin3D(x*freq, y*freq, z*freq))
+		n = n * n * weight
+		weight = Clamp01(n * 2.0)
+		sum += n * amp
+		norm += amp
+		amp *= gain
+		freq *= lacunarity
+	}
+	if norm == 0 {
+		return 0
+	}
+	return Clamp01(sum / norm)
+}
+
+// Curl3D computes a divergence-free 3D velocity vector (vx, vy, vz) = curl(Psi)
+// analytically from 3 decorrelated FBM3DDeriv vector-potential channels.
+func (ne *NoiseEngine) Curl3D(x, y, z float64, octaves int) (vx, vy, vz float64) {
+	if octaves < 1 {
+		octaves = 3
+	}
+	_, _, dPsiXDy, dPsiXDz := ne.FBM3DDeriv(x, y, z, octaves, 2.0, 0.5)
+	_, dPsiYDx, _, dPsiYDz := ne.FBM3DDeriv(x+31.416, y-47.853, z+12.793, octaves, 2.0, 0.5)
+	_, dPsiZDx, dPsiZDy, _ := ne.FBM3DDeriv(x-92.653, y+19.324, z-63.185, octaves, 2.0, 0.5)
+
+	vx = dPsiZDy - dPsiYDz
+	vy = dPsiXDz - dPsiZDx
+	vz = dPsiYDx - dPsiXDy
+	return vx, vy, vz
+}
+
+// Voronoi2DResult holds rich 2D cellular Voronoi metrics including F1/F2 distances,
+// Inigo Quilez's exact distance to the nearest cell border (EdgeDist), log-sum-exp
+// smooth distance (SmoothF1), analytical gradient (GradX, GradY), and deterministic CellID.
+type Voronoi2DResult struct {
+	F1       float64
+	F2       float64
+	EdgeDist float64
+	SmoothF1 float64
+	GradX    float64
+	GradY    float64
+	DeltaX   float64
+	DeltaY   float64
+	CellID   int
+}
+
+// Voronoi2D evaluates a rich 2D cellular Voronoi field with jitter in [0, 1] and
+// smooth-min falloff smoothness (e.g. 16.0; <=0 uses default 16.0).
+func (ne *NoiseEngine) Voronoi2D(x, y, jitter, smoothness float64) Voronoi2DResult {
+	jitter = Clamp01(jitter)
+	if smoothness <= 0 {
+		smoothness = 16.0
+	}
+	ix := fastFloor(x)
+	iy := fastFloor(y)
+	fx := x - float64(ix)
+	fy := y - float64(iy)
+
+	f1Sq := 1e9
+	f2Sq := 1e9
+	var bestRx, bestRy float64
+	var bestID int
+	var sumExp float64
+
+	var offsets [9][2]float64
+	idx := 0
+	for dy := -1; dy <= 1; dy++ {
+		for dx := -1; dx <= 1; dx++ {
+			cx := (ix + dx) & 255
+			cy := (iy + dy) & 255
+			h1 := ne.perm[cx+int(ne.perm[cy])]
+			h2 := ne.perm[cy+int(ne.perm[(cx+73)&255])]
+			px := float64(dx) + 0.5 + jitter*(float64(h1)/255.0-0.5)
+			py := float64(dy) + 0.5 + jitter*(float64(h2)/255.0-0.5)
+			rx := px - fx
+			ry := py - fy
+			offsets[idx] = [2]float64{rx, ry}
+			idx++
+
+			dSq := rx*rx + ry*ry
+			dist := math.Sqrt(dSq)
+			sumExp += math.Exp(-smoothness * dist)
+
+			if dSq < f1Sq {
+				f2Sq = f1Sq
+				f1Sq = dSq
+				bestRx = rx
+				bestRy = ry
+				bestID = (int(h1) << 8) | int(h2)
+			} else if dSq < f2Sq {
+				f2Sq = dSq
+			}
+		}
+	}
+
+	// Pass 2: Inigo Quilez's exact distance to the nearest Voronoi bisector edge
+	edgeDist := 1e9
+	for i := 0; i < 9; i++ {
+		rx, ry := offsets[i][0], offsets[i][1]
+		diffX := rx - bestRx
+		diffY := ry - bestRy
+		diffLen := math.Hypot(diffX, diffY)
+		if diffLen < 1e-5 {
+			continue
+		}
+		midX := 0.5 * (bestRx + rx)
+		midY := 0.5 * (bestRy + ry)
+		dBorder := (midX*diffX + midY*diffY) / diffLen
+		if dBorder < edgeDist {
+			edgeDist = dBorder
+		}
+	}
+
+	f1 := math.Sqrt(f1Sq)
+	f2 := math.Sqrt(f2Sq)
+	var gx, gy float64
+	if f1 > 1e-7 {
+		// Gradient of F1 = ||x - p_1|| points away from the nearest feature point: -(p_1 - x)/F1
+		gx = -bestRx / f1
+		gy = -bestRy / f1
+	}
+	smoothF1 := f1
+	if sumExp > 0 {
+		smoothF1 = -math.Log(sumExp) / smoothness
+	}
+
+	return Voronoi2DResult{
+		F1:       f1,
+		F2:       f2,
+		EdgeDist: math.Max(0, edgeDist),
+		SmoothF1: math.Max(0, smoothF1),
+		GradX:    gx,
+		GradY:    gy,
+		DeltaX:   -bestRx,
+		DeltaY:   -bestRy,
+		CellID:   bestID,
+	}
+}
+
+// Voronoi3DResult holds 3D cellular Voronoi distances (F1, F2), exact distance to the nearest
+// 3D Voronoi cell face (EdgeDist), displacement Delta from the nearest feature point, and CellID.
+type Voronoi3DResult struct {
+	F1       float64
+	F2       float64
+	EdgeDist float64
+	Delta    [3]float64
+	CellID   int
+}
+
+// Voronoi3D evaluates a 3D cellular Voronoi field over a 3x3x3 lattice neighborhood.
+func (ne *NoiseEngine) Voronoi3D(x, y, z, jitter float64) Voronoi3DResult {
+	jitter = Clamp01(jitter)
+	ix := fastFloor(x)
+	iy := fastFloor(y)
+	iz := fastFloor(z)
+	fx := x - float64(ix)
+	fy := y - float64(iy)
+	fz := z - float64(iz)
+
+	f1Sq := 1e9
+	f2Sq := 1e9
+	var bestR [3]float64
+	var bestID int
+	var offsets [27][3]float64
+	idx := 0
+
+	for dz := -1; dz <= 1; dz++ {
+		cz := (iz + dz) & 255
+		for dy := -1; dy <= 1; dy++ {
+			cy := (iy + dy) & 255
+			for dx := -1; dx <= 1; dx++ {
+				cx := (ix + dx) & 255
+				h1 := ne.perm[cx+int(ne.perm[cy+int(ne.perm[cz])])]
+				h2 := ne.perm[cy+int(ne.perm[cz+int(ne.perm[(cx+59)&255])])]
+				h3 := ne.perm[cz+int(ne.perm[cx+int(ne.perm[(cy+131)&255])])]
+
+				px := float64(dx) + 0.5 + jitter*(float64(h1)/255.0-0.5)
+				py := float64(dy) + 0.5 + jitter*(float64(h2)/255.0-0.5)
+				pz := float64(dz) + 0.5 + jitter*(float64(h3)/255.0-0.5)
+
+				rx := px - fx
+				ry := py - fy
+				rz := pz - fz
+				offsets[idx] = [3]float64{rx, ry, rz}
+				idx++
+
+				dSq := rx*rx + ry*ry + rz*rz
+				if dSq < f1Sq {
+					f2Sq = f1Sq
+					f1Sq = dSq
+					bestR = [3]float64{rx, ry, rz}
+					bestID = (int(h1) << 16) | (int(h2) << 8) | int(h3)
+				} else if dSq < f2Sq {
+					f2Sq = dSq
+				}
+			}
+		}
+	}
+
+	edgeDist := 1e9
+	for i := 0; i < 27; i++ {
+		r := offsets[i]
+		dx := r[0] - bestR[0]
+		dy := r[1] - bestR[1]
+		dz := r[2] - bestR[2]
+		dLen := math.Sqrt(dx*dx + dy*dy + dz*dz)
+		if dLen < 1e-5 {
+			continue
+		}
+		mx := 0.5 * (bestR[0] + r[0])
+		my := 0.5 * (bestR[1] + r[1])
+		mz := 0.5 * (bestR[2] + r[2])
+		dFace := (mx*dx + my*dy + mz*dz) / dLen
+		if dFace < edgeDist {
+			edgeDist = dFace
+		}
+	}
+
+	return Voronoi3DResult{
+		F1:       math.Sqrt(f1Sq),
+		F2:       math.Sqrt(f2Sq),
+		EdgeDist: math.Max(0, edgeDist),
+		Delta:    [3]float64{-bestR[0], -bestR[1], -bestR[2]},
+		CellID:   bestID,
+	}
+}
+
+
 

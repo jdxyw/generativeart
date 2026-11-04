@@ -692,13 +692,17 @@ func (c *Canvas) SavePDF(filename string) error {
 // Part VI — Direction 5: Pen-Plotter SVG Export & TSP Path Optimization
 // ============================================================================
 
-// PlotterConfig configures pen-plotter SVG export, color-layer grouping, and TSP tour optimization.
+// PlotterConfig configures pen-plotter SVG export, color-layer grouping, hidden-line removal,
+// polygon hatch fill generation, and TSP tour optimization.
 type PlotterConfig struct {
 	MaxPens            int     // Maximum number of physical pen color layers (0 = keep exact stroke colors, >0 = Oklab K-Means palette quantization)
 	DefaultStrokeWidth float64 // Fallback pen width in pixels for filled contours when no explicit stroke width was recorded (default 0.9)
 	TwoOptPasses       int     // Number of 2-Opt local search refinement passes per pen layer (default 40)
 	CenterlineOnly     bool    // If true, only export explicit stroke centerlines and skip filled polygons
 	IncludeBackground  bool    // If true, emit a background <rect> element
+	HiddenLineRemoval  bool    // If true, occlusion-culls earlier background strokes against opaque foreground filled polygons
+	HatchFills         bool    // If true, fills closed polygons with lightness-driven parallel/cross-hatched pen strokes
+	HatchSpacingPx     float64 // Base hatch line spacing in pixels when HatchFills is true (default 4.5)
 }
 
 // DefaultPlotterConfig returns a balanced configuration for AxiDraw / mechanical pen-plotter SVG export.
@@ -709,6 +713,9 @@ func DefaultPlotterConfig() PlotterConfig {
 		TwoOptPasses:       40,
 		CenterlineOnly:     false,
 		IncludeBackground:  false,
+		HiddenLineRemoval:  false,
+		HatchFills:         false,
+		HatchSpacingPx:     4.5,
 	}
 }
 
@@ -767,6 +774,277 @@ func extractPlotterSubpaths(op vectorOp, defaultW float64, centerlineOnly bool) 
 		})
 	}
 	return out
+}
+
+func extractRingsFromCanvasPath(p *canvas.Path) [][]Point {
+	if p == nil || p.Empty() {
+		return nil
+	}
+	flat := p.ReplaceArcs().Flatten(0.6)
+	var rings [][]Point
+	for _, sp := range flat.Split() {
+		d := sp.Data()
+		var ring []Point
+		for i := 0; i < len(d); {
+			switch d[i] {
+			case canvas.MoveToCmd, canvas.LineToCmd, canvas.CloseCmd:
+				pt := Pt(d[i+1], d[i+2])
+				if len(ring) == 0 || ring[len(ring)-1].Dist(pt) > 1e-4 {
+					ring = append(ring, pt)
+				}
+				i += 4
+			case canvas.QuadToCmd:
+				ring = append(ring, Pt(d[i+3], d[i+4]))
+				i += 6
+			case canvas.CubeToCmd:
+				ring = append(ring, Pt(d[i+5], d[i+6]))
+				i += 8
+			default:
+				i += 4
+			}
+		}
+		if len(ring) >= 3 {
+			rings = append(rings, ring)
+		}
+	}
+	return rings
+}
+
+// clipOpenPathOutsideRings trims path p by removing any sub-segments whose midpoints lie
+// inside occluderRings (2D Hidden-Line Removal against a foreground polygon).
+func clipOpenPathOutsideRings(p *canvas.Path, occluderRings [][]Point, occBounds canvas.Rect) *canvas.Path {
+	if p == nil || p.Empty() || len(occluderRings) == 0 {
+		return p
+	}
+	fb := p.FastBounds()
+	if fb.X1 < occBounds.X0 || fb.X0 > occBounds.X1 || fb.Y1 < occBounds.Y0 || fb.Y0 > occBounds.Y1 {
+		return p
+	}
+	flat := p.ReplaceArcs().Flatten(0.45)
+	out := &canvas.Path{}
+
+	for _, sp := range flat.Split() {
+		sfb := sp.FastBounds()
+		if sfb.X1 < occBounds.X0 || sfb.X0 > occBounds.X1 || sfb.Y1 < occBounds.Y0 || sfb.Y0 > occBounds.Y1 {
+			out = out.Append(sp)
+			continue
+		}
+		d := sp.Data()
+		var pts []Point
+		for i := 0; i < len(d); {
+			switch d[i] {
+			case canvas.MoveToCmd, canvas.LineToCmd, canvas.CloseCmd:
+				pts = append(pts, Pt(d[i+1], d[i+2]))
+				i += 4
+			case canvas.QuadToCmd:
+				pts = append(pts, Pt(d[i+3], d[i+4]))
+				i += 6
+			case canvas.CubeToCmd:
+				pts = append(pts, Pt(d[i+5], d[i+6]))
+				i += 8
+			default:
+				i += 4
+			}
+		}
+		if len(pts) < 2 {
+			continue
+		}
+
+		penDown := false
+		var lastPt Point
+		for idx := 0; idx < len(pts)-1; idx++ {
+			a := pts[idx]
+			b := pts[idx+1]
+			if a.Dist(b) < 1e-6 {
+				continue
+			}
+			ts := []float64{0.0, 1.0}
+			for _, ring := range occluderRings {
+				m := len(ring)
+				if m < 3 {
+					continue
+				}
+				for e := 0; e < m; e++ {
+					cPt := ring[e]
+					dPt := ring[(e+1)%m]
+					if t, ok := segmentIntersectT(a, b, cPt, dPt); ok {
+						ts = append(ts, t)
+					}
+				}
+			}
+			sort.Float64s(ts)
+
+			for k := 0; k < len(ts)-1; k++ {
+				t0, t1 := ts[k], ts[k+1]
+				if t1-t0 < 1e-6 {
+					continue
+				}
+				mid := a.Lerp(b, 0.5*(t0+t1))
+				if !pointInPolygonRings(mid, occluderRings) {
+					p0 := a.Lerp(b, t0)
+					p1 := a.Lerp(b, t1)
+					if !penDown || lastPt.Dist(p0) > 1e-3 {
+						out.MoveTo(p0.X, p0.Y)
+					}
+					out.LineTo(p1.X, p1.Y)
+					lastPt = p1
+					penDown = true
+				} else {
+					penDown = false
+				}
+			}
+		}
+	}
+	return out
+}
+
+// generatePolygonHatchStrokes converts a filled polygon vectorOp into parallel (and for dark
+// shades, cross-hatched) pen strokes clipped to the polygon's interior, driven by Oklab lightness L.
+func generatePolygonHatchStrokes(op vectorOp, baseSpacing, strokeW float64) []plotterStroke {
+	if op.path == nil || op.path.Empty() {
+		return nil
+	}
+	rings := extractRingsFromCanvasPath(op.path)
+	if len(rings) == 0 {
+		return nil
+	}
+	if baseSpacing <= 0.5 {
+		baseSpacing = 4.5
+	}
+	lab := RGBAToOklab(op.col)
+	if lab.L > 0.93 {
+		return nil
+	}
+
+	fb := op.path.FastBounds()
+	cx := 0.5 * (fb.X0 + fb.X1)
+	cy := 0.5 * (fb.Y0 + fb.Y1)
+	diag := math.Hypot(fb.X1-fb.X0, fb.Y1-fb.Y0) * 0.55
+	if diag < baseSpacing*0.5 {
+		return nil
+	}
+
+	spacing := baseSpacing * (0.55 + 1.15*common.Clamp01(lab.L))
+	angle1 := math.Pi*0.25 + 0.35*(lab.L-0.5)
+	angles := []float64{angle1}
+	spacings := []float64{spacing}
+	if lab.L < 0.42 {
+		// Add cross-hatch pass for deep shadow polygons
+		angles = append(angles, angle1+math.Pi*0.5)
+		spacings = append(spacings, spacing*1.35)
+	}
+
+	stack := [][][]Point{rings}
+	var out []plotterStroke
+	for passIdx, ang := range angles {
+		sp := spacings[passIdx]
+		tx, ty := math.Cos(ang), math.Sin(ang)
+		nx, ny := -ty, tx
+		linesPath := &canvas.Path{}
+		for d := -diag; d <= diag; d += sp {
+			px := cx + nx*d
+			py := cy + ny*d
+			linesPath.MoveTo(px-tx*diag, py-ty*diag)
+			linesPath.LineTo(px+tx*diag, py+ty*diag)
+		}
+		clipped := clipOpenPathAgainstPolyStack(linesPath, stack)
+		if clipped == nil || clipped.Empty() {
+			continue
+		}
+		for _, sub := range clipped.Split() {
+			if sub == nil || sub.Empty() {
+				continue
+			}
+			spStart := sub.StartPos()
+			spEnd := sub.Pos()
+			out = append(out, plotterStroke{
+				path:       sub,
+				start:      Pt(spStart.X, spStart.Y),
+				end:        Pt(spEnd.X, spEnd.Y),
+				strokeW:    strokeW,
+				col:        op.col,
+				alpha:      op.alpha,
+				reversible: true,
+			})
+		}
+	}
+	return out
+}
+
+func collectPlotterStrokes(ops []vectorOp, cfg PlotterConfig) []plotterStroke {
+	defaultW := cfg.DefaultStrokeWidth
+	if defaultW <= 0 {
+		defaultW = 0.9
+	}
+
+	type layerEntry struct {
+		strokes       []plotterStroke
+		occluderRings [][]Point
+		occBounds     canvas.Rect
+		isOccluder    bool
+	}
+
+	entries := make([]layerEntry, len(ops))
+	for i, op := range ops {
+		s := extractPlotterSubpaths(op, defaultW, cfg.CenterlineOnly)
+		if cfg.HatchFills && (op.centerline == nil || op.centerline.Empty()) && !cfg.CenterlineOnly {
+			s = append(s, generatePolygonHatchStrokes(op, cfg.HatchSpacingPx, defaultW)...)
+		}
+		entries[i].strokes = s
+		if cfg.HiddenLineRemoval && (op.centerline == nil || op.centerline.Empty()) && op.alpha >= 0.80 && op.col.A >= 200 && op.path != nil && !op.path.Empty() {
+			rings := extractRingsFromCanvasPath(op.path)
+			if len(rings) > 0 {
+				entries[i].occluderRings = rings
+				entries[i].occBounds = op.path.FastBounds()
+				entries[i].isOccluder = true
+			}
+		}
+	}
+
+	if cfg.HiddenLineRemoval {
+		for j := 1; j < len(entries); j++ {
+			if !entries[j].isOccluder {
+				continue
+			}
+			occRings := entries[j].occluderRings
+			occBounds := entries[j].occBounds
+			for i := 0; i < j; i++ {
+				if len(entries[i].strokes) == 0 {
+					continue
+				}
+				var visible []plotterStroke
+				for _, st := range entries[i].strokes {
+					trimmed := clipOpenPathOutsideRings(st.path, occRings, occBounds)
+					if trimmed == nil || trimmed.Empty() {
+						continue
+					}
+					for _, sub := range trimmed.Split() {
+						if sub == nil || sub.Empty() {
+							continue
+						}
+						spStart := sub.StartPos()
+						spEnd := sub.Pos()
+						visible = append(visible, plotterStroke{
+							path:       sub,
+							start:      Pt(spStart.X, spStart.Y),
+							end:        Pt(spEnd.X, spEnd.Y),
+							strokeW:    st.strokeW,
+							col:        st.col,
+							alpha:      st.alpha,
+							reversible: true,
+						})
+					}
+				}
+				entries[i].strokes = visible
+			}
+		}
+	}
+
+	var allStrokes []plotterStroke
+	for _, e := range entries {
+		allStrokes = append(allStrokes, e.strokes...)
+	}
+	return allStrokes
 }
 
 // quantizePlotterColors clusters the distinct stroke colors into at most maxPens Oklab centroids.
@@ -1047,10 +1325,7 @@ func (c *Canvas) OptimizeVectorOpsTSP(cfg PlotterConfig) PlotterStats {
 		cfg.DefaultStrokeWidth = 0.9
 	}
 
-	var allStrokes []plotterStroke
-	for _, op := range c.vecOps {
-		allStrokes = append(allStrokes, extractPlotterSubpaths(op, cfg.DefaultStrokeWidth, cfg.CenterlineOnly)...)
-	}
+	allStrokes := collectPlotterStrokes(c.vecOps, cfg)
 	if len(allStrokes) == 0 {
 		return PlotterStats{}
 	}
@@ -1139,10 +1414,7 @@ func (c *Canvas) WritePlotterSVG(w io.Writer, cfg PlotterConfig) (PlotterStats, 
 		cfg.DefaultStrokeWidth = 0.9
 	}
 
-	var allStrokes []plotterStroke
-	for _, op := range c.vecOps {
-		allStrokes = append(allStrokes, extractPlotterSubpaths(op, cfg.DefaultStrokeWidth, cfg.CenterlineOnly)...)
-	}
+	allStrokes := collectPlotterStrokes(c.vecOps, cfg)
 	if len(allStrokes) == 0 {
 		return PlotterStats{}, c.WriteSVG(w)
 	}

@@ -238,3 +238,87 @@ func TestHyperbolicCoxeterGroupAndDrosteSpiral(t *testing.T) {
 	_ = lvl1
 }
 
+func TestPhase3Analytical3DNoiseCurlAndVoronoi(t *testing.T) {
+	ne := NewNoiseEngine(20261104)
+
+	// 1. Verify Perlin3DDeriv matches central finite differences
+	x, y, z := 2.37, -1.42, 3.81
+	eps := 1e-5
+	val, gx, gy, gz := ne.Perlin3DDeriv(x, y, z)
+	if math.Abs(val-ne.Perlin3D(x, y, z)) > 1e-12 {
+		t.Fatalf("Perlin3DDeriv value mismatch vs Perlin3D")
+	}
+	fdX := (ne.Perlin3D(x+eps, y, z) - ne.Perlin3D(x-eps, y, z)) / (2.0 * eps)
+	fdY := (ne.Perlin3D(x, y+eps, z) - ne.Perlin3D(x, y-eps, z)) / (2.0 * eps)
+	fdZ := (ne.Perlin3D(x, y, z+eps) - ne.Perlin3D(x, y, z-eps)) / (2.0 * eps)
+	if math.Abs(gx-fdX) > 1e-4 || math.Abs(gy-fdY) > 1e-4 || math.Abs(gz-fdZ) > 1e-4 {
+		t.Fatalf("Perlin3DDeriv mismatch vs finite difference: got (%f,%f,%f) want (%f,%f,%f)", gx, gy, gz, fdX, fdY, fdZ)
+	}
+
+	// 2. Verify Curl3D is divergence-free: dVx/dx + dVy/dy + dVz/dz ≈ 0
+	vx1, _, _ := ne.Curl3D(x+eps, y, z, 3)
+	vx0, _, _ := ne.Curl3D(x-eps, y, z, 3)
+	_, vy1, _ := ne.Curl3D(x, y+eps, z, 3)
+	_, vy0, _ := ne.Curl3D(x, y-eps, z, 3)
+	_, _, vz1 := ne.Curl3D(x, y, z+eps, 3)
+	_, _, vz0 := ne.Curl3D(x, y, z-eps, 3)
+	div := (vx1-vx0)/(2*eps) + (vy1-vy0)/(2*eps) + (vz1-vz0)/(2*eps)
+	if math.Abs(div) > 1e-3 {
+		t.Fatalf("expected Curl3D to be divergence-free, got div=%e", div)
+	}
+
+	// 3. Verify Voronoi2D & Voronoi3D metrics
+	v2 := ne.Voronoi2D(3.4, -2.1, 0.85, 16.0)
+	if v2.F1 < 0 || v2.F2 < v2.F1 || v2.EdgeDist < 0 {
+		t.Fatalf("unexpected Voronoi2D result: %+v", v2)
+	}
+	v3 := ne.Voronoi3D(1.8, -0.7, 2.9, 0.85)
+	if v3.F1 < 0 || v3.F2 < v3.F1 || v3.EdgeDist < 0 {
+		t.Fatalf("unexpected Voronoi3D result: %+v", v3)
+	}
+}
+
+func TestPhase3SphericalHarmonicsAndGeodesicGoldbergMesh(t *testing.T) {
+	// 1. Verify SphericalHarmonicYlm orthonormality on S^2 via midpoint quadrature
+	nTheta, nPhi := 90, 180
+	dTheta := math.Pi / float64(nTheta)
+	dPhi := 2.0 * math.Pi / float64(nPhi)
+	var norm22, cross22_31 float64
+	for it := 0; it < nTheta; it++ {
+		theta := (float64(it) + 0.5) * dTheta
+		sinT := math.Sin(theta)
+		for ip := 0; ip < nPhi; ip++ {
+			phi := (float64(ip) + 0.5) * dPhi
+			dOmega := sinT * dTheta * dPhi
+			y21 := SphericalHarmonicYlm(2, 1, theta, phi)
+			y3m2 := SphericalHarmonicYlm(3, -2, theta, phi)
+			norm22 += y21 * y21 * dOmega
+			cross22_31 += y21 * y3m2 * dOmega
+		}
+	}
+	if math.Abs(norm22-1.0) > 1e-3 {
+		t.Fatalf("expected integral of |Y_2^1|^2 over S^2 to equal 1.0, got %f", norm22)
+	}
+	if math.Abs(cross22_31) > 1e-3 {
+		t.Fatalf("expected orthogonality between Y_2^1 and Y_3^-2, got %f", cross22_31)
+	}
+
+	// 2. Verify BuildGeodesicSphere(2) produces 162 vertices, 320 triangles, 12 pentagons, and 150 hexagons
+	mesh := BuildGeodesicSphere(2)
+	if len(mesh.Vertices) != 162 || len(mesh.Triangles) != 320 {
+		t.Fatalf("expected 162 vertices and 320 triangles for subdiv=2, got V=%d T=%d", len(mesh.Vertices), len(mesh.Triangles))
+	}
+	pentagons, hexagons := 0, 0
+	for _, cell := range mesh.Cells {
+		if cell.IsPentagon && len(cell.Vertices) == 5 {
+			pentagons++
+		} else if len(cell.Vertices) == 6 {
+			hexagons++
+		}
+	}
+	if pentagons != 12 || hexagons != 150 {
+		t.Fatalf("expected 12 Goldberg pentagons and 150 hexagons, got pentagons=%d hexagons=%d", pentagons, hexagons)
+	}
+}
+
+

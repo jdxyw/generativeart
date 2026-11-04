@@ -311,10 +311,61 @@ func ExtractMarchingSquares(
 		return nil
 	}
 
-	// Stitch connected segments into ordered polylines using a spatial endpoint hash
+	// Stitch connected segments into ordered polylines using an O(M) spatial endpoint hash
 	const epsSq = 0.04
-	var polylines [][]Point
+	const invBucket = 2.0 // bucket size = 0.5px (>= sqrt(epsSq) = 0.2px)
+	type bKey struct{ bx, by int }
+	type endRef struct {
+		segIdx int
+		isB    bool
+	}
+	buckets := make(map[bKey][]endRef, len(segs)*2)
+	addEndpoint := func(pt Point, segIdx int, isB bool) {
+		k := bKey{int(math.Floor(pt.X * invBucket)), int(math.Floor(pt.Y * invBucket))}
+		buckets[k] = append(buckets[k], endRef{segIdx: segIdx, isB: isB})
+	}
+	for i := range segs {
+		addEndpoint(segs[i].a, i, false)
+		addEndpoint(segs[i].b, i, true)
+	}
 
+	findNext := func(pt Point) (Point, bool) {
+		cx := int(math.Floor(pt.X * invBucket))
+		cy := int(math.Floor(pt.Y * invBucket))
+		bestIdx := -1
+		bestIsB := false
+		bestDistSq := epsSq + 1e-9
+		for dy := -1; dy <= 1; dy++ {
+			for dx := -1; dx <= 1; dx++ {
+				refs := buckets[bKey{cx + dx, cy + dy}]
+				for _, ref := range refs {
+					if segs[ref.segIdx].used {
+						continue
+					}
+					cand := segs[ref.segIdx].a
+					if ref.isB {
+						cand = segs[ref.segIdx].b
+					}
+					dSq := (cand.X-pt.X)*(cand.X-pt.X) + (cand.Y-pt.Y)*(cand.Y-pt.Y)
+					if dSq <= epsSq && (bestIdx == -1 || ref.segIdx < bestIdx || (ref.segIdx == bestIdx && dSq < bestDistSq)) {
+						bestIdx = ref.segIdx
+						bestIsB = ref.isB
+						bestDistSq = dSq
+					}
+				}
+			}
+		}
+		if bestIdx < 0 {
+			return Point{}, false
+		}
+		segs[bestIdx].used = true
+		if bestIsB {
+			return segs[bestIdx].a, true
+		}
+		return segs[bestIdx].b, true
+	}
+
+	var polylines [][]Point
 	for i := range segs {
 		if segs[i].used {
 			continue
@@ -324,30 +375,11 @@ func ExtractMarchingSquares(
 
 		// Extend forward from tail
 		for {
-			tail := line[len(line)-1]
-			found := false
-			for j := range segs {
-				if segs[j].used {
-					continue
-				}
-				da := (segs[j].a.X-tail.X)*(segs[j].a.X-tail.X) + (segs[j].a.Y-tail.Y)*(segs[j].a.Y-tail.Y)
-				if da <= epsSq {
-					segs[j].used = true
-					line = append(line, segs[j].b)
-					found = true
-					break
-				}
-				db := (segs[j].b.X-tail.X)*(segs[j].b.X-tail.X) + (segs[j].b.Y-tail.Y)*(segs[j].b.Y-tail.Y)
-				if db <= epsSq {
-					segs[j].used = true
-					line = append(line, segs[j].a)
-					found = true
-					break
-				}
-			}
-			if !found {
+			nextPt, ok := findNext(line[len(line)-1])
+			if !ok {
 				break
 			}
+			line = append(line, nextPt)
 		}
 
 		// Extend backward from head
@@ -357,29 +389,11 @@ func ExtractMarchingSquares(
 			if len(prefix) > 0 {
 				head = prefix[len(prefix)-1]
 			}
-			found := false
-			for j := range segs {
-				if segs[j].used {
-					continue
-				}
-				da := (segs[j].a.X-head.X)*(segs[j].a.X-head.X) + (segs[j].a.Y-head.Y)*(segs[j].a.Y-head.Y)
-				if da <= epsSq {
-					segs[j].used = true
-					prefix = append(prefix, segs[j].b)
-					found = true
-					break
-				}
-				db := (segs[j].b.X-head.X)*(segs[j].b.X-head.X) + (segs[j].b.Y-head.Y)*(segs[j].b.Y-head.Y)
-				if db <= epsSq {
-					segs[j].used = true
-					prefix = append(prefix, segs[j].a)
-					found = true
-					break
-				}
-			}
-			if !found {
+			nextPt, ok := findNext(head)
+			if !ok {
 				break
 			}
+			prefix = append(prefix, nextPt)
 		}
 
 		if len(prefix) > 0 {
@@ -1021,4 +1035,248 @@ func RelaxCentroidalVoronoi(
 	}
 
 	return sites
+}
+
+// ============================================================================
+// Phase 3: Anisotropic Turing Reaction-Diffusion & Screened-Poisson PDE Solvers
+// ============================================================================
+
+// ReactionDiffusionConfig configures a 2D isotropic or flow-aligned anisotropic
+// Gray-Scott / Turing reaction-diffusion PDE simulation.
+type ReactionDiffusionConfig struct {
+	Width      int
+	Height     int
+	Steps      int
+	Dt         float64
+	DiffU      float64
+	DiffV      float64
+	Feed       float64
+	Kill       float64
+	Anisotropy float64       // 0 = isotropic 9-point Laplacian; (0..0.85] = stretch diffusion along FlowField
+	FlowField  VectorField2D // Optional tangent vector field for directional Turing stripes/coral meanders
+	FeedFn     ScalarField2D // Optional spatially varying feed rate F(x, y)
+	KillFn     ScalarField2D // Optional spatially varying kill rate k(x, y)
+	Seed       int64
+}
+
+// DefaultReactionDiffusionConfig returns a coral/labyrinth Gray-Scott configuration.
+func DefaultReactionDiffusionConfig(w, h int, seed int64) ReactionDiffusionConfig {
+	return ReactionDiffusionConfig{
+		Width:      w,
+		Height:     h,
+		Steps:      600,
+		Dt:         1.0,
+		DiffU:      0.18,
+		DiffV:      0.09,
+		Feed:       0.0545,
+		Kill:       0.0620,
+		Anisotropy: 0.0,
+		Seed:       seed,
+	}
+}
+
+// SolveAnisotropicReactionDiffusion2D integrates the 2D Gray-Scott reaction-diffusion PDE
+// with an optional spatially varying diffusion tensor aligned with cfg.FlowField, returning
+// the converged activator/inhibitor concentrations (u, v) of length Width * Height.
+func SolveAnisotropicReactionDiffusion2D(cfg ReactionDiffusionConfig) (u, v []float64) {
+	w, h := cfg.Width, cfg.Height
+	if w <= 2 || h <= 2 {
+		return nil, nil
+	}
+	if cfg.Steps <= 0 {
+		cfg.Steps = 400
+	}
+	if cfg.Dt <= 0 {
+		cfg.Dt = 1.0
+	}
+	if cfg.DiffU <= 0 {
+		cfg.DiffU = 0.18
+	}
+	if cfg.DiffV <= 0 {
+		cfg.DiffV = 0.09
+	}
+	if cfg.Feed <= 0 {
+		cfg.Feed = 0.0545
+	}
+	if cfg.Kill <= 0 {
+		cfg.Kill = 0.0620
+	}
+	anis := common.Constrain(cfg.Anisotropy, 0.0, 0.85)
+
+	n := w * h
+	u = make([]float64, n)
+	v = make([]float64, n)
+	nextU := make([]float64, n)
+	nextV := make([]float64, n)
+
+	for i := range u {
+		u[i] = 1.0
+	}
+
+	rng := rand.New(rand.NewSource(cfg.Seed))
+	numSeeds := 16 + (w*h)/2400
+	for s := 0; s < numSeeds; s++ {
+		cx := rng.Intn(w)
+		cy := rng.Intn(h)
+		rad := 2 + rng.Intn(4)
+		for dy := -rad; dy <= rad; dy++ {
+			py := (cy + dy + h) % h
+			for dx := -rad; dx <= rad; dx++ {
+				if dx*dx+dy*dy > rad*rad {
+					continue
+				}
+				px := (cx + dx + w) % w
+				idx := py*w + px
+				u[idx] = 0.50
+				v[idx] = 0.25 + 0.05*(rng.Float64()-0.5)
+			}
+		}
+	}
+
+	// Precompute anisotropic directional tensor coefficients (dxx, dxy, dyy) when FlowField is provided
+	useAnis := anis > 1e-4 && cfg.FlowField != nil
+	var tXX, tXY, tYY []float64
+	if useAnis {
+		tXX = make([]float64, n)
+		tXY = make([]float64, n)
+		tYY = make([]float64, n)
+		dPar := 1.0 + anis
+		dPerp := 1.0 - 0.65*anis
+		for y := 0; y < h; y++ {
+			for x := 0; x < w; x++ {
+				dir := cfg.FlowField(float64(x), float64(y)).Norm()
+				tx, ty := dir.X, dir.Y
+				if tx == 0 && ty == 0 {
+					tx = 1.0
+				}
+				nx, ny := -ty, tx
+				idx := y*w + x
+				tXX[idx] = dPar*tx*tx + dPerp*nx*nx
+				tXY[idx] = (dPar-dPerp)*tx*ty
+				tYY[idx] = dPar*ty*ty + dPerp*ny*ny
+			}
+		}
+	}
+
+	for step := 0; step < cfg.Steps; step++ {
+		parallelRows(w, h, func(y0, y1 int) {
+			for y := y0; y < y1; y++ {
+				yU := (y - 1 + h) % h
+				yD := (y + 1) % h
+				rC := y * w
+				rU := yU * w
+				rD := yD * w
+				fy := float64(y)
+
+				for x := 0; x < w; x++ {
+					xL := (x - 1 + w) % w
+					xR := (x + 1) % w
+					idx := rC + x
+
+					uC := u[idx]
+					vC := v[idx]
+
+					var lapU, lapV float64
+					if !useAnis {
+						// Isotropic 9-point stencil
+						lapU = 0.20*(u[rC+xL]+u[rC+xR]+u[rU+x]+u[rD+x]) +
+							0.05*(u[rU+xL]+u[rU+xR]+u[rD+xL]+u[rD+xR]) - uC
+						lapV = 0.20*(v[rC+xL]+v[rC+xR]+v[rU+x]+v[rD+x]) +
+							0.05*(v[rU+xL]+v[rU+xR]+v[rD+xL]+v[rD+xR]) - vC
+					} else {
+						// Anisotropic tensor Laplacian: dxx * f_xx + 2 * dxy * f_xy + dyy * f_yy
+						dxx := tXX[idx]
+						dxy := tXY[idx]
+						dyy := tYY[idx]
+
+						uxx := u[rC+xL] + u[rC+xR] - 2.0*uC
+						uyy := u[rU+x] + u[rD+x] - 2.0*uC
+						uxy := 0.25 * (u[rD+xR] - u[rD+xL] - u[rU+xR] + u[rU+xL])
+						lapU = 0.25 * (dxx*uxx + 2.0*dxy*uxy + dyy*uyy)
+
+						vxx := v[rC+xL] + v[rC+xR] - 2.0*vC
+						vyy := v[rU+x] + v[rD+x] - 2.0*vC
+						vxy := 0.25 * (v[rD+xR] - v[rD+xL] - v[rU+xR] + v[rU+xL])
+						lapV = 0.25 * (dxx*vxx + 2.0*dxy*vxy + dyy*vyy)
+					}
+
+					feed := cfg.Feed
+					if cfg.FeedFn != nil {
+						feed = cfg.FeedFn(float64(x), fy)
+					}
+					kill := cfg.Kill
+					if cfg.KillFn != nil {
+						kill = cfg.KillFn(float64(x), fy)
+					}
+
+					uvv := uC * vC * vC
+					du := cfg.DiffU*lapU - uvv + feed*(1.0-uC)
+					dv := cfg.DiffV*lapV + uvv - (feed+kill)*vC
+
+					nextU[idx] = common.Clamp01(uC + cfg.Dt*du)
+					nextV[idx] = common.Clamp01(vC + cfg.Dt*dv)
+				}
+			}
+		})
+		u, nextU = nextU, u
+		v, nextV = nextV, v
+	}
+
+	return u, v
+}
+
+// SolveScreenedPoisson2D solves the 2D elliptic Screened-Poisson / Helmholtz PDE
+// (-nabla^2 + screeningLambda) u = rhs on an nx x ny grid with zero-flux Neumann boundary
+// conditions using Red-Black Gauss-Seidel Successive Over-Relaxation (SOR).
+func SolveScreenedPoisson2D(nx, ny int, rhs []float64, screeningLambda float64, iterations int) []float64 {
+	if nx <= 0 || ny <= 0 || len(rhs) < nx*ny {
+		return nil
+	}
+	if iterations <= 0 {
+		iterations = 64
+	}
+	if screeningLambda < 0 {
+		screeningLambda = 0
+	}
+	// Ensure strictly non-singular diagonal when pure Neumann boundaries are used
+	diag := 4.0 + math.Max(1e-6, screeningLambda)
+	invDiag := 1.0 / diag
+	omega := 1.68
+
+	u := make([]float64, nx*ny)
+	for iter := 0; iter < iterations; iter++ {
+		for colorParity := 0; colorParity < 2; colorParity++ {
+			parity := colorParity
+			parallelRows(nx, ny, func(y0, y1 int) {
+				for y := y0; y < y1; y++ {
+					yU := y - 1
+					if yU < 0 {
+						yU = 0
+					}
+					yD := y + 1
+					if yD >= ny {
+						yD = ny - 1
+					}
+					rC := y * nx
+					rU := yU * nx
+					rD := yD * nx
+					xStart := (y + parity) & 1
+					for x := xStart; x < nx; x += 2 {
+						xL := x - 1
+						if xL < 0 {
+							xL = 0
+						}
+						xR := x + 1
+						if xR >= nx {
+							xR = nx - 1
+						}
+						idx := rC + x
+						gs := (u[rC+xL] + u[rC+xR] + u[rU+x] + u[rD+x] + rhs[idx]) * invDiag
+						u[idx] += omega * (gs - u[idx])
+					}
+				}
+			})
+		}
+	}
+	return u
 }

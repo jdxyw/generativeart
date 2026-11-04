@@ -1,6 +1,7 @@
 package render
 
 import (
+	"image/color"
 	"math"
 
 	"github.com/jdxyw/generativeart/common"
@@ -597,4 +598,235 @@ func raymarchSDF3DInterval(sdf SDF3D, ro, rd, lightDir Vec3, tStart, tEnd float6
 		t += stepLength
 	}
 	return SDF3DHit{Hit: false, T: tEnd}
+}
+
+// =============================================================================
+// 4. Phase 3: 3D-to-2D Vector Hidden-Line Removal (HLR) & Contour Extractor
+// =============================================================================
+
+// SDF3DVectorHLRConfig configures 3D SDF silhouette, crease, and topographic cross-section
+// vector contour extraction with raymarched hidden-line removal.
+type SDF3DVectorHLRConfig struct {
+	GridRes          int     // Screen-space Marching-Squares evaluation grid resolution (default 140)
+	MaxDist          float64 // Maximum raymarching distance (default 18.0)
+	FOV              float64 // Camera focal length multiplier (default 1.75)
+	DepthJumpThresh  float64 // Depth discontinuity threshold for internal occlusion contours (default 0.22)
+	NormalCreaseCos  float64 // Normal dot-product threshold for sharp CSG crease extraction (default 0.80)
+	SliceLevels      int     // Number of 3D object-space topographic cross-section iso-contours (default 10)
+	SliceAxis        Vec3    // 3D axis along which topographic cross-section contours are sliced (default Y=(0,1,0))
+}
+
+// DefaultSDF3DVectorHLRConfig returns a balanced configuration for 3D SDF vector contour extraction.
+func DefaultSDF3DVectorHLRConfig() SDF3DVectorHLRConfig {
+	return SDF3DVectorHLRConfig{
+		GridRes:         140,
+		MaxDist:         18.0,
+		FOV:             1.75,
+		DepthJumpThresh: 0.22,
+		NormalCreaseCos: 0.80,
+		SliceLevels:     10,
+		SliceAxis:       V3(0, 1, 0),
+	}
+}
+
+// ExtractSDF3DVectorContours extracts visible 2D vector polylines (outer silhouettes, occlusion
+// boundaries, CSG normal creases, and 3D topographic cross-section contours) from a 3D SDF scene
+// viewed from camPos toward camTarget, performing hidden-line removal automatically via primary raymarching.
+func ExtractSDF3DVectorContours(
+	sdf SDF3D,
+	camPos, camTarget Vec3,
+	w, h int,
+	cfg SDF3DVectorHLRConfig,
+) (silhouettes, creases, slices [][]Point) {
+	if sdf == nil || w <= 0 || h <= 0 {
+		return nil, nil, nil
+	}
+	nx := cfg.GridRes
+	if nx < 24 {
+		nx = 120
+	}
+	ny := int(math.Round(float64(nx) * float64(h) / float64(w)))
+	if ny < 24 {
+		ny = 24
+	}
+	maxDist := cfg.MaxDist
+	if maxDist <= 0 {
+		maxDist = 18.0
+	}
+	fov := cfg.FOV
+	if fov <= 0 {
+		fov = 1.75
+	}
+	sliceAxis := cfg.SliceAxis.Normalize()
+	if sliceAxis.Len() < 1e-6 {
+		sliceAxis = V3(0, 1, 0)
+	}
+
+	// Build orthonormal camera basis (right, up, forward)
+	forward := camTarget.Sub(camPos).Normalize()
+	worldUp := V3(0, 1, 0)
+	if math.Abs(forward.Y) > 0.96 {
+		worldUp = V3(1, 0, 0)
+	}
+	right := forward.Cross(worldUp).Normalize()
+	up := right.Cross(forward).Normalize()
+	aspect := float64(w) / float64(h)
+
+	gw, gh := nx+1, ny+1
+	hits := make([]SDF3DHit, gw*gh)
+	minSlice := 1e9
+	maxSlice := -1e9
+
+	parallelRows(gw, gh, func(y0, y1 int) {
+		for iy := y0; iy < y1; iy++ {
+			vy := (0.5 - float64(iy)/float64(ny)) * 2.0
+			rowOff := iy * gw
+			for ix := 0; ix < gw; ix++ {
+				vx := (float64(ix)/float64(nx) - 0.5) * 2.0 * aspect
+				rd := forward.Scale(fov).Add(right.Scale(vx)).Add(up.Scale(vy)).Normalize()
+				t := 0.02
+				var hHit SDF3DHit
+				for step := 0; step < 64 && t < maxDist; step++ {
+					pos := camPos.Add(rd.Scale(t))
+					d := sdf(pos)
+					if d < 0.0015 {
+						norm, _ := CalcSDF3DNormalAndCurvatureAtHit(sdf, pos, d, 0.0025)
+						hHit = SDF3DHit{
+							Hit:    true,
+							T:      t,
+							Pos:    pos,
+							Normal: norm,
+						}
+						break
+					}
+					t += d * 0.95
+				}
+				hits[rowOff+ix] = hHit
+			}
+		}
+	})
+
+	for _, ht := range hits {
+		if ht.Hit {
+			sVal := ht.Pos.Dot(sliceAxis)
+			if sVal < minSlice {
+				minSlice = sVal
+			}
+			if sVal > maxSlice {
+				maxSlice = sVal
+			}
+		}
+	}
+
+	fw, fh := float64(w), float64(h)
+	sampleBilinearHit := func(x, y float64) SDF3DHit {
+		u := common.Clamp01(x/fw) * float64(nx)
+		v := common.Clamp01(y/fh) * float64(ny)
+		ix := common.ConstrainInt(int(math.Round(u)), 0, nx)
+		iy := common.ConstrainInt(int(math.Round(v)), 0, ny)
+		return hits[iy*gw+ix]
+	}
+
+	// 1. Extract outer silhouette contour (hit vs miss boundary)
+	silhouettes = ExtractMarchingSquares(nx, ny, fw, fh, 0.0, func(x, y float64) float64 {
+		ht := sampleBilinearHit(x, y)
+		if ht.Hit {
+			return 1.0
+		}
+		return -1.0
+	})
+
+	// 2. Extract internal occlusion depth-jump & sharp normal-crease contours
+	creases = ExtractMarchingSquares(nx, ny, fw, fh, 0.0, func(x, y float64) float64 {
+		u := common.ConstrainInt(int(math.Round((x/fw)*float64(nx))), 1, nx-1)
+		v := common.ConstrainInt(int(math.Round((y/fh)*float64(ny))), 1, ny-1)
+		c := hits[v*gw+u]
+		if !c.Hit {
+			return -1.0
+		}
+		r := hits[v*gw+u+1]
+		d := hits[(v+1)*gw+u]
+		if !r.Hit || !d.Hit {
+			return -1.0
+		}
+		dJump := math.Max(math.Abs(c.T-r.T), math.Abs(c.T-d.T))
+		if dJump > cfg.DepthJumpThresh {
+			return dJump - cfg.DepthJumpThresh
+		}
+		minCos := math.Min(c.Normal.Dot(r.Normal), c.Normal.Dot(d.Normal))
+		if minCos < cfg.NormalCreaseCos {
+			return cfg.NormalCreaseCos - minCos
+		}
+		return -1.0
+	})
+
+	// 3. Extract visible 3D object-space topographic cross-section iso-contours
+	if cfg.SliceLevels > 0 && maxSlice > minSlice+1e-4 {
+		for lvl := 1; lvl <= cfg.SliceLevels; lvl++ {
+			isoVal := minSlice + (float64(lvl)/float64(cfg.SliceLevels+1))*(maxSlice-minSlice)
+			rawLines := ExtractMarchingSquares(nx, ny, fw, fh, isoVal, func(x, y float64) float64 {
+				ht := sampleBilinearHit(x, y)
+				if !ht.Hit {
+					return minSlice - 100.0
+				}
+				return ht.Pos.Dot(sliceAxis)
+			})
+			// Filter segments so iso-contours never jump across occluded background gaps or sky
+			maxSegLen := math.Hypot(fw/float64(nx), fh/float64(ny)) * 2.2
+			for _, poly := range rawLines {
+				var cur []Point
+				for _, pt := range poly {
+					ht := sampleBilinearHit(pt.X, pt.Y)
+					if !ht.Hit || math.Abs(ht.Pos.Dot(sliceAxis)-isoVal) > (maxSlice-minSlice)*0.18 {
+						if len(cur) >= 2 {
+							slices = append(slices, cur)
+						}
+						cur = nil
+						continue
+					}
+					if len(cur) > 0 && cur[len(cur)-1].Dist(pt) > maxSegLen {
+						if len(cur) >= 2 {
+							slices = append(slices, cur)
+						}
+						cur = []Point{pt}
+						continue
+					}
+					cur = append(cur, pt)
+				}
+				if len(cur) >= 2 {
+					slices = append(slices, cur)
+				}
+			}
+		}
+	}
+
+	return silhouettes, creases, slices
+}
+
+// RenderSDF3DVectorContours extracts visible 3D SDF silhouettes, creases, and cross-section
+// iso-contours with Hidden-Line Removal and strokes them as vector polylines onto c (ready for
+// both HDR raster and infinite-resolution SVG/PDF/Pen-Plotter export).
+func (c *Canvas) RenderSDF3DVectorContours(
+	sdf SDF3D,
+	camPos, camTarget Vec3,
+	cfg SDF3DVectorHLRConfig,
+	silhouetteCol, creaseCol, sliceCol color.RGBA,
+	baseWidth float64,
+) {
+	if c == nil || sdf == nil {
+		return
+	}
+	if baseWidth <= 0 {
+		baseWidth = 1.6
+	}
+	sil, creases, slices := ExtractSDF3DVectorContours(sdf, camPos, camTarget, c.Width, c.Height, cfg)
+	for _, poly := range slices {
+		c.StrokePolyline(poly, baseWidth*0.55, sliceCol, 0.78)
+	}
+	for _, poly := range creases {
+		c.StrokePolyline(poly, baseWidth*0.82, creaseCol, 0.90)
+	}
+	for _, poly := range sil {
+		c.StrokePolyline(poly, baseWidth*1.25, silhouetteCol, 0.98)
+	}
 }

@@ -66,6 +66,8 @@ type postFlags struct {
 	dof        *float64
 	plotter    *bool
 	pens       *int
+	hlr        *bool
+	hatchFills *bool
 }
 
 func registerPostFlags(fs *flag.FlagSet) postFlags {
@@ -83,6 +85,8 @@ func registerPostFlags(fs *flag.FlagSet) postFlags {
 		dof:        fs.Float64("dof", 0, "Thin-lens polygonal-aperture bokeh Depth-of-Field max CoC radius in pixels (e.g. 6.0)"),
 		plotter:    fs.Bool("plotter", false, "Export pen-plotter SVG with <g> color layers and 2-Opt TSP path optimization"),
 		pens:       fs.Int("pens", 0, "Maximum number of pen color layers for -plotter SVG (0 = exact colors)"),
+		hlr:        fs.Bool("hlr", false, "Enable 2D vector hidden-line removal (occlusion culling) for -plotter SVG"),
+		hatchFills: fs.Bool("hatch-fills", false, "Convert filled polygons into lightness-driven hatch strokes for -plotter SVG"),
 	}
 }
 
@@ -280,11 +284,17 @@ func runRender(args []string) {
 	}
 
 	eng := desc.Build(params)
-	if strings.EqualFold(filepath.Ext(*out), ".svg") && ((pf.plotter != nil && *pf.plotter) || (pf.pens != nil && *pf.pens > 0)) {
+	if strings.EqualFold(filepath.Ext(*out), ".svg") && ((pf.plotter != nil && *pf.plotter) || (pf.pens != nil && *pf.pens > 0) || (pf.hlr != nil && *pf.hlr) || (pf.hatchFills != nil && *pf.hatchFills)) {
 		c.Draw(eng)
 		pcfg := render.DefaultPlotterConfig()
 		if pf.pens != nil && *pf.pens > 0 {
 			pcfg.MaxPens = *pf.pens
+		}
+		if pf.hlr != nil && *pf.hlr {
+			pcfg.HiddenLineRemoval = true
+		}
+		if pf.hatchFills != nil && *pf.hatchFills {
+			pcfg.HatchFills = true
 		}
 		stats, err := c.ToPlotterSVG(*out, pcfg)
 		if err != nil {
@@ -393,11 +403,17 @@ func runReplay(args []string) {
 		c.AddPostEffect(effects...)
 	}
 
-	if strings.EqualFold(filepath.Ext(*out), ".svg") && ((pf.plotter != nil && *pf.plotter) || (pf.pens != nil && *pf.pens > 0)) {
+	if strings.EqualFold(filepath.Ext(*out), ".svg") && ((pf.plotter != nil && *pf.plotter) || (pf.pens != nil && *pf.pens > 0) || (pf.hlr != nil && *pf.hlr) || (pf.hatchFills != nil && *pf.hatchFills)) {
 		c.Draw(eng)
 		pcfg := render.DefaultPlotterConfig()
 		if pf.pens != nil && *pf.pens > 0 {
 			pcfg.MaxPens = *pf.pens
+		}
+		if pf.hlr != nil && *pf.hlr {
+			pcfg.HiddenLineRemoval = true
+		}
+		if pf.hatchFills != nil && *pf.hatchFills {
+			pcfg.HatchFills = true
 		}
 		stats, err := c.ToPlotterSVG(*out, pcfg)
 		if err != nil {

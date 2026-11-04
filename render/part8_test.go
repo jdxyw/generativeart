@@ -219,3 +219,82 @@ func TestPhase2AdaptiveMoebiusOklchAndDepthOfField(t *testing.T) {
 	parsedEff.Apply(rc)
 }
 
+func TestPhase3DelaunayVoronoiPDEAndVectorHLR(t *testing.T) {
+	// 1. Verify BuildDelaunayVoronoi2D, exact Voronoi area partition, Lloyd CVT, Gabriel Graph & Euclidean MST
+	sites := []Point{
+		Pt(20, 20), Pt(80, 22), Pt(25, 78), Pt(76, 75),
+		Pt(50, 50), Pt(48, 24), Pt(22, 50), Pt(82, 48), Pt(52, 82),
+	}
+	bMin, bMax := Pt(0, 0), Pt(100, 100)
+	mesh := BuildDelaunayVoronoi2D(sites, bMin, bMax)
+	if len(mesh.Triangles) < 8 || len(mesh.Cells) != len(sites) {
+		t.Fatalf("unexpected Delaunay/Voronoi counts: tris=%d cells=%d", len(mesh.Triangles), len(mesh.Cells))
+	}
+	var totalArea float64
+	for _, cell := range mesh.Cells {
+		totalArea += cell.Area
+	}
+	if math.Abs(totalArea-10000.0) > 1.0 {
+		t.Fatalf("expected clipped Voronoi cells to partition 100x100 domain (area=10000), got %f", totalArea)
+	}
+
+	relaxed := RelaxVoronoiPolygonCVT(sites, bMin, bMax, 3)
+	if len(relaxed) != len(sites) {
+		t.Fatalf("unexpected relaxed site count: %d", len(relaxed))
+	}
+	gabriel := mesh.ExtractGabrielGraph()
+	mst := mesh.ExtractMinimumSpanningTree()
+	if len(mst) != len(sites)-1 || len(gabriel) < len(mst) {
+		t.Fatalf("expected MST edges=%d and Gabriel >= MST, got mst=%d gabriel=%d", len(sites)-1, len(mst), len(gabriel))
+	}
+
+	// 2. Verify Anisotropic Reaction-Diffusion & Screened-Poisson SOR Solver
+	rdCfg := DefaultReactionDiffusionConfig(36, 36, 2026)
+	rdCfg.Steps = 40
+	rdCfg.Anisotropy = 0.65
+	rdCfg.FlowField = func(x, y float64) Point {
+		return Pt(1.0, 0.25)
+	}
+	u, v := SolveAnisotropicReactionDiffusion2D(rdCfg)
+	if len(u) != 36*36 || len(v) != 36*36 {
+		t.Fatalf("unexpected RD buffer lengths: %d, %d", len(u), len(v))
+	}
+
+	rhs := make([]float64, 24*24)
+	rhs[12*24+12] = 10.0
+	pot := SolveScreenedPoisson2D(24, 24, rhs, 0.25, 50)
+	if len(pot) != 24*24 || pot[12*24+12] <= pot[0] {
+		t.Fatalf("expected positive Screened-Poisson peak at source center, got center=%f corner=%f", pot[12*24+12], pot[0])
+	}
+
+	// 3. Verify 2D Plotter Hidden-Line Removal (HLR), Polygon Hatching & 3D SDF Vector Contours
+	rc := NewCanvas(120, 120)
+	rc.FillBackground(color.RGBA{248, 244, 236, 255})
+	// Background line crossing the entire canvas
+	rc.StrokePolyline([]Point{Pt(10, 60), Pt(110, 60)}, 1.2, color.RGBA{20, 24, 32, 255}, 1.0)
+	// Opaque dark foreground polygon occluding the middle [35..85] x [35..85]
+	rc.FillPolygon([]Point{Pt(35, 35), Pt(85, 35), Pt(85, 85), Pt(35, 85)}, color.RGBA{30, 36, 52, 255}, 1.0)
+
+	pcfg := DefaultPlotterConfig()
+	pcfg.HiddenLineRemoval = true
+	pcfg.HatchFills = true
+	pcfg.HatchSpacingPx = 6.0
+	stats := rc.OptimizeVectorOpsTSP(pcfg)
+	if stats.TotalPaths < 6 {
+		t.Fatalf("expected HLR split strokes + polygon hatch lines, got TotalPaths=%d", stats.TotalPaths)
+	}
+
+	// 4. Verify 3D SDF Vector Contour HLR extraction on a torus
+	torusSDF := func(p Vec3) float64 {
+		return SDF3DTorus(p, 0.85, 0.28)
+	}
+	hlrCfg := DefaultSDF3DVectorHLRConfig()
+	hlrCfg.GridRes = 48
+	hlrCfg.SliceLevels = 4
+	sil, _, slices := ExtractSDF3DVectorContours(torusSDF, V3(0, 1.4, 2.8), V3(0, 0, 0), 120, 120, hlrCfg)
+	if len(sil) == 0 || len(slices) == 0 {
+		t.Fatalf("expected non-empty 3D SDF vector silhouettes (%d) and topographic slices (%d)", len(sil), len(slices))
+	}
+}
+
+
