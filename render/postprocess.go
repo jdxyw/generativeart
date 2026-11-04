@@ -126,6 +126,16 @@ func DeckleBorderEffect(marginFrac, roughness float64, matCol color.RGBA, seed i
 	)
 }
 
+// DepthOfFieldEffect returns a composable PostEffect that applies thin-lens polygonal-aperture
+// bokeh depth of field around normalized focal center (focalX, focalY) in [0, 1]^2 with sharp
+// in-focus radius focalRadius and maximum Circle-of-Confusion radius maxCoC (in pixels).
+func DepthOfFieldEffect(focalX, focalY, focalRadius, maxCoC float64, blades int) PostEffect {
+	return NewPostEffect(
+		fmt.Sprintf("dof(%.2f,%.2f,%.2f,%.2f,%d)", focalX, focalY, focalRadius, maxCoC, blades),
+		func(c *Canvas) { c.ApplyDepthOfField(focalX, focalY, focalRadius, maxCoC, blades) },
+	)
+}
+
 // ParsePostEffect reconstructs a composable PostEffect from its serialized Name() string
 // (e.g. "bloom(0.62,6.00,0.35)", "relief(0.60,-135,38,0.38)", "chromatic(0.80)", "vignette(0.25)")
 // or shorthand name ("bloom", "relief", "chromatic", "kuwahara", "vignette", "paper", "deckle", "tonemap").
@@ -194,6 +204,11 @@ func ParsePostEffect(spec string) (PostEffect, bool) {
 			return DeckleBorderEffect(argAt(0, 0.045), argAt(1, 1.0), matCol, int64(argAt(6, 20261021))), true
 		}
 		return DeckleBorderEffect(argAt(0, 0.045), argAt(1, 1.0), matCol, int64(argAt(2, 20261021))), true
+	case "dof":
+		if len(args) == 1 {
+			return DepthOfFieldEffect(0.5, 0.5, 0.28, args[0], 6), true
+		}
+		return DepthOfFieldEffect(argAt(0, 0.5), argAt(1, 0.5), argAt(2, 0.28), argAt(3, 6.0), int(math.Round(argAt(4, 6)))), true
 	default:
 		return nil, false
 	}
@@ -959,6 +974,121 @@ func (c *Canvas) ApplyDeckleBorder(marginFrac, roughness float64, matCol color.R
 					c.pix[idx+0] = artR + rim
 					c.pix[idx+1] = artG + rim
 					c.pix[idx+2] = artB + rim
+				}
+			}
+		}
+	})
+}
+
+func buildBokehApertureKernel(numSamples, blades int) [][2]float64 {
+	if numSamples < 8 {
+		numSamples = 48
+	}
+	const goldenAngle = 2.39996322972865332 // pi * (3 - sqrt(5))
+	kernel := make([][2]float64, numSamples)
+	sector := 0.0
+	halfSector := 0.0
+	cosHalf := 1.0
+	if blades >= 3 {
+		sector = 2.0 * math.Pi / float64(blades)
+		halfSector = 0.5 * sector
+		cosHalf = math.Cos(halfSector)
+	}
+	for i := 0; i < numSamples; i++ {
+		r := math.Sqrt((float64(i) + 0.5) / float64(numSamples))
+		theta := float64(i) * goldenAngle
+		if blades >= 3 {
+			localAngle := math.Mod(theta, sector)
+			if localAngle < 0 {
+				localAngle += sector
+			}
+			polyScale := cosHalf / math.Max(0.25, math.Cos(localAngle-halfSector))
+			r *= polyScale
+		}
+		kernel[i] = [2]float64{r * math.Cos(theta), r * math.Sin(theta)}
+	}
+	return kernel
+}
+
+// ApplyDepthOfField applies a thin-lens polygonal-aperture bokeh Depth-of-Field pass in 64-bit
+// linear HDR space around normalized focal center (focalX, focalY) in [0, 1]^2 with sharp
+// in-focus radius focalRadius and maximum Circle-of-Confusion radius maxCoC (in pixels).
+func (c *Canvas) ApplyDepthOfField(focalX, focalY, focalRadius, maxCoC float64, blades int) {
+	if c == nil || c.Width <= 0 || c.Height <= 0 || maxCoC <= 0.25 {
+		return
+	}
+	w, h := c.Width, c.Height
+	fw, fh := float64(w), float64(h)
+	depthBuf := make([]float64, w*h)
+	parallelRows(w, h, func(y0, y1 int) {
+		for y := y0; y < y1; y++ {
+			uy := (float64(y) + 0.5) / fh
+			for x := 0; x < w; x++ {
+				ux := (float64(x) + 0.5) / fw
+				dist := math.Hypot(ux-focalX, uy-focalY)
+				defocus := math.Max(0.0, dist-focalRadius) / math.Max(0.15, 0.75-focalRadius)
+				depthBuf[y*w+x] = common.Smoothstep(0.0, 1.0, defocus)
+			}
+		}
+	})
+	c.ApplyDepthOfFieldBuffer(depthBuf, 0.0, 1.0, maxCoC, blades)
+}
+
+// ApplyDepthOfFieldBuffer applies a thin-lens polygonal-aperture bokeh Depth-of-Field pass
+// driven by an explicit per-pixel depth buffer depthBuf (length Width * Height).
+// Circle of Confusion CoC(x, y) = min(maxCoC, |depthBuf[x, y] - focalDepth| * aperture * maxCoC).
+// Specular HDR highlights receive physical bokeh energy weighting so out-of-focus pinpoints
+// bloom into crisp N-blade polygonal (or circular when blades < 3) aperture discs.
+func (c *Canvas) ApplyDepthOfFieldBuffer(depthBuf []float64, focalDepth, aperture, maxCoC float64, blades int) {
+	if c == nil || c.Width <= 0 || c.Height <= 0 || maxCoC <= 0.25 || len(depthBuf) < c.Width*c.Height {
+		return
+	}
+	w, h := c.Width, c.Height
+	if aperture <= 0 {
+		aperture = 1.0
+	}
+	maxCoC = common.Constrain(maxCoC, 0.25, 32.0)
+
+	src := make([]float64, len(c.pix))
+	copy(src, c.pix)
+	kernel := buildBokehApertureKernel(48, blades)
+
+	parallelRows(w, h, func(y0, y1 int) {
+		for y := y0; y < y1; y++ {
+			for x := 0; x < w; x++ {
+				coc := math.Min(maxCoC, math.Abs(depthBuf[y*w+x]-focalDepth)*aperture*maxCoC)
+				if coc < 0.35 {
+					continue
+				}
+				var sumR, sumG, sumB, sumW float64
+				cIdx := (y*w + x) * 4
+				cr, cg, cb := src[cIdx+0], src[cIdx+1], src[cIdx+2]
+				sumR, sumG, sumB, sumW = cr, cg, cb, 1.0
+
+				for _, tap := range kernel {
+					sx := common.ConstrainInt(int(math.Round(float64(x)+tap[0]*coc)), 0, w-1)
+					sy := common.ConstrainInt(int(math.Round(float64(y)+tap[1]*coc)), 0, h-1)
+					sCoc := math.Min(maxCoC, math.Abs(depthBuf[sy*w+sx]-focalDepth)*aperture*maxCoC)
+					// Prevent sharp foreground pixels from bleeding into blurry background unless sample is also defocused
+					if sCoc+0.75 < coc*math.Hypot(tap[0], tap[1]) {
+						continue
+					}
+					sIdx := (sy*w + sx) * 4
+					sr, sg, sb := src[sIdx+0], src[sIdx+1], src[sIdx+2]
+					lum := 0.2126*sr + 0.7152*sg + 0.0722*sb
+					// Highlight bokeh boost: bright specular pinpoints form luminous polygonal bokeh discs
+					hiBoost := math.Max(0.0, lum-0.50)
+					wTap := 1.0 + 3.2*hiBoost*hiBoost
+					sumR += sr * wTap
+					sumG += sg * wTap
+					sumB += sb * wTap
+					sumW += wTap
+				}
+				if sumW > 0 {
+					invW := 1.0 / sumW
+					c.pix[cIdx+0] = sumR * invW
+					c.pix[cIdx+1] = sumG * invW
+					c.pix[cIdx+2] = sumB * invW
 				}
 			}
 		}

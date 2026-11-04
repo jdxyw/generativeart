@@ -63,6 +63,7 @@ type postFlags struct {
 	vignette   *float64
 	deckle     *float64
 	tonemap    *float64
+	dof        *float64
 	plotter    *bool
 	pens       *int
 }
@@ -79,6 +80,7 @@ func registerPostFlags(fs *flag.FlagSet) postFlags {
 		vignette:   fs.Float64("vignette", 0, "Smooth radial vignette strength (e.g. 0.25)"),
 		deckle:     fs.Float64("deckle", 0, "Torn deckle-edged museum mat border fraction (e.g. 0.045)"),
 		tonemap:    fs.Float64("tonemap", 0, "ACES filmic tone-mapping exposure (e.g. 1.05)"),
+		dof:        fs.Float64("dof", 0, "Thin-lens polygonal-aperture bokeh Depth-of-Field max CoC radius in pixels (e.g. 6.0)"),
 		plotter:    fs.Bool("plotter", false, "Export pen-plotter SVG with <g> color layers and 2-Opt TSP path optimization"),
 		pens:       fs.Int("pens", 0, "Maximum number of pen color layers for -plotter SVG (0 = exact colors)"),
 	}
@@ -111,6 +113,9 @@ func (pf postFlags) buildEffects(seed int64) []render.PostEffect {
 	}
 	if pf.tonemap != nil && *pf.tonemap > 0 {
 		effects = append(effects, render.ToneMapEffect(*pf.tonemap, 2.2))
+	}
+	if pf.dof != nil && *pf.dof > 0 {
+		effects = append(effects, render.DepthOfFieldEffect(0.5, 0.5, 0.28, *pf.dof, 6))
 	}
 	if pf.paper != nil && *pf.paper > 0 {
 		effects = append(effects, render.PaperTextureEffect(*pf.paper, seed))

@@ -411,18 +411,19 @@ A comprehensive technical audit across `generativeart.go`, `platform.go`, `poste
 
 ---
 
-### 10.2 Phase 2: Core 3D, Optical & Rendering Pipeline Upgrades (Planned Next)
+### 10.2 Phase 2: Core 3D, Optical & Rendering Pipeline Upgrades (Implemented)
 
-1. **Edge-Adaptive 2×2 SSAA & Compact G-Buffer in `render/moebius_engine.go`**:
-   - Two-pass edge-adaptive supersampling: evaluate $1\times 1$ primary centers first, and only evaluate the remaining 3 sub-pixel rays where neighbor `ObjID`/`PartID`/`DetailID`, depth $|\Delta Z|$, normal $\|\Delta\mathbf{N}\|$, or illumination $|\Delta I|$ crosses an edge threshold (`60%–75%` raymarching reduction).
-   - Replace `math.Sin` in `EvaluateMoebiusStoneRelief`'s $3\times 3$ inner Voronoi loop with integer bit-mixing (`hash2D`), and parallelize Stage 3/4 hatching and borders.
-2. **Keinert Over-Relaxation Sphere Tracing & Bounding-Sphere Early-Out (`render/sdf3d.go`)**:
-   - Add bounding-sphere intersection pre-rejection and Keinert over-relaxation ($\omega \approx 1.35$) with secant root refinement in `RaymarchSDF3D`, plus smooth weight-blended triplanar projection in `EvaluateMoebiusStoneRelief3D`.
+1. **Edge-Adaptive 2×2 SSAA & Fast Integer Voronoi Hash in `render/moebius_engine.go`**:
+   - Two-pass edge-adaptive supersampling: evaluates $1\times 1$ primary centers first, and only evaluates the remaining 3 sub-pixel rays where neighbor `ObjID`/`PartID`/`DetailID`, depth $|\Delta Z|$, normal $\|\Delta\mathbf{N}\|$, illumination $|\Delta I|$, crack/tick masks, or terminator hachures require supersampling (`50%–75%` raymarching reduction on sky/flat regions with zero loss of contour or hachure crispness).
+   - Replaced 18 trigonometric `math.Sin` calls in `EvaluateMoebiusStoneRelief`'s $3\times 3$ inner Voronoi loop with 64-bit integer bit-mixing (`moebiusHash2D`), and parallelized `drawMoebiusSerigraphBorder`.
+2. **Keinert Over-Relaxation Sphere Tracing, Bounding-Sphere Early-Out & Smooth Triplanar Blending (`render/sdf3d.go`)**:
+   - Added `IntersectBoundingSphere` and `RaymarchSDF3DBounded` for 0-call sky/background ray rejection, plus Keinert over-relaxation ($\omega = 1.25$) with automatic step fallback and secant root interpolation in `RaymarchSDF3D`, and `CalcSDF3DNormalAndCurvatureAtHit` (eliminating redundant center SDF evaluations).
+   - Upgraded `EvaluateMoebiusStoneRelief3D` with 4th-power smooth triplanar normal blending across $45^\circ$ bevel transitions while keeping a fast 1-plane path on cardinal faces.
 3. **3D Dielectrics, Snell Refraction, Beer-Lambert Absorption & Spectral Dispersion (`render/sdf3d_optics.go`)**:
-   - Recursive interior/exterior signed-distance raymarching (`TraceSDF3DDielectric`), Schlick-Fresnel reflectance, total internal reflection (TIR), Beer-Lambert volume attenuation $\mathbf{T}(\ell) = \exp(-\boldsymbol{\sigma}_a \ell)$, and Abbe-number RGB chromatic dispersion ($\eta_R, \eta_G, \eta_B$).
-4. **Oklch Chroma-Preserving Gamut Mapping & Thin-Lens Polygonal Bokeh DoF (`render/canvas.go`, `render/postprocess.go`)**:
-   - Replace hard per-channel sRGB clipping in `OklabToRGBA` with binary-searched Oklch chroma reduction so bright gold/vermilion highlights preserve perceptual hue.
-   - Add `ApplyDepthOfField` / `DepthOfFieldEffect` with signed Circle-of-Confusion (CoC) and $N$-blade regular-polygon Vogel spiral aperture sampling.
+   - Implemented `ReflectVec3`, `RefractVec3`, `SchlickFresnel`, `BeerLambertTransmittance`, `MarchSDF3DInterior`, `TraceSDF3DDielectric`, and `EvalSDF3DCausticIntensity`, plus 6 physical material presets (`DielectricCrownGlass`, `DielectricFlintPrism`, `DielectricBalticAmber`, `DielectricMuranoEmerald`, `DielectricCobaltSapphire`, `DielectricDiamond`).
+4. **Oklch Chroma-Preserving Gamut Mapping & Thin-Lens Polygonal Bokeh DoF (`render/canvas.go`, `render/postprocess.go`, `cmd/genart`)**:
+   - Added `Oklch`, `OklabToOklch`, `OklchToOklab`, and `GamutMapOklab` in `render/canvas.go` so `OklabToRGBA` preserves perceptual lightness $L$ and hue angle $H$ via binary-searched chroma compression instead of per-channel RGB clipping.
+   - Added `ApplyDepthOfField`, `ApplyDepthOfFieldBuffer`, and `DepthOfFieldEffect` (`dof(...)` in `ParsePostEffect`, `-dof` in `cmd/genart`) with 48-tap Golden-Angle Vogel spiral sampling shaped by an $N$-blade regular polygon aperture.
 
 ---
 

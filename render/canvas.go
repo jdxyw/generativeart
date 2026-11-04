@@ -171,6 +171,56 @@ type Oklab struct {
 	L, A, B float64
 }
 
+// Oklch represents a color in cylindrical Oklch perceptual coordinates (Lightness L, Chroma C, Hue angle H in radians).
+type Oklch struct {
+	L, C, H float64
+}
+
+// OklabToOklch converts Cartesian Oklab (L, a, b) to cylindrical Oklch (L, C, H).
+func OklabToOklch(lab Oklab) Oklch {
+	return Oklch{
+		L: lab.L,
+		C: math.Hypot(lab.A, lab.B),
+		H: math.Atan2(lab.B, lab.A),
+	}
+}
+
+// OklchToOklab converts cylindrical Oklch (L, C, H) to Cartesian Oklab (L, a, b).
+func OklchToOklab(lch Oklch) Oklab {
+	return Oklab{
+		L: lch.L,
+		A: lch.C * math.Cos(lch.H),
+		B: lch.C * math.Sin(lch.H),
+	}
+}
+
+// GamutMapOklab maps an Oklab color into the sRGB [0, 1]^3 linear gamut by preserving
+// perceptual lightness L and hue angle H = atan2(B, A) while binary-searching chroma C
+// when any linear RGB channel falls outside [0, 1].
+func GamutMapOklab(lab Oklab) Oklab {
+	if lab.L <= 0.0 {
+		return Oklab{L: 0, A: 0, B: 0}
+	}
+	if lab.L >= 1.0 {
+		return Oklab{L: 1, A: 0, B: 0}
+	}
+	rLin, gLin, bLin := OklabToLinearRGB(lab)
+	if rLin >= 0.0 && rLin <= 1.0 && gLin >= 0.0 && gLin <= 1.0 && bLin >= 0.0 && bLin <= 1.0 {
+		return lab
+	}
+	lo, hi := 0.0, 1.0
+	for i := 0; i < 6; i++ {
+		mid := 0.5 * (lo + hi)
+		rM, gM, bM := OklabToLinearRGB(Oklab{L: lab.L, A: lab.A * mid, B: lab.B * mid})
+		if rM >= -1e-4 && rM <= 1.0001 && gM >= -1e-4 && gM <= 1.0001 && bM >= -1e-4 && bM <= 1.0001 {
+			lo = mid
+		} else {
+			hi = mid
+		}
+	}
+	return Oklab{L: lab.L, A: lab.A * lo, B: lab.B * lo}
+}
+
 // SRGBToLinear converts a normalized sRGB component [0, 1] to linear light [0, 1].
 func SRGBToLinear(c float64) float64 {
 	if c <= 0 {
@@ -262,9 +312,11 @@ func RGBAToOklab(c color.RGBA) Oklab {
 	return LinearRGBAToOklab(srgb8ToLinearLUT[c.R], srgb8ToLinearLUT[c.G], srgb8ToLinearLUT[c.B])
 }
 
-// OklabToRGBA converts an Oklab color and alpha byte back to sRGB color.RGBA with gamut clamping.
+// OklabToRGBA converts an Oklab color and alpha byte back to sRGB color.RGBA using
+// Oklch chroma-preserving gamut mapping when out of sRGB bounds.
 func OklabToRGBA(lab Oklab, alpha uint8) color.RGBA {
-	rLin, gLin, bLin := OklabToLinearRGB(lab)
+	mapped := GamutMapOklab(lab)
+	rLin, gLin, bLin := OklabToLinearRGB(mapped)
 	r := LinearToSRGB(common.Constrain(rLin, 0, 1))
 	g := LinearToSRGB(common.Constrain(gLin, 0, 1))
 	b := LinearToSRGB(common.Constrain(bLin, 0, 1))

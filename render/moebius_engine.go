@@ -44,6 +44,16 @@ type MoebiusStoneRelief struct {
 	ColorMod  float64    // Per-boulder subtle mineral tone variation in [-1, 1]
 }
 
+func moebiusHash2D(x, y int) (float64, float64) {
+	h1 := uint64(int64(x))*0x9E3779B97F4A7C15 ^ uint64(int64(y))*0xBF58476D1CE4E5B9 ^ 0x94D049BB133111EB
+	h1 = (h1 ^ (h1 >> 30)) * 0xBF58476D1CE4E5B9
+	h1 = (h1 ^ (h1 >> 27)) * 0x94D049BB133111EB
+	h1 = h1 ^ (h1 >> 31)
+	u1 := float64(h1&0xFFFFFF) / float64(0x1000000)
+	u2 := float64((h1>>24)&0xFFFFFF) / float64(0x1000000)
+	return u1, u2
+}
+
 // EvaluateMoebiusStoneRelief computes an organic, domain-warped Voronoi boulder &
 // horizontal erosion-fissure relief field that transforms smooth mathematical shapes
 // into craggy, hand-inked Mœbius rock towers, arches, and ancient carved ruins.
@@ -74,11 +84,8 @@ func EvaluateMoebiusStoneRelief(ne *common.NoiseEngine, u, v, freqX, freqY, warp
 		for dx := -1; dx <= 1; dx++ {
 			cx := iu + dx
 			cy := iv + dy
-			// Deterministic pseudo-random cell feature point
-			h1 := math.Sin(float64(cx)*127.1 + float64(cy)*311.7)
-			h1 = h1*43758.5453 - math.Floor(h1*43758.5453)
-			h2 := math.Sin(float64(cx)*269.5 + float64(cy)*183.3)
-			h2 = h2*43758.5453 - math.Floor(h2*43758.5453)
+			// Fast integer bit-mixing cell feature point (zero trigonometric calls)
+			h1, h2 := moebiusHash2D(cx, cy)
 
 			px := float64(dx) + 0.16 + 0.68*h1
 			py := float64(dy) + 0.16 + 0.68*h2
@@ -205,42 +212,93 @@ func RenderMoebiusScene(rc *Canvas, cfg MoebiusConfig, evalFn func(ux, uy float6
 		numWorkers = 1
 	}
 	var wg sync.WaitGroup
-	rowsPerWorker := (sh + numWorkers - 1) / numWorkers
 
-	// Stage 1: Evaluate 2W x 2H supersampled G-Buffer in parallel
-	for worker := 0; worker < numWorkers; worker++ {
-		y0 := worker * rowsPerWorker
-		y1 := y0 + rowsPerWorker
-		if y1 > sh {
-			y1 = sh
+	evalSample := func(sx, sy int) MoebiusPixel {
+		ux := (float64(sx) + 0.5) / fsw
+		uy := (float64(sy) + 0.5) / fsh
+		p := evalFn(ux, uy)
+		tx, ty := p.FlowTangent[0], p.FlowTangent[1]
+		tLen := math.Hypot(tx, ty)
+		if tLen < 1e-5 {
+			tx = 0.96
+			ty = 0.22 * p.Normal[0]
+			tLen = math.Hypot(tx, ty)
 		}
-		if y0 >= y1 {
-			continue
+		p.FlowTangent = [2]float64{tx / tLen, ty / tLen}
+		return p
+	}
+
+	// Stage 1A: Evaluate primary W x H samples at top-left sub-pixel (2*px, 2*py) and seed all 4 sub-quadrants
+	parallelRows(w, h, func(y0, y1 int) {
+		for py := y0; py < y1; py++ {
+			sy0 := py * 2
+			r0 := sy0 * sw
+			r1 := (sy0 + 1) * sw
+			for px := 0; px < w; px++ {
+				sx0 := px * 2
+				p := evalSample(sx0, sy0)
+				gbuf[r0+sx0] = p
+				gbuf[r0+sx0+1] = p
+				gbuf[r1+sx0] = p
+				gbuf[r1+sx0+1] = p
+			}
 		}
-		wg.Add(1)
-		go func(startY, endY int) {
-			defer wg.Done()
-			for sy := startY; sy < endY; sy++ {
-				uy := (float64(sy) + 0.5) / fsh
-				rowOff := sy * sw
-				for sx := 0; sx < sw; sx++ {
-					ux := (float64(sx) + 0.5) / fsw
-					p := evalFn(ux, uy)
-					tx, ty := p.FlowTangent[0], p.FlowTangent[1]
-					tLen := math.Hypot(tx, ty)
-					if tLen < 1e-5 {
-						// Default to near-horizontal Mœbius contour hachure angle slightly tilted by normal
-						tx = 0.96
-						ty = 0.22 * p.Normal[0]
-						tLen = math.Hypot(tx, ty)
+	})
+
+	// Stage 1B: Edge-Adaptive 2x2 SSAA — only evaluate the remaining 3 sub-pixel rays where
+	// neighborhood discontinuities, cracks, stipple, or terminator hachure bands exist.
+	parallelRows(w, h, func(y0, y1 int) {
+		for py := y0; py < y1; py++ {
+			sy0 := py * 2
+			r0 := sy0 * sw
+			r1 := (sy0 + 1) * sw
+			for px := 0; px < w; px++ {
+				sx0 := px * 2
+				c0 := gbuf[r0+sx0]
+				needsSSAA := c0.CrackInk > 0.02 || c0.TickMask > 0.02 || c0.Stipple > 0.015 ||
+					(c0.Illum > 0.10 && c0.Illum < 0.56 && c0.Depth < 80.0)
+
+				if !needsSSAA {
+					for oy := -1; oy <= 1 && !needsSSAA; oy++ {
+						ny := py + oy
+						if ny < 0 || ny >= h {
+							continue
+						}
+						nRow := (ny * 2) * sw
+						for ox := -1; ox <= 1; ox++ {
+							if ox == 0 && oy == 0 {
+								continue
+							}
+							nx := px + ox
+							if nx < 0 || nx >= w {
+								continue
+							}
+							nb := gbuf[nRow+nx*2]
+							if nb.ObjID != c0.ObjID || nb.PartID != c0.PartID || nb.DetailID != c0.DetailID ||
+								math.Abs(nb.Depth-c0.Depth) > 0.04 ||
+								math.Abs(nb.Illum-c0.Illum) > 0.035 ||
+								nb.CrackInk > 0.02 || nb.TickMask > 0.02 {
+								needsSSAA = true
+								break
+							}
+							dnx := nb.Normal[0] - c0.Normal[0]
+							dny := nb.Normal[1] - c0.Normal[1]
+							dnz := nb.Normal[2] - c0.Normal[2]
+							if dnx*dnx+dny*dny+dnz*dnz > 0.015 {
+								needsSSAA = true
+								break
+							}
+						}
 					}
-					p.FlowTangent = [2]float64{tx / tLen, ty / tLen}
-					gbuf[rowOff+sx] = p
+				}
+				if needsSSAA {
+					gbuf[r0+sx0+1] = evalSample(sx0+1, sy0)
+					gbuf[r1+sx0] = evalSample(sx0, sy0+1)
+					gbuf[r1+sx0+1] = evalSample(sx0+1, sy0+1)
 				}
 			}
-		}(y0, y1)
-	}
-	wg.Wait()
+		}
+	})
 
 	inkR, inkG, inkB, _ := ColorToLinearRGB(cfg.InkColor)
 	inkLin := [3]float64{inkR, inkG, inkB}
@@ -611,25 +669,27 @@ func drawMoebiusSerigraphBorder(rc *Canvas, cfg MoebiusConfig) {
 	mFillet := cfg.BorderMargin * 0.96
 	mRule2 := cfg.BorderMargin * 1.04
 
-	for y := 0; y < h; y++ {
-		uy := (float64(y) + 0.5) / fh
-		dy := math.Min(uy, 1.0-uy)
-		for x := 0; x < w; x++ {
-			ux := (float64(x) + 0.5) / fw
-			dx := math.Min(ux, 1.0-ux)
-			distEdge := math.Min(dx, dy)
-			if distEdge >= mRule2 {
-				continue
-			}
-			if distEdge < mOuter {
-				rc.SetPixelLinear(x, y, matR, matG, matB, 1.0)
-			} else if distEdge < mRule1 {
-				rc.SetPixelLinear(x, y, inkR, inkG, inkB, 1.0)
-			} else if distEdge < mFillet {
-				rc.SetPixelLinear(x, y, filletR, filletG, filletB, 1.0)
-			} else {
-				rc.SetPixelLinear(x, y, inkR, inkG, inkB, 1.0)
+	parallelRows(w, h, func(y0, y1 int) {
+		for y := y0; y < y1; y++ {
+			uy := (float64(y) + 0.5) / fh
+			dy := math.Min(uy, 1.0-uy)
+			for x := 0; x < w; x++ {
+				ux := (float64(x) + 0.5) / fw
+				dx := math.Min(ux, 1.0-ux)
+				distEdge := math.Min(dx, dy)
+				if distEdge >= mRule2 {
+					continue
+				}
+				if distEdge < mOuter {
+					rc.SetPixelLinear(x, y, matR, matG, matB, 1.0)
+				} else if distEdge < mRule1 {
+					rc.SetPixelLinear(x, y, inkR, inkG, inkB, 1.0)
+				} else if distEdge < mFillet {
+					rc.SetPixelLinear(x, y, filletR, filletG, filletB, 1.0)
+				} else {
+					rc.SetPixelLinear(x, y, inkR, inkG, inkB, 1.0)
+				}
 			}
 		}
-	}
+	})
 }

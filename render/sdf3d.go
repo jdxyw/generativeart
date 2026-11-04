@@ -360,6 +360,8 @@ func AlignIcosahedral5FoldY(p Vec3) Vec3 {
 // EvaluateMoebiusStoneRelief3D evaluates object-locked 3D triplanar Voronoi stone &
 // metal relief in the rotating object's local coordinate frame (pLocal, nLocal),
 // eliminating 2D "shower-door" texture swimming during 3D animations.
+// Uses smooth power-weighted triplanar blending across 45-degree bevel transitions
+// while retaining a fast 1-plane path on cardinal-aligned faces.
 func EvaluateMoebiusStoneRelief3D(ne *common.NoiseEngine, pLocal, nLocal Vec3, freq, warpStrength float64) MoebiusStoneRelief {
 	if ne == nil {
 		return MoebiusStoneRelief{}
@@ -368,21 +370,70 @@ func EvaluateMoebiusStoneRelief3D(ne *common.NoiseEngine, pLocal, nLocal Vec3, f
 	ay := math.Abs(nLocal.Y)
 	az := math.Abs(nLocal.Z)
 
-	// Select dominant local triplanar projection plane for crisp block IDs,
-	// and blend crack/pock ink smoothly across face transitions
-	var uDom, vDom float64
-	var planeOffset float64
-	if ax >= ay && ax >= az {
-		uDom, vDom = pLocal.Y, pLocal.Z
-		planeOffset = 1.7
-	} else if ay >= ax && ay >= az {
-		uDom, vDom = pLocal.X, pLocal.Z
-		planeOffset = 3.4
-	} else {
-		uDom, vDom = pLocal.X, pLocal.Y
-		planeOffset = 0.0
+	// Fast path when one normal component strongly dominates (e.g. > 0.78)
+	if ax >= ay && ax >= az && ax > 0.78 && ax-ay > 0.22 && ax-az > 0.22 {
+		return EvaluateMoebiusStoneRelief(ne, pLocal.Y+1.7, pLocal.Z-1.7, freq, freq, warpStrength)
 	}
-	return EvaluateMoebiusStoneRelief(ne, uDom+planeOffset, vDom-planeOffset, freq, freq, warpStrength)
+	if ay >= ax && ay >= az && ay > 0.78 && ay-ax > 0.22 && ay-az > 0.22 {
+		return EvaluateMoebiusStoneRelief(ne, pLocal.X+3.4, pLocal.Z-3.4, freq, freq, warpStrength)
+	}
+	if az >= ax && az >= ay && az > 0.78 && az-ax > 0.22 && az-ay > 0.22 {
+		return EvaluateMoebiusStoneRelief(ne, pLocal.X, pLocal.Y, freq, freq, warpStrength)
+	}
+
+	// Smooth 4th-power triplanar weights across diagonal/bevel transitions
+	wx := math.Max(0.0, ax-0.12)
+	wy := math.Max(0.0, ay-0.12)
+	wz := math.Max(0.0, az-0.12)
+	wx = wx * wx * wx * wx
+	wy = wy * wy * wy * wy
+	wz = wz * wz * wz * wz
+	wSum := wx + wy + wz
+	if wSum < 1e-8 {
+		return EvaluateMoebiusStoneRelief(ne, pLocal.X, pLocal.Y, freq, freq, warpStrength)
+	}
+	wx /= wSum
+	wy /= wSum
+	wz /= wSum
+
+	var out MoebiusStoneRelief
+	bestW := -1.0
+	if wx > 0.05 {
+		rx := EvaluateMoebiusStoneRelief(ne, pLocal.Y+1.7, pLocal.Z-1.7, freq, freq, warpStrength)
+		out.CrackInk += wx * rx.CrackInk
+		out.PockInk += wx * rx.PockInk
+		out.ColorMod += wx * rx.ColorMod
+		out.NormalMod[0] += wx * rx.NormalMod[0]
+		out.NormalMod[1] += wx * rx.NormalMod[1]
+		if wx > bestW {
+			bestW = wx
+			out.BlockID = rx.BlockID
+		}
+	}
+	if wy > 0.05 {
+		ry := EvaluateMoebiusStoneRelief(ne, pLocal.X+3.4, pLocal.Z-3.4, freq, freq, warpStrength)
+		out.CrackInk += wy * ry.CrackInk
+		out.PockInk += wy * ry.PockInk
+		out.ColorMod += wy * ry.ColorMod
+		out.NormalMod[0] += wy * ry.NormalMod[0]
+		out.NormalMod[1] += wy * ry.NormalMod[1]
+		if wy > bestW {
+			bestW = wy
+			out.BlockID = ry.BlockID
+		}
+	}
+	if wz > 0.05 {
+		rz := EvaluateMoebiusStoneRelief(ne, pLocal.X, pLocal.Y, freq, freq, warpStrength)
+		out.CrackInk += wz * rz.CrackInk
+		out.PockInk += wz * rz.PockInk
+		out.ColorMod += wz * rz.ColorMod
+		out.NormalMod[0] += wz * rz.NormalMod[0]
+		out.NormalMod[1] += wz * rz.NormalMod[1]
+		if wz > bestW {
+			out.BlockID = rz.BlockID
+		}
+	}
+	return out
 }
 
 // =============================================================================
@@ -393,6 +444,12 @@ func EvaluateMoebiusStoneRelief3D(ne *common.NoiseEngine, pLocal, nLocal Vec3, f
 // 3D mean curvature kappa in [-1, 1] (>0 convex ridge, <0 concave valley) using a
 // 4-point tetrahedral finite-difference stencil plus center evaluation.
 func CalcSDF3DNormalAndCurvature(sdf SDF3D, p Vec3, eps float64) (Vec3, float64) {
+	return CalcSDF3DNormalAndCurvatureAtHit(sdf, p, sdf(p), eps)
+}
+
+// CalcSDF3DNormalAndCurvatureAtHit evaluates the unit surface normal N and normalized
+// 3D mean curvature kappa in [-1, 1] using 4 tetrahedral samples and a known center distance dCenter.
+func CalcSDF3DNormalAndCurvatureAtHit(sdf SDF3D, p Vec3, dCenter, eps float64) (Vec3, float64) {
 	if eps <= 0 {
 		eps = 0.002
 	}
@@ -405,7 +462,6 @@ func CalcSDF3DNormalAndCurvature(sdf SDF3D, p Vec3, eps float64) (Vec3, float64)
 	d1 := sdf(p.Add(k1.Scale(eps)))
 	d2 := sdf(p.Add(k2.Scale(eps)))
 	d3 := sdf(p.Add(k3.Scale(eps)))
-	dCenter := sdf(p)
 
 	grad := k0.Scale(d0).Add(k1.Scale(d1)).Add(k2.Scale(d2)).Add(k3.Scale(d3))
 	norm := grad.Normalize()
@@ -414,6 +470,28 @@ func CalcSDF3DNormalAndCurvature(sdf SDF3D, p Vec3, eps float64) (Vec3, float64)
 	lap := (d0 + d1 + d2 + d3 - 4.0*dCenter) / (eps * 2.5)
 	curv := common.Constrain(lap, -1.0, 1.0)
 	return norm, curv
+}
+
+// IntersectBoundingSphere analytically intersects ray (ro, rd) with a sphere at center of radius r.
+// Returns [tMin, tMax] along the ray and hit=true if the ray enters the sphere ahead of ro.
+func IntersectBoundingSphere(ro, rd, center Vec3, radius float64) (tMin, tMax float64, hit bool) {
+	oc := ro.Sub(center)
+	b := oc.Dot(rd)
+	c := oc.Dot(oc) - radius*radius
+	disc := b*b - c
+	if disc < 0.0 {
+		return 0, 0, false
+	}
+	h := math.Sqrt(disc)
+	t0 := -b - h
+	t1 := -b + h
+	if t1 < 0.0 {
+		return 0, 0, false
+	}
+	if t0 < 0.0 {
+		t0 = 0.0
+	}
+	return t0, t1, true
 }
 
 // CalcSDF3DSoftShadow marches a shadow ray from ro along rd and computes a smooth
@@ -449,20 +527,61 @@ func CalcSDF3DAO(sdf SDF3D, p, n Vec3) float64 {
 	return common.Clamp01(1.0 - 2.4*occ)
 }
 
-// RaymarchSDF3D marches a ray from ro along unit direction rd up to maxDist and
-// returns a complete SDF3DHit with normal, 3D mean curvature, AO, and soft shadow.
+// RaymarchSDF3D marches a ray from ro along unit direction rd up to maxDist using
+// Keinert over-relaxation sphere tracing with automatic step fallback and secant root
+// refinement, returning a complete SDF3DHit with normal, 3D mean curvature, AO, and soft shadow.
 func RaymarchSDF3D(sdf SDF3D, ro, rd, lightDir Vec3, maxDist float64, maxSteps int) SDF3DHit {
+	return raymarchSDF3DInterval(sdf, ro, rd, lightDir, 0.02, maxDist, maxSteps)
+}
+
+// RaymarchSDF3DBounded performs bounding-sphere pre-rejection before sphere tracing sdf
+// across the intersected [tMin, tMax] interval, skipping empty sky/background rays in 0 SDF evaluations.
+func RaymarchSDF3DBounded(sdf SDF3D, ro, rd, lightDir, boundCenter Vec3, boundRadius, maxDist float64, maxSteps int) SDF3DHit {
+	if boundRadius > 0 {
+		t0, t1, ok := IntersectBoundingSphere(ro, rd, boundCenter, boundRadius)
+		if !ok || t0 >= maxDist {
+			return SDF3DHit{Hit: false, T: maxDist}
+		}
+		tStart := math.Max(0.02, t0)
+		tEnd := math.Min(maxDist, t1)
+		return raymarchSDF3DInterval(sdf, ro, rd, lightDir, tStart, tEnd, maxSteps)
+	}
+	return raymarchSDF3DInterval(sdf, ro, rd, lightDir, 0.02, maxDist, maxSteps)
+}
+
+func raymarchSDF3DInterval(sdf SDF3D, ro, rd, lightDir Vec3, tStart, tEnd float64, maxSteps int) SDF3DHit {
 	if maxSteps <= 0 {
 		maxSteps = 72
 	}
-	t := 0.02
-	for i := 0; i < maxSteps && t < maxDist; i++ {
+	t := tStart
+	omega := 1.25
+	prevRadius := 0.0
+	stepLength := 0.0
+
+	for i := 0; i < maxSteps && t < tEnd; i++ {
 		pos := ro.Add(rd.Scale(t))
 		d := sdf(pos)
+
+		// Detect over-relaxation step overshoot and revert to standard sphere tracing
+		if omega > 1.0 && prevRadius > 0 && (prevRadius+math.Abs(d) < stepLength) {
+			stepLength -= omega * prevRadius
+			t += stepLength
+			omega = 1.0
+			prevRadius = 0.0
+			continue
+		}
+
 		if d < 0.0012 {
-			norm, curv := CalcSDF3DNormalAndCurvature(sdf, pos, 0.0025)
+			if d < 0 && prevRadius > 0 && stepLength > 0 {
+				// Secant root interpolation between previous positive sample and current negative sample
+				frac := prevRadius / (prevRadius - d)
+				t = (t - stepLength) + stepLength*common.Clamp01(frac)
+				pos = ro.Add(rd.Scale(t))
+				d = 0.0
+			}
+			norm, curv := CalcSDF3DNormalAndCurvatureAtHit(sdf, pos, d, 0.0025)
 			ao := CalcSDF3DAO(sdf, pos, norm)
-			sh := CalcSDF3DSoftShadow(sdf, pos.Add(norm.Scale(0.006)), lightDir, 0.015, maxDist*0.65, 10.0)
+			sh := CalcSDF3DSoftShadow(sdf, pos.Add(norm.Scale(0.006)), lightDir, 0.015, tEnd*0.65, 10.0)
 			return SDF3DHit{
 				Hit:       true,
 				T:         t,
@@ -473,7 +592,9 @@ func RaymarchSDF3D(sdf SDF3D, ro, rd, lightDir Vec3, maxDist float64, maxSteps i
 				Shadow:    sh,
 			}
 		}
-		t += d * 0.92
+		stepLength = d * omega
+		prevRadius = math.Abs(d)
+		t += stepLength
 	}
-	return SDF3DHit{Hit: false, T: maxDist}
+	return SDF3DHit{Hit: false, T: tEnd}
 }
