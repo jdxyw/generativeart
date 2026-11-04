@@ -2,6 +2,7 @@ package generativeart_test
 
 import (
 	"bytes"
+	"image"
 	"image/color"
 	"image/gif"
 	"image/png"
@@ -315,6 +316,90 @@ func TestParallelTimelapseAndTemporalAA(t *testing.T) {
 		t.Fatalf("expected 6 decoded GIF frames, err=%v", err)
 	}
 }
+
+func TestPhase4DeepColorPNG16RadianceHDRAndSeedDeterminism(t *testing.T) {
+	tmpDir := t.TempDir()
+	png16Path := filepath.Join(tmpDir, "deep16.png")
+	hdrPath := filepath.Join(tmpDir, "radiance.hdr")
+
+	// 1. Test 16-bit Deep-Color PNG (RGBA64) with embedded recipe metadata and Radiance RGBE .hdr export
+	c := generativeart.NewCanva(80, 80)
+	c.SetSeed(20261104)
+	c.SetBackground(color.RGBA{R: 12, G: 16, B: 28, A: 255})
+	c.FillBackground()
+	c.Draw(arts.NewMosaicSun(14, 1.0))
+
+	if err := c.ToPNG16(png16Path); err != nil {
+		t.Fatalf("ToPNG16 failed: %v", err)
+	}
+	f16, err := os.Open(png16Path)
+	if err != nil {
+		t.Fatalf("open png16 failed: %v", err)
+	}
+	defer f16.Close()
+	img16, err := png.Decode(f16)
+	if err != nil {
+		t.Fatalf("png.Decode on 16-bit PNG failed: %v", err)
+	}
+	if _, ok := img16.(*image.RGBA64); !ok {
+		if _, okN := img16.(*image.NRGBA64); !okN {
+			t.Fatalf("expected decoded 16-bit PNG to be *image.RGBA64 or *image.NRGBA64, got %T", img16)
+		}
+	}
+	meta16, err := generativeart.ReadPNGRecipe(png16Path)
+	if err != nil || meta16.Engine != "mosaicSun" {
+		t.Fatalf("expected recipe metadata embedded inside 16-bit PNG, got err=%v meta=%+v", err, meta16)
+	}
+
+	if err := c.ToHDR(hdrPath); err != nil {
+		t.Fatalf("ToHDR failed: %v", err)
+	}
+	hdrBytes, err := os.ReadFile(hdrPath)
+	if err != nil || !bytes.HasPrefix(hdrBytes, []byte("#?RADIANCE\n")) {
+		t.Fatalf("expected valid Radiance RGBE header in .hdr file")
+	}
+
+	// Verify RGBE encode/decode round-trip on super-white HDR values (> 1.0)
+	rgbe := render.FloatToRGBE(3.2, 1.4, 0.25)
+	rDec, gDec, bDec := render.RGBEToFloat(rgbe)
+	if math.Abs(rDec-3.2)/3.2 > 0.02 || math.Abs(gDec-1.4)/1.4 > 0.02 || math.Abs(bDec-0.25)/0.25 > 0.03 {
+		t.Fatalf("RGBE round-trip error too large: got (%f, %f, %f)", rDec, gDec, bDec)
+	}
+
+	// 2. Verify previously non-deterministic / hardcoded-seed engines now respond deterministically to SetSeed
+	for _, name := range []string{"joydivision", "mosaicsun", "sashikoweave", "dotswave"} {
+		desc, ok := arts.Lookup(name)
+		if !ok {
+			t.Fatalf("missing descriptor %s", name)
+		}
+		c1 := generativeart.NewCanva(64, 64)
+		c1.SetSeed(1001)
+		c1.SetBackground(desc.DefaultBG)
+		c1.FillBackground()
+		c1.Draw(desc.Build(nil))
+
+		c2 := generativeart.NewCanva(64, 64)
+		c2.SetSeed(1001)
+		c2.SetBackground(desc.DefaultBG)
+		c2.FillBackground()
+		c2.Draw(desc.Build(nil))
+
+		if !bytes.Equal(c1.Img().Pix, c2.Img().Pix) {
+			t.Fatalf("expected engine %s to be 100%% bit-identical for same seed 1001", name)
+		}
+
+		c3 := generativeart.NewCanva(64, 64)
+		c3.SetSeed(9999)
+		c3.SetBackground(desc.DefaultBG)
+		c3.FillBackground()
+		c3.Draw(desc.Build(nil))
+
+		if bytes.Equal(c1.Img().Pix, c3.Img().Pix) {
+			t.Fatalf("expected engine %s to produce distinct output for different seeds (1001 vs 9999)", name)
+		}
+	}
+}
+
 
 
 

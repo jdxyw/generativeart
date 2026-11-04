@@ -3,7 +3,6 @@ package arts
 import (
 	"image/color"
 	"math"
-	"math/rand"
 
 	"github.com/jdxyw/generativeart"
 	"github.com/jdxyw/generativeart/common"
@@ -57,7 +56,7 @@ func (vt *voxelTerrain) Generative(c *generativeart.Canva) {
 		hScale = 1.0
 	}
 
-	seed := rand.Int63()
+	seed := c.Seed()
 	noise := common.NewNoiseEngine(seed)
 
 	// Reference Image 2 Palette

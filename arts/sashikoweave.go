@@ -131,7 +131,7 @@ func (sw *sashikoWeave) Generative(c *generativeart.Canva) {
 	if n < 2 {
 		n = 3
 	}
-	rng := rand.New(rand.NewSource(202616))
+	rng := rand.New(rand.NewSource(c.Seed() ^ 202616))
 	fabrics := []color.RGBA{deepIndigo, kachiNavy, asagiSlate, tealIndigo, akaneMadder, kachiNavy, kitsuneOchre}
 	threads := []color.RGBA{ivoryCotton, ivoryCotton, goldThread, ivoryCotton, coralThread}
 

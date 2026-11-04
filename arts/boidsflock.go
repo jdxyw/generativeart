@@ -73,7 +73,7 @@ func (bf *boidsFlock) Generative(c *generativeart.Canva) {
 	minSpeed := 2.2 * scale
 	maxSpeed := 5.2 * scale
 
-	seed := rand.Int63()
+	seed := c.Seed()
 	rng := rand.New(rand.NewSource(seed))
 	noise := common.NewNoiseEngine(seed)
 

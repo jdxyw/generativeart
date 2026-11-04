@@ -72,7 +72,7 @@ func (df *dlaFrost) Generative(c *generativeart.Canva) {
 		maxClusterR = math.Min(fw, fh) * 0.45
 	}
 
-	seed := rand.Int63()
+	seed := c.Seed()
 	rng := rand.New(rand.NewSource(seed))
 	noise := common.NewNoiseEngine(seed)
 

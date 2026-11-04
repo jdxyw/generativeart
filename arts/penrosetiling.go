@@ -336,7 +336,7 @@ func (pt *penroseTiling) Generative(c *generativeart.Canva) {
 		}
 	}
 
-	rng := rand.New(rand.NewSource(int64(subs)*9173 + 42))
+	rng := rand.New(rand.NewSource(c.Seed() ^ (int64(subs)*9173 + 42)))
 	maxGlints := common.MinInt(len(accentCenters), 180)
 	stepStride := common.MaxInt(1, len(accentCenters)/maxGlints)
 	for i := 0; i < len(accentCenters); i += stepStride {

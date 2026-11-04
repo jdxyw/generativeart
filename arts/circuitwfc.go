@@ -128,7 +128,7 @@ func (cw *circuitWFC) Generative(c *generativeart.Canva) {
 		}
 	}
 
-	rng := rand.New(rand.NewSource(202619))
+	rng := rand.New(rand.NewSource(c.Seed() ^ 202619))
 
 	// Helper to draw a 3D metallic PCB trace with plated through-hole vias at both ends
 	drawPCBTrace := func(pts []render.Point, col color.RGBA, width float64) {

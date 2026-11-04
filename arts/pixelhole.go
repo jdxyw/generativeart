@@ -5,7 +5,6 @@ import (
 	"github.com/jdxyw/generativeart"
 	"github.com/jdxyw/generativeart/common"
 	"math"
-	"math/rand"
 )
 
 type pixelHole struct {
@@ -39,16 +38,17 @@ func (p *pixelHole) draw(ctex *gg.Context, c *generativeart.Canva, frameCount fl
 	c2 := (int(frameCount/100.0) + 1) % len(c.Opts().ColorSchema())
 	ratio := frameCount/100 - math.Floor(frameCount/100)
 	cl := common.LerpColor(c.Opts().ColorSchema()[c1], c.Opts().ColorSchema()[c2], ratio)
+	rng := c.Rand()
 	for i := 0.0; i < float64(p.dotN); i += 1.0 {
 		ctex.Push()
 		ctex.SetColor(cl)
 		ctex.Rotate(frameCount/(50+10*math.Log(frameCount+1)) + i/20)
 		dd := frameCount/(5+i) + frameCount/5 + math.Sin(i)*50
-		ctex.Translate(common.RandomRangeFloat64(dd/2, dd), 0)
-		x := p.noise.Noise2D(frameCount/50+i/50, 5000)*float64(c.Width())/10 + rand.Float64()*float64(c.Width())/20
-		y := p.noise.Noise2D(frameCount/50+i/50, 10000)*float64(c.Height())/10 + rand.Float64()*float64(c.Height())/20
+		ctex.Translate(common.RandomRangeFloat64From(rng, dd/2, dd), 0)
+		x := p.noise.Noise2D(frameCount/50+i/50, 5000)*float64(c.Width())/10 + rng.Float64()*float64(c.Width())/20
+		y := p.noise.Noise2D(frameCount/50+i/50, 10000)*float64(c.Height())/10 + rng.Float64()*float64(c.Height())/20
 
-		rr := common.RandomRangeFloat64(1.0, 6-math.Log(frameCount+1)/10)
+		rr := common.RandomRangeFloat64From(rng, 1.0, 6-math.Log(frameCount+1)/10)
 		ctex.DrawEllipse(x, y, rr, rr)
 		ctex.Fill()
 		ctex.Pop()

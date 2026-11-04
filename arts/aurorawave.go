@@ -60,7 +60,7 @@ func (aw *auroraWave) Generative(c *generativeart.Canva) {
 		scale = 1.0
 	}
 
-	seed := rand.Int63()
+	seed := c.Seed()
 	rng := rand.New(rand.NewSource(seed))
 	noise := common.NewNoiseEngine(seed)
 

@@ -213,7 +213,7 @@ func (cn *cliffordNebula) Generative(c *generativeart.Canva) {
 		return peaks[i].val > peaks[j].val
 	})
 
-	rng := rand.New(rand.NewSource(42))
+	rng := rand.New(rand.NewSource(c.Seed() ^ 42))
 	selected := make([]peakCandidate, 0, 35)
 	minSep := 18.0 * scale
 	for _, pk := range peaks {

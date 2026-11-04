@@ -3,7 +3,6 @@ package arts
 import (
 	"github.com/fogleman/gg"
 	"github.com/jdxyw/generativeart"
-	"math/rand"
 )
 
 type girdSquares struct {
@@ -24,15 +23,16 @@ func NewGirdSquares(step, rectSize int, decay float64) *girdSquares {
 func (g *girdSquares) Generative(c *generativeart.Canva) {
 	ctex := gg.NewContextForRGBA(c.Img())
 
+	rng := c.Rand()
 	for x := 0; x < c.Width(); x += g.step {
 		for y := 0; y < c.Height(); y += g.step {
-			cl := c.Opts().ColorSchema()[rand.Intn(len(c.Opts().ColorSchema()))]
+			cl := c.Opts().ColorSchema()[rng.Intn(len(c.Opts().ColorSchema()))]
 
 			x0 := float64(x)
 			y0 := float64(y)
 			s := float64(g.rectSize)
 
-			theta := rand.Intn(360) + 1
+			theta := rng.Intn(360) + 1
 			for i := 0; i < c.Opts().NIters(); i++ {
 				ctex.Push()
 

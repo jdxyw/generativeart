@@ -5,7 +5,6 @@ import (
 	"github.com/jdxyw/generativeart"
 	"github.com/jdxyw/generativeart/common"
 	"math"
-	"math/rand"
 )
 
 type perlinPearls struct {
@@ -35,13 +34,14 @@ func (pp *perlinPearls) Generative(c *generativeart.Canva) {
 	ctex.SetLineWidth(0.5)
 	ctex.SetColor(common.Black)
 
+	rng := c.Rand()
 	cs := make([]circles, 0)
 
 	for len(cs) < pp.circleN {
 		c := circles{
-			x:        common.RandomRangeFloat64(100, float64(c.Width())-50),
-			y:        common.RandomRangeFloat64(100, float64(c.Height())-50),
-			radius:   common.RandomRangeFloat64(20, 100),
+			x:        common.RandomRangeFloat64From(rng, 100, float64(c.Width())-50),
+			y:        common.RandomRangeFloat64From(rng, 100, float64(c.Height())-50),
+			radius:   common.RandomRangeFloat64From(rng, 20, 100),
 			colorMin: pp.colorMin,
 			colorMax: pp.colorMax,
 		}
@@ -65,7 +65,7 @@ func (pp *perlinPearls) Generative(c *generativeart.Canva) {
 	for i := 0; i < pp.circleN; i++ {
 		dots := make([]dot, 0)
 		for j := 0; j < pp.dotsN; j++ {
-			theta := rand.Float64() * math.Pi * 2
+			theta := rng.Float64() * math.Pi * 2
 			//x, y := float64(c.Width())/2+math.Sin(theta)*radius, float64(c.Height())/2+math.Cos(theta)*radius
 			dots = append(dots, dot{
 				theta: theta,

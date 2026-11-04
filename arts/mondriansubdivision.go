@@ -63,7 +63,7 @@ func (ms *mondrianSubdivision) Generative(c *generativeart.Canva) {
 	rc.FillBackground(obsidianFrame)
 	rc.SetBlendMode(render.BlendOver)
 
-	rng := rand.New(rand.NewSource(202615))
+	rng := rand.New(rand.NewSource(c.Seed() ^ 202615))
 
 	// 1. Golden-Ratio Recursive KD-Subdivision into Architectural Chambers
 	var cells []bauhausCell

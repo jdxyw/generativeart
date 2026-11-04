@@ -313,7 +313,7 @@ func (hp *halftonePanels) Generative(c *generativeart.Canva) {
 		rc.PushClipPolygon(rectPoly)
 		rc.FillPolygon(rectPoly, inkBlack, 1.0)
 
-		rng := rand.New(rand.NewSource(int64(pIdx*918273 + 1337)))
+		rng := rand.New(rand.NewSource(c.Seed() ^ int64(pIdx*918273+1337)))
 
 		// 1. Starfield & Lower Sky Stipple Screen
 		skyH := ph * (p.yTopFrac + 0.12)

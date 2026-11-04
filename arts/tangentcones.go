@@ -104,7 +104,7 @@ func (tc *tangentCones) Generative(c *generativeart.Canva) {
 		)
 	}
 
-	rng := rand.New(rand.NewSource(7071926))
+	rng := rand.New(rand.NewSource(c.Seed() ^ 7071926))
 
 	// 2. Upper-left meteor / rain shower: ~45 crisp vertical fine lines with glowing diamond/circle bead nodes
 	const meteorCount = 46

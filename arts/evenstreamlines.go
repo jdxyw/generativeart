@@ -168,7 +168,7 @@ func (es *evenStreamlines) Generative(c *generativeart.Canva) {
 		vermilionCoral,
 	)
 
-	rng := rand.New(rand.NewSource(202612))
+	rng := rand.New(rand.NewSource(c.Seed() ^ 202612))
 	for idx, line := range streamlines {
 		if len(line) < 4 {
 			continue

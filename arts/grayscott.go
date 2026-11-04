@@ -134,7 +134,7 @@ func (gs *grayScott) Generative(c *generativeart.Canva) {
 	}
 
 	// Seed initial V concentration along a multi-ring mandala / spiral of 28 circular seeds.
-	rng := rand.New(rand.NewSource(rand.Int63()))
+	rng := rand.New(rand.NewSource(c.Seed()))
 	type seedPt struct {
 		x, y, rad float64
 	}

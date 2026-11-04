@@ -56,7 +56,7 @@ func (pc *packedCapsules) Generative(c *generativeart.Canva) {
 	minGap := 2.5 * scale
 	minSep := lineWidth + minGap
 
-	seed := rand.Int63()
+	seed := c.Seed()
 	rng := rand.New(rand.NewSource(seed))
 	noise := common.NewNoiseEngine(seed)
 

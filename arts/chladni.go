@@ -119,7 +119,7 @@ func (ch *chladni) Generative(c *generativeart.Canva) {
 	}
 
 	// 2. Simulate stochastic cymatic resonance grains migrating toward nodal lines |W(u, v)| == 0.
-	rng := rand.New(rand.NewSource(rand.Int63()))
+	rng := rand.New(rand.NewSource(c.Seed()))
 	rc.SetBlendMode(render.BlendAdd)
 
 	const descendSteps = 18

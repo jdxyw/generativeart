@@ -64,7 +64,7 @@ func (ml *mosaicLotus) Generative(c *generativeart.Canva) {
 	rc.FillBackground(deepPondNavy)
 	rc.SetBlendMode(render.BlendOver)
 
-	rng := rand.New(rand.NewSource(202610))
+	rng := rand.New(rand.NewSource(c.Seed() ^ 202610))
 
 	lotusCX, lotusCY := 0.50*w, 0.48*h
 	rLotusOuter := 0.29 * w

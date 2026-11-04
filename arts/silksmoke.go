@@ -4,7 +4,6 @@ import (
 	"github.com/fogleman/gg"
 	"github.com/jdxyw/generativeart"
 	"github.com/jdxyw/generativeart/common"
-	"math/rand"
 )
 
 type sileSmoke struct {
@@ -32,9 +31,10 @@ func NewSilkSmoke(mc, msp int, minStep, maxStep, minRadius, maxRadius float64, i
 // Generative draws a silk smoke image.
 func (s *sileSmoke) Generative(c *generativeart.Canva) {
 	ctex := gg.NewContextForRGBA(c.Img())
+	rng := c.Rand()
 
-	cn := rand.Intn(s.maxCircle) + int(s.maxCircle/3)
-	circles := newCircleSlice(cn, c.Width(), c.Height(), s.minSteps, s.maxSteps, s.minRadius, s.maxRadius)
+	cn := rng.Intn(s.maxCircle) + int(s.maxCircle/3)
+	circles := newCircleSliceWithRng(rng, cn, c.Width(), c.Height(), s.minSteps, s.maxSteps, s.minRadius, s.maxRadius)
 
 	for i := 0; i < s.maxStepsPerCircle; i++ {
 		ctex.SetRGBA255(0, 0, 0, 5)
@@ -46,7 +46,7 @@ func (s *sileSmoke) Generative(c *generativeart.Canva) {
 
 				cl := c.Opts().LineColor()
 				if s.isRandColor {
-					cl = c.Opts().ColorSchema()[rand.Intn(len(c.Opts().ColorSchema()))]
+					cl = c.Opts().ColorSchema()[rng.Intn(len(c.Opts().ColorSchema()))]
 				}
 
 				if c1 == c2 {

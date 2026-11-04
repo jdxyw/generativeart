@@ -59,7 +59,7 @@ func (mw *mosaicWave) Generative(c *generativeart.Canva) {
 	rc.FillBackground(deepNavy)
 	rc.SetBlendMode(render.BlendOver)
 
-	rng := rand.New(rand.NewSource(202608))
+	rng := rand.New(rand.NewSource(c.Seed() ^ 202608))
 
 	sunCX, sunCY := 0.72*w, 0.28*h
 	rSun := 0.18 * w

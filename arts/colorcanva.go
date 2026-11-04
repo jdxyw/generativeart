@@ -4,7 +4,6 @@ import (
 	"github.com/fogleman/gg"
 	"github.com/jdxyw/generativeart"
 	"github.com/jdxyw/generativeart/common"
-	"math/rand"
 )
 
 type colorCanva struct {
@@ -30,7 +29,8 @@ func (cc *colorCanva) Generative(c *generativeart.Canva) {
 		}
 	}
 
-	rand.Shuffle(len(rects), func(i, j int) {
+	rng := c.Rand()
+	rng.Shuffle(len(rects), func(i, j int) {
 		rects[i], rects[j] = rects[j], rects[i]
 	})
 
@@ -45,9 +45,10 @@ func (cc *colorCanva) Generative(c *generativeart.Canva) {
 }
 
 func (cc *colorCanva) draw(c *generativeart.Canva, ctex *gg.Context, rect *common.Rect) {
-	rnd := rand.Intn(4)
-	ww := (rect.W() / 5) * float64(rand.Intn(int(cc.seg)*2)+1)
-	hh := (rect.H() / 5) * float64(rand.Intn(int(cc.seg)*2)+1)
+	rng := c.Rand()
+	rnd := rng.Intn(4)
+	ww := (rect.W() / 5) * float64(rng.Intn(int(cc.seg)*2)+1)
+	hh := (rect.H() / 5) * float64(rng.Intn(int(cc.seg)*2)+1)
 
 	switch rnd {
 	case 0:
@@ -61,6 +62,6 @@ func (cc *colorCanva) draw(c *generativeart.Canva, ctex *gg.Context, rect *commo
 	}
 	ctex.SetColor(common.Black)
 	ctex.StrokePreserve()
-	ctex.SetColor(c.Opts().ColorSchema()[rand.Intn(len(c.Opts().ColorSchema()))])
+	ctex.SetColor(c.Opts().ColorSchema()[rng.Intn(len(c.Opts().ColorSchema()))])
 	ctex.Fill()
 }

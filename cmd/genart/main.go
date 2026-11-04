@@ -46,10 +46,10 @@ func printUsage() {
 	fmt.Println("Usage:")
 	fmt.Println("  genart list [-v]")
 	fmt.Println("  genart info <art>")
-	fmt.Println("  genart render -art <name> [-set k1=v1,k2=v2] [-palette <name>] [-w 600] [-h 600] [-seed 20261021] [-frames 1] [-delay 8] [-shutter 0] [-subsamples 1] [-bloom 0.35] [-chromatic 0.8] [-relief 0.6] [-kuwahara 3] [-paper 0.3] [-vignette 0.25] [-deckle 0.04] [-tonemap 1.1] -out <file.(png|svg|pdf|gif|jpg)>")
-	fmt.Println("  genart poster [-art <name> | -arts <a,b,c,d>] [-set k1=v1,k2=v2] [-sweep-x name:min:max] [-sweep-y name:min:max] [-grid 2x2] [-panel 420] [-frames 1] [-delay 8] [-theme light|dark] [-title \"...\"] -out <file.(png|svg|pdf|gif|jpg)>")
+	fmt.Println("  genart render -art <name> [-set k1=v1,k2=v2] [-palette <name>] [-w 600] [-h 600] [-seed 20261021] [-depth 8|16] [-frames 1] [-delay 8] [-shutter 0] [-subsamples 1] [-bloom 0.35] [-chromatic 0.8] [-relief 0.6] [-kuwahara 3] [-dof 6.0] [-paper 0.3] [-vignette 0.25] [-deckle 0.04] [-tonemap 1.1] -out <file.(png|hdr|svg|pdf|gif|jpg)>")
+	fmt.Println("  genart poster [-art <name> | -arts <a,b,c,d>] [-set k1=v1,k2=v2] [-sweep-x name:min:max] [-sweep-y name:min:max] [-grid 2x2] [-panel 420] [-frames 1] [-delay 8] [-theme light|dark] [-title \"...\"] -out <file.(png|hdr|svg|pdf|gif|jpg)>")
 	fmt.Println("  genart inspect <file.png>")
-	fmt.Println("  genart replay <input.png> [-w 2400] [-h 2400] [-set k1=v1,k2=v2] [-palette <name>] [-seed 0] [-frames 1] [-delay 8] [-bloom ...] [-relief ...] -out <file.(png|svg|pdf|gif|jpg)>")
+	fmt.Println("  genart replay <input.png> [-w 2400] [-h 2400] [-set k1=v1,k2=v2] [-palette <name>] [-seed 0] [-depth 8|16] [-frames 1] [-delay 8] [-bloom ...] [-relief ...] -out <file.(png|hdr|svg|pdf|gif|jpg)>")
 }
 
 type postFlags struct {
@@ -64,6 +64,7 @@ type postFlags struct {
 	deckle     *float64
 	tonemap    *float64
 	dof        *float64
+	depth      *int
 	plotter    *bool
 	pens       *int
 	hlr        *bool
@@ -83,6 +84,7 @@ func registerPostFlags(fs *flag.FlagSet) postFlags {
 		deckle:     fs.Float64("deckle", 0, "Torn deckle-edged museum mat border fraction (e.g. 0.045)"),
 		tonemap:    fs.Float64("tonemap", 0, "ACES filmic tone-mapping exposure (e.g. 1.05)"),
 		dof:        fs.Float64("dof", 0, "Thin-lens polygonal-aperture bokeh Depth-of-Field max CoC radius in pixels (e.g. 6.0)"),
+		depth:      fs.Int("depth", 8, "PNG channel bit depth: 8 (standard 32-bit RGBA) or 16 (64-bit RGBA64 deep-color)"),
 		plotter:    fs.Bool("plotter", false, "Export pen-plotter SVG with <g> color layers and 2-Opt TSP path optimization"),
 		pens:       fs.Int("pens", 0, "Maximum number of pen color layers for -plotter SVG (0 = exact colors)"),
 		hlr:        fs.Bool("hlr", false, "Enable 2D vector hidden-line removal (occlusion culling) for -plotter SVG"),
@@ -194,7 +196,7 @@ func runInfo(args []string) {
 	fmt.Println(string(pretty))
 }
 
-func saveCanvaByExt(c *generativeart.Canva, eng generativeart.Engine, frames, delay int, outPath string, alreadyDrawn bool) error {
+func saveCanvaByExtWithDepth(c *generativeart.Canva, eng generativeart.Engine, frames, delay, bitDepth int, outPath string, alreadyDrawn bool) error {
 	ext := strings.ToLower(filepath.Ext(outPath))
 	switch ext {
 	case ".gif":
@@ -206,6 +208,11 @@ func saveCanvaByExt(c *generativeart.Canva, eng generativeart.Engine, frames, de
 			c.DrawTimelapseFrames(eng, nFrames)
 		}
 		return c.ToGIF(outPath, delay)
+	case ".hdr":
+		if !alreadyDrawn && eng != nil {
+			c.Draw(eng)
+		}
+		return c.ToHDR(outPath)
 	case ".svg":
 		if !alreadyDrawn && eng != nil {
 			c.Draw(eng)
@@ -225,8 +232,15 @@ func saveCanvaByExt(c *generativeart.Canva, eng generativeart.Engine, frames, de
 		if !alreadyDrawn && eng != nil {
 			c.Draw(eng)
 		}
+		if bitDepth == 16 {
+			return c.ToPNG16(outPath)
+		}
 		return c.ToPNG(outPath)
 	}
+}
+
+func saveCanvaByExt(c *generativeart.Canva, eng generativeart.Engine, frames, delay int, outPath string, alreadyDrawn bool) error {
+	return saveCanvaByExtWithDepth(c, eng, frames, delay, 8, outPath, alreadyDrawn)
 }
 
 func runRender(args []string) {
@@ -322,7 +336,11 @@ func runRender(args []string) {
 		fmt.Printf("Rendered %s (%dx%d, frames=%d, seed=%d) -> %s\n", desc.ID, *w, *h, nFrames, *seed, *out)
 		return
 	}
-	if err := saveCanvaByExt(c, eng, *frames, *delay, *out, false); err != nil {
+	bitDepth := 8
+	if pf.depth != nil && *pf.depth == 16 {
+		bitDepth = 16
+	}
+	if err := saveCanvaByExtWithDepth(c, eng, *frames, *delay, bitDepth, *out, false); err != nil {
 		fmt.Fprintf(os.Stderr, "render failed: %v\n", err)
 		os.Exit(1)
 	}
@@ -424,7 +442,11 @@ func runReplay(args []string) {
 			meta.Engine, stats.LayerCount, stats.TotalPaths, stats.PenUpBeforePx, stats.PenUpAfterPx, stats.TravelReductionPct, *out)
 		return
 	}
-	if err := saveCanvaByExt(c, eng, *frames, *delay, *out, false); err != nil {
+	bitDepth := 8
+	if pf.depth != nil && *pf.depth == 16 {
+		bitDepth = 16
+	}
+	if err := saveCanvaByExtWithDepth(c, eng, *frames, *delay, bitDepth, *out, false); err != nil {
 		fmt.Fprintf(os.Stderr, "save failed: %v\n", err)
 		os.Exit(1)
 	}
@@ -646,7 +668,11 @@ func runPoster(args []string) {
 		}
 	}
 
-	if err := saveCanvaByExt(posterCanva, nil, nFrames, *delay, *out, true); err != nil {
+	bitDepth := 8
+	if pf.depth != nil && *pf.depth == 16 {
+		bitDepth = 16
+	}
+	if err := saveCanvaByExtWithDepth(posterCanva, nil, nFrames, *delay, bitDepth, *out, true); err != nil {
 		fmt.Fprintf(os.Stderr, "poster save failed: %v\n", err)
 		os.Exit(1)
 	}

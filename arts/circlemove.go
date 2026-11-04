@@ -5,7 +5,6 @@ import (
 	"github.com/jdxyw/generativeart"
 	"github.com/jdxyw/generativeart/common"
 	"math"
-	"math/rand"
 )
 
 type circleMove struct {
@@ -23,7 +22,7 @@ func (cm *circleMove) Generative(c *generativeart.Canva) {
 	ctex := gg.NewContextForRGBA(c.Img())
 	ctex.SetLineWidth(0.3)
 	noise := common.NewPerlinNoiseWithSeed(c.Seed())
-	cl := rand.Intn(255)
+	cl := c.Rand().Intn(255)
 	for i := 0; i < cm.circleNum; i++ {
 		//var sx, sy float64
 		var cxx float64

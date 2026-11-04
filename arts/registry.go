@@ -268,6 +268,24 @@ func paramString(p map[string]interface{}, key, def string) string {
 	return def
 }
 
+func paramBool(p map[string]interface{}, key string, def bool) bool {
+	v, ok := lookupParamValue(p, key)
+	if !ok {
+		return def
+	}
+	switch b := v.(type) {
+	case bool:
+		return b
+	case string:
+		if parsed, err := strconv.ParseBool(strings.TrimSpace(b)); err == nil {
+			return parsed
+		}
+		return def
+	default:
+		return def
+	}
+}
+
 var registry = []ArtDescriptor{
 	// Wave 23: Master Architecture, Celestial Mechanics & Sci-Fi Megastructures Quartet (BabelLibrary, KeplerHarmonices, MoebiusHermeticGarage, CalabiYauManifold)
 	{
@@ -1088,6 +1106,247 @@ var registry = []ArtDescriptor{
 		DefaultBG: color.RGBA{10, 14, 20, 255}, DefaultPal: "botanical",
 		Build: func(p map[string]interface{}) generativeart.Engine {
 			return NewPhyllotaxis(paramInt(p, "seedCount", 950), paramFloat(p, "divergenceAngle", 137.507764), paramFloat(p, "scaleFactor", 8.2))
+		},
+	},
+	{
+		ID: "chladni", StructName: "chladni", Category: "chaos",
+		DefaultBG: color.RGBA{8, 10, 18, 255}, DefaultPal: "cyberpunk",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewChladni(paramInt(p, "particlesN", 35000), paramFloat(p, "m", 5.0), paramFloat(p, "n", 3.0), paramFloat(p, "a", 1.0), paramFloat(p, "b", -1.0))
+		},
+	},
+
+	// Wave 1 Classic Engines (31 Foundational Generators)
+	{
+		ID: "blackhole", StructName: "blackHole", Category: "flow",
+		DefaultBG: color.RGBA{20, 20, 20, 255}, DefaultPal: "youthful",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewBlackHole(paramInt(p, "circleN", 200), paramFloat(p, "density", 400.0), paramFloat(p, "circleGap", 0.01))
+		},
+	},
+	{
+		ID: "circlegrid", StructName: "circleGrid", Category: "geom",
+		DefaultBG: color.RGBA{16, 22, 36, 255}, DefaultPal: "youthful",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewCircleGrid(paramInt(p, "circleNumMin", 4), paramInt(p, "circleNumMax", 8))
+		},
+	},
+	{
+		ID: "circleline", StructName: "circleLine", Category: "geom",
+		DefaultBG: common.Lavender, DefaultPal: "youthful",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewCircleLine(paramFloat(p, "step", 0.02), paramInt(p, "lineNum", 600), paramFloat(p, "radius", 1.5), paramFloat(p, "xaixs", 2.0), paramFloat(p, "yaixs", 2.0))
+		},
+	},
+	{
+		ID: "circleloop", StructName: "circleLoop", Category: "geom",
+		DefaultBG: common.Black, DefaultPal: "youthful",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewCircleLoop(paramFloat(p, "radius", 100.0))
+		},
+	},
+	{
+		ID: "circleloop2", StructName: "circleLoop2", Category: "geom",
+		DefaultBG: color.RGBA{230, 230, 230, 255}, DefaultPal: "youthful",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewCircleLoop2(paramInt(p, "depth", 7))
+		},
+	},
+	{
+		ID: "circlemove", StructName: "circleMove", Category: "flow",
+		DefaultBG: common.White, DefaultPal: "youthful",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewCircleMove(paramInt(p, "circleNum", 1000))
+		},
+	},
+	{
+		ID: "circlenoise", StructName: "circleNoise", Category: "flow",
+		DefaultBG: common.White, DefaultPal: "youthful",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewCircleNoise(paramInt(p, "dotsN", 2000), paramInt(p, "colorMin", 60), paramInt(p, "colorMax", 80))
+		},
+	},
+	{
+		ID: "colorcanva", StructName: "colorCanva", Category: "geom",
+		DefaultBG: common.Black, DefaultPal: "youthful",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewColorCanve(paramFloat(p, "seg", 5.0))
+		},
+	},
+	{
+		ID: "colorcircle", StructName: "colorCircle", Category: "geom",
+		DefaultBG: common.White, DefaultPal: "youthful",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewColorCircle(paramInt(p, "circleNum", 30))
+		},
+	},
+	{
+		ID: "colorcircle2", StructName: "colorCircle2", Category: "geom",
+		DefaultBG: common.White, DefaultPal: "youthful",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewColorCircle2(paramInt(p, "circleNum", 30))
+		},
+	},
+	{
+		ID: "contourline", StructName: "contourLine", Category: "flow",
+		DefaultBG: color.RGBA{26, 6, 51, 255}, DefaultPal: "youthful",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewContourLine(paramInt(p, "lineNum", 500))
+		},
+	},
+	{
+		ID: "domainwrap", StructName: "domainWrap", Category: "flow",
+		DefaultBG: common.Black, DefaultPal: "oceanic",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewDomainWrap(
+				paramFloat(p, "scale", 0.01),
+				paramFloat(p, "scale2", 4.0),
+				paramFloat(p, "xOffset", 4.0),
+				paramFloat(p, "yOffset", 20.0),
+				func(r, m1, m2 float64) color.RGBA {
+					return color.RGBA{
+						R: uint8(common.Constrain(m1*200*r, 0, 255)),
+						G: uint8(common.Constrain(r*200, 0, 255)),
+						B: uint8(common.Constrain(m2*255*r, 70, 255)),
+						A: 255,
+					}
+				},
+			)
+		},
+	},
+	{
+		ID: "dotline", StructName: "dotLine", Category: "geom",
+		DefaultBG: color.RGBA{230, 230, 230, 255}, DefaultPal: "youthful",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewDotLine(paramInt(p, "n", 100), paramFloat(p, "ras", 20.0), paramFloat(p, "canv", 50.0), paramBool(p, "randColor", false))
+		},
+	},
+	{
+		ID: "dotswave", StructName: "dotsWave", Category: "flow",
+		DefaultBG: common.Black, DefaultPal: "youthful",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewDotsWave(paramInt(p, "dotsN", 300))
+		},
+	},
+	{
+		ID: "janus", StructName: "janus", Category: "geom",
+		DefaultBG: common.Black, DefaultPal: "youthful",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewJanus(paramInt(p, "n", 10), paramFloat(p, "decay", 0.2))
+		},
+	},
+	{
+		ID: "julia", StructName: "julia", Category: "chaos",
+		DefaultBG: common.Black, DefaultPal: "inferno",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewJulia(func(z complex128) complex128 {
+				return z*z + complex(-0.1, 0.651)
+			}, paramFloat(p, "maxz", 40.0), paramFloat(p, "xaixs", 1.5), paramFloat(p, "yaixs", 1.5))
+		},
+	},
+	{
+		ID: "maze", StructName: "maze", Category: "geom",
+		DefaultBG: common.Azure, DefaultPal: "youthful",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewMaze(paramInt(p, "step", 20))
+		},
+	},
+	{
+		ID: "noiseline", StructName: "noiseLine", Category: "flow",
+		DefaultBG: color.RGBA{230, 230, 230, 255}, DefaultPal: "youthful",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewNoiseLine(paramInt(p, "n", 1000))
+		},
+	},
+	{
+		ID: "oceanfish", StructName: "oceanFish", Category: "bio",
+		DefaultBG: color.RGBA{18, 24, 42, 255}, DefaultPal: "oceanic",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewOceanFish(paramInt(p, "lineNum", 100), paramInt(p, "fishNum", 8))
+		},
+	},
+	{
+		ID: "perlinpearls", StructName: "perlinPearls", Category: "flow",
+		DefaultBG: color.RGBA{230, 230, 230, 255}, DefaultPal: "youthful",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewPerlinPerls(paramInt(p, "circleN", 10), paramInt(p, "dotsN", 200), paramInt(p, "colorMin", 40), paramInt(p, "colorMax", 80))
+		},
+	},
+	{
+		ID: "pixelhole", StructName: "pixelHole", Category: "flow",
+		DefaultBG: common.Black, DefaultPal: "youthful",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewPixelHole(paramInt(p, "dotN", 60))
+		},
+	},
+	{
+		ID: "pointribbon", StructName: "pointRibbon", Category: "geom",
+		DefaultBG: common.Lavender, DefaultPal: "youthful",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewPointRibbon(paramFloat(p, "r", 50.0))
+		},
+	},
+	{
+		ID: "randcircle", StructName: "randCircle", Category: "geom",
+		DefaultBG: common.MistyRose, DefaultPal: "youthful",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewRandCicle(paramInt(p, "maxCircle", 30), paramInt(p, "maxStepsPerCircle", 80), paramFloat(p, "minSteps", 0.2), paramFloat(p, "maxSteps", 2.0), paramFloat(p, "minRadius", 10.0), paramFloat(p, "maxRadius", 30.0), paramBool(p, "isRandColor", true))
+		},
+	},
+	{
+		ID: "randomshape", StructName: "randomShape", Category: "geom",
+		DefaultBG: common.White, DefaultPal: "youthful",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewRandomShape(paramInt(p, "shapeNum", 150))
+		},
+	},
+	{
+		ID: "silksky", StructName: "silkSky", Category: "media",
+		DefaultBG: common.Black, DefaultPal: "sunset",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewSilkSky(paramInt(p, "circleNum", 15), paramFloat(p, "sunRadius", 5.0))
+		},
+	},
+	{
+		ID: "silksmoke", StructName: "sileSmoke", Category: "media",
+		DefaultBG: common.Black, DefaultPal: "youthful",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewSilkSmoke(paramInt(p, "maxCircle", 400), paramInt(p, "maxStepsPerCircle", 20), paramFloat(p, "minSteps", 0.2), paramFloat(p, "maxSteps", 2.0), paramFloat(p, "minRadius", 10.0), paramFloat(p, "maxRadius", 30.0), paramBool(p, "isRandColor", true))
+		},
+	},
+	{
+		ID: "solarflare", StructName: "solarFlare", Category: "flow",
+		DefaultBG: common.Black, DefaultPal: "inferno",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewSolarFlare()
+		},
+	},
+	{
+		ID: "spiralsquare", StructName: "spiralSquare", Category: "geom",
+		DefaultBG: common.MistyRose, DefaultPal: "youthful",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewSpiralSquare(paramInt(p, "squareNum", 40), paramFloat(p, "rectSide", 400.0), paramFloat(p, "decay", 0.05), paramBool(p, "randColor", true))
+		},
+	},
+	{
+		ID: "gridsquare", StructName: "girdSquares", Category: "geom",
+		DefaultBG: common.Black, DefaultPal: "youthful",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewGirdSquares(paramInt(p, "step", 24), paramInt(p, "rectSize", 10), paramFloat(p, "decay", 0.2))
+		},
+	},
+	{
+		ID: "swirl", StructName: "swirl", Category: "chaos",
+		DefaultBG: color.RGBA{113, 3, 0, 255}, DefaultPal: "inferno",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewSwirl(paramFloat(p, "a", 0.970), paramFloat(p, "b", -1.899), paramFloat(p, "c", 1.381), paramFloat(p, "d", -1.506), paramFloat(p, "xaixs", 2.4), paramFloat(p, "yaixs", 2.4))
+		},
+	},
+	{
+		ID: "yarn", StructName: "yarn", Category: "flow",
+		DefaultBG: common.Orange, DefaultPal: "youthful",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewYarn(paramInt(p, "n", 2000))
 		},
 	},
 }

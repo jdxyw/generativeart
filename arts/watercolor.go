@@ -49,7 +49,7 @@ func (wc *watercolor) Generative(c *generativeart.Canva) {
 		scale = 1.0
 	}
 
-	seed := rand.Int63()
+	seed := c.Seed()
 	rng := rand.New(rand.NewSource(seed))
 
 	palette := c.Opts().ColorSchema()
@@ -102,7 +102,7 @@ func (wc *watercolor) Generative(c *generativeart.Canva) {
 		)
 	}
 
-	rc.ApplyPaperTexture(0.55, rand.Int63())
+	rc.ApplyPaperTexture(0.55, seed+77)
 	rc.ApplyVignette(0.18)
 	c.MergeRenderCanvas(rc)
 }

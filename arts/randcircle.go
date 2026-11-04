@@ -36,15 +36,15 @@ func NewRandCicle(mc, msp int, minStep, maxStep, minr, maxr float64, isRandColor
 	}
 }
 
-func newCircleSlice(cn, w, h int, minStep, maxStep, minRadius, maxRadius float64) []circle {
+func newCircleSliceWithRng(rng *rand.Rand, cn, w, h int, minStep, maxStep, minRadius, maxRadius float64) []circle {
 	var circles []circle
 
 	for i := 0; i < cn; i++ {
-		x := rand.Intn(w) + 1
-		y := rand.Intn(h) + 1
-		radius := float64(rand.Intn(int(minRadius))) + maxRadius - minRadius
-		angle := rand.Float64() * math.Pi * 2.0
-		step := minStep + rand.Float64()*(maxStep-minStep)
+		x := rng.Intn(w) + 1
+		y := rng.Intn(h) + 1
+		radius := float64(rng.Intn(int(minRadius))) + maxRadius - minRadius
+		angle := rng.Float64() * math.Pi * 2.0
+		step := minStep + rng.Float64()*(maxStep-minStep)
 		circles = append(circles, circle{
 			x:      float64(x),
 			y:      float64(y),
@@ -93,10 +93,11 @@ func circleSliceUpdate(cs []circle, w, h int) []circle {
 // Generative draws a random circles image.
 func (r *randCircle) Generative(c *generativeart.Canva) {
 	ctex := gg.NewContextForRGBA(c.Img())
+	rng := c.Rand()
 
 	for j := 0; j < c.Opts().NIters(); j++ {
-		cn := rand.Intn(r.maxCircle) + int(r.maxCircle/3)
-		circles := newCircleSlice(cn, c.Width(), c.Height(), r.minSteps, r.maxSteps, r.minRadius, r.maxRadius)
+		cn := rng.Intn(r.maxCircle) + int(r.maxCircle/3)
+		circles := newCircleSliceWithRng(rng, cn, c.Width(), c.Height(), r.minSteps, r.maxSteps, r.minRadius, r.maxRadius)
 
 		for i := 0; i < r.maxStepsPerCircle; i++ {
 			for _, c1 := range circles {
@@ -104,7 +105,7 @@ func (r *randCircle) Generative(c *generativeart.Canva) {
 
 					cl := c.Opts().LineColor()
 					if r.isRandColor {
-						cl = c.Opts().ColorSchema()[rand.Intn(len(c.Opts().ColorSchema()))]
+						cl = c.Opts().ColorSchema()[rng.Intn(len(c.Opts().ColorSchema()))]
 					}
 
 					if c1 == c2 {

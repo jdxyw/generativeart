@@ -91,7 +91,7 @@ func (sc *spaceColonization) Generative(c *generativeart.Canva) {
 		influenceDist = killDist * 3.0
 	}
 
-	seed := rand.Int63()
+	seed := c.Seed()
 	rng := rand.New(rand.NewSource(seed))
 	noise := common.NewNoiseEngine(seed)
 

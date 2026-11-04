@@ -9,7 +9,7 @@ This document serves as the architectural blueprint for `generativeart`, coverin
 6. **Next-Generation Architecture & Platform Roadmap (6 Directions, with Directions 4 & 5 Implemented)**
 7. **Art-Empowering Rendering & Mathematical Foundations (Part VII & Part VIII — Implemented)**
 8. **Wave 23 Master Architecture, Celestial Mechanics & Sci-Fi Megastructures + Part IX–XI Future Roadmap**
-9. **Part X. Underlying Infrastructure Audit & 3-Phase Core Engine Upgrade Roadmap (Phases 1–3 — Implemented)**
+9. **Part X. Underlying Infrastructure Audit & 6-Phase Core Engine Upgrade Roadmap (Phases 1–4 — Implemented)**
 
 ---
 
@@ -441,6 +441,37 @@ A comprehensive technical audit across `generativeart.go`, `platform.go`, `poste
 4. **2D & 3D Vector Hidden-Line Removal (HLR) & Plotter Polygon Hatching (`render/vector_bridge.go`, `render/sdf3d.go`, `cmd/genart`)**:
    - Extended `PlotterConfig` with `HiddenLineRemoval` (`-hlr` in `cmd/genart`, occlusion-culling background strokes against foreground opaque polygons via `clipOpenPathOutsideRings`) and `HatchFills` (`-hatch-fills` in `cmd/genart`, converting filled polygons into Oklab lightness-driven parallel and cross-hatched pen strokes).
    - Added `ExtractSDF3DVectorContours` and `(*Canvas).RenderSDF3DVectorContours` in `render/sdf3d.go` to extract visible 3D silhouettes, occlusion creases, and 3D topographic cross-section iso-contours with raymarched hidden-line removal.
+
+---
+
+### 10.4 Phase 4: Repo-Wide Deterministic Seed Hygiene, `go test ./...` Isolation & 16-Bit PNG / Radiance `.hdr` Export (Implemented)
+
+1. **100% Deterministic Seed Hygiene Across All 144 Engines (`arts/*.go`, `common/utils.go`)**:
+   - Migrated all remaining legacy engines that previously called global `rand.Int63()` / `rand.Float64()` / `rand.Intn()` or hardcoded constant seeds (`rand.NewSource(2026xx)`) to `c.Seed()` and `c.Rand()` (`common.RandomRangeIntFrom`, `common.RandomRangeFloat64From`, `common.RandomGaussianFrom`). Every single one of the 144 engines now responds deterministically to `c.SetSeed(seed)` with zero global `math/rand` lock contention.
+2. **`example/` Build Isolation for Zero-Error `go test ./...` (`example/*.go`, `.github/workflows/go.yml`)**:
+   - Added `//go:build ignore` to all standalone `example/example_*.go` scripts and added `example/doc.go` so `go test ./...` and `go build ./...` pass cleanly across the entire repository while `go run example/example_<name>.go` continues to work unchanged.
+3. **16-Bit Deep-Color PNG (`image.RGBA64`) & Radiance RGBE `.hdr` Export (`render/canvas.go`, `platform.go`, `cmd/genart`)**:
+   - Added `(*Canvas).ResolveToRGBA64`, `(*Canvas).ResolveToneMappedRGBA64`, `(*Canva).Img64`, `(*Canva).WritePNG16`, and `(*Canva).ToPNG16` (`-depth 16` in `cmd/genart`), exporting 48/64-bit deep-color PNGs (65,536 levels per channel) with embedded `GenerativeArt-Recipe` `tEXt` metadata to eliminate 8-bit Mach banding.
+   - Added `FloatToRGBE`, `RGBEToFloat`, `(*Canvas).WriteHDR`, `(*Canvas).SaveHDR`, `(*Canva).WriteHDR`, and `(*Canva).ToHDR` (`.hdr` output in `cmd/genart`) for un-clamped Radiance RGBE high-dynamic-range export.
+
+---
+
+### 10.5 Phase 5: 8-Band Spectral Kubelka-Munk, Wet-on-Wet Fluid Bleed & 3D Weingarten Curvature Tensor (Planned)
+
+1. **8-Wavelength Spectral Kubelka-Munk & Wet-on-Wet Capillary Fluid Diffusion (`render/pigment_engine.go`)**:
+   - Upgrade pigment mixing to 8 visible spectral bands ($380\text{nm}..730\text{nm}$) with CIE 1931 observer integration, plus a 2D water-pigment advection-diffusion solver (`SimulateWetWatercolorBleed`) for wet-on-wet paper fiber bleeding and capillary coffee-ring deposition.
+2. **3D Surface Weingarten Shape Operator & Principal Curvature Directions (`render/sdf3d.go`, `render/engraving_engine.go`)**:
+   - Evaluate the $3\times 3$ 3D Hessian $\nabla^2 f(\mathbf{p})$ and tangent-plane Weingarten shape operator $\mathbf{S} = -(\mathbf{I}-\mathbf{n}\mathbf{n}^\top)\nabla^2 f$ directly on any `SDF3D` to extract intrinsic 3D principal curvature eigenvectors $(\mathbf{e}_1, \mathbf{e}_2, \kappa_1, \kappa_2)$.
+
+---
+
+### 10.6 Phase 6: Interactive Local Live Studio (`genart serve`) & Gallery Lightbox CLI Builder (Planned)
+
+1. **`genart serve` Interactive HTTP Studio (`cmd/genart/main.go`, `index.html`)**:
+   - Add `genart serve [-port 8080]` serving `index.html` alongside `/api/engines`, `/api/render`, `/api/poster`, and `/api/inspect` endpoints for live browser parameter tweaking, post-effect chaining, and drag-and-drop PNG recipe inspection.
+2. **Inline PNG/GIF Toggle Badge & Visual CLI Command Builder (`index.html`)**:
+   - Add one-click static PNG / animated GIF toggle badges on dual-mode gallery cards and an interactive parameter slider + CLI command generator inside the exhibition lightbox.
+
 
 
 

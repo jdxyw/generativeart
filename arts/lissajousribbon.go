@@ -206,7 +206,7 @@ func (lr *lissajousRibbon) GenerativeFrame(c *generativeart.Canva, frameIdx, tot
 		}
 	}
 
-	rng := rand.New(rand.NewSource(202603))
+	rng := rand.New(rand.NewSource(c.Seed() ^ 202603))
 	rc.SetBlendMode(render.BlendAdd)
 
 	// 3. Draw delicate sub-pixel sand filaments (18 grains) connecting corresponding points

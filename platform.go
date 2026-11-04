@@ -11,6 +11,7 @@ import (
 	"image/color"
 	"image/color/palette"
 	"image/gif"
+	"image/png"
 	"io"
 	"math"
 	"os"
@@ -668,6 +669,74 @@ func (c *Canva) ToPDF(fpath string) error {
 		rc = render.NewCanvasFromRGBA(c.img)
 	}
 	return rc.SavePDF(fpath)
+}
+
+// Img64 resolves and returns a 16-bit per channel (48/64-bit deep-color) *image.RGBA64
+// directly from the 64-bit linear HDR buffer, preserving smooth gradients without 8-bit Mach banding.
+func (c *Canva) Img64() *image.RGBA64 {
+	if c == nil {
+		return nil
+	}
+	rc := c.lastRenderCanvas
+	if rc == nil || c.rgbaTouched {
+		rc = render.NewCanvasFromRGBA(c.img)
+	}
+	return rc.ResolveToRGBA64(nil)
+}
+
+// WritePNG16 encodes the canvas as a 16-bit-per-channel deep-color PNG with embedded
+// GenerativeArt-Recipe tEXt metadata to w.
+func (c *Canva) WritePNG16(w io.Writer) error {
+	if c == nil {
+		return errors.New("nil Canva")
+	}
+	var buf bytes.Buffer
+	if err := png.Encode(&buf, c.Img64()); err != nil {
+		return err
+	}
+	rec := c.lastRecipe
+	if rec == nil {
+		rec = captureEngineRecipe(c, nil)
+	}
+	pngBytes := buf.Bytes()
+	if withMeta, err := InjectPNGRecipe(pngBytes, rec); err == nil {
+		pngBytes = withMeta
+	}
+	_, err := w.Write(pngBytes)
+	return err
+}
+
+// ToPNG16 saves the canvas as a 16-bit-per-channel deep-color PNG with embedded recipe metadata at fpath.
+func (c *Canva) ToPNG16(fpath string) error {
+	var buf bytes.Buffer
+	if err := c.WritePNG16(&buf); err != nil {
+		return err
+	}
+	return os.WriteFile(fpath, buf.Bytes(), 0644)
+}
+
+// WriteHDR exports the un-clamped 64-bit linear HDR buffer in Radiance RGBE (.hdr) format to w.
+func (c *Canva) WriteHDR(w io.Writer) error {
+	if c == nil {
+		return errors.New("nil Canva")
+	}
+	rc := c.lastRenderCanvas
+	if rc == nil || c.rgbaTouched {
+		rc = render.NewCanvasFromRGBA(c.img)
+	}
+	return rc.WriteHDR(w)
+}
+
+// ToHDR saves the un-clamped 64-bit linear HDR buffer as a Radiance RGBE (.hdr) file at fpath.
+func (c *Canva) ToHDR(fpath string) error {
+	if c == nil {
+		return errors.New("nil Canva")
+	}
+	rc := c.lastRenderCanvas
+	if rc == nil || c.rgbaTouched {
+		rc = render.NewCanvasFromRGBA(c.img)
+	}
+	return rc.SaveHDR(fpath)
 }
 
 // RecipeMetadata holds the reproducible seed, dimensions, engine name, color palette, options,

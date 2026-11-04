@@ -176,7 +176,21 @@ func Distance(x1, y1, x2, y2 float64) float64 {
 
 // RandomRangeInt returns a integer number between min and max.
 func RandomRangeInt(min, max int) int {
+	if max <= min {
+		return min
+	}
 	return rand.Intn(max-min) + min
+}
+
+// RandomRangeIntFrom returns a deterministic integer in [min, max) using rng.
+func RandomRangeIntFrom(rng *rand.Rand, min, max int) int {
+	if max <= min {
+		return min
+	}
+	if rng == nil {
+		return RandomRangeInt(min, max)
+	}
+	return rng.Intn(max-min) + min
 }
 
 // RandomRangeFloat64 returns a float64 number between min and max.
@@ -184,7 +198,23 @@ func RandomRangeFloat64(min, max float64) float64 {
 	return min + rand.Float64()*(max-min)
 }
 
+// RandomRangeFloat64From returns a deterministic float64 in [min, max) using rng.
+func RandomRangeFloat64From(rng *rand.Rand, min, max float64) float64 {
+	if rng == nil {
+		return RandomRangeFloat64(min, max)
+	}
+	return min + rng.Float64()*(max-min)
+}
+
 // RandomGaussian returns a gaussian random float64 number.
 func RandomGaussian(mean, std float64) float64 {
 	return rand.NormFloat64()*std + mean
+}
+
+// RandomGaussianFrom returns a deterministic Gaussian random float64 using rng.
+func RandomGaussianFrom(rng *rand.Rand, mean, std float64) float64 {
+	if rng == nil {
+		return RandomGaussian(mean, std)
+	}
+	return rng.NormFloat64()*std + mean
 }

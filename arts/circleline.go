@@ -5,7 +5,6 @@ import (
 	"github.com/jdxyw/generativeart"
 	"github.com/jdxyw/generativeart/common"
 	"math"
-	"math/rand"
 )
 
 type point struct {
@@ -46,9 +45,10 @@ func (cl *circleLine) Generative(c *generativeart.Canva) {
 		})
 	}
 
+	rng := c.Rand()
 	for i := 0; i < cl.lineNum; i++ {
-		p1 := points[rand.Intn(len(points))]
-		p2 := points[rand.Intn(len(points))]
+		p1 := points[rng.Intn(len(points))]
+		p2 := points[rng.Intn(len(points))]
 
 		ctex.MoveTo(p1.x, p1.y)
 		ctex.LineTo(p2.x, p2.y)

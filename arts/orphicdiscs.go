@@ -50,7 +50,7 @@ func (od *orphicDiscs) Generative(c *generativeart.Canva) {
 		discCount = 34
 	}
 
-	seed := rand.Int63()
+	seed := c.Seed()
 	rng := rand.New(rand.NewSource(seed))
 	noise := common.NewNoiseEngine(seed)
 

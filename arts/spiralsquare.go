@@ -3,7 +3,6 @@ package arts
 import (
 	"github.com/fogleman/gg"
 	"github.com/jdxyw/generativeart"
-	"math/rand"
 )
 
 type spiralSquare struct {
@@ -27,8 +26,9 @@ func NewSpiralSquare(squareNum int, rectSide, decay float64, randColor bool) *sp
 func (s *spiralSquare) Generative(c *generativeart.Canva) {
 	ctex := gg.NewContextForRGBA(c.Img())
 
+	rng := c.Rand()
 	sl := s.rectSide
-	theta := rand.Intn(360) + 1
+	theta := rng.Intn(360) + 1
 	for i := 0; i < s.squareNum; i++ {
 		ctex.Push()
 		ctex.Translate(float64(c.Width()/2), float64(c.Height()/2))
@@ -47,7 +47,7 @@ func (s *spiralSquare) Generative(c *generativeart.Canva) {
 		ctex.StrokePreserve()
 
 		if s.randColor {
-			ctex.SetColor(c.Opts().ColorSchema()[rand.Intn(len(c.Opts().ColorSchema()))])
+			ctex.SetColor(c.Opts().ColorSchema()[rng.Intn(len(c.Opts().ColorSchema()))])
 		} else {
 			ctex.SetColor(c.Opts().Foreground())
 		}

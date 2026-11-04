@@ -59,7 +59,7 @@ func (mc *mosaicCanyon) Generative(c *generativeart.Canva) {
 	rc.FillBackground(deepObsidian)
 	rc.SetBlendMode(render.BlendOver)
 
-	rng := rand.New(rand.NewSource(202609))
+	rng := rand.New(rand.NewSource(c.Seed() ^ 202609))
 
 	sunCX, sunCY := 0.50*w, 0.24*h
 	rSun := 0.175 * w

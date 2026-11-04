@@ -5,7 +5,6 @@ import (
 	"github.com/jdxyw/generativeart"
 	"github.com/jdxyw/generativeart/common"
 	"math"
-	"math/rand"
 )
 
 type circleLoop2 struct {
@@ -40,11 +39,12 @@ func (cl *circleLoop2) recursionDraw(ctex *gg.Context, c *generativeart.Canva, x
 }
 
 func (cl *circleLoop2) draw(ctex *gg.Context, c *generativeart.Canva, x float64) {
+	rng := c.Rand()
 	var lw float64
-	if rand.Float64() < 0.8 {
+	if rng.Float64() < 0.8 {
 		lw = 1
 	} else {
-		lw = common.RandomRangeFloat64(1.0, common.RandomRangeFloat64(1, 3))
+		lw = common.RandomRangeFloat64From(rng, 1.0, common.RandomRangeFloat64From(rng, 1, 3))
 	}
 	ctex.SetLineWidth(lw)
 
@@ -54,25 +54,25 @@ func (cl *circleLoop2) draw(ctex *gg.Context, c *generativeart.Canva, x float64)
 
 	px := math.Pow(x/float64(c.Height()), a2) * float64(c.Height())
 	py := math.Pow(1-x/float64(c.Height()), a2)*float64(c.Height()) -
-		common.RandomRangeFloat64(0, common.RandomRangeFloat64(float64(c.Height())*0.18, common.RandomRangeFloat64(float64(c.Height())*0.18, float64(c.Height())*0.7)))
+		common.RandomRangeFloat64From(rng, 0, common.RandomRangeFloat64From(rng, float64(c.Height())*0.18, common.RandomRangeFloat64From(rng, float64(c.Height())*0.18, float64(c.Height())*0.7)))
 
-	cls := c.Opts().ColorSchema()[rand.Intn(len(c.Opts().ColorSchema()))]
+	cls := c.Opts().ColorSchema()[rng.Intn(len(c.Opts().ColorSchema()))]
 	ctex.SetColor(cls)
-	nCircles := common.RandomRangeInt(1, 6)
-	if rand.Float64() < 0.03 {
-		nCircles = common.RandomRangeInt(8, 10)
+	nCircles := common.RandomRangeIntFrom(rng, 1, 6)
+	if rng.Float64() < 0.03 {
+		nCircles = common.RandomRangeIntFrom(rng, 8, 10)
 	}
 
-	r := math.Pow(rand.Float64(), 2) * 50
+	r := math.Pow(rng.Float64(), 2) * 50
 
 	var flag bool
-	if rand.Float64() < 0.7 {
+	if rng.Float64() < 0.7 {
 		flag = true
 	}
 
 	for i := 0; i < nCircles; i++ {
 		if flag {
-			ctex.DrawCircle(px*0.39, py*0.39, rand.Float64()*float64(i)*r/float64(nCircles))
+			ctex.DrawCircle(px*0.39, py*0.39, rng.Float64()*float64(i)*r/float64(nCircles))
 		} else {
 			ctex.DrawCircle(px*0.39, py*0.39, float64(i)*r/float64(nCircles))
 		}

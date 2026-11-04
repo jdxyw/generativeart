@@ -135,7 +135,7 @@ func (aa *aizawaAttractor) Generative(c *generativeart.Canva) {
 	cy := fh * 0.51
 	projScale := minDim * 0.295
 
-	rng := rand.New(rand.NewSource(202609))
+	rng := rand.New(rand.NewSource(c.Seed() ^ 202609))
 
 	type bokehCandidate struct {
 		px, py float64

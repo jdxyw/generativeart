@@ -5,7 +5,6 @@ import (
 	"github.com/jdxyw/generativeart"
 	"github.com/jdxyw/generativeart/common"
 	"math"
-	"math/rand"
 )
 
 type circleNoise struct {
@@ -42,9 +41,10 @@ func (cn *circleNoise) Generative(c *generativeart.Canva) {
 	var factor = 0.008
 	noise := common.NewPerlinNoiseWithSeed(c.Seed())
 
+	rng := c.Rand()
 	dots := make([]dot, 0)
 	for i := 0; i < cn.dotsN; i++ {
-		theta := rand.Float64() * math.Pi * 2
+		theta := rng.Float64() * math.Pi * 2
 		x, y := float64(c.Width())/2+math.Sin(theta)*radius, float64(c.Height())/2+math.Cos(theta)*radius
 		dots = append(dots, dot{
 			theta: theta,

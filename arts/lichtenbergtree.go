@@ -74,7 +74,7 @@ func (lt *lichtenbergTree) Generative(c *generativeart.Canva) {
 	)
 
 	// 2. Generate Recursive Dielectric Breakdown Tree with Jagged Laplace Sub-Stepping
-	rng := rand.New(rand.NewSource(202623))
+	rng := rand.New(rand.NewSource(c.Seed() ^ 202623))
 	maxDepth := lt.branches
 	if maxDepth < 6 {
 		maxDepth = 9

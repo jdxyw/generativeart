@@ -35,11 +35,11 @@ func (j *janus) Generative(c *generativeart.Canva) {
 		ctex.Translate(float64(c.Width()/2), float64(c.Height()/2))
 
 		//theta += rand.Float64()*math.Pi/2
-		theta := common.RandomRangeFloat64(math.Pi/4, 3*math.Pi/4)
+		theta := common.RandomRangeFloat64From(c.Rand(), math.Pi/4, 3*math.Pi/4)
 		x1, y1 := math.Cos(theta)*r, math.Sin(theta)*r
 		x2, y2 := -x1, -y1
 
-		noise := common.RandomRangeFloat64(-math.Abs(y1), math.Abs(y1))
+		noise := common.RandomRangeFloat64From(c.Rand(), -math.Abs(y1), math.Abs(y1))
 		y1 += noise
 		y2 += noise
 

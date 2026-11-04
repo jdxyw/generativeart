@@ -5,7 +5,6 @@ import (
 	"github.com/jdxyw/generativeart"
 	"github.com/jdxyw/generativeart/common"
 	"math"
-	"math/rand"
 )
 
 type noiseLine struct {
@@ -23,23 +22,24 @@ func NewNoiseLine(n int) *noiseLine {
 func (nl *noiseLine) Generative(c *generativeart.Canva) {
 	ctex := gg.NewContextForRGBA(c.Img())
 	noise := common.NewPerlinNoiseWithSeed(c.Seed())
+	rng := c.Rand()
 
 	ctex.SetColor(common.Black)
 	for i := 0; i < 80; i++ {
-		x := rand.Float64() * float64(c.Width())
-		y := rand.Float64() * float64(c.Height())
+		x := rng.Float64() * float64(c.Width())
+		y := rng.Float64() * float64(c.Height())
 
-		s := rand.Float64() * float64(c.Width()) / 8
+		s := rng.Float64() * float64(c.Width()) / 8
 		ctex.SetLineWidth(0.5)
 		ctex.DrawEllipse(x, y, s, s)
 		ctex.Stroke()
 	}
 
-	t := rand.Float64() * 10
+	t := rng.Float64() * 10
 	for i := 0; i < nl.n; i++ {
-		x := common.RandomRangeFloat64(-0.5, 1.5) * float64(c.Width())
-		y := common.RandomRangeFloat64(-0.5, 1.5) * float64(c.Height())
-		cl := c.Opts().ColorSchema()[rand.Intn(len(c.Opts().ColorSchema()))]
+		x := common.RandomRangeFloat64From(rng, -0.5, 1.5) * float64(c.Width())
+		y := common.RandomRangeFloat64From(rng, -0.5, 1.5) * float64(c.Height())
+		cl := c.Opts().ColorSchema()[rng.Intn(len(c.Opts().ColorSchema()))]
 		nrgba := common.WithAlpha(cl, uint8(c.Opts().Alpha()))
 
 		l := 400

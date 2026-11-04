@@ -5,7 +5,6 @@ import (
 	"github.com/jdxyw/generativeart"
 	"github.com/jdxyw/generativeart/common"
 	"math"
-	"math/rand"
 )
 
 type contourLine struct {
@@ -23,10 +22,11 @@ func NewContourLine(lineNum int) *contourLine {
 func (cl *contourLine) Generative(c *generativeart.Canva) {
 	ctex := gg.NewContextForRGBA(c.Img())
 	noise := common.NewPerlinNoiseWithSeed(c.Seed())
+	rng := c.Rand()
 	for i := 0; i < cl.lineNum; i++ {
-		cls := c.Opts().ColorSchema()[rand.Intn(len(c.Opts().ColorSchema()))]
-		x := rand.Float64() * float64(c.Width())
-		y := rand.Float64() * float64(c.Height())
+		cls := c.Opts().ColorSchema()[rng.Intn(len(c.Opts().ColorSchema()))]
+		x := rng.Float64() * float64(c.Width())
+		y := rng.Float64() * float64(c.Height())
 
 		for j := 0; j < 1500; j++ {
 
@@ -38,9 +38,9 @@ func (cl *contourLine) Generative(c *generativeart.Canva) {
 			ctex.DrawEllipse(x, y, 2, 2)
 			ctex.Fill()
 
-			if x > float64(c.Width()) || x < 0 || y > float64(c.Height()) || y < 0 || rand.Float64() < 0.001 {
-				x = rand.Float64() * float64(c.Width())
-				y = rand.Float64() * float64(c.Height())
+			if x > float64(c.Width()) || x < 0 || y > float64(c.Height()) || y < 0 || rng.Float64() < 0.001 {
+				x = rng.Float64() * float64(c.Width())
+				y = rng.Float64() * float64(c.Height())
 			}
 		}
 	}

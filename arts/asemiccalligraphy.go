@@ -486,7 +486,7 @@ func (ac *asemicCalligraphy) Generative(c *generativeart.Canva) {
 
 	// 2. Render Classical Chinese Calligraphy Characters (Right-to-Left Columns, Top-to-Bottom)
 	glyphBank := buildLantingScrollGlyphs()
-	rng := rand.New(rand.NewSource(202620))
+	rng := rand.New(rand.NewSource(c.Seed() ^ 202620))
 	glyphs := ac.glyphsPerCol
 	if glyphs < 3 {
 		glyphs = 5

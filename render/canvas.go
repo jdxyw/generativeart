@@ -1,9 +1,11 @@
 package render
 
 import (
+	"fmt"
 	"image"
 	"image/color"
 	"image/png"
+	"io"
 	"math"
 	"os"
 	"runtime"
@@ -805,6 +807,185 @@ func (c *Canvas) ResolveToneMapped(dst *image.RGBA, exposure, gamma float64) *im
 		}
 	})
 	return dst
+}
+
+// ResolveToRGBA64 converts the 64-bit float linear-RGB buffer to a 16-bit per channel
+// (48/64-bit deep color) gamma-correct sRGB *image.RGBA64, eliminating 8-bit Mach banding.
+func (c *Canvas) ResolveToRGBA64(dst *image.RGBA64) *image.RGBA64 {
+	if dst == nil || dst.Bounds().Dx() != c.Width || dst.Bounds().Dy() != c.Height {
+		dst = image.NewRGBA64(image.Rect(0, 0, c.Width, c.Height))
+	}
+	b := dst.Bounds()
+	parallelRows(c.Width, c.Height, func(y0, y1 int) {
+		for y := y0; y < y1; y++ {
+			for x := 0; x < c.Width; x++ {
+				idx := (y*c.Width + x) * 4
+				rLin := common.Constrain(c.pix[idx+0], 0, 1)
+				gLin := common.Constrain(c.pix[idx+1], 0, 1)
+				bLin := common.Constrain(c.pix[idx+2], 0, 1)
+				a := common.Constrain(c.pix[idx+3], 0, 1)
+
+				r16 := uint16(math.Round(LinearToSRGB(rLin) * a * 65535.0))
+				g16 := uint16(math.Round(LinearToSRGB(gLin) * a * 65535.0))
+				b16 := uint16(math.Round(LinearToSRGB(bLin) * a * 65535.0))
+				a16 := uint16(math.Round(a * 65535.0))
+
+				off := dst.PixOffset(b.Min.X+x, b.Min.Y+y)
+				dst.Pix[off+0] = uint8(r16 >> 8)
+				dst.Pix[off+1] = uint8(r16)
+				dst.Pix[off+2] = uint8(g16 >> 8)
+				dst.Pix[off+3] = uint8(g16)
+				dst.Pix[off+4] = uint8(b16 >> 8)
+				dst.Pix[off+5] = uint8(b16)
+				dst.Pix[off+6] = uint8(a16 >> 8)
+				dst.Pix[off+7] = uint8(a16)
+			}
+		}
+	})
+	return dst
+}
+
+// ResolveToneMappedRGBA64 resolves HDR linear-RGB pixels to a 16-bit per channel *image.RGBA64
+// using exposure scaling and ACES filmic tone mapping.
+func (c *Canvas) ResolveToneMappedRGBA64(dst *image.RGBA64, exposure, gamma float64) *image.RGBA64 {
+	if dst == nil || dst.Bounds().Dx() != c.Width || dst.Bounds().Dy() != c.Height {
+		dst = image.NewRGBA64(image.Rect(0, 0, c.Width, c.Height))
+	}
+	if exposure <= 0 {
+		exposure = 1.0
+	}
+	b := dst.Bounds()
+	useSRGB := gamma <= 0
+	invGamma := 1.0 / 2.2
+	if !useSRGB {
+		invGamma = 1.0 / gamma
+	}
+
+	parallelRows(c.Width, c.Height, func(y0, y1 int) {
+		for y := y0; y < y1; y++ {
+			for x := 0; x < c.Width; x++ {
+				idx := (y*c.Width + x) * 4
+				rMapped := acesFilmic(c.pix[idx+0] * exposure)
+				gMapped := acesFilmic(c.pix[idx+1] * exposure)
+				bMapped := acesFilmic(c.pix[idx+2] * exposure)
+				a := common.Constrain(c.pix[idx+3], 0, 1)
+
+				var rS, gS, bS float64
+				if useSRGB {
+					rS = LinearToSRGB(rMapped) * a
+					gS = LinearToSRGB(gMapped) * a
+					bS = LinearToSRGB(bMapped) * a
+				} else {
+					rS = math.Pow(rMapped, invGamma) * a
+					gS = math.Pow(gMapped, invGamma) * a
+					bS = math.Pow(bMapped, invGamma) * a
+				}
+
+				r16 := uint16(math.Round(common.Constrain(rS, 0, 1) * 65535.0))
+				g16 := uint16(math.Round(common.Constrain(gS, 0, 1) * 65535.0))
+				b16 := uint16(math.Round(common.Constrain(bS, 0, 1) * 65535.0))
+				a16 := uint16(math.Round(a * 65535.0))
+
+				off := dst.PixOffset(b.Min.X+x, b.Min.Y+y)
+				dst.Pix[off+0] = uint8(r16 >> 8)
+				dst.Pix[off+1] = uint8(r16)
+				dst.Pix[off+2] = uint8(g16 >> 8)
+				dst.Pix[off+3] = uint8(g16)
+				dst.Pix[off+4] = uint8(b16 >> 8)
+				dst.Pix[off+5] = uint8(b16)
+				dst.Pix[off+6] = uint8(a16 >> 8)
+				dst.Pix[off+7] = uint8(a16)
+			}
+		}
+	})
+	return dst
+}
+
+// FloatToRGBE encodes a linear floating-point RGB triplet into Greg Ward's 4-byte Radiance RGBE format.
+func FloatToRGBE(r, g, b float64) [4]uint8 {
+	if r < 0 {
+		r = 0
+	}
+	if g < 0 {
+		g = 0
+	}
+	if b < 0 {
+		b = 0
+	}
+	v := r
+	if g > v {
+		v = g
+	}
+	if b > v {
+		v = b
+	}
+	if v < 1e-32 {
+		return [4]uint8{0, 0, 0, 0}
+	}
+	frac, exp := math.Frexp(v)
+	scale := frac * 256.0 / v
+	e := exp + 128
+	if e <= 0 {
+		return [4]uint8{0, 0, 0, 0}
+	}
+	if e > 255 {
+		e = 255
+	}
+	return [4]uint8{
+		uint8(common.ConstrainInt(int(math.Round(r*scale)), 0, 255)),
+		uint8(common.ConstrainInt(int(math.Round(g*scale)), 0, 255)),
+		uint8(common.ConstrainInt(int(math.Round(b*scale)), 0, 255)),
+		uint8(e),
+	}
+}
+
+// RGBEToFloat decodes a 4-byte Radiance RGBE pixel back into linear floating-point (R, G, B).
+func RGBEToFloat(rgbe [4]uint8) (r, g, b float64) {
+	if rgbe[3] == 0 {
+		return 0, 0, 0
+	}
+	f := math.Ldexp(1.0, int(rgbe[3])-(128+8))
+	return float64(rgbe[0]) * f, float64(rgbe[1]) * f, float64(rgbe[2]) * f
+}
+
+// WriteHDR exports the un-clamped 64-bit linear HDR canvas in Radiance RGBE (.hdr) format to w.
+func (c *Canvas) WriteHDR(w io.Writer) error {
+	if c == nil || c.Width <= 0 || c.Height <= 0 {
+		return fmt.Errorf("invalid canvas dimensions")
+	}
+	header := fmt.Sprintf("#?RADIANCE\nSOFTWARE=generativeart\nFORMAT=32-bit_rle_rgbe\n\n-Y %d +X %d\n", c.Height, c.Width)
+	if _, err := io.WriteString(w, header); err != nil {
+		return err
+	}
+	rowBuf := make([]byte, c.Width*4)
+	for y := 0; y < c.Height; y++ {
+		for x := 0; x < c.Width; x++ {
+			idx := (y*c.Width + x) * 4
+			rgbe := FloatToRGBE(c.pix[idx+0], c.pix[idx+1], c.pix[idx+2])
+			off := x * 4
+			rowBuf[off+0] = rgbe[0]
+			rowBuf[off+1] = rgbe[1]
+			rowBuf[off+2] = rgbe[2]
+			rowBuf[off+3] = rgbe[3]
+		}
+		if _, err := w.Write(rowBuf); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// SaveHDR writes the un-clamped 64-bit linear HDR canvas as a Radiance .hdr file at filename.
+func (c *Canvas) SaveHDR(filename string) error {
+	f, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	wErr := c.WriteHDR(f)
+	if cErr := f.Close(); wErr == nil {
+		wErr = cErr
+	}
+	return wErr
 }
 
 // SavePNG resolves the canvas to sRGB RGBA and writes it to a PNG file.

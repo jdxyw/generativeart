@@ -70,7 +70,7 @@ func (ms *mosaicSun) GenerativeFrame(c *generativeart.Canva, frameIdx, totalFram
 	sunCY := 0.28 * h
 	rSun := 0.27 * w
 
-	rng := rand.New(rand.NewSource(202606))
+	rng := rand.New(rand.NewSource(c.Seed() ^ 202606))
 
 	// Quantized color field sampler for outside the sun core (sky halo + tangential sunbeams + rolling waves)
 	sampleSkyColor := func(x, y, jitter float64) color.RGBA {

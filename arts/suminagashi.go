@@ -120,7 +120,7 @@ func (sm *suminagashi) Generative(c *generativeart.Canva) {
 		darkRimTable[i] = linRGB{r: rrL, g: rgL, b: rbL}
 	}
 
-	rng := rand.New(rand.NewSource(202605))
+	rng := rand.New(rand.NewSource(c.Seed() ^ 202605))
 
 	// 1. Construct concentric multi-ring ink drops using phyllotaxis + jittered organic centers
 	drops := make([]marblingDrop, dropNum)

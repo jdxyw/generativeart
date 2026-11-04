@@ -86,7 +86,7 @@ func (bb *buddhabrot) Generative(c *generativeart.Canva) {
 	orbitR := make([]float64, maxIt)
 	orbitI := make([]float64, maxIt)
 
-	rng := rand.New(rand.NewSource(202621))
+	rng := rand.New(rand.NewSource(c.Seed() ^ 202621))
 	samples := bb.samplesN
 	if samples < 50000 {
 		samples = 180000

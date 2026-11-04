@@ -63,7 +63,7 @@ func (mv *mosaicVortex) Generative(c *generativeart.Canva) {
 	rc.FillBackground(deepMidnight)
 	rc.SetBlendMode(render.BlendOver)
 
-	rng := rand.New(rand.NewSource(202607))
+	rng := rand.New(rand.NewSource(c.Seed() ^ 202607))
 
 	// Key focal anchors
 	moonCX, moonCY := 0.75*w, 0.24*h

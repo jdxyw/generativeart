@@ -72,7 +72,7 @@ func (ph *physarum) Generative(c *generativeart.Canva) {
 		scale = 1.0
 	}
 
-	rng := rand.New(rand.NewSource(rand.Int63()))
+	rng := rand.New(rand.NewSource(c.Seed()))
 	nPix := w * h
 	trail0 := make([]float64, nPix)
 	trail1 := make([]float64, nPix)

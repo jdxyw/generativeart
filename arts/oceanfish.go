@@ -5,7 +5,6 @@ import (
 	"github.com/jdxyw/generativeart"
 	"github.com/jdxyw/generativeart/common"
 	"math"
-	"math/rand"
 )
 
 type oceanFish struct {
@@ -48,12 +47,13 @@ func (o *oceanFish) Generative(c *generativeart.Canva) {
 }
 
 func (o *oceanFish) drawlines(ctx *gg.Context, c *generativeart.Canva) {
+	rng := c.Rand()
 	for i := 0; i < o.lineNum; i++ {
-		cl := c.Opts().ColorSchema()[rand.Intn(len(c.Opts().ColorSchema()))]
+		cl := c.Opts().ColorSchema()[rng.Intn(len(c.Opts().ColorSchema()))]
 		ctx.SetColor(cl)
-		ctx.SetLineWidth(common.RandomRangeFloat64(3, 20))
-		y := rand.Float64() * float64(c.Height())
-		ctx.DrawLine(0, y+common.RandomRangeFloat64(-50, 50), float64(c.Width()), y+common.RandomRangeFloat64(-50, 50))
+		ctx.SetLineWidth(common.RandomRangeFloat64From(rng, 3, 20))
+		y := rng.Float64() * float64(c.Height())
+		ctx.DrawLine(0, y+common.RandomRangeFloat64From(rng, -50, 50), float64(c.Width()), y+common.RandomRangeFloat64From(rng, -50, 50))
 		ctx.Stroke()
 	}
 }

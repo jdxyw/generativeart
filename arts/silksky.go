@@ -4,7 +4,6 @@ import (
 	"github.com/fogleman/gg"
 	"github.com/jdxyw/generativeart"
 	"github.com/jdxyw/generativeart/common"
-	"math/rand"
 )
 
 type silkSky struct {
@@ -23,8 +22,9 @@ func NewSilkSky(circleNum int, sunRadius float64) *silkSky {
 // Generative draws a silk sky image.
 func (s *silkSky) Generative(c *generativeart.Canva) {
 	ctex := gg.NewContextForRGBA(c.Img())
-	xm := float64(rand.Intn(c.Width()/5)) + float64(c.Width()*4/5-c.Width()/5)
-	ym := float64(rand.Intn(c.Height()/5)) + float64(c.Height()*4/5-c.Height()/5)
+	rng := c.Rand()
+	xm := float64(rng.Intn(c.Width()/5)) + float64(c.Width()*4/5-c.Width()/5)
+	ym := float64(rng.Intn(c.Height()/5)) + float64(c.Height()*4/5-c.Height()/5)
 
 	mh := s.circleNum*2 + 2
 	ms := s.circleNum*2 + 50

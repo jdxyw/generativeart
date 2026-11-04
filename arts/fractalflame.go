@@ -60,7 +60,7 @@ func (ff *fractalFlame) Generative(c *generativeart.Canva) {
 	gAcc := make([]float64, nPix)
 	bAcc := make([]float64, nPix)
 
-	rng := rand.New(rand.NewSource(rand.Int63()))
+	rng := rand.New(rand.NewSource(c.Seed()))
 
 	schema := c.Opts().ColorSchema()
 	if len(schema) == 0 {

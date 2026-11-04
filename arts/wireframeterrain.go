@@ -93,7 +93,7 @@ func (wt *wireframeTerrain) GenerativeFrame(c *generativeart.Canva, frameIdx, to
 		}
 	}
 
-	starRng := rand.New(rand.NewSource(202615))
+	starRng := rand.New(rand.NewSource(c.Seed() ^ 202615))
 	for i := 0; i < 95; i++ {
 		sx := starRng.Float64() * w
 		sy := starRng.Float64() * 0.23 * h

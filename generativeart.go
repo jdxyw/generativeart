@@ -207,7 +207,13 @@ func (c *Canva) SetForeground(rgba color.RGBA) {
 }
 
 func (c *Canva) SetColorSchema(rgbas []color.RGBA) {
-	c.opts.colorSchema = rgbas
+	if len(rgbas) == 0 {
+		c.opts.colorSchema = nil
+		return
+	}
+	cp := make([]color.RGBA, len(rgbas))
+	copy(cp, rgbas)
+	c.opts.colorSchema = cp
 }
 
 func (c *Canva) SetLineColor(rgba color.RGBA) {
