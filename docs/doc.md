@@ -130,6 +130,10 @@
 	- [Moebius Incal](#moebius-incal)
 	- [Moebius Edena](#moebius-edena)
 	- [Moebius Starwatcher](#moebius-starwatcher)
+	- [Piranesi Carceri](#piranesi-carceri)
+	- [Moebius Leviathan](#moebius-leviathan)
+	- [Durer Polyhedron](#durer-polyhedron)
+	- [Mineral Shan Shui](#mineral-shan-shui)
 
 ## CLI Tool (`cmd/genart`) & Exhibition Poster Reference
 
@@ -2059,6 +2063,71 @@ ms := arts.NewMoebiusStarwatcher(3, 4, -0.24)
 ```
 
 ![](../images/moebiusstarwatcher.png)
+
+## Piranesi Carceri
+
+`Piranesi Carceri` renders a Giovanni Battista Piranesi *Carceri d'Invenzione* and Mœbius *La Citadelle Aveugle* subterranean vaulted stone labyrinth with 4 receding viaduct planes, suspension staircases, diagonal volumetric sunbeams, Kubelka-Munk sepia/sienna/indigo pigments (`render.MixKubelkaMunk`), and Hessian principal-curvature copperplate burin cross-hatching (`render.RenderCurvatureEngraving`).
+
+### parameters
+
+- arches: Number of arched bays per tier (default `4`).
+- tiers: Number of receding architectural vault planes (default `4`).
+- vaultDepth: Perspective depth scale (default `1.0`).
+
+```go
+pc := arts.NewPiranesiCarceri(4, 4, 1.0)
+```
+
+![](../images/piranesicarceri.png)
+
+## Moebius Leviathan
+
+`Moebius Leviathan` renders a 3D SDF raymarched (`render.RaymarchSDF3D`) biomechanical Nautilus-whale airship with fluted bone-ivory carapace segments, striped vermilion-gold dorsal/pectoral sails, and escort gliders soaring above Kubelka-Munk watercolor cumulus cloud banks (`render.EvaluateWatercolorWash`) and craggy sandstone spires.
+
+### parameters
+
+- ribs: Number of fluted biomechanical carapace segments (default `14`).
+- crystalCount: Number of foreground canyon spires (default `5`).
+- bankAngle: Pitch/banking angle in radians (default `-0.18`).
+
+```go
+ml := arts.NewMoebiusLeviathan(14, 5, -0.18)
+```
+
+![](../images/moebiusleviathan.png)
+
+## Durer Polyhedron
+
+`Durer Polyhedron` renders an Albrecht Dürer *Melencolia I* and Wenzel Jamnitzer *Perspectiva Corporum Regularium* (1568) 3D SDF raymarched hollow icosahedral-dodecahedral star monument (`render.FoldIcosahedral` & `render.FoldOctahedral`) and nested armillary rings on an octagonal stone plinth, engraved with 2nd-order Hessian principal-curvature burin cross-hatching and chiaroscuro white-chalk highlights.
+
+### parameters
+
+- symmetry: Polyhedral symmetry order (default `12`).
+- rings: Number of nested armillary rings (default `3`).
+- twist: Initial rotation angle in radians (default `0.32`).
+
+```go
+dp := arts.NewDurerPolyhedron(12, 3, 0.32)
+```
+
+![](../images/durerpolyhedron.png)
+
+## Mineral Shan Shui
+
+`Mineral Shan Shui` fuses Song-Dynasty Blue-and-Green Mineral Landscape painting (*Qinglü Shanshui* — Wang Ximeng's *A Thousand Li of Rivers and Mountains*) with Mœbius *Ligne Claire* rock relief: 4 receding karst mountain ranges glazed with physical Kubelka-Munk Azurite (*Shiqing*), Malachite (*Shilv*), Yellow Ochre (*Zheshi*), Cinnabar (*Zhusha*), and 24k Mud-Gold (*Nijin*), complete with cold-pressed mineral granulation, axe-cut *Cunfa* fissures, drifting valley mist, and a lakeside stilted pavilion.
+
+### parameters
+
+- peaks: Number of major karst mountain peaks (default `5`).
+- mistLayers: Number of valley mist strata (default `4`).
+- mineralRichness: Cold-pressed mineral granulation multiplier (default `1.0`).
+
+```go
+ms := arts.NewMineralShanShui(5, 4, 1.0)
+```
+
+![](../images/mineralshanshui.png)
+
 
 
 

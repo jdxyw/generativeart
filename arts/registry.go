@@ -106,6 +106,36 @@ func paramString(p map[string]interface{}, key, def string) string {
 }
 
 var registry = []ArtDescriptor{
+	// Wave 22: Part VIII Flagship Quartet (PiranesiCarceri, MoebiusLeviathan, DurerPolyhedron, MineralShanShui)
+	{
+		ID: "piranesicarceri", StructName: "piranesiCarceri", Category: "geom",
+		DefaultBG: color.RGBA{248, 241, 224, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewPiranesiCarceri(paramInt(p, "arches", 4), paramInt(p, "tiers", 4), paramFloat(p, "vaultDepth", 1.0))
+		},
+	},
+	{
+		ID: "moebiusleviathan", StructName: "moebiusLeviathan", Category: "media",
+		DefaultBG: color.RGBA{248, 241, 224, 255}, DefaultPal: "sunset",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewMoebiusLeviathan(paramInt(p, "ribs", 14), paramInt(p, "crystalCount", 5), paramFloat(p, "bankAngle", -0.18))
+		},
+	},
+	{
+		ID: "durerpolyhedron", StructName: "durerPolyhedron", Category: "geom",
+		DefaultBG: color.RGBA{248, 241, 224, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewDurerPolyhedron(paramInt(p, "symmetry", 12), paramInt(p, "rings", 3), paramFloat(p, "twist", 0.32))
+		},
+	},
+	{
+		ID: "mineralshanshui", StructName: "mineralShanShui", Category: "media",
+		DefaultBG: color.RGBA{244, 234, 210, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewMineralShanShui(paramInt(p, "peaks", 5), paramInt(p, "mistLayers", 4), paramFloat(p, "mineralRichness", 1.0))
+		},
+	},
+
 	// Wave 21: Jean "Mœbius" Giraud Ligne Claire Quartet (MoebiusCanyon, MoebiusIncal, MoebiusEdena, MoebiusStarwatcher)
 	{
 		ID: "moebiuscanyon", StructName: "moebiusCanyon", Category: "media",
@@ -880,6 +910,15 @@ func ListDescriptors() []ArtDescriptor {
 // name recorded in PNG RecipeMetadata (e.g. "cloisonneEnamel").
 func Lookup(nameOrStruct string) (ArtDescriptor, bool) {
 	q := strings.ToLower(strings.TrimSpace(nameOrStruct))
+	if q == "escherdrostewave" {
+		return ArtDescriptor{
+			ID: "escherdrostewave", StructName: "escherDrosteGallery", Category: "geom",
+			DefaultBG: color.RGBA{18, 22, 34, 255}, DefaultPal: "dunhuang",
+			Build: func(p map[string]interface{}) generativeart.Engine {
+				return NewEscherDrosteGallery(paramInt(p, "branches", 2), paramInt(p, "archesPerRing", 8), paramFloat(p, "scaleRatio", 16.0))
+			},
+		}, true
+	}
 	for _, d := range registry {
 		if d.ID == q || strings.ToLower(d.StructName) == q {
 			return d, true

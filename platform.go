@@ -156,12 +156,14 @@ func buildSharedAnimationPalette(srcFrames []*image.RGBA) (color.Palette, *[2621
 		return active[i].weight > active[j].weight
 	})
 
-	// Multi-pass perceptual diversity seeding so all 256 slots cover the full gamut without clumping
-	centers := make([][3]int, 0, 256)
+	// Multi-pass perceptual diversity seeding so all 31 opaque slots cover the full gamut without clumping
+	// (slot 31 is reserved for GIF89a inter-frame delta transparency; 32 total entries = 5-bit LZW root code size!)
+	const maxOpaque = 31
+	centers := make([][3]int, 0, maxOpaque)
 	used := make([]bool, len(active))
-	thresholds := []int{420, 180, 72, 24, 0}
+	thresholds := []int{1400, 650, 260, 90, 0}
 	for _, minDist := range thresholds {
-		if len(centers) >= 256 {
+		if len(centers) >= maxOpaque {
 			break
 		}
 		for i, bk := range active {
@@ -181,20 +183,20 @@ func buildSharedAnimationPalette(srcFrames []*image.RGBA) (color.Palette, *[2621
 			if !tooClose {
 				centers = append(centers, [3]int{bk.avgR, bk.avgG, bk.avgB})
 				used[i] = true
-				if len(centers) >= 256 {
+				if len(centers) >= maxOpaque {
 					break
 				}
 			}
 		}
 	}
 
-	// 3 iterations of weighted K-Means refinement over active histogram buckets
+	// 4 iterations of weighted K-Means refinement over active histogram buckets
 	if len(centers) > 1 && len(active) > len(centers) {
 		sumW := make([]float64, len(centers))
 		sumR := make([]float64, len(centers))
 		sumG := make([]float64, len(centers))
 		sumB := make([]float64, len(centers))
-		for iter := 0; iter < 3; iter++ {
+		for iter := 0; iter < 4; iter++ {
 			for k := range centers {
 				sumW[k], sumR[k], sumG[k], sumB[k] = 0, 0, 0, 0
 			}
@@ -230,15 +232,16 @@ func buildSharedAnimationPalette(srcFrames []*image.RGBA) (color.Palette, *[2621
 		}
 	}
 
-	for i := 0; len(centers) < 256 && i < len(palette.Plan9); i += 4 {
+	for i := 0; len(centers) < maxOpaque && i < len(palette.Plan9); i += 4 {
 		r, g, b, _ := palette.Plan9[i].RGBA()
 		centers = append(centers, [3]int{int(r >> 8), int(g >> 8), int(b >> 8)})
 	}
 
-	pal := make(color.Palette, len(centers))
+	pal := make(color.Palette, len(centers)+1)
 	for i, c := range centers {
 		pal[i] = color.RGBA{R: uint8(c[0]), G: uint8(c[1]), B: uint8(c[2]), A: 255}
 	}
+	pal[len(centers)] = color.RGBA{R: 0, G: 0, B: 0, A: 0}
 
 	// Precompute 18-bit (64x64x64) RGB -> nearest palette index LUT in parallel
 	var lut [262144]uint8
@@ -303,23 +306,19 @@ func (c *Canva) WriteGIF(w io.Writer, delayCentiseconds int) error {
 	}
 
 	sharedPal, lut, centers := buildSharedAnimationPalette(srcFrames)
-	// Subtle 4x4 micro-dither matrix (-2..+2) applied only when the pixel lies between palette stops
-	bayer4x4 := [4][4]int{
-		{-2, 0, -1, 1},
-		{1, -1, 2, 0},
-		{-1, 1, -2, 0},
-		{2, 0, 1, -1},
-	}
+	transIdx := uint8(len(sharedPal) - 1)
 
 	outGIF := &gif.GIF{
 		Image:     make([]*image.Paletted, len(srcFrames)),
 		Delay:     make([]int, len(srcFrames)),
+		Disposal:  make([]byte, len(srcFrames)),
 		LoopCount: 0,
 	}
 
 	var wg sync.WaitGroup
 	for i, rgba := range srcFrames {
 		outGIF.Delay[i] = delayCentiseconds
+		outGIF.Disposal[i] = gif.DisposalNone
 		wg.Add(1)
 		go func(frameIdx int, src *image.RGBA) {
 			defer wg.Done()
@@ -327,7 +326,6 @@ func (c *Canva) WriteGIF(w io.Writer, delayCentiseconds int) error {
 			fw, fh := b.Dx(), b.Dy()
 			pm := image.NewPaletted(b, sharedPal)
 			for y := 0; y < fh; y++ {
-				bRow := bayer4x4[y&3]
 				srcOff := y * src.Stride
 				dstOff := y * pm.Stride
 				for x := 0; x < fw; x++ {
@@ -336,42 +334,100 @@ func (c *Canva) WriteGIF(w io.Writer, delayCentiseconds int) error {
 					b0 := int(src.Pix[srcOff+x*4+2])
 					baseKey := ((r0 >> 2) << 12) | ((g0 >> 2) << 6) | (b0 >> 2)
 					idx0 := lut[baseKey]
-					pc := centers[idx0]
-					dr := r0 - pc[0]
-					dg := g0 - pc[1]
-					db := b0 - pc[2]
-					// Skip dithering on exact/near-exact matches so solid fills and vector strokes stay razor-sharp
-					if 3*dr*dr+4*dg*dg+2*db*db <= 28 {
-						pm.Pix[dstOff+x] = idx0
-						continue
+					if x > 0 {
+						prevIdx := pm.Pix[dstOff+x-1]
+						if prevIdx != idx0 && int(prevIdx) < len(centers) {
+							pcPrev := centers[prevIdx]
+							dr := r0 - pcPrev[0]
+							dg := g0 - pcPrev[1]
+							db := b0 - pcPrev[2]
+							// Horizontal LZW run-coherence: preserve continuous scanline runs when within 1-2 LSBs
+							if 3*dr*dr+4*dg*dg+2*db*db <= 220 {
+								idx0 = prevIdx
+							}
+						}
 					}
-					dith := bRow[x&3]
-					r := r0 + dith
-					g := g0 + dith
-					bl := b0 + dith
-					if r < 0 {
-						r = 0
-					} else if r > 255 {
-						r = 255
-					}
-					if g < 0 {
-						g = 0
-					} else if g > 255 {
-						g = 255
-					}
-					if bl < 0 {
-						bl = 0
-					} else if bl > 255 {
-						bl = 255
-					}
-					key := ((r >> 2) << 12) | ((g >> 2) << 6) | (bl >> 2)
-					pm.Pix[dstOff+x] = lut[key]
+					pm.Pix[dstOff+x] = idx0
 				}
 			}
 			outGIF.Image[frameIdx] = pm
 		}(i, rgba)
 	}
 	wg.Wait()
+
+	// GIF89a Inter-Frame Delta Transparency Coding (DisposalNone):
+	// Any pixel in frame i > 0 whose quantized palette index or perceptual RGB matches
+	// the currently displayed pixel from frames 0..i-1 is encoded as transIdx (255),
+	// converting unchanged regions into long runs of 255 for 2x-5x LZW compression.
+	if len(srcFrames) > 1 {
+		b0 := srcFrames[0].Bounds()
+		fw, fh := b0.Dx(), b0.Dy()
+		canvasIdx := make([]uint8, fw*fh)
+		canvasRGB := make([][3]uint8, fw*fh)
+		pm0 := outGIF.Image[0]
+		s0 := srcFrames[0]
+		for y := 0; y < fh; y++ {
+			for x := 0; x < fw; x++ {
+				pos := y*fw + x
+				canvasIdx[pos] = pm0.Pix[y*pm0.Stride+x]
+				off := y*s0.Stride + x*4
+				canvasRGB[pos] = [3]uint8{s0.Pix[off], s0.Pix[off+1], s0.Pix[off+2]}
+			}
+		}
+		for fi := 1; fi < len(srcFrames); fi++ {
+			pm := outGIF.Image[fi]
+			sf := srcFrames[fi]
+			if sf.Bounds().Dx() != fw || sf.Bounds().Dy() != fh {
+				continue
+			}
+			minX, minY := fw, fh
+			maxX, maxY := -1, -1
+			for y := 0; y < fh; y++ {
+				rowOff := y * pm.Stride
+				sOff := y * sf.Stride
+				posBase := y * fw
+				for x := 0; x < fw; x++ {
+					pos := posBase + x
+					idx := pm.Pix[rowOff+x]
+					if idx == canvasIdx[pos] {
+						pm.Pix[rowOff+x] = transIdx
+						continue
+					}
+					r := int(sf.Pix[sOff+x*4+0])
+					g := int(sf.Pix[sOff+x*4+1])
+					bl := int(sf.Pix[sOff+x*4+2])
+					prev := canvasRGB[pos]
+					dr := r - int(prev[0])
+					dg := g - int(prev[1])
+					db := bl - int(prev[2])
+					if 3*dr*dr+4*dg*dg+2*db*db <= 240 {
+						pm.Pix[rowOff+x] = transIdx
+					} else {
+						canvasIdx[pos] = idx
+						canvasRGB[pos] = [3]uint8{uint8(r), uint8(g), uint8(bl)}
+						if x < minX {
+							minX = x
+						}
+						if x > maxX {
+							maxX = x
+						}
+						if y < minY {
+							minY = y
+						}
+						if y > maxY {
+							maxY = y
+						}
+					}
+				}
+			}
+			// Crop delta frame to its tight dirty bounding rectangle for additional LZW savings
+			if maxX >= minX && maxY >= minY {
+				outGIF.Image[fi] = pm.SubImage(image.Rect(minX, minY, maxX+1, maxY+1)).(*image.Paletted)
+			} else {
+				outGIF.Image[fi] = pm.SubImage(image.Rect(0, 0, 1, 1)).(*image.Paletted)
+			}
+		}
+	}
 	return gif.EncodeAll(w, outGIF)
 }
 

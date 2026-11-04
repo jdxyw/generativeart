@@ -8,17 +8,20 @@ This gallery contains standalone `Go` usage examples and rendered outputs for `g
 
 ## 🎞️ Seamless 600×600 HD Looping GIF Animations (`DrawTimelapseFrames` + `ToGIF`)
 
-| Mœbius Desert Canyon (`moebiuscanyon`) | Mœbius L'Incal Sanctuary (`moebiusincal`) | Escher Circle Limit (`eschercirclelimit`) | Escher Droste Spiral (`escherdrostegallery`) |
+| Dürer 3D Polyhedron (`durerpolyhedron`) | Piranesi Carceri (`piranesicarceri`) | Mœbius Leviathan (`moebiusleviathan`) | Mœbius Arzach Citadel (`moebiuscanyon`) |
 | :---: | :---: | :---: | :---: |
-| ![Moebius Canyon Loop](images/moebiuscanyon_loop.gif) | ![Moebius Incal Loop](images/moebiusincal_loop.gif) | ![Escher Circle Limit Loop](images/eschercirclelimit_loop.gif) | ![Escher Droste Gallery Loop](images/escherdrostegallery_loop.gif) |
-| **Celestial Gabor Astrolabe (`gaborwaveinterference`)** | **3D Perlin Curl Silk (`analyticalcurlsilk`)** | **Binary Nebula Plumes (`nebulaplumes`)** | **Abyssal Kuroshio Jet (`abyssalcurrents`)** |
-| ![Gabor Wave Interference Loop](images/gaborwaveinterference_loop.gif) | ![Analytical Curl Silk Loop](images/analyticalcurlsilk_loop.gif) | ![Nebula Plumes Loop](images/nebulaplumes_loop.gif) | ![Abyssal Currents Loop](images/abyssalcurrents_loop.gif) |
-| **Vortex Impasto (`vorteximpasto`)** | **Squeegee Scrape (`squeegeescrape`)** | **Hex Basalt Columns (`basaltcolumns`)** | **3D Wireframe Glacier (`wireframeterrain`)** |
-| ![Vortex Impasto Loop](images/vorteximpasto_loop.gif) | ![Squeegee Scrape Loop](images/squeegeescrape_loop.gif) | ![Basalt Columns Loop](images/basaltcolumns_loop.gif) | ![Wireframe Terrain Loop](images/wireframeterrain_loop.gif) |
+| ![Durer Polyhedron Loop](images/durerpolyhedron_loop.gif) | ![Piranesi Carceri Loop](images/piranesicarceri_loop.gif) | ![Moebius Leviathan Loop](images/moebiusleviathan_loop.gif) | ![Moebius Canyon Loop](images/moebiuscanyon_loop.gif) |
+| **Escher Circle Limit (`eschercirclelimit`)** | **Escher Droste Spiral (`escherdrostegallery`)** | **Celestial Gabor Astrolabe (`gaborwaveinterference`)** | **3D Perlin Curl Silk (`analyticalcurlsilk`)** |
+| ![Escher Circle Limit Loop](images/eschercirclelimit_loop.gif) | ![Escher Droste Gallery Loop](images/escherdrostegallery_loop.gif) | ![Gabor Wave Interference Loop](images/gaborwaveinterference_loop.gif) | ![Analytical Curl Silk Loop](images/analyticalcurlsilk_loop.gif) |
+| **Binary Nebula Plumes (`nebulaplumes`)** | **Abyssal Kuroshio Jet (`abyssalcurrents`)** | **Vortex Impasto (`vorteximpasto`)** | **Squeegee Scrape (`squeegeescrape`)** |
+| ![Nebula Plumes Loop](images/nebulaplumes_loop.gif) | ![Abyssal Currents Loop](images/abyssalcurrents_loop.gif) | ![Vortex Impasto Loop](images/vorteximpasto_loop.gif) | ![Squeegee Scrape Loop](images/squeegeescrape_loop.gif) |
 | **3D Lissajous Silk (`lissajousribbon`)** | **Karst Terraces (`marchingisolines`)** | **Jovian Vortex (`vortexfluid`)** | **Dunhuang Caisson (`dunhuangapsara`)** |
 | ![Lissajous Ribbon Loop](images/lissajousribbon_loop.gif) | ![Marching Isolines Loop](images/marchingisolines_loop.gif) | ![Vortex Fluid Loop](images/vortexfluid_loop.gif) | ![Dunhuang Caisson Loop](images/dunhuangapsara_loop.gif) |
 
 ```bash
+go run ./cmd/genart render -art durerpolyhedron       -w 600 -h 600 -frames 20 -delay 12 -out images/durerpolyhedron_loop.gif
+go run ./cmd/genart render -art piranesicarceri       -w 600 -h 600 -frames 20 -delay 12 -out images/piranesicarceri_loop.gif
+go run ./cmd/genart render -art moebiusleviathan      -w 600 -h 600 -frames 20 -delay 12 -out images/moebiusleviathan_loop.gif
 go run ./cmd/genart render -art moebiuscanyon         -w 600 -h 600 -frames 20 -delay 12 -out images/moebiuscanyon_loop.gif
 go run ./cmd/genart render -art moebiusincal          -w 600 -h 600 -frames 20 -delay 12 -out images/moebiusincal_loop.gif
 go run ./cmd/genart render -art eschercirclelimit     -w 600 -h 600 -frames 20 -delay 12 -out images/eschercirclelimit_loop.gif
@@ -67,6 +70,11 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
 
 ## Table of Contents
 
+- [Wave 22: Part VIII Flagship Quartet — Piranesi Carceri Vault Labyrinth, 3D SDF Mœbius Leviathan Airship, Dürer/Jamnitzer 3D Polyhedron & Kubelka-Munk Mineral Shan-Shui](#wave-22-part-viii-flagship-quartet--piranesi-carceri-vault-labyrinth-3d-sdf-mœbius-leviathan-airship-dürerjamnitzer-3d-polyhedron--kubelka-munk-mineral-shan-shui)
+  - [Piranesi Carceri](#piranesi-carceri)
+  - [Moebius Leviathan](#moebius-leviathan)
+  - [Durer Polyhedron](#durer-polyhedron)
+  - [Mineral Shan Shui](#mineral-shan-shui)
 - [Wave 21: Jean "Mœbius" Giraud Ligne Claire Quartet — Stratified Desert Canyon, L'Incal Megastructure Sanctuary, Gardens of Edena Travertine Oasis & Starwatcher Dyson-Torus Citadel](#wave-21-jean-mœbius-giraud-ligne-claire-quartet--stratified-desert-canyon-lincal-megastructure-sanctuary-gardens-of-edena-travertine-oasis--starwatcher-dyson-torus-citadel)
   - [Moebius Canyon](#moebius-canyon)
   - [Moebius Incal](#moebius-incal)
@@ -216,6 +224,114 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
   - [Silk Sky](#silk-sky)
   - [Circle Move](#circle-move)
   - [Random Circle](#random-circle)
+
+---
+
+## Wave 22: Part VIII Flagship Quartet — Piranesi Carceri Vault Labyrinth, 3D SDF Mœbius Leviathan Airship, Dürer/Jamnitzer 3D Polyhedron & Kubelka-Munk Mineral Shan-Shui
+
+### Piranesi Carceri
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20262201)
+	c.SetBackground(color.RGBA{R: 248, G: 241, B: 224, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewPiranesiCarceri(4, 4, 1.0))
+	c.ToPNG("piranesicarceri.png")
+}
+```
+
+![Piranesi Carceri](images/piranesicarceri.png)
+
+### Moebius Leviathan
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20262202)
+	c.SetBackground(color.RGBA{R: 248, G: 241, B: 224, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Sunset)
+	c.Draw(arts.NewMoebiusLeviathan(14, 5, -0.18))
+	c.ToPNG("moebiusleviathan.png")
+}
+```
+
+![Moebius Leviathan](images/moebiusleviathan.png)
+
+### Durer Polyhedron
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20262203)
+	c.SetBackground(color.RGBA{R: 248, G: 241, B: 224, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewDurerPolyhedron(12, 3, 0.32))
+	c.ToPNG("durerpolyhedron.png")
+}
+```
+
+![Durer Polyhedron](images/durerpolyhedron.png)
+
+### Mineral Shan Shui
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20262204)
+	c.SetBackground(color.RGBA{R: 244, G: 234, B: 210, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewMineralShanShui(5, 4, 1.0))
+	c.ToPNG("mineralshanshui.png")
+}
+```
+
+![Mineral Shan Shui](images/mineralshanshui.png)
 
 ---
 

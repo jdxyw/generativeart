@@ -259,7 +259,7 @@ func (mi *moebiusIncal) GenerativeFrame(c *generativeart.Canva, frameIdx, totalF
 		secSym := math.Abs(secFrac*2.0 - 1.0)
 
 		if r > 0.22 {
-			logR := math.Log(r/0.22) * 4.2 - phase
+			logR := math.Log(r/0.22) * 4.2
 			tierIdx := int(math.Floor(logR))
 			tierFrac := logR - float64(tierIdx)
 
@@ -298,15 +298,16 @@ func (mi *moebiusIncal) GenerativeFrame(c *generativeart.Canva, frameIdx, totalF
 				lit *= 0.45
 			}
 
-			// Cohesive, continuous Mœbius shaft gradient (NO random rainbow patchwork!):
+			// Cohesive, continuous Mœbius shaft gradient:
 			// Warm sunlit limestone (#f9d888) and terracotta (#ec7852) smoothly varying with radius & angle
 			warmMix := 0.5 + 0.5*math.Sin(logR*0.8+0.2*stone.ColorMod)
 			sunC := moebiusLerp3(shaftSunCoral, shaftSunGold, warmMix)
 			if isButtress || isLedge {
 				sunC = shaftSunGold
 			} else if inWindowArch && ((tierIdx+secIdx)%6 == 0) {
-				sunC = incalCyan
-				lit = 0.92
+				windowPulse := 0.55 + 0.45*math.Cos(phi-float64(tierIdx)*0.9)
+				sunC = moebiusLerp3(shaftSunGold, incalCyan, windowPulse)
+				lit = 0.78 + 0.18*windowPulse
 			}
 
 			atmos := common.Smoothstep(0.76, 0.22, r) * 0.58

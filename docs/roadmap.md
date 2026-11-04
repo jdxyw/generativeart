@@ -4,7 +4,7 @@ This document serves as the architectural blueprint for `generativeart`, coverin
 1. **Core Engine Refactoring & Performance Upgrades (Package 1 — Implemented)**
 2. **Computational Geometry, Topological Fields & 2D SDF Engine (Package 2 — Implemented)**
 3. **Platform & Export Foundations (Package 3 — Implemented: Dual Vector/HDR Backend, `DrawTimelapse` HD GIF, PNG `tEXt` Recipes & `cmd/genart` CLI)**
-4. **Waves 9–21 `arts/` Visual Paradigms (136 Art Engines + 26 HD 600×600 Loop GIFs — Implemented)**
+4. **Waves 9–22 `arts/` Visual Paradigms (140 Art Engines + 29 HD 600×600 Loop GIFs — Implemented)**
 5. **Exhibition Poster & ContactSheet Engine (`poster.go` — Implemented) & HD GIF Expansion**
 6. **Next-Generation Architecture & Platform Roadmap (6 Directions, with Directions 4 & 5 Implemented)**
 7. **Art-Empowering Rendering & Mathematical Foundations (Next-Tier Capabilities for Future `arts/` — Implemented)**
@@ -207,6 +207,12 @@ Expand `arts/` from **94** to **100** generators with pure mathematical attracto
 42. **`MoebiusEdena`** (`NewMoebiusEdena(domes, terraces int, floraScale float64)`): *Le Monde d'Edena* & *40 Days in the Desert B* gnarled sandstone canyon arch, wind-rippled desert dunes, winding turquoise oasis lagoon, and biomorphic sanctuary domes.
 43. **`MoebiusStarwatcher`** (`NewMoebiusStarwatcher(rings, sails int, orbitTilt float64)`): *Starwatcher* & *Chroniques Métalliques* weathered bone-ivory and brass-ochre relic ring-citadel over jagged desert badlands and a billowing coral-gold cosmic cloud bank.
 
+### 5.1j Wave 22 — Part VIII Flagship Quartet: Piranesi Carceri Vault Labyrinth, 3D SDF Mœbius Leviathan Airship, Dürer/Jamnitzer 3D Polyhedron & Kubelka-Munk Mineral Shan-Shui (+4 Engines + Part VIII Foundations, 140 Total — Implemented)
+44. **`PiranesiCarceri`** (`NewPiranesiCarceri(arches, tiers int, vaultDepth float64)`): *Carceri d'Invenzione* 4-tier subterranean vaulted stone labyrinth with suspension catwalks, volumetric sunbeams, Kubelka-Munk sepia/sienna/indigo pigments, and Hessian principal-curvature burin cross-hatching (`RenderCurvatureEngraving`).
+45. **`MoebiusLeviathan`** (`NewMoebiusLeviathan(ribs, crystalCount int, bankAngle float64)`): 3D SDF raymarched (`RaymarchSDF3D`) biomechanical Nautilus-whale airship with fluted bone-ivory carapace ribs, striped vermilion-gold dorsal sails, and escort gliders over Kubelka-Munk watercolor cloud banks.
+46. **`DurerPolyhedron`** (`NewDurerPolyhedron(symmetry, rings int, twist float64)`): 3D SDF raymarched (`FoldIcosahedral` / `FoldOctahedral`) hollow Renaissance star-polyhedron & armillary monument engraved with principal-curvature copperplate burin cross-hatching and chiaroscuro white-chalk highlights.
+47. **`MineralShanShui`** (`NewMineralShanShui(peaks, mistLayers int, mineralRichness float64)`): Song-Dynasty *Qinglü Shanshui* karst landscape glazed with physical Kubelka-Munk Azurite (*Shiqing*), Malachite (*Shilv*), Yellow Ochre (*Zheshi*), and 24k Mud-Gold (*Nijin*) with cold-pressed mineral granulation (`EvaluateWatercolorWash`) and axe-cut *Cunfa* rock fissures.
+
 ### 5.2 Direction 2: Pure-Go WebAssembly (WASM) Interactive Gallery Playground
 - **Architecture (`wasm/main.go`, `GOOS=js GOARCH=wasm`)**:
   - Compile the pure-Go `generativeart` registry and HDR engine to WebAssembly.
@@ -228,8 +234,8 @@ Expand `arts/` from **94** to **100** generators with pure mathematical attracto
     go run ./cmd/genart poster -arts dunhuangapsara,celticknotwork,gyroidsurface,persiantilework -grid 2x2 -panel 420 -theme dark -title "WAVE XII EXHIBITION" -out images/poster_wave12.png
     ```
 
-### 5.4 Direction 4: High-Definition 600×600 Seamless Loop GIF Expansion (26 HD Loop GIFs — Implemented)
-- Expanded the `600×600` 18-bit LUT + K-Means quantized seamless 360° loop GIF collection to **26 HD animations**: `moebiuscanyon_loop.gif`, `moebiusincal_loop.gif`, `eschercirclelimit_loop.gif`, `escherdrostegallery_loop.gif`, `escherdrostewave_loop.gif`, `gaborwaveinterference_loop.gif`, `analyticalcurlsilk_loop.gif`, `nebulaplumes_loop.gif`, `abyssalcurrents_loop.gif`, `solarprominence_loop.gif`, `botanicalwhorls_loop.gif`, `vorteximpasto_loop.gif`, `squeegeescrape_loop.gif`, `basaltcolumns_loop.gif`, `wireframeterrain_loop.gif`, `lissajousribbon_loop.gif`, `marchingisolines_loop.gif`, `vortexfluid_loop.gif`, `dunhuangapsara_loop.gif`, `stainedrosewindow_loop.gif`, `newtonbasin_loop.gif`, `origamitessellation_loop.gif`, `cyclicautomata_loop.gif`, `gyroidsurface_loop.gif`, `mosaicsun_loop.gif`, and `magneticdipole_loop.gif`.
+### 5.4 Direction 4: High-Definition 600×600 Seamless Loop GIF Expansion (29 HD Loop GIFs — Implemented)
+- Expanded the `600×600` 18-bit LUT + K-Means quantized seamless 360° loop GIF collection to **29 HD animations**: `durerpolyhedron_loop.gif`, `piranesicarceri_loop.gif`, `moebiusleviathan_loop.gif`, `moebiuscanyon_loop.gif`, `moebiusincal_loop.gif`, `eschercirclelimit_loop.gif`, `escherdrostegallery_loop.gif`, `escherdrostewave_loop.gif`, `gaborwaveinterference_loop.gif`, `analyticalcurlsilk_loop.gif`, `nebulaplumes_loop.gif`, `abyssalcurrents_loop.gif`, `solarprominence_loop.gif`, `botanicalwhorls_loop.gif`, `vorteximpasto_loop.gif`, `squeegeescrape_loop.gif`, `basaltcolumns_loop.gif`, `wireframeterrain_loop.gif`, `lissajousribbon_loop.gif`, `marchingisolines_loop.gif`, `vortexfluid_loop.gif`, `dunhuangapsara_loop.gif`, `stainedrosewindow_loop.gif`, `newtonbasin_loop.gif`, `origamitessellation_loop.gif`, `cyclicautomata_loop.gif`, `gyroidsurface_loop.gif`, `mosaicsun_loop.gif`, and `magneticdipole_loop.gif`.
 
 ---
 
