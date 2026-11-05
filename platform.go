@@ -597,6 +597,223 @@ func (c *Canva) ToGIFWithColors(fpath string, delayCentiseconds, maxOpaqueColors
 	return f.Close()
 }
 
+// EvaluateAestheticMetrics evaluates the perceptual Oklab/Oklch AestheticMetrics on this Canva.
+func (c *Canva) EvaluateAestheticMetrics() render.AestheticMetrics {
+	if c == nil {
+		return render.AestheticMetrics{}
+	}
+	rc := c.lastRenderCanvas
+	if rc == nil || c.rgbaTouched {
+		rc = render.NewCanvasFromRGBA(c.img)
+	}
+	return rc.EvaluateAestheticMetrics()
+}
+
+func writePNGChunk(buf *bytes.Buffer, chunkType string, data []byte) {
+	var lenBuf [4]byte
+	binary.BigEndian.PutUint32(lenBuf[:], uint32(len(data)))
+	buf.Write(lenBuf[:])
+	buf.WriteString(chunkType)
+	if len(data) > 0 {
+		buf.Write(data)
+	}
+	crc := crc32.NewIEEE()
+	crc.Write([]byte(chunkType))
+	if len(data) > 0 {
+		crc.Write(data)
+	}
+	var crcBuf [4]byte
+	binary.BigEndian.PutUint32(crcBuf[:], crc.Sum32())
+	buf.Write(crcBuf[:])
+}
+
+func extractPNGIHDRAndIDATs(pngBytes []byte) (ihdr []byte, idats [][]byte, err error) {
+	if len(pngBytes) < 16 || !bytes.Equal(pngBytes[:8], pngSignature) {
+		return nil, nil, errors.New("invalid PNG byte stream")
+	}
+	pos := 8
+	for pos+8 <= len(pngBytes) {
+		length := int(binary.BigEndian.Uint32(pngBytes[pos : pos+4]))
+		cType := string(pngBytes[pos+4 : pos+8])
+		dataStart := pos + 8
+		dataEnd := dataStart + length
+		if dataEnd+4 > len(pngBytes) || length < 0 {
+			break
+		}
+		switch cType {
+		case "IHDR":
+			ihdr = make([]byte, length)
+			copy(ihdr, pngBytes[dataStart:dataEnd])
+		case "IDAT":
+			chunk := make([]byte, length)
+			copy(chunk, pngBytes[dataStart:dataEnd])
+			idats = append(idats, chunk)
+		case "IEND":
+			return ihdr, idats, nil
+		}
+		pos = dataEnd + 4
+	}
+	if len(ihdr) == 0 || len(idats) == 0 {
+		return nil, nil, errors.New("missing IHDR or IDAT in encoded PNG frame")
+	}
+	return ihdr, idats, nil
+}
+
+func buildFCTLChunkData(seqNum, width, height, xOff, yOff uint32, delayNum, delayDen uint16, disposeOp, blendOp uint8) []byte {
+	var data [26]byte
+	binary.BigEndian.PutUint32(data[0:4], seqNum)
+	binary.BigEndian.PutUint32(data[4:8], width)
+	binary.BigEndian.PutUint32(data[8:12], height)
+	binary.BigEndian.PutUint32(data[12:16], xOff)
+	binary.BigEndian.PutUint32(data[16:20], yOff)
+	binary.BigEndian.PutUint16(data[20:22], delayNum)
+	binary.BigEndian.PutUint16(data[22:24], delayDen)
+	data[24] = disposeOp
+	data[25] = blendOp
+	return data[:]
+}
+
+// WriteAPNG encodes the recorded timelapse frames (or current canvas image) as a lossless
+// 24-bit/32-bit true-color Animated PNG (APNG) stream with acTL, fcTL, and fdAT chunks
+// plus embedded GenerativeArt-Recipe tEXt metadata to w.
+func (c *Canva) WriteAPNG(w io.Writer, delayCentiseconds int) error {
+	if c == nil {
+		return errors.New("nil Canva")
+	}
+	if delayCentiseconds <= 0 {
+		delayCentiseconds = 8
+	}
+	srcFrames := c.frames
+	if len(srcFrames) == 0 && c.img != nil {
+		srcFrames = []*image.RGBA{c.Img()}
+	}
+	if len(srcFrames) == 0 {
+		return errors.New("no frames available to encode")
+	}
+
+	// Encode all frames to PNG in parallel to extract compressed IDAT streams
+	type encodedFrame struct {
+		ihdr  []byte
+		idats [][]byte
+		err   error
+	}
+	encFrames := make([]encodedFrame, len(srcFrames))
+	var wg sync.WaitGroup
+	for i, rgba := range srcFrames {
+		wg.Add(1)
+		go func(fIdx int, img *image.RGBA) {
+			defer wg.Done()
+			var fb bytes.Buffer
+			if err := png.Encode(&fb, img); err != nil {
+				encFrames[fIdx].err = err
+				return
+			}
+			ihdr, idats, err := extractPNGIHDRAndIDATs(fb.Bytes())
+			encFrames[fIdx] = encodedFrame{ihdr: ihdr, idats: idats, err: err}
+		}(i, rgba)
+	}
+	wg.Wait()
+
+	for i, ef := range encFrames {
+		if ef.err != nil {
+			return fmt.Errorf("frame %d PNG encode failed: %w", i, ef.err)
+		}
+	}
+
+	b0 := srcFrames[0].Bounds()
+	fw, fh := uint32(b0.Dx()), uint32(b0.Dy())
+
+	var out bytes.Buffer
+	out.Write(pngSignature)
+
+	// 1. IHDR chunk
+	writePNGChunk(&out, "IHDR", encFrames[0].ihdr)
+
+	// 2. GenerativeArt-Recipe tEXt chunk
+	rec := c.lastRecipe
+	if rec == nil {
+		rec = captureEngineRecipe(c, nil)
+	}
+	if jsonPayload, err := json.Marshal(rec); err == nil {
+		var textData bytes.Buffer
+		textData.WriteString(PNGRecipeKeyword)
+		textData.WriteByte(0)
+		textData.Write(jsonPayload)
+		writePNGChunk(&out, "tEXt", textData.Bytes())
+	}
+
+	// 3. acTL (Animation Control Chunk: num_frames, num_plays=0 for infinite loop)
+	var actlData [8]byte
+	binary.BigEndian.PutUint32(actlData[0:4], uint32(len(srcFrames)))
+	binary.BigEndian.PutUint32(actlData[4:8], 0)
+	writePNGChunk(&out, "acTL", actlData[:])
+
+	// 4. Frame 0: fcTL + standard IDAT chunks
+	var seqNum uint32
+	fctl0 := buildFCTLChunkData(seqNum, fw, fh, 0, 0, uint16(delayCentiseconds), 100, 0, 0)
+	seqNum++
+	writePNGChunk(&out, "fcTL", fctl0)
+	for _, idat := range encFrames[0].idats {
+		writePNGChunk(&out, "IDAT", idat)
+	}
+
+	// 5. Frames 1..N-1: fcTL + fdAT chunks
+	for fi := 1; fi < len(encFrames); fi++ {
+		fctl := buildFCTLChunkData(seqNum, fw, fh, 0, 0, uint16(delayCentiseconds), 100, 0, 0)
+		seqNum++
+		writePNGChunk(&out, "fcTL", fctl)
+		for _, idat := range encFrames[fi].idats {
+			fdat := make([]byte, 4+len(idat))
+			binary.BigEndian.PutUint32(fdat[0:4], seqNum)
+			seqNum++
+			copy(fdat[4:], idat)
+			writePNGChunk(&out, "fdAT", fdat)
+		}
+	}
+
+	// 6. IEND chunk
+	writePNGChunk(&out, "IEND", nil)
+
+	_, err := w.Write(out.Bytes())
+	return err
+}
+
+// ToAPNG saves the recorded timelapse frames (or current image) as a 24-bit true-color APNG file at fpath.
+func (c *Canva) ToAPNG(fpath string, delayCentiseconds int) error {
+	var buf bytes.Buffer
+	if err := c.WriteAPNG(&buf, delayCentiseconds); err != nil {
+		return err
+	}
+	return os.WriteFile(fpath, buf.Bytes(), 0644)
+}
+
+// ReadAPNGFrameCountFromBytes parses the acTL chunk of an APNG byte stream and returns (numFrames, numPlays).
+func ReadAPNGFrameCountFromBytes(apngBytes []byte) (numFrames, numPlays int, err error) {
+	if len(apngBytes) < 16 || !bytes.Equal(apngBytes[:8], pngSignature) {
+		return 0, 0, errors.New("invalid PNG/APNG signature")
+	}
+	pos := 8
+	for pos+8 <= len(apngBytes) {
+		length := int(binary.BigEndian.Uint32(apngBytes[pos : pos+4]))
+		cType := string(apngBytes[pos+4 : pos+8])
+		dataStart := pos + 8
+		dataEnd := dataStart + length
+		if dataEnd+4 > len(apngBytes) || length < 0 {
+			break
+		}
+		if cType == "acTL" && length == 8 {
+			nf := int(binary.BigEndian.Uint32(apngBytes[dataStart : dataStart+4]))
+			np := int(binary.BigEndian.Uint32(apngBytes[dataStart+4 : dataStart+8]))
+			return nf, np, nil
+		}
+		if cType == "IEND" {
+			break
+		}
+		pos = dataEnd + 4
+	}
+	return 0, 0, errors.New("acTL chunk not found in APNG")
+}
+
 // WriteSVG exports the canvas as an infinite-resolution vector SVG (or embedded raster
 // fallback for pure pixel-splat engines) to w.
 func (c *Canva) WriteSVG(w io.Writer) error {

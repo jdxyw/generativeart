@@ -7,6 +7,7 @@ import (
 	"image/gif"
 	"image/png"
 	"math"
+	"math/rand"
 	"os"
 	"path/filepath"
 	"strings"
@@ -399,6 +400,75 @@ func TestPhase4DeepColorPNG16RadianceHDRAndSeedDeterminism(t *testing.T) {
 		}
 	}
 }
+
+func TestPhase6AestheticMetricsAPNGAndKeyframeAnimator(t *testing.T) {
+	// 1. Verify EvaluateAestheticMetrics scores a rich artwork higher than a blank monotone canvas
+	blank := generativeart.NewCanva(80, 80)
+	blank.SetBackground(color.RGBA{R: 120, G: 120, B: 120, A: 255})
+	blank.FillBackground()
+	blankScore := blank.EvaluateAestheticMetrics()
+	if blankScore.TotalScore > 25.0 || blankScore.ClippingPenalty < 0.5 {
+		t.Fatalf("expected blank monotone canvas to receive low score and high clipping penalty, got %+v", blankScore)
+	}
+
+	rich := generativeart.NewCanva(96, 96)
+	rich.SetSeed(20261105)
+	rich.SetBackground(color.RGBA{R: 16, G: 20, B: 34, A: 255})
+	rich.SetColorSchema(common.Dunhuang)
+	rich.FillBackground()
+	rich.Draw(arts.NewCloisonneEnamel(5, 10))
+	richScore := rich.EvaluateAestheticMetrics()
+	if richScore.TotalScore <= blankScore.TotalScore+25.0 || richScore.DynamicRange <= 0.3 {
+		t.Fatalf("expected rich artwork to score significantly higher than blank canvas: rich=%+v blank=%+v", richScore, blankScore)
+	}
+
+	// 2. Verify RandomizeParams, NewParamKeyframeEngine, and 24-bit True-Color APNG Encoder
+	desc, ok := arts.Lookup("cloisonneenamel")
+	if !ok {
+		t.Fatalf("missing cloisonneenamel descriptor")
+	}
+	rng := rand.New(rand.NewSource(42))
+	rParams := desc.RandomizeParams(rng)
+	if len(rParams) == 0 {
+		t.Fatalf("expected non-empty randomized params")
+	}
+
+	kf0 := map[string]interface{}{"rings": 4, "petals": 8}
+	kf1 := map[string]interface{}{"rings": 6, "petals": 12}
+	kfAnim := arts.NewParamKeyframeEngine(desc, kf0, kf1)
+
+	animCanva := generativeart.NewCanva(64, 64)
+	animCanva.SetSeed(2026)
+	animCanva.SetBackground(desc.DefaultBG)
+	animCanva.FillBackground()
+	animCanva.DrawTimelapseFrames(kfAnim, 4)
+	if len(animCanva.Frames()) != 4 {
+		t.Fatalf("expected 4 keyframe animation frames, got %d", len(animCanva.Frames()))
+	}
+
+	tmpDir := t.TempDir()
+	apngPath := filepath.Join(tmpDir, "test_loop.apng")
+	if err := animCanva.ToAPNG(apngPath, 10); err != nil {
+		t.Fatalf("ToAPNG failed: %v", err)
+	}
+	apngBytes, err := os.ReadFile(apngPath)
+	if err != nil {
+		t.Fatalf("ReadFile APNG failed: %v", err)
+	}
+	numFrames, numPlays, err := generativeart.ReadAPNGFrameCountFromBytes(apngBytes)
+	if err != nil || numFrames != 4 || numPlays != 0 {
+		t.Fatalf("expected APNG with numFrames=4, numPlays=0, got frames=%d plays=%d err=%v", numFrames, numPlays, err)
+	}
+	// Standard png.Decode must decode Frame 0 of the APNG cleanly
+	if _, err := png.Decode(bytes.NewReader(apngBytes)); err != nil {
+		t.Fatalf("standard png.Decode failed on APNG stream: %v", err)
+	}
+	// Recipe metadata must also be readable from the APNG stream
+	if meta, err := generativeart.ReadPNGRecipeFromBytes(apngBytes); err != nil || meta == nil {
+		t.Fatalf("expected embedded recipe metadata in APNG stream, got err=%v", err)
+	}
+}
+
 
 
 

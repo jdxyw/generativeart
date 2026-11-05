@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"image/color"
 	"math"
+	"math/rand"
 	"reflect"
 	"sort"
 	"strconv"
@@ -111,6 +112,213 @@ func (d ArtDescriptor) ResolveParams(overrides map[string]interface{}) (map[stri
 		out[ck] = v
 	}
 	return out, nil
+}
+
+var categoryHarmoniousPalettes = map[string][]string{
+	"geom":  {"dunhuang", "sunset", "ukiyoe", "oceanic", "cyberpunk", "botanical"},
+	"media": {"dunhuang", "sunset", "ukiyoe", "botanical", "oceanic", "pasteldream"},
+	"chaos": {"inferno", "plasma", "magma", "cyberpunk", "dunhuang", "viridis"},
+	"flow":  {"oceanic", "cyberpunk", "dunhuang", "sunset", "viridis", "plasma"},
+	"bio":   {"botanical", "oceanic", "dunhuang", "viridis", "sunset", "ukiyoe"},
+}
+
+// RandomizePalette picks either the descriptor's tuned default palette or a category-harmonious palette.
+func (d ArtDescriptor) RandomizePalette(rng *rand.Rand) string {
+	if rng == nil {
+		return d.DefaultPal
+	}
+	if rng.Float64() < 0.45 {
+		return d.DefaultPal
+	}
+	cands, ok := categoryHarmoniousPalettes[d.Category]
+	if !ok || len(cands) == 0 {
+		cands = PaletteNames()
+	}
+	return cands[rng.Intn(len(cands))]
+}
+
+// RandomizeParams generates a mathematically valid, aesthetically balanced random parameter map
+// for this ArtDescriptor around its golden default range.
+func (d ArtDescriptor) RandomizeParams(rng *rand.Rand) map[string]interface{} {
+	specs := d.ParamSpecs()
+	if len(specs) == 0 {
+		return nil
+	}
+	if rng == nil {
+		return d.DefaultParams()
+	}
+	out := make(map[string]interface{}, len(specs))
+
+	switch d.ID {
+	case "eschercirclelimit":
+		triples := [][3]int{{6, 4, 2}, {7, 3, 2}, {5, 4, 2}, {6, 3, 2}}
+		pick := triples[rng.Intn(len(triples))]
+		out["p"], out["q"], out["r"] = pick[0], pick[1], pick[2]
+		return out
+	case "escherdrostegallery":
+		out["branches"] = 1 + rng.Intn(2)
+		out["archesPerRing"] = 6 + rng.Intn(5)*2
+		out["scaleRatio"] = 16.0
+		return out
+	case "weingartentorusknot":
+		knots := [][2]int{{2, 3}, {2, 5}, {3, 4}}
+		pick := knots[rng.Intn(len(knots))]
+		out["pWind"] = pick[0]
+		out["qWind"] = pick[1]
+		out["tubeScale"] = math.Round((0.88+0.24*rng.Float64())*100) / 100
+		return out
+	case "lyapunovfractal":
+		seqs := []string{"AABAB", "AB", "AABB", "ABBB", "AABBB"}
+		out["seq"] = seqs[rng.Intn(len(seqs))]
+		out["maxIter"] = 80
+		return out
+	}
+
+	for _, sp := range specs {
+		switch sp.Type {
+		case "int", "uint":
+			def := 1
+			if v, ok := sp.Default.(int64); ok {
+				def = int(v)
+			} else if v, ok := sp.Default.(uint64); ok {
+				def = int(v)
+			}
+			if def <= 1 {
+				out[sp.Name] = def
+				continue
+			}
+			if def >= 20000 {
+				out[sp.Name] = int(float64(def) * (0.65 + 0.45*rng.Float64()))
+			} else {
+				minV := int(math.Max(2, math.Round(float64(def)*0.75)))
+				maxV := int(math.Max(float64(minV+1), math.Round(float64(def)*1.32)))
+				out[sp.Name] = minV + rng.Intn(maxV-minV+1)
+			}
+		case "float64":
+			def, _ := sp.Default.(float64)
+			if math.Abs(def) < 1e-6 {
+				out[sp.Name] = 0.0
+				continue
+			}
+			if strings.Contains(strings.ToLower(sp.Name), "angle") && def > 100 {
+				out[sp.Name] = math.Round((137.507764+(rng.Float64()-0.5)*0.6)*1000) / 1000
+			} else {
+				factor := 0.78 + 0.44*rng.Float64()
+				out[sp.Name] = math.Round(def*factor*1000) / 1000
+			}
+		default:
+			out[sp.Name] = sp.Default
+		}
+	}
+	return out
+}
+
+// NewParamKeyframeEngine wraps any ArtDescriptor into a seamless looping AnimatedEngine.
+// If d already implements AnimatedEngine and len(keyframes) == 0, it delegates directly to d's native
+// GenerativeFrame. Otherwise, it smoothly interpolates d's scalar parameters across keyframes
+// (or along a closed cosine-eased harmonic parameter orbit when <=1 keyframe is supplied) over phase in [0, 1).
+func NewParamKeyframeEngine(d ArtDescriptor, keyframes ...map[string]interface{}) generativeart.AnimatedEngine {
+	baseParams := d.DefaultParams()
+	if len(keyframes) > 0 && keyframes[0] != nil {
+		for k, v := range keyframes[0] {
+			baseParams[k] = v
+		}
+	}
+
+	// If no explicit multi-keyframe trajectory was passed and the engine natively supports animation, use native GenerativeFrame
+	if len(keyframes) <= 1 {
+		if nativeAnim, ok := d.Build(baseParams).(generativeart.AnimatedEngine); ok {
+			return nativeAnim
+		}
+	}
+
+	// Build closed periodic ring of keyframes
+	ring := keyframes
+	if len(ring) <= 1 {
+		// Automatically construct a smooth 2-keyframe harmonic excursion (+18% parameter orbit)
+		kf0 := make(map[string]interface{}, len(baseParams))
+		kf1 := make(map[string]interface{}, len(baseParams))
+		for k, v := range baseParams {
+			kf0[k] = v
+			switch val := v.(type) {
+			case float64:
+				if math.Abs(val) > 1e-5 {
+					kf1[k] = val * 1.18
+				} else {
+					kf1[k] = 0.20
+				}
+			case int64:
+				kf1[k] = val
+			case int:
+				kf1[k] = val
+			default:
+				kf1[k] = v
+			}
+		}
+		ring = []map[string]interface{}{kf0, kf1}
+	}
+
+	return generativeart.NewAnimatedEngine(func(c *generativeart.Canva, frameIdx, totalFrames int, phase float64) {
+		nK := len(ring)
+		u := math.Mod(phase, 1.0)
+		if u < 0 {
+			u += 1.0
+		}
+		scaled := u * float64(nK)
+		idx0 := int(math.Floor(scaled)) % nK
+		idx1 := (idx0 + 1) % nK
+		localT := scaled - math.Floor(scaled)
+		// Smooth C1 cosine easing between keyframes
+		smoothT := 0.5 - 0.5*math.Cos(localT*math.Pi)
+
+		k0 := ring[idx0]
+		k1 := ring[idx1]
+		interp := make(map[string]interface{}, len(baseParams))
+		for k, defVal := range baseParams {
+			v0, ok0 := k0[k]
+			if !ok0 {
+				v0 = defVal
+			}
+			v1, ok1 := k1[k]
+			if !ok1 {
+				v1 = v0
+			}
+			f0, isF0 := toFloat64Param(v0)
+			f1, isF1 := toFloat64Param(v1)
+			if isF0 && isF1 {
+				val := f0 + (f1-f0)*smoothT
+				switch defVal.(type) {
+				case int, int64:
+					interp[k] = int(math.Round(val))
+				default:
+					interp[k] = val
+				}
+			} else {
+				interp[k] = v0
+			}
+		}
+		eng := d.Build(interp)
+		if anim, ok := eng.(generativeart.AnimatedEngine); ok {
+			anim.GenerativeFrame(c, frameIdx, totalFrames, phase)
+		} else {
+			eng.Generative(c)
+		}
+	})
+}
+
+func toFloat64Param(v interface{}) (float64, bool) {
+	switch n := v.(type) {
+	case float64:
+		return n, true
+	case float32:
+		return float64(n), true
+	case int:
+		return float64(n), true
+	case int64:
+		return float64(n), true
+	default:
+		return 0, false
+	}
 }
 
 // ParseParamOverrides parses a CLI parameter override string such as "galleries=8,tiers=6,shaftScale=1.25"

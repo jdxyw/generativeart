@@ -514,7 +514,7 @@ func (c *Canvas) ApplyChromaticAberration(strength float64) {
 	}
 	w, h := c.Width, c.Height
 	nPix := w * h
-	src := make([]float64, nPix*3)
+	src := c.ensureScratch(nPix * 3)
 	for i := 0; i < nPix; i++ {
 		sIdx := i * 4
 		dIdx := i * 3
@@ -1049,7 +1049,7 @@ func (c *Canvas) ApplyDepthOfFieldBuffer(depthBuf []float64, focalDepth, apertur
 	}
 	maxCoC = common.Constrain(maxCoC, 0.25, 32.0)
 
-	src := make([]float64, len(c.pix))
+	src := c.ensureScratch(len(c.pix))
 	copy(src, c.pix)
 	kernel := buildBokehApertureKernel(48, blades)
 

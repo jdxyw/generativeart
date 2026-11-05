@@ -483,6 +483,7 @@ type Canvas struct {
 	Width     int
 	Height    int
 	pix       []float64
+	scratch   []float64
 	blendMode BlendMode
 
 	ras          *vector.Rasterizer
@@ -554,6 +555,15 @@ func (c *Canvas) SetBlendMode(mode BlendMode) {
 // GetBlendMode returns the currently active BlendMode.
 func (c *Canvas) GetBlendMode() BlendMode {
 	return c.blendMode
+}
+
+func (c *Canvas) ensureScratch(needed int) []float64 {
+	if cap(c.scratch) < needed {
+		c.scratch = make([]float64, needed)
+	} else {
+		c.scratch = c.scratch[:needed]
+	}
+	return c.scratch
 }
 
 // FillBackground fills the entire canvas with a solid color in Linear RGB.

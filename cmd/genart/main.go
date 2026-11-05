@@ -6,11 +6,13 @@ import (
 	"fmt"
 	"image/color"
 	"math"
+	"math/rand"
 	"os"
 	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/jdxyw/generativeart"
 	"github.com/jdxyw/generativeart/arts"
@@ -36,6 +38,10 @@ func main() {
 		runInspect(os.Args[2:])
 	case "replay":
 		runReplay(os.Args[2:])
+	case "curate":
+		runCurate(os.Args[2:])
+	case "serve", "studio":
+		runServe(os.Args[2:])
 	default:
 		printUsage()
 		os.Exit(1)
@@ -46,10 +52,12 @@ func printUsage() {
 	fmt.Println("Usage:")
 	fmt.Println("  genart list [-v]")
 	fmt.Println("  genart info <art>")
-	fmt.Println("  genart render -art <name> [-set k1=v1,k2=v2] [-palette <name>] [-w 600] [-h 600] [-seed 20261021] [-depth 8|16] [-frames 1] [-delay 8] [-shutter 0] [-subsamples 1] [-bloom 0.35] [-chromatic 0.8] [-relief 0.6] [-kuwahara 3] [-dof 6.0] [-paper 0.3] [-vignette 0.25] [-deckle 0.04] [-tonemap 1.1] -out <file.(png|hdr|svg|pdf|gif|jpg)>")
-	fmt.Println("  genart poster [-art <name> | -arts <a,b,c,d>] [-set k1=v1,k2=v2] [-sweep-x name:min:max] [-sweep-y name:min:max] [-grid 2x2] [-panel 420] [-frames 1] [-delay 8] [-theme light|dark] [-title \"...\"] -out <file.(png|hdr|svg|pdf|gif|jpg)>")
+	fmt.Println("  genart render -art <name> [-random] [-score] [-set k1=v1,k2=v2] [-palette <name>] [-w 600] [-h 600] [-seed 20261021] [-depth 8|16] [-frames 1] [-delay 8] [-shutter 0] [-subsamples 1] [-bloom 0.35] [-chromatic 0.8] [-relief 0.6] [-kuwahara 3] [-dof 6.0] [-paper 0.3] [-vignette 0.25] [-deckle 0.04] [-tonemap 1.1] -out <file.(png|apng|hdr|svg|pdf|gif|jpg)>")
+	fmt.Println("  genart poster [-art <name> | -arts <a,b,c,d>] [-set k1=v1,k2=v2] [-sweep-x name:min:max] [-sweep-y name:min:max] [-grid 2x2] [-panel 420] [-frames 1] [-delay 8] [-theme light|dark] [-title \"...\"] -out <file.(png|apng|hdr|svg|pdf|gif|jpg)>")
+	fmt.Println("  genart curate [-art <name>] [-count 16] [-keep 4] [-w 480] [-h 480] [-dir curated_out]")
+	fmt.Println("  genart serve [-addr :8080]")
 	fmt.Println("  genart inspect <file.png>")
-	fmt.Println("  genart replay <input.png> [-w 2400] [-h 2400] [-set k1=v1,k2=v2] [-palette <name>] [-seed 0] [-depth 8|16] [-frames 1] [-delay 8] [-bloom ...] [-relief ...] -out <file.(png|hdr|svg|pdf|gif|jpg)>")
+	fmt.Println("  genart replay <input.png> [-w 2400] [-h 2400] [-set k1=v1,k2=v2] [-palette <name>] [-seed 0] [-depth 8|16] [-frames 1] [-delay 8] [-bloom ...] [-relief ...] -out <file.(png|apng|hdr|svg|pdf|gif|jpg)>")
 }
 
 type postFlags struct {
@@ -208,6 +216,15 @@ func saveCanvaByExtWithDepth(c *generativeart.Canva, eng generativeart.Engine, f
 			c.DrawTimelapseFrames(eng, nFrames)
 		}
 		return c.ToGIF(outPath, delay)
+	case ".apng":
+		nFrames := frames
+		if nFrames < 2 {
+			nFrames = 8
+		}
+		if eng != nil {
+			c.DrawTimelapseFrames(eng, nFrames)
+		}
+		return c.ToAPNG(outPath, delay)
 	case ".hdr":
 		if !alreadyDrawn && eng != nil {
 			c.Draw(eng)
@@ -246,17 +263,19 @@ func saveCanvaByExt(c *generativeart.Canva, eng generativeart.Engine, frames, de
 func runRender(args []string) {
 	fs := flag.NewFlagSet("render", flag.ExitOnError)
 	artName := fs.String("art", "mosaicsun", "Art generator name")
+	randomMode := fs.Bool("random", false, "Randomize seed, palette, and aesthetic parameters within golden bounds")
+	scoreMode := fs.Bool("score", false, "Evaluate and print Oklab/Oklch perceptual AestheticMetrics score")
 	setExpr := fs.String("set", "", "Override engine parameters (e.g. 'galleries=8,tiers=6,shaftScale=1.25' or JSON)")
 	palName := fs.String("palette", "", "Color palette name (optional override)")
 	w := fs.Int("w", 600, "Canvas width in pixels")
 	h := fs.Int("h", 600, "Canvas height in pixels")
 	seed := fs.Int64("seed", 20261021, "Deterministic random seed")
-	frames := fs.Int("frames", 1, "Number of frames (for .gif timelapse)")
-	delay := fs.Int("delay", 8, "Frame delay in centiseconds (for .gif)")
+	frames := fs.Int("frames", 1, "Number of frames (for .gif/.apng timelapse)")
+	delay := fs.Int("delay", 8, "Frame delay in centiseconds (for .gif/.apng)")
 	shutter := fs.Float64("shutter", 0, "Shutter-angle fraction in [0, 1] for temporal motion blur in .gif animations")
 	subsamples := fs.Int("subsamples", 1, "Number of temporal sub-samples per frame for motion blur (e.g. 4)")
 	colors := fs.Int("colors", 31, "Maximum opaque colors in shared GIF palette (2..255, default 31)")
-	out := fs.String("out", "output.png", "Output file path (.png, .svg, .pdf, .gif, .jpg)")
+	out := fs.String("out", "output.png", "Output file path (.png, .apng, .hdr, .svg, .pdf, .gif, .jpg)")
 	pf := registerPostFlags(fs)
 	_ = fs.Parse(args)
 
@@ -266,7 +285,19 @@ func runRender(args []string) {
 		os.Exit(1)
 	}
 
+	activeSeed := *seed
+	chosenPal := desc.DefaultPal
 	var params map[string]interface{}
+
+	if *randomMode {
+		rng := rand.New(rand.NewSource(time.Now().UnixNano() ^ *seed))
+		if *seed == 20261021 {
+			activeSeed = 20260000 + rng.Int63n(900000)
+		}
+		chosenPal = desc.RandomizePalette(rng)
+		params = desc.RandomizeParams(rng)
+	}
+
 	if strings.TrimSpace(*setExpr) != "" {
 		rawOverrides, err := arts.ParseParamOverrides(*setExpr)
 		if err != nil {
@@ -278,22 +309,32 @@ func runRender(args []string) {
 			fmt.Fprintf(os.Stderr, "%v\n", err)
 			os.Exit(1)
 		}
-		params = resolved
+		if params == nil {
+			params = resolved
+		} else {
+			for k, v := range rawOverrides {
+				for rk, rv := range resolved {
+					if strings.EqualFold(k, rk) {
+						params[rk] = rv
+					}
+				}
+				_ = v
+			}
+		}
 	}
 
 	c := generativeart.NewCanva(*w, *h)
-	c.SetSeed(*seed)
+	c.SetSeed(activeSeed)
 	c.SetBackground(desc.DefaultBG)
 	c.FillBackground()
 
-	chosenPal := desc.DefaultPal
 	if *palName != "" {
 		chosenPal = *palName
 	}
 	if schema, exists := arts.PaletteByName(chosenPal); exists {
 		c.SetColorSchema(schema)
 	}
-	if effects := pf.buildEffects(*seed); len(effects) > 0 {
+	if effects := pf.buildEffects(activeSeed); len(effects) > 0 {
 		c.AddPostEffect(effects...)
 	}
 
@@ -333,7 +374,7 @@ func runRender(args []string) {
 			fmt.Fprintf(os.Stderr, "gif encode failed: %v\n", err)
 			os.Exit(1)
 		}
-		fmt.Printf("Rendered %s (%dx%d, frames=%d, seed=%d) -> %s\n", desc.ID, *w, *h, nFrames, *seed, *out)
+		fmt.Printf("Rendered %s (%dx%d, frames=%d, seed=%d) -> %s\n", desc.ID, *w, *h, nFrames, activeSeed, *out)
 		return
 	}
 	bitDepth := 8
@@ -344,7 +385,13 @@ func runRender(args []string) {
 		fmt.Fprintf(os.Stderr, "render failed: %v\n", err)
 		os.Exit(1)
 	}
-	fmt.Printf("Rendered %s (%dx%d, seed=%d) -> %s\n", desc.ID, *w, *h, *seed, *out)
+	if *scoreMode {
+		sc := c.EvaluateAestheticMetrics()
+		fmt.Printf("Rendered %s (%dx%d, seed=%d, palette=%s, aesthetic=%.1f/100 [DR=%.2f Contrast=%.2f Harmony=%.2f Struct=%.2f Focal=%.2f]) -> %s\n",
+			desc.ID, *w, *h, activeSeed, chosenPal, sc.TotalScore, sc.DynamicRange, sc.ContrastStd, sc.ColorHarmony, sc.StructuralEntropy, sc.FocalSaliency, *out)
+		return
+	}
+	fmt.Printf("Rendered %s (%dx%d, seed=%d) -> %s\n", desc.ID, *w, *h, activeSeed, *out)
 }
 
 func runInspect(args []string) {

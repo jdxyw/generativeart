@@ -649,6 +649,54 @@ func RaymarchSDF3DBounded(sdf SDF3D, ro, rd, lightDir, boundCenter Vec3, boundRa
 	return raymarchSDF3DInterval(sdf, ro, rd, lightDir, 0.02, maxDist, maxSteps)
 }
 
+// RaymarchSDF3DCoarseFine accelerates 3D SDF sphere tracing by evaluating a cheap bounding
+// coarseSDF when far from surfaces (d > detailThreshold) and switching to fineSDF only inside
+// the near-surface shell (d <= detailThreshold).
+func RaymarchSDF3DCoarseFine(
+	coarseSDF, fineSDF SDF3D,
+	detailThreshold float64,
+	ro, rd, lightDir Vec3,
+	maxDist float64,
+	maxSteps int,
+) SDF3DHit {
+	if coarseSDF == nil {
+		return RaymarchSDF3D(fineSDF, ro, rd, lightDir, maxDist, maxSteps)
+	}
+	if fineSDF == nil {
+		return RaymarchSDF3D(coarseSDF, ro, rd, lightDir, maxDist, maxSteps)
+	}
+	if detailThreshold <= 0 {
+		detailThreshold = 0.045
+	}
+	if maxSteps <= 0 {
+		maxSteps = 72
+	}
+	t := 0.02
+	for i := 0; i < maxSteps && t < maxDist; i++ {
+		pos := ro.Add(rd.Scale(t))
+		d := coarseSDF(pos)
+		if d <= detailThreshold {
+			d = fineSDF(pos)
+			if d < 0.0012 {
+				norm, curv := CalcSDF3DNormalAndCurvatureAtHit(fineSDF, pos, d, 0.0025)
+				ao := CalcSDF3DAO(fineSDF, pos, norm)
+				sh := CalcSDF3DSoftShadow(coarseSDF, pos.Add(norm.Scale(0.006)), lightDir, 0.015, maxDist*0.65, 10.0)
+				return SDF3DHit{
+					Hit:       true,
+					T:         t,
+					Pos:       pos,
+					Normal:    norm,
+					Curvature: curv,
+					AO:        ao,
+					Shadow:    sh,
+				}
+			}
+		}
+		t += d * 0.95
+	}
+	return SDF3DHit{Hit: false, T: maxDist}
+}
+
 func raymarchSDF3DInterval(sdf SDF3D, ro, rd, lightDir Vec3, tStart, tEnd float64, maxSteps int) SDF3DHit {
 	if maxSteps <= 0 {
 		maxSteps = 72

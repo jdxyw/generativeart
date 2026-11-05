@@ -9,7 +9,7 @@ This document serves as the architectural blueprint for `generativeart`, coverin
 6. **Next-Generation Architecture & Platform Roadmap (6 Directions, with Directions 4 & 5 Implemented)**
 7. **Art-Empowering Rendering & Mathematical Foundations (Part VII & Part VIII — Implemented)**
 8. **Waves 23–24 Master Architecture, 3D Dielectric Optics, Spherical Harmonics, Relativistic Lensing & Weingarten Curvature (148 Art Engines + 37 HD 600×600 Loop GIFs — Implemented)**
-9. **Part X. Underlying Infrastructure Audit & 6-Phase Core Engine Upgrade Roadmap (Phases 1–5 — Implemented)**
+9. **Part X. Underlying Infrastructure Audit & 6-Phase Core Engine Upgrade Roadmap (Phases 1–6 — Implemented)**
 
 ---
 
@@ -461,12 +461,18 @@ A comprehensive technical audit across `generativeart.go`, `platform.go`, `poste
 
 ---
 
-### 10.6 Phase 6: Interactive Local Live Studio (`genart serve`) & Gallery Lightbox CLI Builder (Planned)
+### 10.6 Phase 6: Perceptual Aesthetic Scoring, 24-Bit APNG Encoder, Keyframe Animator, 2-Tier SDF & Live Studio (`genart serve` / `genart curate` — Implemented)
 
-1. **`genart serve` Interactive HTTP Studio (`cmd/genart/main.go`, `index.html`)**:
-   - Add `genart serve [-port 8080]` serving `index.html` alongside `/api/engines`, `/api/render`, `/api/poster`, and `/api/inspect` endpoints for live browser parameter tweaking, post-effect chaining, and drag-and-drop PNG recipe inspection.
-2. **Inline PNG/GIF Toggle Badge & Visual CLI Command Builder (`index.html`)**:
-   - Add one-click static PNG / animated GIF toggle badges on dual-mode gallery cards and an interactive parameter slider + CLI command generator inside the exhibition lightbox.
+1. **Perceptual Oklab/Oklch Aesthetic Scoring Engine & Smart Parameter Randomizer (`render/aesthetic.go`, `arts/registry.go`, `cmd/genart`)**:
+   - Added `(*Canvas).EvaluateAestheticMetrics() AestheticMetrics` and `(*Canva).EvaluateAestheticMetrics()` computing 5th–95th percentile Oklab `DynamicRange`, `ContrastStd`, Oklch `ColorHarmony` (chroma richness + 24-sector hue-wheel Shannon entropy), multi-scale `StructuralEntropy`, `FocalSaliency`, and `ClippingPenalty` (`TotalScore` in `[0, 100]`).
+   - Added `(*ArtDescriptor).RandomizeParams(rng)` and `(*ArtDescriptor).RandomizePalette(rng)` with mathematical invariant guards, exposed via `genart render -random -score` and the multi-core auto-curation subcommand `genart curate -count N -keep K -dir <out>`.
+2. **Zero-Dependency 24-Bit True-Color APNG Encoder & Keyframe Parameter Animator (`platform.go`, `arts/registry.go`, `cmd/genart`)**:
+   - Added `(*Canva).WriteAPNG`, `(*Canva).ToAPNG`, and `ReadAPNGFrameCountFromBytes` (`.apng` output in `cmd/genart`), assembling `IHDR`, `GenerativeArt-Recipe` `tEXt`, `acTL`, `fcTL`, `IDAT`, and `fdAT` chunks in pure Go for lossless 24-bit/32-bit true-color animations without 256-color GIF quantization banding.
+   - Added `arts.NewParamKeyframeEngine(desc, keyframes...)` to animate any static or animated `ArtDescriptor` smoothly across keyframe parameter states using $C^1$ cosine easing.
+3. **Zero-Allocation PostEffect Scratch Reuse & 2-Tier Coarse/Fine 3D SDF Raymarching (`render/canvas.go`, `render/postprocess.go`, `render/sdf3d.go`)**:
+   - Added reusable `scratch []float64` buffer on `render.Canvas` (`ensureScratch`) eliminating repeated heap allocations across chained `PostEffect` passes, and added `RaymarchSDF3DCoarseFine(coarseSDF, fineSDF, detailThreshold, ...)` to skip expensive near-surface SDF details during far-field and shadow marching.
+4. **Interactive Local Live Studio HTTP Server (`cmd/genart/studio.go`, `genart serve`)**:
+   - Added `genart serve [-addr :8080]` serving the interactive exhibition gallery alongside `/api/engines`, `/api/render` (with real-time parameter overrides, `-random` curation, post-effects, and `AestheticMetrics` scoring), and `/api/inspect`.
 
 
 

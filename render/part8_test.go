@@ -367,7 +367,28 @@ func TestPhase5SpectralKubelkaMunkWetBleedAndWeingarten3D(t *testing.T) {
 	if inkW < 0 || inkW > 1 || chalkW != 0 {
 		t.Fatalf("unexpected Evaluate3DWeingartenEngraving weights: ink=%f chalk=%f", inkW, chalkW)
 	}
+
+	// 4. Verify Phase 6 Coarse/Fine 2-Tier 3D SDF Raymarching evaluates fineSDF far fewer times than full RaymarchSDF3D
+	fineCallsCoarseFine := 0
+	fineCallsFull := 0
+	coarseSDF := func(p Vec3) float64 {
+		return SDF3DSphere(p, 1.04)
+	}
+	fineSDF1 := func(p Vec3) float64 {
+		fineCallsCoarseFine++
+		return SDF3DSphere(p, 1.0) - 0.01*math.Cos(p.X*12.0)
+	}
+	fineSDF2 := func(p Vec3) float64 {
+		fineCallsFull++
+		return SDF3DSphere(p, 1.0) - 0.01*math.Cos(p.X*12.0)
+	}
+	cfHit := RaymarchSDF3DCoarseFine(coarseSDF, fineSDF1, 0.06, V3(0, 0, 5.0), V3(0, 0, -1), V3(0.4, 0.7, 0.5).Normalize(), 10.0, 64)
+	fullHit := RaymarchSDF3D(fineSDF2, V3(0, 0, 5.0), V3(0, 0, -1), V3(0.4, 0.7, 0.5).Normalize(), 10.0, 64)
+	if !cfHit.Hit || !fullHit.Hit || fineCallsCoarseFine >= fineCallsFull {
+		t.Fatalf("expected RaymarchSDF3DCoarseFine to reduce fineSDF calls: coarseFine=%d vs full=%d", fineCallsCoarseFine, fineCallsFull)
+	}
 }
+
 
 
 
