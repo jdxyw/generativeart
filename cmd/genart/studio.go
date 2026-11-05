@@ -6,8 +6,10 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"image/color"
 	"image/png"
 	"io"
+	"math"
 	"math/rand"
 	"net/http"
 	"os"
@@ -17,6 +19,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/jdxyw/generativeart"
 	"github.com/jdxyw/generativeart/arts"
@@ -153,7 +156,7 @@ func runCurate(args []string) {
 }
 
 // buildStudioMux returns the HTTP handler for `genart serve`, exposing `/api/engines`,
-// `/api/render`, `/api/inspect`, and the interactive Studio UI.
+// `/api/render`, `/api/inspect`, `/studio`, and the interactive Exhibition Gallery.
 func buildStudioMux() http.Handler {
 	mux := http.NewServeMux()
 
@@ -161,8 +164,10 @@ func buildStudioMux() http.Handler {
 		descs := arts.ListDescriptors()
 		type engineSummary struct {
 			ID                string           `json:"id"`
+			StructName        string           `json:"struct_name"`
 			Category          string           `json:"category"`
 			DefaultPalette    string           `json:"default_palette"`
+			DefaultBG         string           `json:"default_bg"`
 			SupportsAnimation bool             `json:"supports_animation"`
 			Parameters        []arts.ParamSpec `json:"parameters"`
 		}
@@ -170,20 +175,35 @@ func buildStudioMux() http.Handler {
 		for i, d := range descs {
 			list[i] = engineSummary{
 				ID:                d.ID,
+				StructName:        d.StructName,
 				Category:          d.Category,
 				DefaultPalette:    d.DefaultPal,
+				DefaultBG:         fmt.Sprintf("#%02x%02x%02x", d.DefaultBG.R, d.DefaultBG.G, d.DefaultBG.B),
 				SupportsAnimation: d.SupportsAnimation(),
 				Parameters:        d.ParamSpecs(),
 			}
 		}
+		palNames := arts.PaletteNames()
+		palColors := make(map[string][]string, len(palNames))
+		for _, pn := range palNames {
+			if cols, ok := arts.PaletteByName(pn); ok {
+				hexes := make([]string, len(cols))
+				for ci, c := range cols {
+					hexes[ci] = fmt.Sprintf("#%02x%02x%02x", c.R, c.G, c.B)
+				}
+				palColors[pn] = hexes
+			}
+		}
 		w.Header().Set("Content-Type", "application/json")
 		_ = json.NewEncoder(w).Encode(map[string]interface{}{
-			"engines":  list,
-			"palettes": arts.PaletteNames(),
+			"engines":        list,
+			"palettes":       palNames,
+			"palette_colors": palColors,
 		})
 	})
 
 	mux.HandleFunc("/api/render", func(w http.ResponseWriter, r *http.Request) {
+		t0 := time.Now()
 		q := r.URL.Query()
 		artName := q.Get("art")
 		if artName == "" {
@@ -197,10 +217,10 @@ func buildStudioMux() http.Handler {
 
 		width, _ := strconv.Atoi(q.Get("w"))
 		height, _ := strconv.Atoi(q.Get("h"))
-		if width <= 0 || width > 1600 {
+		if width <= 0 || width > 2400 {
 			width = 480
 		}
-		if height <= 0 || height > 1600 {
+		if height <= 0 || height > 2400 {
 			height = 480
 		}
 		seed, err := strconv.ParseInt(q.Get("seed"), 10, 64)
@@ -209,7 +229,7 @@ func buildStudioMux() http.Handler {
 		}
 
 		palName := q.Get("palette")
-		if palName == "" {
+		if palName == "" || palName == "default" {
 			palName = desc.DefaultPal
 		}
 
@@ -218,9 +238,27 @@ func buildStudioMux() http.Handler {
 			rng := rand.New(rand.NewSource(seed))
 			palName = desc.RandomizePalette(rng)
 			params = desc.RandomizeParams(rng)
-		} else if setStr := q.Get("set"); setStr != "" {
-			if raw, err := arts.ParseParamOverrides(setStr); err == nil {
-				if resolved, err := desc.ResolveParams(raw); err == nil {
+		} else {
+			rawOverrides := make(map[string]interface{})
+			if setStr := q.Get("set"); setStr != "" {
+				if parsed, err := arts.ParseParamOverrides(setStr); err == nil {
+					for k, v := range parsed {
+						rawOverrides[k] = v
+					}
+				}
+			}
+			for k, vals := range q {
+				if strings.HasPrefix(k, "p.") && len(vals) > 0 {
+					pKey := strings.TrimPrefix(k, "p.")
+					if parsed, err := arts.ParseParamOverrides(pKey + "=" + vals[0]); err == nil {
+						for pk, pv := range parsed {
+							rawOverrides[pk] = pv
+						}
+					}
+				}
+			}
+			if len(rawOverrides) > 0 {
+				if resolved, err := desc.ResolveParams(rawOverrides); err == nil {
 					params = resolved
 				}
 			}
@@ -235,17 +273,60 @@ func buildStudioMux() http.Handler {
 		if pal, exists := arts.PaletteByName(palName); exists {
 			c.SetColorSchema(pal)
 		}
-		if bVal, err := strconv.ParseFloat(q.Get("bloom"), 64); err == nil && bVal > 0 {
-			c.AddPostEffect(render.BloomEffect(0.62, 6.0, bVal))
+
+		var postCLI []string
+		if kVal, err := strconv.Atoi(q.Get("kuwahara")); err == nil && kVal > 0 {
+			c.AddPostEffect(render.AnisotropicKuwaharaEffect(kVal, 8.0, 1.25))
+			postCLI = append(postCLI, fmt.Sprintf("-kuwahara %d", kVal))
 		}
 		if rVal, err := strconv.ParseFloat(q.Get("relief"), 64); err == nil && rVal > 0 {
 			c.AddPostEffect(render.LuminanceReliefEffect(rVal, -135, 38, 0.35))
+			postCLI = append(postCLI, fmt.Sprintf("-relief %.2f", rVal))
 		}
-		if chVal, err := strconv.ParseFloat(q.Get("chromatic"), 64); err == nil && chVal != 0 {
+		if bVal, err := strconv.ParseFloat(q.Get("bloom"), 64); err == nil && bVal > 0 {
+			c.AddPostEffect(render.BloomEffect(0.62, 6.0, bVal))
+			postCLI = append(postCLI, fmt.Sprintf("-bloom %.2f", bVal))
+		}
+		if chVal, err := strconv.ParseFloat(q.Get("chromatic"), 64); err == nil && math.Abs(chVal) > 1e-5 {
 			c.AddPostEffect(render.ChromaticAberrationEffect(chVal))
+			postCLI = append(postCLI, fmt.Sprintf("-chromatic %.2f", chVal))
+		}
+		cVal := 1.0
+		sVal := 1.0
+		if v, err := strconv.ParseFloat(q.Get("contrast"), 64); err == nil && v > 0 {
+			cVal = v
+		}
+		if v, err := strconv.ParseFloat(q.Get("saturation"), 64); err == nil && v >= 0 {
+			sVal = v
+		}
+		if math.Abs(cVal-1.0) > 1e-4 || math.Abs(sVal-1.0) > 1e-4 {
+			c.AddPostEffect(render.ColorGradeEffect(cVal, sVal, 225.0, 42.0, 0.0))
+			if math.Abs(cVal-1.0) > 1e-4 {
+				postCLI = append(postCLI, fmt.Sprintf("-contrast %.2f", cVal))
+			}
+			if math.Abs(sVal-1.0) > 1e-4 {
+				postCLI = append(postCLI, fmt.Sprintf("-saturation %.2f", sVal))
+			}
+		}
+		if tmVal, err := strconv.ParseFloat(q.Get("tonemap"), 64); err == nil && tmVal > 0 {
+			c.AddPostEffect(render.ToneMapEffect(tmVal, 2.2))
+			postCLI = append(postCLI, fmt.Sprintf("-tonemap %.2f", tmVal))
 		}
 		if dofVal, err := strconv.ParseFloat(q.Get("dof"), 64); err == nil && dofVal > 0 {
 			c.AddPostEffect(render.DepthOfFieldEffect(0.5, 0.5, 0.28, dofVal, 6))
+			postCLI = append(postCLI, fmt.Sprintf("-dof %.2f", dofVal))
+		}
+		if pVal, err := strconv.ParseFloat(q.Get("paper"), 64); err == nil && pVal > 0 {
+			c.AddPostEffect(render.PaperTextureEffect(pVal, seed))
+			postCLI = append(postCLI, fmt.Sprintf("-paper %.2f", pVal))
+		}
+		if vVal, err := strconv.ParseFloat(q.Get("vignette"), 64); err == nil && vVal > 0 {
+			c.AddPostEffect(render.VignetteEffect(vVal))
+			postCLI = append(postCLI, fmt.Sprintf("-vignette %.2f", vVal))
+		}
+		if dkVal, err := strconv.ParseFloat(q.Get("deckle"), 64); err == nil && dkVal > 0 {
+			c.AddPostEffect(render.DeckleBorderEffect(dkVal, 1.0, color.RGBA{R: 242, G: 236, B: 224, A: 255}, seed))
+			postCLI = append(postCLI, fmt.Sprintf("-deckle %.3f", dkVal))
 		}
 
 		c.FillBackground()
@@ -259,6 +340,14 @@ func buildStudioMux() http.Handler {
 			pngBytes = withMeta
 		}
 
+		if q.Get("download") == "1" || q.Get("download") == "true" {
+			fname := fmt.Sprintf("%s_s%d_%s.png", desc.ID, seed, palName)
+			w.Header().Set("Content-Type", "image/png")
+			w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%q", fname))
+			_, _ = w.Write(pngBytes)
+			return
+		}
+
 		var setParts []string
 		for _, sp := range desc.ParamSpecs() {
 			if v, exists := params[sp.Name]; exists {
@@ -269,17 +358,25 @@ func buildStudioMux() http.Handler {
 		if len(setParts) > 0 {
 			cliCmd += fmt.Sprintf(" -set %q", strings.Join(setParts, ","))
 		}
+		if len(postCLI) > 0 {
+			cliCmd += " " + strings.Join(postCLI, " ")
+		}
 		cliCmd += fmt.Sprintf(" -out %s.png", desc.ID)
+
+		renderMS := time.Since(t0).Milliseconds()
 
 		w.Header().Set("Content-Type", "application/json")
 		_ = json.NewEncoder(w).Encode(map[string]interface{}{
 			"art":          desc.ID,
+			"struct_name":  desc.StructName,
+			"category":     desc.Category,
 			"palette":      palName,
 			"seed":         seed,
 			"width":        width,
 			"height":       height,
 			"params":       params,
 			"aesthetic":    metrics,
+			"render_ms":    renderMS,
 			"cli_command":  cliCmd,
 			"image_base64": "data:image/png;base64," + base64.StdEncoding.EncodeToString(pngBytes),
 		})
@@ -300,6 +397,13 @@ func buildStudioMux() http.Handler {
 		_ = json.NewEncoder(w).Encode(meta)
 	})
 
+	serveStudio := func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		_, _ = io.WriteString(w, studioWorkbenchHTML)
+	}
+	mux.HandleFunc("/studio", serveStudio)
+	mux.HandleFunc("/studio/", serveStudio)
+
 	mux.Handle("/images/", http.StripPrefix("/images/", http.FileServer(http.Dir("images"))))
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/" || r.URL.Path == "/index.html" {
@@ -319,6 +423,7 @@ func runServe(args []string) {
 
 	fmt.Printf("GenerativeArt Live Studio listening on http://localhost%s\n", *addr)
 	fmt.Println("  - GET  /             -> Interactive Exhibition Gallery (index.html)")
+	fmt.Println("  - GET  /studio       -> Interactive Visual Parameter Workbench (sliders, palettes, 🎲 random, live canvas & download)")
 	fmt.Println("  - GET  /api/engines  -> Full catalog of 148 engines, palettes & parameter schemas")
 	fmt.Println("  - GET  /api/render   -> Real-time multi-core HDR render + Oklab AestheticMetrics score")
 	fmt.Println("  - POST /api/inspect  -> Extract embedded GenerativeArt-Recipe tEXt metadata from any PNG")

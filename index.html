@@ -326,7 +326,8 @@
       <button type="button" class="btn-pill active" id="btnCol3" onclick="setGridCols(3)">3-Col</button>
       <button type="button" class="btn-pill" id="btnCol4" onclick="setGridCols(4)">4-Col</button>
       <button type="button" class="btn-pill" id="btnCol2" onclick="setGridCols(2)">Large (2-Col)</button>
-      <a class="btn-pill btn-primary" href="https://github.com/jdxyw/generativeart" target="_blank" rel="noopener">★ GitHub Repo</a>
+      <a class="btn-pill btn-primary" href="/studio">🎛️ Live Studio</a>
+      <a class="btn-pill" href="https://github.com/jdxyw/generativeart" target="_blank" rel="noopener">★ GitHub Repo</a>
     </div>
   </nav>
 
@@ -403,6 +404,7 @@
           <div class="meta-pills">
             <span class="meta-pill" id="modalFilePill"></span>
             <span class="meta-pill" id="modalExamplePill"></span>
+            <a class="meta-pill" id="modalStudioLink" href="/studio" style="color:var(--accent);border-color:var(--border-strong);font-weight:600;">🎛️ 在 Studio 中调参</a>
           </div>
         </div>
         <div style="display:flex; align-items:center; gap:0.5rem;">
@@ -881,6 +883,8 @@ ${drawCall}
       document.getElementById("modalDesc").textContent = lang === "zh" ? item.zhDesc : item.enDesc;
       document.getElementById("modalFilePill").textContent = `Engine: arts/${item.id}.go`;
       document.getElementById("modalExamplePill").textContent = `Example: example/example_${item.id}.go`;
+      const studioLink = document.getElementById("modalStudioLink");
+      if (studioLink) studioLink.href = `/studio?art=${encodeURIComponent(item.id)}`;
       document.getElementById("modalSwatches").innerHTML = item.colors.map(c => `<span class="swatch" style="background:${c}"></span>`).join("");
       document.getElementById("modalCode").textContent = buildGoSnippet(item);
       document.getElementById("copyCodeBtn").textContent = "Copy Go Code";
