@@ -597,7 +597,7 @@ func SimulateWetWatercolorBleed(cfg WetWatercolorConfig, deposits []WetWatercolo
 					}
 					gran := deposits[k].Pigment.Granulation
 					granMod := 1.0 + granStr*gran*(valley-0.46)*1.45
-					curRGB = GlazeSpectralKubelkaMunk(curRGB, deposits[k].Pigment, cVal* math.Max(0.15, granMod))
+					curRGB = GlazeKubelkaMunk(curRGB, deposits[k].Pigment, cVal*math.Max(0.15, granMod))
 				}
 				outRGB[idx*3+0] = curRGB[0]
 				outRGB[idx*3+1] = curRGB[1]

@@ -662,10 +662,10 @@ func raymarchSDF3DInterval(sdf SDF3D, ro, rd, lightDir Vec3, tStart, tEnd float6
 		pos := ro.Add(rd.Scale(t))
 		d := sdf(pos)
 
-		// Detect over-relaxation step overshoot and revert to standard sphere tracing
+		// Detect over-relaxation step overshoot and revert to standard 1.0 * prevRadius step
 		if omega > 1.0 && prevRadius > 0 && (prevRadius+math.Abs(d) < stepLength) {
-			stepLength -= omega * prevRadius
-			t += stepLength
+			t -= (omega - 1.0) * prevRadius
+			stepLength = prevRadius
 			omega = 1.0
 			prevRadius = 0.0
 			continue

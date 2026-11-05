@@ -138,6 +138,10 @@
 	- [Kepler Harmonices](#kepler-harmonices)
 	- [Moebius Hermetic Garage](#moebius-hermetic-garage)
 	- [Calabi Yau Manifold](#calabi-yau-manifold)
+	- [Murano Glass Nautilus](#murano-glass-nautilus)
+	- [Haeckel Radiolaria](#haeckel-radiolaria)
+	- [Relativistic Lens](#relativistic-lens)
+	- [Weingarten Torus Knot](#weingarten-torus-knot)
 
 ## CLI Tool (`cmd/genart`) & Exhibition Poster Reference
 
@@ -2195,6 +2199,71 @@ cy := arts.NewCalabiYauManifold(5, 2, 0.35)
 ```
 
 ![](../images/calabiyaumanifold.png)
+
+## Murano Glass Nautilus
+
+`Murano Glass Nautilus` raymarches a 3D Venetian Murano blown-glass logarithmic-spiral Nautilus vessel and an interior rotating 5-fold icosahedral flint-diamond core hovering above an engraved obsidian-and-24k-gold celestial astrolabe altar, using Phase 2–5 3D dielectric Snell refraction (`render.TraceSDF3DDielectric`), Beer-Lambert emerald/amber volume absorption, Abbe RGB chromatic dispersion, Aventurine thin-film iridescence, and refractive caustics (`render.EvalSDF3DCausticIntensity`).
+
+### parameters
+
+- chambers: Number of fluted logarithmic-spiral glass chambers (default `14`).
+- facets: Symmetry order of the interior crystal core (default `5`).
+- dispersion: Spectral Abbe chromatic dispersion spread between blue and red IORs (default `0.048`).
+
+```go
+mg := arts.NewMuranoGlassNautilus(14, 5, 0.048)
+```
+
+![](../images/muranoglassnautilus.png)
+
+## Haeckel Radiolaria
+
+`Haeckel Radiolaria` renders a 3D Ernst Haeckel (*Kunstformen der Natur*, 1904) biomineralized siliceous radiolarian endoskeleton with 3 concentric perforated geodesic silica shells, 20 radial 3-bladed crystal spicules with tiered verticil barbs, and a glowing cinnabar-gold protoplasmic central capsule over an abyssal Prussian-blue chromolithograph plate, using Phase 3–5 real orthonormal Spherical Harmonics (`common.SphericalHarmonicCartesian`) and intrinsic 3D Weingarten principal-curvature copperplate burin engraving (`render.Evaluate3DWeingartenEngraving`).
+
+### parameters
+
+- shells: Number of concentric nested endoskeleton shells (`1..3`, default `3`).
+- spineOrder: Spherical harmonic degree $l$ modulating the outer shell (`4..8`, default `6`).
+- poreScale: Spatial frequency multiplier for hexagonal *areolae* sieve pores (default `1.0`).
+
+```go
+hr := arts.NewHaeckelRadiolaria(3, 6, 1.0)
+```
+
+![](../images/haeckelradiolaria.png)
+
+## Relativistic Lens
+
+`Relativistic Lens` integrates general-relativistic null geodesics around a spinning Schwarzschild/Kerr black hole framed by a 3D engraved Renaissance brass armillary sphere and stone observatory oculus, rendering the primary equatorial accretion disk, gravitationally lensed Einstein halo ring, critical photon sphere, helical polar astrophysical jets, and relativistic Doppler beaming via 8-band spectral Kubelka-Munk pigments and `Curl3D` MHD filaments.
+
+### parameters
+
+- rings: Number of logarithmic spiral MHD accretion arms (default `4`).
+- jets: Number of polar relativistic jet channels (default `2`).
+- spinRate: Dimensionless relativistic Doppler beaming spin parameter (default `0.85`).
+
+```go
+rl := arts.NewRelativisticLens(4, 2, 0.85)
+```
+
+![](../images/relativisticlens.png)
+
+## Weingarten Torus Knot
+
+`Weingarten Torus Knot` combines M.C. Escher, Albrecht Dürer, and Song-Dynasty mineral watercolor washes: a continuous 3D fluted $(p, q)$ trefoil torus-knot monument interlocked with a gilded astrolabe ring, shaded via the 3D tangent-plane Weingarten shape operator (`render.CalcSDF3DWeingartenCurvature` — gilding elliptic $K>0$ crests in 24k Mud-Gold and cross-hatching hyperbolic $K<0$ saddles in Azurite/Malachite) in front of a 2D wet-on-wet capillary watercolor bleed scroll (`render.SimulateWetWatercolorBleed`).
+
+### parameters
+
+- pWind: Longitudinal torus-knot winding number $p$ (default `2`).
+- qWind: Meridional torus-knot winding number $q$ (default `3`).
+- tubeScale: Cross-sectional tube radius multiplier (default `1.0`).
+
+```go
+wt := arts.NewWeingartenTorusKnot(2, 3, 1.0)
+```
+
+![](../images/weingartentorusknot.png)
+
 
 
 

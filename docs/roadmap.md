@@ -8,7 +8,7 @@ This document serves as the architectural blueprint for `generativeart`, coverin
 5. **Exhibition Poster & ContactSheet Engine (`poster.go` — Implemented) & HD GIF Expansion**
 6. **Next-Generation Architecture & Platform Roadmap (6 Directions, with Directions 4 & 5 Implemented)**
 7. **Art-Empowering Rendering & Mathematical Foundations (Part VII & Part VIII — Implemented)**
-8. **Wave 23 Master Architecture, Celestial Mechanics & Sci-Fi Megastructures + Part IX–XI Future Roadmap**
+8. **Waves 23–24 Master Architecture, 3D Dielectric Optics, Spherical Harmonics, Relativistic Lensing & Weingarten Curvature (148 Art Engines + 37 HD 600×600 Loop GIFs — Implemented)**
 9. **Part X. Underlying Infrastructure Audit & 6-Phase Core Engine Upgrade Roadmap (Phases 1–5 — Implemented)**
 
 ---
@@ -352,21 +352,15 @@ Leveraging Part VIII's 3D SDF raymarcher, 3D object-locked copperplate burin eng
 4. **`CalabiYauManifold`** (`NewCalabiYauManifold(foldOrder, rings int, phaseMorph float64)`):
    - String-theory Calabi-Yau / Clebsch algebraic surface manifold raymarched in 3D with hollowed genus-tunnel handles and orbiting golden geodesic rings, combining Kubelka-Munk Lapis Lazuli, Malachite, Vermilion, and 24k Gold Leaf glazes with 3D object-locked principal-curvature burin cross-hatching (`images/calabiyaumanifold.png` + `images/calabiyaumanifold_loop.gif`).
 
-### 9.2 Direction 2: Part IX Optical Upgrade — 3D Dielectrics, Snell Refraction, Beer-Lambert Absorption & Volumetric Caustics (`render/sdf3d_optics.go`)
-- **Underlying Engine**:
-  - Extend `sdf3d.go` with multi-bounce Snell refraction ($\eta_1 \sin\theta_1 = \eta_2 \sin\theta_2$), Schlick-Fresnel reflectance, internal total reflection, Beer-Lambert spectral volume attenuation $T(\lambda) = e^{-\sigma_a(\lambda)\, d}$, and spectral index-of-refraction dispersion ($\eta_R, \eta_G, \eta_B$).
-- **Target Masterpieces**:
-  - **`MuranoGlassNautilus`**: Venetian Murano blown-glass nautilus with gold-leaf *Aventurine* inclusions and internal caustic light pipes.
-  - **`DispersionPrism`**: Newton optical prism array splitting collimated beams into dispersed spectral caustics.
-  - **`AmberInclusion`**: Baltic amber cabochon with Beer-Lambert honey-gold internal absorption enclosing fractal dendritic inclusions.
-
-### 9.3 Direction 3: Part X Biological Upgrade — 3D Morphogenesis, Biomineralization & Ernst Haeckel *Kunstformen der Natur* (`render/morphogenesis3d.go`)
-- **Underlying Engine**:
-  - 3D spherical-harmonic and polyhedral-lattice reaction-diffusion / Voronoi skeletal operators generating perforated siliceous endoskeletons and calcareous plates in 3D SDF space, paired with 19th-century chromolithograph & copperplate engraving shaders.
-- **Target Masterpieces**:
-  - **`HaeckelRadiolaria`**: Ernst Haeckel (1904) *Phaeodaria / Acantharia* concentric perforated geodesic silica shells and radial spicules.
-  - **`DiatomFrustule`**: Multi-scale hierarchical sieve-pore (*areolae*) microscopic glass frustules.
-  - **`BrainCoral3D`**: True 3D surface-extruded gyroid/meandroid brain-coral labyrinth with abyssal bioluminescence.
+### 9.2 Direction 2: Wave 24 — Phase 2–5 Flagship Quartet: 3D Dielectric Murano Glass, Haeckel Spherical-Harmonic Radiolaria, Relativistic Black-Hole Lens & Weingarten Torus-Knot (Implemented)
+1. **`MuranoGlassNautilus`** (`NewMuranoGlassNautilus(chambers, facets int, dispersion float64)`):
+   - Venetian Murano blown-glass logarithmic-spiral Nautilus and 5-fold icosahedral diamond core hovering over an obsidian-gold astrolabe altar with Snell refraction (`TraceSDF3DDielectric`), Beer-Lambert volume absorption, Abbe RGB chromatic dispersion, and refractive caustics (`EvalSDF3DCausticIntensity`) (`images/muranoglassnautilus.png` + `images/muranoglassnautilus_loop.gif`).
+2. **`HaeckelRadiolaria`** (`NewHaeckelRadiolaria(shells, spineOrder int, poreScale float64)`):
+   - Ernst Haeckel (1904) *Kunstformen der Natur* concentric perforated geodesic silica shells, 20 verticil-barbed crystal spicules, and a glowing cinnabar-gold central capsule driven by Spherical Harmonics $Y_l^m$ (`SphericalHarmonicCartesian`) and 3D Weingarten principal-curvature burin engraving (`images/haeckelradiolaria.png` + `images/haeckelradiolaria_loop.gif`).
+3. **`RelativisticLens`** (`NewRelativisticLens(rings, jets int, spinRate float64)`):
+   - General-relativistic Schwarzschild/Kerr null-geodesic raymarching around a spinning black hole with Doppler-beamed 8-band spectral Kubelka-Munk accretion disk, gravitationally lensed Einstein ring, polar astrophysical jets, and 3D engraved brass armillary rings (`images/relativisticlens.png` + `images/relativisticlens_loop.gif`).
+4. **`WeingartenTorusKnot`** (`NewWeingartenTorusKnot(pWind, qWind int, tubeScale float64)`):
+   - Continuous 3D fluted $(2, 3)$ trefoil torus-knot monument interlocked with a gilded astrolabe ring, shaded via the 3D Weingarten shape operator (`CalcSDF3DWeingartenCurvature`) over a 2D wet-on-wet capillary watercolor bleed scroll (`SimulateWetWatercolorBleed`) (`images/weingartentorusknot.png` + `images/weingartentorusknot_loop.gif`).
 
 ### 9.4 Direction 4: Interactive Gallery Enhancements (`index.html`)
 - Inline **Static PNG / Animated GIF toggle badge** directly on dual-mode gallery cards.

@@ -8,17 +8,21 @@ This gallery contains standalone `Go` usage examples and rendered outputs for `g
 
 ## 🎞️ Seamless 600×600 HD Looping GIF Animations (`DrawTimelapseFrames` + `ToGIF`)
 
-| Babel Library (`babellibrary`) | Kepler Harmonices (`keplerharmonices`) | Mœbius Hermetic Garage (`moebiushermeticgarage`) | Calabi-Yau Manifold (`calabiyaumanifold`) |
+| Murano Glass Nautilus (`muranoglassnautilus`) | Haeckel Radiolaria (`haeckelradiolaria`) | Relativistic Lens (`relativisticlens`) | Weingarten Torus Knot (`weingartentorusknot`) |
 | :---: | :---: | :---: | :---: |
+| ![Murano Glass Nautilus Loop](images/muranoglassnautilus_loop.gif) | ![Haeckel Radiolaria Loop](images/haeckelradiolaria_loop.gif) | ![Relativistic Lens Loop](images/relativisticlens_loop.gif) | ![Weingarten Torus Knot Loop](images/weingartentorusknot_loop.gif) |
+| **Babel Library (`babellibrary`)** | **Kepler Harmonices (`keplerharmonices`)** | **Mœbius Hermetic Garage (`moebiushermeticgarage`)** | **Calabi-Yau Manifold (`calabiyaumanifold`)** |
 | ![Babel Library Loop](images/babellibrary_loop.gif) | ![Kepler Harmonices Loop](images/keplerharmonices_loop.gif) | ![Moebius Hermetic Garage Loop](images/moebiushermeticgarage_loop.gif) | ![Calabi Yau Manifold Loop](images/calabiyaumanifold_loop.gif) |
 | **Dürer 3D Polyhedron (`durerpolyhedron`)** | **Piranesi Carceri (`piranesicarceri`)** | **Mœbius Leviathan (`moebiusleviathan`)** | **Mœbius Arzach Citadel (`moebiuscanyon`)** |
 | ![Durer Polyhedron Loop](images/durerpolyhedron_loop.gif) | ![Piranesi Carceri Loop](images/piranesicarceri_loop.gif) | ![Moebius Leviathan Loop](images/moebiusleviathan_loop.gif) | ![Moebius Canyon Loop](images/moebiuscanyon_loop.gif) |
 | **Escher Circle Limit (`eschercirclelimit`)** | **Escher Droste Spiral (`escherdrostegallery`)** | **Celestial Gabor Astrolabe (`gaborwaveinterference`)** | **3D Perlin Curl Silk (`analyticalcurlsilk`)** |
 | ![Escher Circle Limit Loop](images/eschercirclelimit_loop.gif) | ![Escher Droste Gallery Loop](images/escherdrostegallery_loop.gif) | ![Gabor Wave Interference Loop](images/gaborwaveinterference_loop.gif) | ![Analytical Curl Silk Loop](images/analyticalcurlsilk_loop.gif) |
-| **Binary Nebula Plumes (`nebulaplumes`)** | **Abyssal Kuroshio Jet (`abyssalcurrents`)** | **Vortex Impasto (`vorteximpasto`)** | **Squeegee Scrape (`squeegeescrape`)** |
-| ![Nebula Plumes Loop](images/nebulaplumes_loop.gif) | ![Abyssal Currents Loop](images/abyssalcurrents_loop.gif) | ![Vortex Impasto Loop](images/vorteximpasto_loop.gif) | ![Squeegee Scrape Loop](images/squeegeescrape_loop.gif) |
 
 ```bash
+go run ./cmd/genart render -art muranoglassnautilus   -w 600 -h 600 -frames 20 -delay 12 -out images/muranoglassnautilus_loop.gif
+go run ./cmd/genart render -art haeckelradiolaria     -w 600 -h 600 -frames 20 -delay 12 -out images/haeckelradiolaria_loop.gif
+go run ./cmd/genart render -art relativisticlens      -w 600 -h 600 -frames 20 -delay 12 -out images/relativisticlens_loop.gif
+go run ./cmd/genart render -art weingartentorusknot   -w 600 -h 600 -frames 20 -delay 12 -out images/weingartentorusknot_loop.gif
 go run ./cmd/genart render -art babellibrary          -w 600 -h 600 -frames 20 -delay 12 -out images/babellibrary_loop.gif
 go run ./cmd/genart render -art keplerharmonices      -w 600 -h 600 -frames 20 -delay 12 -out images/keplerharmonices_loop.gif
 go run ./cmd/genart render -art moebiushermeticgarage -w 600 -h 600 -frames 20 -delay 12 -out images/moebiushermeticgarage_loop.gif
@@ -74,6 +78,11 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
 
 ## Table of Contents
 
+- [Wave 24: Phase 2–5 Flagship Quartet — Venetian Murano Blown-Glass Nautilus, Haeckel 3D Silica Radiolaria, Relativistic Black-Hole Gravitational Lens & Weingarten Torus-Knot Sculpture](#wave-24-phase-25-flagship-quartet--venetian-murano-blown-glass-nautilus-haeckel-3d-silica-radiolaria-relativistic-black-hole-gravitational-lens--weingarten-torus-knot-sculpture)
+  - [Murano Glass Nautilus](#murano-glass-nautilus)
+  - [Haeckel Radiolaria](#haeckel-radiolaria)
+  - [Relativistic Lens](#relativistic-lens)
+  - [Weingarten Torus Knot](#weingarten-torus-knot)
 - [Wave 23: Master Architecture, Celestial Mechanics & Sci-Fi Megastructures — Borges Library of Babel, Kepler Mysterium Cosmographicum, Mœbius Hermetic Garage & Calabi-Yau Algebraic Manifold](#wave-23-master-architecture-celestial-mechanics--sci-fi-megastructures--borges-library-of-babel-kepler-mysterium-cosmographicum-mœbius-hermetic-garage--calabi-yau-algebraic-manifold)
   - [Babel Library](#babel-library)
   - [Kepler Harmonices](#kepler-harmonices)
@@ -233,6 +242,114 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
   - [Silk Sky](#silk-sky)
   - [Circle Move](#circle-move)
   - [Random Circle](#random-circle)
+
+---
+
+## Wave 24: Phase 2–5 Flagship Quartet — Venetian Murano Blown-Glass Nautilus, Haeckel 3D Silica Radiolaria, Relativistic Black-Hole Gravitational Lens & Weingarten Torus-Knot Sculpture
+
+### Murano Glass Nautilus
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20262401)
+	c.SetBackground(color.RGBA{R: 248, G: 241, B: 224, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewMuranoGlassNautilus(14, 5, 0.048))
+	c.ToPNG("muranoglassnautilus.png")
+}
+```
+
+![Murano Glass Nautilus](images/muranoglassnautilus.png)
+
+### Haeckel Radiolaria
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20262402)
+	c.SetBackground(color.RGBA{R: 248, G: 241, B: 224, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Oceanic)
+	c.Draw(arts.NewHaeckelRadiolaria(3, 6, 1.0))
+	c.ToPNG("haeckelradiolaria.png")
+}
+```
+
+![Haeckel Radiolaria](images/haeckelradiolaria.png)
+
+### Relativistic Lens
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20262403)
+	c.SetBackground(color.RGBA{R: 248, G: 241, B: 224, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Inferno)
+	c.Draw(arts.NewRelativisticLens(4, 2, 0.85))
+	c.ToPNG("relativisticlens.png")
+}
+```
+
+![Relativistic Lens](images/relativisticlens.png)
+
+### Weingarten Torus Knot
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20262404)
+	c.SetBackground(color.RGBA{R: 248, G: 241, B: 224, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewWeingartenTorusKnot(2, 3, 1.0))
+	c.ToPNG("weingartentorusknot.png")
+}
+```
+
+![Weingarten Torus Knot](images/weingartentorusknot.png)
 
 ---
 

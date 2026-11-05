@@ -287,6 +287,36 @@ func paramBool(p map[string]interface{}, key string, def bool) bool {
 }
 
 var registry = []ArtDescriptor{
+	// Wave 24: Phase 2–5 Flagship Quartet (MuranoGlassNautilus, HaeckelRadiolaria, RelativisticLens, WeingartenTorusKnot)
+	{
+		ID: "muranoglassnautilus", StructName: "muranoGlassNautilus", Category: "media",
+		DefaultBG: color.RGBA{248, 241, 224, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewMuranoGlassNautilus(paramInt(p, "chambers", 14), paramInt(p, "facets", 5), paramFloat(p, "dispersion", 0.048))
+		},
+	},
+	{
+		ID: "haeckelradiolaria", StructName: "haeckelRadiolaria", Category: "bio",
+		DefaultBG: color.RGBA{248, 241, 224, 255}, DefaultPal: "oceanic",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewHaeckelRadiolaria(paramInt(p, "shells", 3), paramInt(p, "spineOrder", 6), paramFloat(p, "poreScale", 1.0))
+		},
+	},
+	{
+		ID: "relativisticlens", StructName: "relativisticLens", Category: "chaos",
+		DefaultBG: color.RGBA{248, 241, 224, 255}, DefaultPal: "inferno",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewRelativisticLens(paramInt(p, "rings", 4), paramInt(p, "jets", 2), paramFloat(p, "spinRate", 0.85))
+		},
+	},
+	{
+		ID: "weingartentorusknot", StructName: "weingartenTorusKnot", Category: "geom",
+		DefaultBG: color.RGBA{248, 241, 224, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewWeingartenTorusKnot(paramInt(p, "pWind", 2), paramInt(p, "qWind", 3), paramFloat(p, "tubeScale", 1.0))
+		},
+	},
+
 	// Wave 23: Master Architecture, Celestial Mechanics & Sci-Fi Megastructures Quartet (BabelLibrary, KeplerHarmonices, MoebiusHermeticGarage, CalabiYauManifold)
 	{
 		ID: "babellibrary", StructName: "babelLibrary", Category: "geom",
