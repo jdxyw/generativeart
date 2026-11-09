@@ -471,8 +471,10 @@ A comprehensive technical audit across `generativeart.go`, `platform.go`, `poste
    - Added `arts.NewParamKeyframeEngine(desc, keyframes...)` to animate any static or animated `ArtDescriptor` smoothly across keyframe parameter states using $C^1$ cosine easing.
 3. **Zero-Allocation PostEffect Scratch Reuse & 2-Tier Coarse/Fine 3D SDF Raymarching (`render/canvas.go`, `render/postprocess.go`, `render/sdf3d.go`)**:
    - Added reusable `scratch []float64` buffer on `render.Canvas` (`ensureScratch`) eliminating repeated heap allocations across chained `PostEffect` passes, and added `RaymarchSDF3DCoarseFine(coarseSDF, fineSDF, detailThreshold, ...)` to skip expensive near-surface SDF details during far-field and shadow marching.
-4. **Interactive Local Live Studio HTTP Server (`cmd/genart/studio.go`, `genart serve`)**:
-   - Added `genart serve [-addr :8080]` serving the interactive exhibition gallery alongside `/api/engines`, `/api/render` (with real-time parameter overrides, `-random` curation, post-effects, and `AestheticMetrics` scoring), and `/api/inspect`.
+4. **Interactive Local Live Studio HTTP Server (`cmd/genart/studio.go`, `cmd/genart/studio_ui.go`, `genart serve`)**:
+   - Added `genart serve [-addr :8080]` serving the interactive exhibition gallery (`/`) and the built-in interactive visual parameter workbench (`/studio`) alongside `/api/engines`, `/api/render` (with real-time parameter overrides, `-random` curation, post-effects, PNG download, and `AestheticMetrics` scoring), and `/api/inspect`.
+5. **Wave 25 Multi-Paradigm Non-Mœbius Flagship Quartet (152 Engines & 41 HD Loop GIFs)**:
+   - Added `HopfTorusSilk` (3D depth-sorted Hopf Fibration Villarceau silk ribbon sculpture), `VolcanicAtollTerraces` (16-tier 3D laser-cut volcanic caldera & coral atoll topographic relief), `PeacockOcelliPlumes` (3D G-Buffer photonic peacock feather ocelli & horizon-shadowed barbules), and `ByzantineRoseMosaic` (3D beveled cloisonné star-rose medallion with sweeping silk ribbons).
 
 
 

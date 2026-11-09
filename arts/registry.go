@@ -495,6 +495,36 @@ func paramBool(p map[string]interface{}, key string, def bool) bool {
 }
 
 var registry = []ArtDescriptor{
+	// Wave 25: Multi-Paradigm Non-Moebius Flagship Quartet (HopfTorusSilk, VolcanicAtollTerraces, PeacockOcelliPlumes, ByzantineRoseMosaic)
+	{
+		ID: "hopftorussilk", StructName: "hopfTorusSilk", Category: "flow",
+		DefaultBG: color.RGBA{6, 9, 19, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewHopfTorusSilk(paramInt(p, "fibers", 6), paramInt(p, "strands", 22), paramFloat(p, "cliffordAngle", 0.72))
+		},
+	},
+	{
+		ID: "volcanicatollterraces", StructName: "volcanicAtollTerraces", Category: "geom",
+		DefaultBG: color.RGBA{244, 236, 214, 255}, DefaultPal: "sunset",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewVolcanicAtollTerraces(paramInt(p, "tiers", 16), paramInt(p, "islands", 4), paramFloat(p, "erosionStrength", 1.75))
+		},
+	},
+	{
+		ID: "peacockocelliplumes", StructName: "peacockOcelliPlumes", Category: "bio",
+		DefaultBG: color.RGBA{12, 20, 30, 255}, DefaultPal: "oceanic",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewPeacockOcelliPlumes(paramInt(p, "ocelli", 7), paramInt(p, "barbCount", 18000), paramFloat(p, "filmNm", 390.0))
+		},
+	},
+	{
+		ID: "byzantinerosemosaic", StructName: "byzantineRoseMosaic", Category: "geom",
+		DefaultBG: color.RGBA{12, 14, 24, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewByzantineRoseMosaic(paramInt(p, "petals", 12), paramInt(p, "rings", 4), paramFloat(p, "ribbonSpiral", 1.15))
+		},
+	},
+
 	// Wave 24: Phase 2–5 Flagship Quartet (MuranoGlassNautilus, HaeckelRadiolaria, RelativisticLens, WeingartenTorusKnot)
 	{
 		ID: "muranoglassnautilus", StructName: "muranoGlassNautilus", Category: "media",

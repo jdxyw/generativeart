@@ -207,7 +207,7 @@ func buildStudioMux() http.Handler {
 		q := r.URL.Query()
 		artName := q.Get("art")
 		if artName == "" {
-			artName = "muranoglassnautilus"
+			artName = "hopftorussilk"
 		}
 		desc, ok := arts.Lookup(artName)
 		if !ok {

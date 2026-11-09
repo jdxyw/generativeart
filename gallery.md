@@ -8,17 +8,21 @@ This gallery contains standalone `Go` usage examples and rendered outputs for `g
 
 ## 🎞️ Seamless 600×600 HD Looping GIF Animations (`DrawTimelapseFrames` + `ToGIF`)
 
-| Murano Glass Nautilus (`muranoglassnautilus`) | Haeckel Radiolaria (`haeckelradiolaria`) | Relativistic Lens (`relativisticlens`) | Weingarten Torus Knot (`weingartentorusknot`) |
+| 3D Hopf Torus Silk (`hopftorussilk`) | Volcanic Atoll Terraces (`volcanicatollterraces`) | Peacock Ocelli Plumes (`peacockocelliplumes`) | Cloisonné Star-Rose (`byzantinerosemosaic`) |
 | :---: | :---: | :---: | :---: |
+| ![Hopf Torus Silk Loop](images/hopftorussilk_loop.gif) | ![Volcanic Atoll Terraces Loop](images/volcanicatollterraces_loop.gif) | ![Peacock Ocelli Plumes Loop](images/peacockocelliplumes_loop.gif) | ![Byzantine Rose Mosaic Loop](images/byzantinerosemosaic_loop.gif) |
+| **Murano Glass Nautilus (`muranoglassnautilus`)** | **Haeckel Radiolaria (`haeckelradiolaria`)** | **Relativistic Lens (`relativisticlens`)** | **Weingarten Torus Knot (`weingartentorusknot`)** |
 | ![Murano Glass Nautilus Loop](images/muranoglassnautilus_loop.gif) | ![Haeckel Radiolaria Loop](images/haeckelradiolaria_loop.gif) | ![Relativistic Lens Loop](images/relativisticlens_loop.gif) | ![Weingarten Torus Knot Loop](images/weingartentorusknot_loop.gif) |
 | **Babel Library (`babellibrary`)** | **Kepler Harmonices (`keplerharmonices`)** | **Mœbius Hermetic Garage (`moebiushermeticgarage`)** | **Calabi-Yau Manifold (`calabiyaumanifold`)** |
 | ![Babel Library Loop](images/babellibrary_loop.gif) | ![Kepler Harmonices Loop](images/keplerharmonices_loop.gif) | ![Moebius Hermetic Garage Loop](images/moebiushermeticgarage_loop.gif) | ![Calabi Yau Manifold Loop](images/calabiyaumanifold_loop.gif) |
 | **Dürer 3D Polyhedron (`durerpolyhedron`)** | **Piranesi Carceri (`piranesicarceri`)** | **Mœbius Leviathan (`moebiusleviathan`)** | **Mœbius Arzach Citadel (`moebiuscanyon`)** |
 | ![Durer Polyhedron Loop](images/durerpolyhedron_loop.gif) | ![Piranesi Carceri Loop](images/piranesicarceri_loop.gif) | ![Moebius Leviathan Loop](images/moebiusleviathan_loop.gif) | ![Moebius Canyon Loop](images/moebiuscanyon_loop.gif) |
-| **Escher Circle Limit (`eschercirclelimit`)** | **Escher Droste Spiral (`escherdrostegallery`)** | **Celestial Gabor Astrolabe (`gaborwaveinterference`)** | **3D Perlin Curl Silk (`analyticalcurlsilk`)** |
-| ![Escher Circle Limit Loop](images/eschercirclelimit_loop.gif) | ![Escher Droste Gallery Loop](images/escherdrostegallery_loop.gif) | ![Gabor Wave Interference Loop](images/gaborwaveinterference_loop.gif) | ![Analytical Curl Silk Loop](images/analyticalcurlsilk_loop.gif) |
 
 ```bash
+go run ./cmd/genart render -art hopftorussilk         -w 600 -h 600 -frames 20 -delay 12 -out images/hopftorussilk_loop.gif
+go run ./cmd/genart render -art volcanicatollterraces -w 600 -h 600 -frames 20 -delay 12 -out images/volcanicatollterraces_loop.gif
+go run ./cmd/genart render -art peacockocelliplumes   -w 600 -h 600 -frames 20 -delay 12 -out images/peacockocelliplumes_loop.gif
+go run ./cmd/genart render -art byzantinerosemosaic   -w 600 -h 600 -frames 20 -delay 12 -out images/byzantinerosemosaic_loop.gif
 go run ./cmd/genart render -art muranoglassnautilus   -w 600 -h 600 -frames 20 -delay 12 -out images/muranoglassnautilus_loop.gif
 go run ./cmd/genart render -art haeckelradiolaria     -w 600 -h 600 -frames 20 -delay 12 -out images/haeckelradiolaria_loop.gif
 go run ./cmd/genart render -art relativisticlens      -w 600 -h 600 -frames 20 -delay 12 -out images/relativisticlens_loop.gif
@@ -78,6 +82,11 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
 
 ## Table of Contents
 
+- [Wave 25: Multi-Paradigm Non-Mœbius Flagship Quartet — 3D Hopf Fibration Silk Ribbons, 3D Laser-Cut Volcanic Atoll Terraces, 3D G-Buffer Peacock Ocelli Plumes & Cloisonné Star-Rose Mosaic](#wave-25-multi-paradigm-non-mœbius-flagship-quartet--3d-hopf-fibration-silk-ribbons-3d-laser-cut-volcanic-atoll-terraces-3d-g-buffer-peacock-ocelli-plumes--cloisonné-star-rose-mosaic)
+  - [Hopf Torus Silk](#hopf-torus-silk)
+  - [Volcanic Atoll Terraces](#volcanic-atoll-terraces)
+  - [Peacock Ocelli Plumes](#peacock-ocelli-plumes)
+  - [Byzantine Rose Mosaic](#byzantine-rose-mosaic)
 - [Wave 24: Phase 2–5 Flagship Quartet — Venetian Murano Blown-Glass Nautilus, Haeckel 3D Silica Radiolaria, Relativistic Black-Hole Gravitational Lens & Weingarten Torus-Knot Sculpture](#wave-24-phase-25-flagship-quartet--venetian-murano-blown-glass-nautilus-haeckel-3d-silica-radiolaria-relativistic-black-hole-gravitational-lens--weingarten-torus-knot-sculpture)
   - [Murano Glass Nautilus](#murano-glass-nautilus)
   - [Haeckel Radiolaria](#haeckel-radiolaria)
@@ -242,6 +251,114 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
   - [Silk Sky](#silk-sky)
   - [Circle Move](#circle-move)
   - [Random Circle](#random-circle)
+
+---
+
+## Wave 25: Multi-Paradigm Non-Mœbius Flagship Quartet — 3D Hopf Fibration Silk Ribbons, 3D Laser-Cut Volcanic Atoll Terraces, 3D G-Buffer Peacock Ocelli Plumes & Cloisonné Star-Rose Mosaic
+
+### Hopf Torus Silk
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20262501)
+	c.SetBackground(color.RGBA{R: 6, G: 9, B: 19, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewHopfTorusSilk(6, 22, 0.72))
+	c.ToPNG("hopftorussilk.png")
+}
+```
+
+![Hopf Torus Silk](images/hopftorussilk.png)
+
+### Volcanic Atoll Terraces
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20262501)
+	c.SetBackground(color.RGBA{R: 244, G: 236, B: 214, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Sunset)
+	c.Draw(arts.NewVolcanicAtollTerraces(16, 4, 1.75))
+	c.ToPNG("volcanicatollterraces.png")
+}
+```
+
+![Volcanic Atoll Terraces](images/volcanicatollterraces.png)
+
+### Peacock Ocelli Plumes
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20262501)
+	c.SetBackground(color.RGBA{R: 12, G: 20, B: 30, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Oceanic)
+	c.Draw(arts.NewPeacockOcelliPlumes(7, 18000, 390.0))
+	c.ToPNG("peacockocelliplumes.png")
+}
+```
+
+![Peacock Ocelli Plumes](images/peacockocelliplumes.png)
+
+### Byzantine Rose Mosaic
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20262501)
+	c.SetBackground(color.RGBA{R: 12, G: 14, B: 24, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewByzantineRoseMosaic(12, 4, 1.15))
+	c.ToPNG("byzantinerosemosaic.png")
+}
+```
+
+![Byzantine Rose Mosaic](images/byzantinerosemosaic.png)
 
 ---
 

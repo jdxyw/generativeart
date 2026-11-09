@@ -142,6 +142,10 @@
 	- [Haeckel Radiolaria](#haeckel-radiolaria)
 	- [Relativistic Lens](#relativistic-lens)
 	- [Weingarten Torus Knot](#weingarten-torus-knot)
+	- [Hopf Torus Silk](#hopf-torus-silk)
+	- [Volcanic Atoll Terraces](#volcanic-atoll-terraces)
+	- [Peacock Ocelli Plumes](#peacock-ocelli-plumes)
+	- [Byzantine Rose Mosaic](#byzantine-rose-mosaic)
 
 ## CLI Tool (`cmd/genart`) & Exhibition Poster Reference
 
@@ -2263,6 +2267,71 @@ wt := arts.NewWeingartenTorusKnot(2, 3, 1.0)
 ```
 
 ![](../images/weingartentorusknot.png)
+
+## Hopf Torus Silk
+
+`Hopf Torus Silk` sculpts a 3D depth-sorted Hopf Fibration $S^3 \to S^2$ Villarceau silk and metallic ribbon sculpture (`三维霍普夫纤维丛克利福德环面金属丝带雕塑`) over deep midnight-obsidian space with Kajiya-Kay anisotropic silk highlights, self-occlusion drop shadows, and Airy thin-film iridescence.
+
+### parameters
+
+- fibers: Number of interlocking Hopf fiber ribbon bundles (default `6`).
+- strands: Number of parallel fluted silk/metallic cords per ribbon bundle (default `22`).
+- cliffordAngle: Clifford torus latitude parameter $\eta$ in radians (default `0.72`).
+
+```go
+ht := arts.NewHopfTorusSilk(6, 22, 0.72)
+```
+
+![](../images/hopftorussilk.png)
+
+## Volcanic Atoll Terraces
+
+`Volcanic Atoll Terraces` synthesizes a 3D laser-cut archival topographic paper and lacquer relief of a volcanic caldera lagoon and turquoise coral barrier atoll (`三维激光切层火山破火山口与珊瑚环礁等高线描金纸雕`) driven by `ErosionFBM2D`, with ray-cast 3D drop shadows and 24K gold Marching-Squares contour rims.
+
+### parameters
+
+- tiers: Number of stepped topographic elevation plates (default `16`).
+- islands: Number of surrounding satellite atoll islets (default `4`).
+- erosionStrength: Gradient-damped `ErosionFBM2D` strength (default `1.75`).
+
+```go
+va := arts.NewVolcanicAtollTerraces(16, 4, 1.75)
+```
+
+![](../images/volcanicatollterraces.png)
+
+## Peacock Ocelli Plumes
+
+`Peacock Ocelli Plumes` sculpts a 3D G-Buffer photonic peacock feather ocelli relief (`三维孔雀眼羽枝阵列与光子晶体薄膜干涉浮雕`) with dipole-arched keratin barbules, horizon-marched soft shadows, Airy thin-film structural color, and sapphire cabochon eye jewels.
+
+### parameters
+
+- ocelli: Number of Poisson-disk / Voronoi-relaxed peacock eye-spot centers (default `7`).
+- barbCount: Total number of 3D feather barbule filaments (default `18000`).
+- filmNm: Base photonic thin-film thickness in nanometers (default `390.0`).
+
+```go
+po := arts.NewPeacockOcelliPlumes(7, 18000, 390.0)
+```
+
+![](../images/peacockocelliplumes.png)
+
+## Byzantine Rose Mosaic
+
+`Byzantine Rose Mosaic` combines recessed 8-pointed star caisson frames and sweeping 3D gilded silk ribbons with a multi-tier 3D beveled cloisonné enamel and stained-glass rose window medallion (`拜占庭敦煌琉璃金丝玫瑰宝相花与三维飞天绶带`).
+
+### parameters
+
+- petals: Number of radial cloisonné rose petals per ring (default `12`).
+- rings: Number of concentric cloisonné petal rings (default `4`).
+- ribbonSpiral: Angular spiral wrap multiplier for the flying silk ribbons (default `1.15`).
+
+```go
+br := arts.NewByzantineRoseMosaic(12, 4, 1.15)
+```
+
+![](../images/byzantinerosemosaic.png)
+
 
 
 

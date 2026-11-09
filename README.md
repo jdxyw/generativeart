@@ -4,7 +4,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/jdxyw/generativeart)](https://goreportcard.com/report/github.com/jdxyw/generativeart)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/jdxyw/generativeart/master/LICENSE)
 
-`generativeart` is a pure-`Go` generative art engine and algorithm collection supporting **148 generative art types** across flow fields, strange attractors, 3D terrain geomorphology, biological morphogenesis, 3D SDF raymarching, 3D dielectric refraction & caustics, spherical harmonics, general-relativistic gravitational lensing, complex phase portraits, differential topology, non-Euclidean geometry, Jean "Mœbius" Giraud *Ligne Claire* sci-fi printmaking, Piranesi/Dürer/Kepler Weingarten principal-curvature copperplate engraving, 8-band spectral Kubelka-Munk mineral Shanshui, quasicrystals, stained-glass mosaics, cloisonné enamel, 3D origami, and traditional printmaking.
+`generativeart` is a pure-`Go` generative art engine and algorithm collection supporting **152 generative art types** across 3D depth-sorted Hopf fibration silk sculptures, 3D laser-cut topographic reliefs, 3D G-Buffer photonic feather plumes, cloisonné enamel rose mandalas, flow fields, strange attractors, 3D terrain geomorphology, biological morphogenesis, 3D SDF raymarching, 3D dielectric refraction & caustics, spherical harmonics, general-relativistic gravitational lensing, complex phase portraits, differential topology, non-Euclidean geometry, Jean "Mœbius" Giraud *Ligne Claire* sci-fi printmaking, Piranesi/Dürer/Kepler Weingarten principal-curvature copperplate engraving, 8-band spectral Kubelka-Munk mineral Shanshui, quasicrystals, stained-glass mosaics, 3D origami, and traditional printmaking.
 
 - 🌐 **Live Interactive Web Gallery (GitHub Pages)**: **[https://jdxyw.github.io/generativeart/](https://jdxyw.github.io/generativeart/)**
 - 🖼️ **Full Code & Image Gallery (`gallery.md`)**: **[./gallery.md](./gallery.md)**
@@ -15,29 +15,29 @@
 
 ## Featured Gallery Highlights
 
-> Browse all **148 artworks**, full `Go` source snippets, and rendered previews in **[`gallery.md`](./gallery.md)** or on the **[Interactive GitHub Pages Gallery](https://jdxyw.github.io/generativeart/)**.
+> Browse all **152 artworks**, full `Go` source snippets, and rendered previews in **[`gallery.md`](./gallery.md)** or on the **[Interactive GitHub Pages Gallery](https://jdxyw.github.io/generativeart/)**.
 
-| [Murano Glass Nautilus](./gallery.md#murano-glass-nautilus) | [Haeckel Radiolaria](./gallery.md#haeckel-radiolaria) | [Relativistic Lens](./gallery.md#relativistic-lens) | [Weingarten Torus Knot](./gallery.md#weingarten-torus-knot) |
+| [Hopf Torus Silk](./gallery.md#hopf-torus-silk) | [Volcanic Atoll Terraces](./gallery.md#volcanic-atoll-terraces) | [Peacock Ocelli Plumes](./gallery.md#peacock-ocelli-plumes) | [Byzantine Rose Mosaic](./gallery.md#byzantine-rose-mosaic) |
 | :---: | :---: | :---: | :---: |
+| ![Hopf Torus Silk](images/hopftorussilk.png) | ![Volcanic Atoll Terraces](images/volcanicatollterraces.png) | ![Peacock Ocelli Plumes](images/peacockocelliplumes.png) | ![Byzantine Rose Mosaic](images/byzantinerosemosaic.png) |
+| **[Murano Glass Nautilus](./gallery.md#murano-glass-nautilus)** | **[Haeckel Radiolaria](./gallery.md#haeckel-radiolaria)** | **[Relativistic Lens](./gallery.md#relativistic-lens)** | **[Weingarten Torus Knot](./gallery.md#weingarten-torus-knot)** |
 | ![Murano Glass Nautilus](images/muranoglassnautilus.png) | ![Haeckel Radiolaria](images/haeckelradiolaria.png) | ![Relativistic Lens](images/relativisticlens.png) | ![Weingarten Torus Knot](images/weingartentorusknot.png) |
 | **[Babel Library](./gallery.md#babel-library)** | **[Kepler Harmonices](./gallery.md#kepler-harmonices)** | **[Moebius Hermetic Garage](./gallery.md#moebius-hermetic-garage)** | **[Calabi Yau Manifold](./gallery.md#calabi-yau-manifold)** |
 | ![Babel Library](images/babellibrary.png) | ![Kepler Harmonices](images/keplerharmonices.png) | ![Moebius Hermetic Garage](images/moebiushermeticgarage.png) | ![Calabi Yau Manifold](images/calabiyaumanifold.png) |
-| **[Piranesi Carceri](./gallery.md#piranesi-carceri)** | **[Moebius Leviathan](./gallery.md#moebius-leviathan)** | **[Durer Polyhedron](./gallery.md#durer-polyhedron)** | **[Mineral Shan Shui](./gallery.md#mineral-shan-shui)** |
-| ![Piranesi Carceri](images/piranesicarceri.png) | ![Moebius Leviathan](images/moebiusleviathan.png) | ![Durer Polyhedron](images/durerpolyhedron.png) | ![Mineral Shan Shui](images/mineralshanshui.png) |
 
-👉 **[View All 148 Artworks & Code Examples in `gallery.md` →](./gallery.md)**
+👉 **[View All 152 Artworks & Code Examples in `gallery.md` →](./gallery.md)**
 
 ### 🎞️ Seamless 600×600 HD Looping Animations (`DrawTimelapseFrames` + `ToGIF`)
 
-| Murano Glass Nautilus (`muranoglassnautilus`) | Haeckel Radiolaria (`haeckelradiolaria`) | Relativistic Lens (`relativisticlens`) | Weingarten Torus Knot (`weingartentorusknot`) |
+| 3D Hopf Torus Silk (`hopftorussilk`) | Volcanic Atoll Terraces (`volcanicatollterraces`) | Peacock Ocelli Plumes (`peacockocelliplumes`) | Cloisonné Star-Rose (`byzantinerosemosaic`) |
 | :---: | :---: | :---: | :---: |
+| ![Hopf Torus Silk Loop](images/hopftorussilk_loop.gif) | ![Volcanic Atoll Terraces Loop](images/volcanicatollterraces_loop.gif) | ![Peacock Ocelli Plumes Loop](images/peacockocelliplumes_loop.gif) | ![Byzantine Rose Mosaic Loop](images/byzantinerosemosaic_loop.gif) |
+| **Murano Glass Nautilus (`muranoglassnautilus`)** | **Haeckel Radiolaria (`haeckelradiolaria`)** | **Relativistic Lens (`relativisticlens`)** | **Weingarten Torus Knot (`weingartentorusknot`)** |
 | ![Murano Glass Nautilus Loop](images/muranoglassnautilus_loop.gif) | ![Haeckel Radiolaria Loop](images/haeckelradiolaria_loop.gif) | ![Relativistic Lens Loop](images/relativisticlens_loop.gif) | ![Weingarten Torus Knot Loop](images/weingartentorusknot_loop.gif) |
 | **Babel Library (`babellibrary`)** | **Kepler Harmonices (`keplerharmonices`)** | **Mœbius Hermetic Garage (`moebiushermeticgarage`)** | **Calabi-Yau Manifold (`calabiyaumanifold`)** |
 | ![Babel Library Loop](images/babellibrary_loop.gif) | ![Kepler Harmonices Loop](images/keplerharmonices_loop.gif) | ![Moebius Hermetic Garage Loop](images/moebiushermeticgarage_loop.gif) | ![Calabi Yau Manifold Loop](images/calabiyaumanifold_loop.gif) |
 | **Dürer 3D Polyhedron (`durerpolyhedron`)** | **Piranesi Carceri (`piranesicarceri`)** | **Mœbius Leviathan (`moebiusleviathan`)** | **Mœbius Arzach Citadel (`moebiuscanyon`)** |
 | ![Durer Polyhedron Loop](images/durerpolyhedron_loop.gif) | ![Piranesi Carceri Loop](images/piranesicarceri_loop.gif) | ![Moebius Leviathan Loop](images/moebiusleviathan_loop.gif) | ![Moebius Canyon Loop](images/moebiuscanyon_loop.gif) |
-| **Escher Circle Limit (`eschercirclelimit`)** | **Escher Droste Spiral (`escherdrostegallery`)** | **Celestial Gabor Astrolabe (`gaborwaveinterference`)** | **3D Perlin Curl Silk (`analyticalcurlsilk`)** |
-| ![Escher Circle Limit Loop](images/eschercirclelimit_loop.gif) | ![Escher Droste Gallery Loop](images/escherdrostegallery_loop.gif) | ![Gabor Wave Interference Loop](images/gaborwaveinterference_loop.gif) | ![Analytical Curl Silk Loop](images/analyticalcurlsilk_loop.gif) |
 
 ### 🖼️ Museum Exhibition Posters & Multi-Panel Contact Sheets (`genart poster`)
 
@@ -232,9 +232,15 @@ _ = poster.ToPNG("poster_dunhuang.png")
 
 ## Supported Art Types & Constructors
 
-All 148 generators implement `generativeart.Engine` under package `github.com/jdxyw/generativeart/arts` (see [gallery.md](./gallery.md) for visual examples and [docs/doc.md](./docs/doc.md) for parameter details):
+All 152 generators implement `generativeart.Engine` under package `github.com/jdxyw/generativeart/arts` (see [gallery.md](./gallery.md) for visual examples and [docs/doc.md](./docs/doc.md) for parameter details):
 
 ```go
+// Wave 25: Multi-Paradigm Non-Moebius Flagship Quartet (HopfTorusSilk, VolcanicAtollTerraces, PeacockOcelliPlumes, ByzantineRoseMosaic)
+NewHopfTorusSilk(fibers, strands int, cliffordAngle float64)
+NewVolcanicAtollTerraces(tiers, islands int, erosionStrength float64)
+NewPeacockOcelliPlumes(ocelli, barbCount int, filmNm float64)
+NewByzantineRoseMosaic(petals, rings int, ribbonSpiral float64)
+
 // Wave 24: Phase 2–5 Flagship Quartet (MuranoGlassNautilus, HaeckelRadiolaria, RelativisticLens, WeingartenTorusKnot)
 NewMuranoGlassNautilus(chambers, facets int, dispersion float64)
 NewHaeckelRadiolaria(shells, spineOrder int, poreScale float64)
