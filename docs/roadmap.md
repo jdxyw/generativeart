@@ -476,7 +476,9 @@ A comprehensive technical audit across `generativeart.go`, `platform.go`, `poste
 5. **Wave 25 Multi-Paradigm Non-Mœbius Flagship Quartet (152 Engines & 41 HD Loop GIFs)**:
    - Added `HopfTorusSilk` (3D depth-sorted Hopf Fibration Villarceau silk ribbon sculpture), `VolcanicAtollTerraces` (16-tier 3D laser-cut volcanic caldera & coral atoll topographic relief), `PeacockOcelliPlumes` (3D G-Buffer photonic peacock feather ocelli & horizon-shadowed barbules), and `ByzantineRoseMosaic` (3D beveled cloisonné star-rose medallion with sweeping silk ribbons).
 6. **Wave 26 Multi-Paradigm Non-Mœbius Flagship Quartet (156 Engines & 45 HD Loop GIFs)**:
-   - Added `FidenzaVelvetLoom` (collision-free gilded lacquer flow-beam tapestry on obsidian velvet), `KuroshioBioluminescence` (Fast LIC Kuroshio ocean current & bioluminescent Kármán vortex street), `LorentzStrangeRibbon` (3D depth-sorted Lorenz butterfly strange-attractor silk ribbon sculpture), and `CoronalMagneticArcade` (3D G-Buffer Total Solar Eclipse diamond ring & coronal magnetic arcade plasma plumes).
+   - Added `FidenzaVelvetLoom` (collision-free gilded lacquer flow-beam tapestry on obsidian velvet), `KuroshioBioluminescence` (3D translucent bioluminescent deep-sea Medusa with thin-film bell & trailing tentacles), `LorentzStrangeRibbon` (3D depth-sorted Lorenz butterfly strange-attractor silk ribbon sculpture), and `CoronalMagneticArcade` (3D G-Buffer Total Solar Eclipse diamond ring & coronal magnetic arcade plasma plumes).
+7. **Wave 27 Multi-Paradigm Non-Mœbius Flagship Trio (159 Engines & 48 HD Loop GIFs)**:
+   - Added `AgateGeodeCrystal` (3D radiating cathedral cluster of translucent hexagonal amethyst, aquamarine-beryl, and citrine quartz prisms emerging from a Brazilian fortification-agate geode cradle), `FabergeGuillocheOrnament` (3D ray-traced Imperial Fabergé translucent Beer-Lambert guilloché enamel egg on a 24K gold chalice pedestal with orbiting 3D filigree ribbons), and `AuroraCurtainFold` (3D folded Polar Aurora Borealis draperies, Lofoten snow peaks & Arctic fjord lagoon reflection).
 
 
 

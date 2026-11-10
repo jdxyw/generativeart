@@ -495,6 +495,29 @@ func paramBool(p map[string]interface{}, key string, def bool) bool {
 }
 
 var registry = []ArtDescriptor{
+	// Wave 27: Multi-Paradigm Flagship Trio (AgateGeodeCrystal, FabergeGuillocheOrnament, AuroraCurtainFold)
+	{
+		ID: "agategeodecrystal", StructName: "agateGeodeCrystal", Category: "geom",
+		DefaultBG: color.RGBA{7, 9, 18, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewAgateGeodeCrystal(paramInt(p, "bands", 20), paramInt(p, "druzyRings", 3), paramFloat(p, "crystalScale", 1.0))
+		},
+	},
+	{
+		ID: "fabergeguillocheornament", StructName: "fabergeGuillocheOrnament", Category: "geom",
+		DefaultBG: color.RGBA{6, 8, 20, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewFabergeGuillocheOrnament(paramInt(p, "petals", 12), paramInt(p, "guillocheWaves", 28), paramFloat(p, "enamelDepth", 1.0))
+		},
+	},
+	{
+		ID: "auroracurtainfold", StructName: "auroraCurtainFold", Category: "flow",
+		DefaultBG: color.RGBA{3, 6, 18, 255}, DefaultPal: "oceanic",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewAuroraCurtainFold(paramInt(p, "curtains", 4), paramInt(p, "rays", 180), paramFloat(p, "foldCurl", 1.15))
+		},
+	},
+
 	// Wave 26: Multi-Paradigm Flagship Quartet (FidenzaVelvetLoom, KuroshioBioluminescence, LorentzStrangeRibbon, CoronalMagneticArcade)
 	{
 		ID: "fidenzavelvetloom", StructName: "fidenzaVelvetLoom", Category: "geom",

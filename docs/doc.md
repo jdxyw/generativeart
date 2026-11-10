@@ -150,6 +150,10 @@
 	- [Kuroshio Bioluminescence](#kuroshio-bioluminescence)
 	- [Lorentz Strange Ribbon](#lorentz-strange-ribbon)
 	- [Coronal Magnetic Arcade](#coronal-magnetic-arcade)
+	- [Agate Geode Crystal](#agate-geode-crystal)
+	- [Song Blue Green Scroll](#song-blue-green-scroll)
+	- [Faberge Guilloche Ornament](#faberge-guilloche-ornament)
+	- [Aurora Curtain Fold](#aurora-curtain-fold)
 
 ## CLI Tool (`cmd/genart`) & Exhibition Poster Reference
 
@@ -2399,6 +2403,55 @@ cm := arts.NewCoronalMagneticArcade(9, 19000, 1.15)
 ```
 
 ![](../images/coronalmagneticarcade.png)
+
+## Agate Geode Crystal
+
+`Agate Geode Crystal` synthesizes a 3D radiating cathedral cluster of 34 translucent hexagonal amethyst, aquamarine-beryl, and citrine quartz prisms with Snell dielectric refraction and internal phantom growth chevrons emerging from a Brazilian fortification-agate geode cradle (`三维紫水晶海蓝宝六方晶簇与巴西堡垒玛瑙晶洞基座`) over a reflective black obsidian plinth.
+
+### parameters
+
+- bands: Number of concentric Liesegang fortification agate bands on the geode cradle (default `20`).
+- druzyRings: Number of crystal depth tiers in the cathedral cluster (default `3`).
+- crystalScale: Overall scale multiplier for the 3D hexagonal quartz prisms (default `1.0`).
+
+```go
+ag := arts.NewAgateGeodeCrystal(20, 3, 1.0)
+```
+
+![](../images/agategeodecrystal.png)
+
+## Faberge Guilloche Ornament
+
+`Faberge Guilloche Ornament` synthesizes a 3D ray-traced Imperial Fabergé translucent engine-turned guilloché enamel egg monument (`三维法贝热皇家透光玑镂珐琅彩蛋与环轨金丝绶带`) tilted on a sculpted 24K gold chalice pedestal and encircled by 3D depth-sorted gilded filigree ribbons.
+
+### parameters
+
+- petals: Number of spiral diamond-trellis meridian divisions around the 3D egg (default `12`).
+- guillocheWaves: Frequency of the engine-turned guilloché lathe engraving (default `28`).
+- enamelDepth: Optical thickness multiplier for the translucent Beer-Lambert vitreous enamel (default `1.0`).
+
+```go
+fg := arts.NewFabergeGuillocheOrnament(12, 28, 1.0)
+```
+
+![](../images/fabergeguillocheornament.png)
+
+## Aurora Curtain Fold
+
+`Aurora Curtain Fold` synthesizes 3D depth-sorted Kelvin-Helmholtz folded Polar Aurora Borealis draperies, vertical geomagnetic ray pillars, an Arctic fjord mountain silhouette, and a rippling glacial lagoon reflection (`极地北极光三维折叠光幕、磁力线光柱与冰峡湾倒影`).
+
+### parameters
+
+- curtains: Number of overlapping 3D auroral curtain sheets (default `4`).
+- rays: Base number of vertical geomagnetic ray pillars per curtain (default `180`).
+- foldCurl: Kelvin-Helmholtz serpentine fold amplitude (default `1.15`).
+
+```go
+ac := arts.NewAuroraCurtainFold(4, 180, 1.15)
+```
+
+![](../images/auroracurtainfold.png)
+
 
 
 

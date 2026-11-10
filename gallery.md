@@ -8,17 +8,18 @@ This gallery contains standalone `Go` usage examples and rendered outputs for `g
 
 ## 🎞️ Seamless 600×600 HD Looping GIF Animations (`DrawTimelapseFrames` + `ToGIF`)
 
-| Fidenza Velvet Loom (`fidenzavelvetloom`) | Kuroshio Bioluminescence (`kuroshiobioluminescence`) | 3D Lorentz Ribbons (`lorentzstrangeribbon`) | Solar Eclipse Corona (`coronalmagneticarcade`) |
+| Brazilian Agate Geode (`agategeodecrystal`) | Fabergé Guilloché Star (`fabergeguillocheornament`) | Polar Aurora Fold (`auroracurtainfold`) | Fidenza Velvet Loom (`fidenzavelvetloom`) |
 | :---: | :---: | :---: | :---: |
-| ![Fidenza Velvet Loom Loop](images/fidenzavelvetloom_loop.gif) | ![Kuroshio Bioluminescence Loop](images/kuroshiobioluminescence_loop.gif) | ![Lorentz Strange Ribbon Loop](images/lorentzstrangeribbon_loop.gif) | ![Coronal Magnetic Arcade Loop](images/coronalmagneticarcade_loop.gif) |
-| **3D Hopf Torus Silk (`hopftorussilk`)** | **Volcanic Atoll Terraces (`volcanicatollterraces`)** | **Peacock Ocelli Plumes (`peacockocelliplumes`)** | **Cloisonné Star-Rose (`byzantinerosemosaic`)** |
-| ![Hopf Torus Silk Loop](images/hopftorussilk_loop.gif) | ![Volcanic Atoll Terraces Loop](images/volcanicatollterraces_loop.gif) | ![Peacock Ocelli Plumes Loop](images/peacockocelliplumes_loop.gif) | ![Byzantine Rose Mosaic Loop](images/byzantinerosemosaic_loop.gif) |
-| **Murano Glass Nautilus (`muranoglassnautilus`)** | **Haeckel Radiolaria (`haeckelradiolaria`)** | **Relativistic Lens (`relativisticlens`)** | **Weingarten Torus Knot (`weingartentorusknot`)** |
-| ![Murano Glass Nautilus Loop](images/muranoglassnautilus_loop.gif) | ![Haeckel Radiolaria Loop](images/haeckelradiolaria_loop.gif) | ![Relativistic Lens Loop](images/relativisticlens_loop.gif) | ![Weingarten Torus Knot Loop](images/weingartentorusknot_loop.gif) |
-| **Babel Library (`babellibrary`)** | **Kepler Harmonices (`keplerharmonices`)** | **Mœbius Hermetic Garage (`moebiushermeticgarage`)** | **Calabi-Yau Manifold (`calabiyaumanifold`)** |
-| ![Babel Library Loop](images/babellibrary_loop.gif) | ![Kepler Harmonices Loop](images/keplerharmonices_loop.gif) | ![Moebius Hermetic Garage Loop](images/moebiushermeticgarage_loop.gif) | ![Calabi Yau Manifold Loop](images/calabiyaumanifold_loop.gif) |
+| ![Agate Geode Crystal Loop](images/agategeodecrystal_loop.gif) | ![Faberge Guilloche Ornament Loop](images/fabergeguillocheornament_loop.gif) | ![Aurora Curtain Fold Loop](images/auroracurtainfold_loop.gif) | ![Fidenza Velvet Loom Loop](images/fidenzavelvetloom_loop.gif) |
+| **Abyssal Medusa (`kuroshiobioluminescence`)** | **3D Lorentz Ribbons (`lorentzstrangeribbon`)** | **Solar Eclipse Corona (`coronalmagneticarcade`)** | **3D Hopf Torus Silk (`hopftorussilk`)** |
+| ![Kuroshio Bioluminescence Loop](images/kuroshiobioluminescence_loop.gif) | ![Lorentz Strange Ribbon Loop](images/lorentzstrangeribbon_loop.gif) | ![Coronal Magnetic Arcade Loop](images/coronalmagneticarcade_loop.gif) | ![Hopf Torus Silk Loop](images/hopftorussilk_loop.gif) |
+| **Volcanic Atoll Terraces (`volcanicatollterraces`)** | **Peacock Ocelli Plumes (`peacockocelliplumes`)** | **Cloisonné Star-Rose (`byzantinerosemosaic`)** | **Murano Glass Nautilus (`muranoglassnautilus`)** |
+| ![Volcanic Atoll Terraces Loop](images/volcanicatollterraces_loop.gif) | ![Peacock Ocelli Plumes Loop](images/peacockocelliplumes_loop.gif) | ![Byzantine Rose Mosaic Loop](images/byzantinerosemosaic_loop.gif) | ![Murano Glass Nautilus Loop](images/muranoglassnautilus_loop.gif) |
 
 ```bash
+go run ./cmd/genart render -art agategeodecrystal        -w 600 -h 600 -frames 20 -delay 12 -out images/agategeodecrystal_loop.gif
+go run ./cmd/genart render -art fabergeguillocheornament -w 600 -h 600 -frames 20 -delay 12 -out images/fabergeguillocheornament_loop.gif
+go run ./cmd/genart render -art auroracurtainfold        -w 600 -h 600 -frames 20 -delay 12 -out images/auroracurtainfold_loop.gif
 go run ./cmd/genart render -art fidenzavelvetloom       -w 600 -h 600 -frames 20 -delay 12 -out images/fidenzavelvetloom_loop.gif
 go run ./cmd/genart render -art kuroshiobioluminescence -w 600 -h 600 -frames 20 -delay 12 -out images/kuroshiobioluminescence_loop.gif
 go run ./cmd/genart render -art lorentzstrangeribbon    -w 600 -h 600 -frames 20 -delay 12 -out images/lorentzstrangeribbon_loop.gif
@@ -86,6 +87,11 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
 
 ## Table of Contents
 
+- [Wave 27: Multi-Paradigm Non-Mœbius Flagship Quartet — Brazilian Agate & Amethyst Geode, Song Dynasty Blue-and-Green Shanshui Scroll, Imperial Fabergé Guilloché Enamel Star & 3D Polar Aurora Borealis Fjord](#wave-27-multi-paradigm-non-mœbius-flagship-quartet--brazilian-agate--amethyst-geode-song-dynasty-blue-and-green-shanshui-scroll-imperial-fabergé-guilloché-enamel-star--3d-polar-aurora-borealis-fjord)
+  - [Agate Geode Crystal](#agate-geode-crystal)
+  - [Song Blue Green Scroll](#song-blue-green-scroll)
+  - [Faberge Guilloche Ornament](#faberge-guilloche-ornament)
+  - [Aurora Curtain Fold](#aurora-curtain-fold)
 - [Wave 26: Multi-Paradigm Non-Mœbius Flagship Quartet — Fidenza Velvet & Gold Loom, Kuroshio Bioluminescence LIC, 3D Lorentz Strange-Attractor Ribbons & Total Solar Eclipse Coronal Arcade](#wave-26-multi-paradigm-non-mœbius-flagship-quartet--fidenza-velvet--gold-loom-kuroshio-bioluminescence-lic-3d-lorentz-strange-attractor-ribbons--total-solar-eclipse-coronal-arcade)
   - [Fidenza Velvet Loom](#fidenza-velvet-loom)
   - [Kuroshio Bioluminescence](#kuroshio-bioluminescence)
@@ -260,6 +266,88 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
   - [Silk Sky](#silk-sky)
   - [Circle Move](#circle-move)
   - [Random Circle](#random-circle)
+
+---
+
+## Wave 27: Multi-Paradigm Non-Mœbius Flagship Quartet — Brazilian Agate & Amethyst Geode, Song Dynasty Blue-and-Green Shanshui Scroll, Imperial Fabergé Guilloché Enamel Star & 3D Polar Aurora Borealis Fjord
+
+### Agate Geode Crystal
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20262701)
+	c.SetBackground(color.RGBA{R: 7, G: 9, B: 18, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewAgateGeodeCrystal(20, 3, 1.0))
+	c.ToPNG("agategeodecrystal.png")
+}
+```
+
+![Agate Geode Crystal](images/agategeodecrystal.png)
+
+### Faberge Guilloche Ornament
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20262701)
+	c.SetBackground(color.RGBA{R: 6, G: 8, B: 20, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewFabergeGuillocheOrnament(12, 28, 1.0))
+	c.ToPNG("fabergeguillocheornament.png")
+}
+```
+
+![Faberge Guilloche Ornament](images/fabergeguillocheornament.png)
+
+### Aurora Curtain Fold
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20262701)
+	c.SetBackground(color.RGBA{R: 3, G: 6, B: 18, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Oceanic)
+	c.Draw(arts.NewAuroraCurtainFold(4, 180, 1.15))
+	c.ToPNG("auroracurtainfold.png")
+}
+```
+
+![Aurora Curtain Fold](images/auroracurtainfold.png)
 
 ---
 
