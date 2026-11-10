@@ -146,6 +146,10 @@
 	- [Volcanic Atoll Terraces](#volcanic-atoll-terraces)
 	- [Peacock Ocelli Plumes](#peacock-ocelli-plumes)
 	- [Byzantine Rose Mosaic](#byzantine-rose-mosaic)
+	- [Fidenza Velvet Loom](#fidenza-velvet-loom)
+	- [Kuroshio Bioluminescence](#kuroshio-bioluminescence)
+	- [Lorentz Strange Ribbon](#lorentz-strange-ribbon)
+	- [Coronal Magnetic Arcade](#coronal-magnetic-arcade)
 
 ## CLI Tool (`cmd/genart`) & Exhibition Poster Reference
 
@@ -2331,6 +2335,71 @@ br := arts.NewByzantineRoseMosaic(12, 4, 1.15)
 ```
 
 ![](../images/byzantinerosemosaic.png)
+
+## Fidenza Velvet Loom
+
+`Fidenza Velvet Loom` weaves a collision-free curved lacquer and cloisonné flow-beam tapestry over midnight-obsidian velvet (`黑曜石天鹅绒无碰撞描金流场大漆色块织锦`) with 3D drop shadows, silk striation ribs, and burnished 24K gold wire rims.
+
+### parameters
+
+- beams: Target segment density factor along each flow beam (default `18`).
+- octaves: Number of Perlin flow-field octaves (default `5`).
+- turbulence: Flow-field curvature modulation factor (default `2.2`).
+
+```go
+fv := arts.NewFidenzaVelvetLoom(18, 5, 2.2)
+```
+
+![](../images/fidenzavelvetloom.png)
+
+## Kuroshio Bioluminescence
+
+`Kuroshio Bioluminescence` synthesizes a 3D translucent bioluminescent deep-sea Medusa (`黑潮深海夜光水母薄膜干涉伞盖与生物发光触手`) swimming through the abyss with a ribbed thin-film iridescent umbrella bell, 4 helical organza oral arms, and trailing nematocyst silk filaments.
+
+### parameters
+
+- eddies: Number of radial gastrovascular bell ribs and scalloped lappets (default `14`).
+- streamlines: Density factor for trailing bioluminescent tentacles (default `18`).
+- licLength: Tentacle length multiplier (default `24.0`).
+
+```go
+kb := arts.NewKuroshioBioluminescence(14, 18, 24.0)
+```
+
+![](../images/kuroshiobioluminescence.png)
+
+## Lorentz Strange Ribbon
+
+`Lorentz Strange Ribbon` sculpts a 3D depth-sorted Lorenz butterfly strange-attractor and separatrix metallic silk ribbon sculpture (`三维洛伦兹奇异吸引子双翼景深金属丝带雕塑`) over deep midnight-obsidian space with Kajiya-Kay anisotropic highlights.
+
+### parameters
+
+- strands: Number of parallel fluted silk/metallic cords per ribbon bundle (default `26`).
+- rho: Lorenz system $\rho$ parameter controlling wing span (default `28.0`).
+- beta: Lorenz system $\beta$ geometric aspect parameter (default `2.667`).
+
+```go
+ls := arts.NewLorentzStrangeRibbon(26, 28.0, 2.667)
+```
+
+![](../images/lorentzstrangeribbon.png)
+
+## Coronal Magnetic Arcade
+
+`Coronal Magnetic Arcade` sculpts an asymmetric Total Solar Eclipse occulted lunar disc with a blazing Baily's beads diamond ring and 3D G-Buffer horizon-shadowed coronal magnetic arcade plasma plumes (`日全食黑曜石月影钻戒与三维日冕磁拱等离子羽流`).
+
+### parameters
+
+- dipoles: Number of active solar limb magnetic dipole regions (default `9`).
+- strokeCount: Total number of 3D coronal plasma plume filaments (default `19000`).
+- flareTwist: Helical magnetic flux-rope twist factor (default `1.15`).
+
+```go
+cm := arts.NewCoronalMagneticArcade(9, 19000, 1.15)
+```
+
+![](../images/coronalmagneticarcade.png)
+
 
 
 

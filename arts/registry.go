@@ -495,6 +495,36 @@ func paramBool(p map[string]interface{}, key string, def bool) bool {
 }
 
 var registry = []ArtDescriptor{
+	// Wave 26: Multi-Paradigm Flagship Quartet (FidenzaVelvetLoom, KuroshioBioluminescence, LorentzStrangeRibbon, CoronalMagneticArcade)
+	{
+		ID: "fidenzavelvetloom", StructName: "fidenzaVelvetLoom", Category: "geom",
+		DefaultBG: color.RGBA{7, 11, 22, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewFidenzaVelvetLoom(paramInt(p, "beams", 18), paramInt(p, "octaves", 5), paramFloat(p, "turbulence", 2.2))
+		},
+	},
+	{
+		ID: "kuroshiobioluminescence", StructName: "kuroshioBioluminescence", Category: "bio",
+		DefaultBG: color.RGBA{4, 10, 28, 255}, DefaultPal: "oceanic",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewKuroshioBioluminescence(paramInt(p, "eddies", 14), paramInt(p, "streamlines", 18), paramFloat(p, "licLength", 24.0))
+		},
+	},
+	{
+		ID: "lorentzstrangeribbon", StructName: "lorentzStrangeRibbon", Category: "chaos",
+		DefaultBG: color.RGBA{6, 9, 19, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewLorentzStrangeRibbon(paramInt(p, "strands", 26), paramFloat(p, "rho", 28.0), paramFloat(p, "beta", 2.667))
+		},
+	},
+	{
+		ID: "coronalmagneticarcade", StructName: "coronalMagneticArcade", Category: "media",
+		DefaultBG: color.RGBA{5, 7, 16, 255}, DefaultPal: "inferno",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewCoronalMagneticArcade(paramInt(p, "dipoles", 9), paramInt(p, "strokeCount", 19000), paramFloat(p, "flareTwist", 1.15))
+		},
+	},
+
 	// Wave 25: Multi-Paradigm Non-Moebius Flagship Quartet (HopfTorusSilk, VolcanicAtollTerraces, PeacockOcelliPlumes, ByzantineRoseMosaic)
 	{
 		ID: "hopftorussilk", StructName: "hopfTorusSilk", Category: "flow",

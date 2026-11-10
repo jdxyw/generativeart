@@ -475,6 +475,8 @@ A comprehensive technical audit across `generativeart.go`, `platform.go`, `poste
    - Added `genart serve [-addr :8080]` serving the interactive exhibition gallery (`/`) and the built-in interactive visual parameter workbench (`/studio`) alongside `/api/engines`, `/api/render` (with real-time parameter overrides, `-random` curation, post-effects, PNG download, and `AestheticMetrics` scoring), and `/api/inspect`.
 5. **Wave 25 Multi-Paradigm Non-Mœbius Flagship Quartet (152 Engines & 41 HD Loop GIFs)**:
    - Added `HopfTorusSilk` (3D depth-sorted Hopf Fibration Villarceau silk ribbon sculpture), `VolcanicAtollTerraces` (16-tier 3D laser-cut volcanic caldera & coral atoll topographic relief), `PeacockOcelliPlumes` (3D G-Buffer photonic peacock feather ocelli & horizon-shadowed barbules), and `ByzantineRoseMosaic` (3D beveled cloisonné star-rose medallion with sweeping silk ribbons).
+6. **Wave 26 Multi-Paradigm Non-Mœbius Flagship Quartet (156 Engines & 45 HD Loop GIFs)**:
+   - Added `FidenzaVelvetLoom` (collision-free gilded lacquer flow-beam tapestry on obsidian velvet), `KuroshioBioluminescence` (Fast LIC Kuroshio ocean current & bioluminescent Kármán vortex street), `LorentzStrangeRibbon` (3D depth-sorted Lorenz butterfly strange-attractor silk ribbon sculpture), and `CoronalMagneticArcade` (3D G-Buffer Total Solar Eclipse diamond ring & coronal magnetic arcade plasma plumes).
 
 
 

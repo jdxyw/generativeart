@@ -98,6 +98,10 @@ func TestMosaicFamilyGenerators(t *testing.T) {
 		{"VolcanicAtollTerraces", NewVolcanicAtollTerraces(16, 4, 1.75)},
 		{"PeacockOcelliPlumes", NewPeacockOcelliPlumes(5, 2500, 390.0)},
 		{"ByzantineRoseMosaic", NewByzantineRoseMosaic(12, 4, 1.15)},
+		{"FidenzaVelvetLoom", NewFidenzaVelvetLoom(16, 5, 2.2)},
+		{"KuroshioBioluminescence", NewKuroshioBioluminescence(10, 14, 16.0)},
+		{"LorentzStrangeRibbon", NewLorentzStrangeRibbon(18, 28.0, 2.667)},
+		{"CoronalMagneticArcade", NewCoronalMagneticArcade(7, 2800, 1.15)},
 	}
 
 	for _, tc := range cases {
