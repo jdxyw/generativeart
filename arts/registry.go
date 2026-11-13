@@ -495,6 +495,22 @@ func paramBool(p map[string]interface{}, key string, def bool) bool {
 }
 
 var registry = []ArtDescriptor{
+	// Wave 29: M.C. Escher Metamorphosis & Whirlpool Print Duo (EscherDayAndNight, EscherImpossibleBelvedere)
+	{
+		ID: "escherdayandnight", StructName: "escherDayAndNight", Category: "geom",
+		DefaultBG: color.RGBA{250, 243, 227, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewEscherDayAndNight(paramInt(p, "cols", 8), paramInt(p, "rows", 8), paramFloat(p, "morphStrength", 1.0))
+		},
+	},
+	{
+		ID: "escherimpossiblebelvedere", StructName: "escherImpossibleBelvedere", Category: "geom",
+		DefaultBG: color.RGBA{250, 243, 227, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewEscherImpossibleBelvedere(paramInt(p, "cols", 12), paramInt(p, "rows", 10), paramFloat(p, "morphStrength", 1.0))
+		},
+	},
+
 	// Wave 28: Apollonian, Quasicrystal & Muqarnas Flagship Trio (ApollonianGasketFoam, PenroseWavefrontLoom, LorenzWatercolorSilk)
 	{
 		ID: "apolloniangasketfoam", StructName: "apollonianGasketFoam", Category: "chaos",

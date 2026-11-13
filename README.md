@@ -4,7 +4,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/jdxyw/generativeart)](https://goreportcard.com/report/github.com/jdxyw/generativeart)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/jdxyw/generativeart/master/LICENSE)
 
-`generativeart` is a pure-`Go` generative art engine and algorithm collection supporting **162 generative art types** across Descartes-Soddy Apollonian sphere packings, 10-fold Penrose P3 quasicrystal cloisonné medallions, 3D Alhambra Muqarnas honeycomb stalactite domes, Brazilian fortification agate geodes, Imperial Fabergé guilloché enamels, 3D Polar Aurora Borealis draperies, 3D depth-sorted Hopf & Lorenz silk sculptures, 3D laser-cut volcanic reliefs, 3D G-Buffer photonic feather & solar coronal plumes, bioluminescent deep-sea medusae, collision-free Fidenza lacquer looms, cloisonné enamel rose mandalas, flow fields, strange attractors, 3D terrain geomorphology, biological morphogenesis, 3D SDF raymarching, 3D dielectric refraction & caustics, spherical harmonics, general-relativistic gravitational lensing, complex phase portraits, differential topology, non-Euclidean geometry, Jean "Mœbius" Giraud *Ligne Claire* sci-fi printmaking, Piranesi/Dürer/Kepler Weingarten principal-curvature copperplate engraving, quasicrystals, stained-glass mosaics, 3D origami, and traditional printmaking.
+`generativeart` is a pure-`Go` generative art engine and algorithm collection supporting **164 generative art types** across M.C. Escher isohedral & conformal spiral metamorphosis woodcuts (*Day and Night*, *Path of Life / Whirlpools*, *Metamorphosis*), Descartes-Soddy Apollonian sphere packings, 10-fold Penrose P3 quasicrystal cloisonné medallions, 3D Alhambra Muqarnas honeycomb stalactite domes, Brazilian fortification agate geodes, Imperial Fabergé guilloché enamels, 3D Polar Aurora Borealis draperies, 3D depth-sorted Hopf & Lorenz silk sculptures, 3D laser-cut volcanic reliefs, 3D G-Buffer photonic feather & solar coronal plumes, bioluminescent deep-sea medusae, collision-free Fidenza lacquer looms, cloisonné enamel rose mandalas, flow fields, strange attractors, 3D terrain geomorphology, biological morphogenesis, 3D SDF raymarching, 3D dielectric refraction & caustics, spherical harmonics, general-relativistic gravitational lensing, complex phase portraits, differential topology, non-Euclidean geometry, Jean "Mœbius" Giraud *Ligne Claire* sci-fi printmaking, Piranesi/Dürer/Kepler Weingarten principal-curvature copperplate engraving, quasicrystals, stained-glass mosaics, 3D origami, and traditional printmaking.
 
 - 🌐 **Live Interactive Web Gallery (GitHub Pages)**: **[https://jdxyw.github.io/generativeart/](https://jdxyw.github.io/generativeart/)**
 - 🖼️ **Full Code & Image Gallery (`gallery.md`)**: **[./gallery.md](./gallery.md)**
@@ -15,27 +15,27 @@
 
 ## Featured Gallery Highlights
 
-> Browse all **162 artworks**, full `Go` source snippets, and rendered previews in **[`gallery.md`](./gallery.md)** or on the **[Interactive GitHub Pages Gallery](https://jdxyw.github.io/generativeart/)**.
+> Browse all **164 artworks**, full `Go` source snippets, and rendered previews in **[`gallery.md`](./gallery.md)** or on the **[Interactive GitHub Pages Gallery](https://jdxyw.github.io/generativeart/)**.
 
-| [Apollonian Gasket Foam](./gallery.md#apollonian-gasket-foam) | [Penrose Wavefront Loom](./gallery.md#penrose-wavefront-loom) | [Muqarnas Stalactite Dome](./gallery.md#lorenz-watercolor-silk) | [Agate Geode Crystal](./gallery.md#agate-geode-crystal) |
+| [Escher Day and Night](./gallery.md#escher-day-and-night) | [Escher Path of Life Spiral](./gallery.md#escher-impossible-belvedere) | [Escher Metamorphosis](./gallery.md#escher-metamorphosis) | [Apollonian Gasket Foam](./gallery.md#apollonian-gasket-foam) |
 | :---: | :---: | :---: | :---: |
-| ![Apollonian Gasket Foam](images/apolloniangasketfoam.png) | ![Penrose Wavefront Loom](images/penrosewavefrontloom.png) | ![Muqarnas Stalactite Dome](images/lorenzwatercolorsilk.png) | ![Agate Geode Crystal](images/agategeodecrystal.png) |
-| **[Fabergé Guilloché Egg](./gallery.md#faberge-guilloche-ornament)** | **[Aurora Curtain Fold](./gallery.md#aurora-curtain-fold)** | **[Fidenza Velvet Loom](./gallery.md#fidenza-velvet-loom)** | **[Kuroshio Bioluminescence](./gallery.md#kuroshio-bioluminescence)** |
-| ![Faberge Guilloche Ornament](images/fabergeguillocheornament.png) | ![Aurora Curtain Fold](images/auroracurtainfold.png) | ![Fidenza Velvet Loom](images/fidenzavelvetloom.png) | ![Kuroshio Bioluminescence](images/kuroshiobioluminescence.png) |
-| **[Lorentz Strange Ribbon](./gallery.md#lorentz-strange-ribbon)** | **[Coronal Magnetic Arcade](./gallery.md#coronal-magnetic-arcade)** | **[Hopf Torus Silk](./gallery.md#hopf-torus-silk)** | **[Volcanic Atoll Terraces](./gallery.md#volcanic-atoll-terraces)** |
-| ![Lorentz Strange Ribbon](images/lorentzstrangeribbon.png) | ![Coronal Magnetic Arcade](images/coronalmagneticarcade.png) | ![Hopf Torus Silk](images/hopftorussilk.png) | ![Volcanic Atoll Terraces](images/volcanicatollterraces.png) |
+| ![Escher Day and Night](images/escherdayandnight.png) | ![Escher Impossible Belvedere](images/escherimpossiblebelvedere.png) | ![Escher Metamorphosis](images/eschermetamorphosis.png) | ![Apollonian Gasket Foam](images/apolloniangasketfoam.png) |
+| **[Penrose Wavefront Loom](./gallery.md#penrose-wavefront-loom)** | **[Muqarnas Stalactite Dome](./gallery.md#lorenz-watercolor-silk)** | **[Agate Geode Crystal](./gallery.md#agate-geode-crystal)** | **[Fabergé Guilloché Egg](./gallery.md#faberge-guilloche-ornament)** |
+| ![Penrose Wavefront Loom](images/penrosewavefrontloom.png) | ![Muqarnas Stalactite Dome](images/lorenzwatercolorsilk.png) | ![Agate Geode Crystal](images/agategeodecrystal.png) | ![Faberge Guilloche Ornament](images/fabergeguillocheornament.png) |
+| **[Aurora Curtain Fold](./gallery.md#aurora-curtain-fold)** | **[Fidenza Velvet Loom](./gallery.md#fidenza-velvet-loom)** | **[Kuroshio Bioluminescence](./gallery.md#kuroshio-bioluminescence)** | **[Lorentz Strange Ribbon](./gallery.md#lorentz-strange-ribbon)** |
+| ![Aurora Curtain Fold](images/auroracurtainfold.png) | ![Fidenza Velvet Loom](images/fidenzavelvetloom.png) | ![Kuroshio Bioluminescence](images/kuroshiobioluminescence.png) | ![Lorentz Strange Ribbon](images/lorentzstrangeribbon.png) |
 
-👉 **[View All 162 Artworks & Code Examples in `gallery.md` →](./gallery.md)**
+👉 **[View All 164 Artworks & Code Examples in `gallery.md` →](./gallery.md)**
 
 ### 🎞️ Seamless 600×600 HD Looping Animations (`DrawTimelapseFrames` + `ToGIF`)
 
-| Apollonian Gasket (`apolloniangasketfoam`) | Penrose Quasicrystal (`penrosewavefrontloom`) | Muqarnas Dome (`lorenzwatercolorsilk`) | 3D Amethyst Cathedral (`agategeodecrystal`) |
+| Escher Day & Night (`escherdayandnight`) | Escher Path of Life (`escherimpossiblebelvedere`) | Escher Metamorphosis (`eschermetamorphosis`) | Apollonian Gasket (`apolloniangasketfoam`) |
 | :---: | :---: | :---: | :---: |
-| ![Apollonian Gasket Foam Loop](images/apolloniangasketfoam_loop.gif) | ![Penrose Wavefront Loom Loop](images/penrosewavefrontloom_loop.gif) | ![Lorenz Watercolor Silk Loop](images/lorenzwatercolorsilk_loop.gif) | ![Agate Geode Crystal Loop](images/agategeodecrystal_loop.gif) |
-| **3D Fabergé Egg (`fabergeguillocheornament`)** | **Polar Aurora Fold (`auroracurtainfold`)** | **Fidenza Velvet Loom (`fidenzavelvetloom`)** | **Abyssal Medusa (`kuroshiobioluminescence`)** |
-| ![Faberge Guilloche Ornament Loop](images/fabergeguillocheornament_loop.gif) | ![Aurora Curtain Fold Loop](images/auroracurtainfold_loop.gif) | ![Fidenza Velvet Loom Loop](images/fidenzavelvetloom_loop.gif) | ![Kuroshio Bioluminescence Loop](images/kuroshiobioluminescence_loop.gif) |
-| **3D Lorentz Ribbons (`lorentzstrangeribbon`)** | **Solar Eclipse Corona (`coronalmagneticarcade`)** | **3D Hopf Torus Silk (`hopftorussilk`)** | **Volcanic Atoll Terraces (`volcanicatollterraces`)** |
-| ![Lorentz Strange Ribbon Loop](images/lorentzstrangeribbon_loop.gif) | ![Coronal Magnetic Arcade Loop](images/coronalmagneticarcade_loop.gif) | ![Hopf Torus Silk Loop](images/hopftorussilk_loop.gif) | ![Volcanic Atoll Terraces Loop](images/volcanicatollterraces_loop.gif) |
+| ![Escher Day and Night Loop](images/escherdayandnight_loop.gif) | ![Escher Impossible Belvedere Loop](images/escherimpossiblebelvedere_loop.gif) | ![Escher Metamorphosis Loop](images/eschermetamorphosis_loop.gif) | ![Apollonian Gasket Foam Loop](images/apolloniangasketfoam_loop.gif) |
+| **Penrose Quasicrystal (`penrosewavefrontloom`)** | **Muqarnas Dome (`lorenzwatercolorsilk`)** | **3D Amethyst Cathedral (`agategeodecrystal`)** | **3D Fabergé Egg (`fabergeguillocheornament`)** |
+| ![Penrose Wavefront Loom Loop](images/penrosewavefrontloom_loop.gif) | ![Lorenz Watercolor Silk Loop](images/lorenzwatercolorsilk_loop.gif) | ![Agate Geode Crystal Loop](images/agategeodecrystal_loop.gif) | ![Faberge Guilloche Ornament Loop](images/fabergeguillocheornament_loop.gif) |
+| **Polar Aurora Fold (`auroracurtainfold`)** | **Fidenza Velvet Loom (`fidenzavelvetloom`)** | **Abyssal Medusa (`kuroshiobioluminescence`)** | **3D Lorentz Ribbons (`lorentzstrangeribbon`)** |
+| ![Aurora Curtain Fold Loop](images/auroracurtainfold_loop.gif) | ![Fidenza Velvet Loom Loop](images/fidenzavelvetloom_loop.gif) | ![Kuroshio Bioluminescence Loop](images/kuroshiobioluminescence_loop.gif) | ![Lorentz Strange Ribbon Loop](images/lorentzstrangeribbon_loop.gif) |
 | **Murano Glass Nautilus (`muranoglassnautilus`)** | **Haeckel Radiolaria (`haeckelradiolaria`)** | **Relativistic Lens (`relativisticlens`)** | **Weingarten Torus Knot (`weingartentorusknot`)** |
 | ![Murano Glass Nautilus Loop](images/muranoglassnautilus_loop.gif) | ![Haeckel Radiolaria Loop](images/haeckelradiolaria_loop.gif) | ![Relativistic Lens Loop](images/relativisticlens_loop.gif) | ![Weingarten Torus Knot Loop](images/weingartentorusknot_loop.gif) |
 
@@ -232,9 +232,13 @@ _ = poster.ToPNG("poster_dunhuang.png")
 
 ## Supported Art Types & Constructors
 
-All 162 generators implement `generativeart.Engine` under package `github.com/jdxyw/generativeart/arts` (see [gallery.md](./gallery.md) for visual examples and [docs/doc.md](./docs/doc.md) for parameter details):
+All 164 generators implement `generativeart.Engine` under package `github.com/jdxyw/generativeart/arts` (see [gallery.md](./gallery.md) for visual examples and [docs/doc.md](./docs/doc.md) for parameter details):
 
 ```go
+// Wave 29: M.C. Escher Metamorphosis & Conformal Whirlpool Print Duo (EscherDayAndNight, EscherImpossibleBelvedere)
+NewEscherDayAndNight(cols, rows int, morphStrength float64)
+NewEscherImpossibleBelvedere(cols, rows int, morphStrength float64)
+
 // Wave 28: Apollonian, Quasicrystal & Muqarnas Flagship Trio (ApollonianGasketFoam, PenroseWavefrontLoom, LorenzWatercolorSilk)
 NewApollonianGasketFoam(depth, symmetry int, filmNm float64)
 NewPenroseWavefrontLoom(generations, terraces int, oxideNm float64)

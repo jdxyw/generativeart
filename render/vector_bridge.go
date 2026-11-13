@@ -461,15 +461,19 @@ func (c *Canvas) rasterizePathInternal(p, centerline *canvas.Path, strokeW float
 		}
 	}
 
+	if len(c.clipPolyStack) > 0 {
+		p = clipFilledPathAgainstPolyStack(p, c.clipPolyStack)
+		if p == nil || p.Empty() {
+			return
+		}
+	}
+
 	if c.recordVector {
 		vecP := p.Copy()
 		var vecCL *canvas.Path
 		if centerline != nil && !centerline.Empty() {
 			vecCL = centerline.Copy()
-		}
-		if len(c.clipPolyStack) > 0 {
-			vecP = clipFilledPathAgainstPolyStack(vecP, c.clipPolyStack)
-			if vecCL != nil {
+			if len(c.clipPolyStack) > 0 {
 				vecCL = clipOpenPathAgainstPolyStack(vecCL, c.clipPolyStack)
 			}
 		}

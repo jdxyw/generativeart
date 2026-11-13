@@ -68,13 +68,12 @@ func (em *escherMetamorphosis) GenerativeFrame(c *generativeart.Canva, frameIdx,
 	if rows < 4 {
 		rows = 10
 	}
-	// Use a slightly finer effective grid (e.g., 12x12 for default 10x10) so there are
-	// more intermediate transitional tiles across the metamorphosis progression.
+	// Use a bold, clear 8x8 effective grid for default 10x10 so each cube/bird tile is large and legible!
 	effCols := cols
 	effRows := rows
-	if cols <= 10 && rows <= 10 {
-		effCols = cols + 2
-		effRows = rows + 2
+	if cols == 10 && rows == 10 {
+		effCols = 8
+		effRows = 8
 	}
 
 	strength := em.morphStrength
@@ -197,40 +196,44 @@ func (em *escherMetamorphosis) GenerativeFrame(c *generativeart.Canva, frameIdx,
 		u := (nx - ny) * invSqrt2
 		v := (nx + ny) * invSqrt2
 
-		waveShift := 0.0
-		breath := 0.0
 		if isAnim {
-			waveShift = 0.24 * math.Sin(phi)
-			breath = 0.06 * math.Cos(phi)
+			// Full-contrast travelling metamorphosis wave in GIF mode:
+			// Sweeps across the lattice so tiles visibly cycle all the way from 0.0 (sharp 3D cube)
+			// to 1.35*strength (deeply winged Escher bird) and back!
+			wavePhase := phi - u*2.35 - 0.45*math.Sin(1.6*v+phi)
+			rawWave := 0.5 + 0.5*math.Cos(wavePhase)
+			// Sharpen extremes so both pure 3D cubes (0.0) and full birds (1.0) occupy broad bands
+			fullCycle := common.Smoothstep(0.12, 0.88, rawWave)
+			radGuard := common.Smoothstep(1.32, 0.82, math.Hypot(nx*0.72, ny*0.72))
+			return strength * 1.32 * fullCycle * (0.25 + 0.75*radGuard)
 		}
 
-		// Wide S-curved diagonal metamorphosis corridor spanning the entire canvas
-		curvedU := u - 0.18*math.Sin(1.35*v+waveShift)
-		bandDist := math.Abs(curvedU) / (1.28 + breath)
+		// Wide S-curved diagonal metamorphosis corridor spanning the entire canvas (static print)
+		curvedU := u - 0.18*math.Sin(1.35*v)
+		bandDist := math.Abs(curvedU) / 1.18
 		bandRamp := common.Constrain(1.0-bandDist, 0.0, 1.0)
-		// Gentle blend of linear and cosine ramp (no steep quintic cliff!)
-		bandEnv := 0.55*bandRamp + 0.45*(0.5-0.5*math.Cos(math.Pi*bandRamp))
+		bandEnv := 0.50*bandRamp + 0.50*(0.5-0.5*math.Cos(math.Pi*bandRamp))
 
-		// Broad radial envelope so outer perimeter and corners reach pure 3D cube state (t -> 0.0)
-		radDist := math.Hypot(nx*0.76, ny*0.76)
-		radRamp := common.Constrain((1.24-radDist)/1.12, 0.0, 1.0)
-		radEnv := 0.50*radRamp + 0.50*(0.5-0.5*math.Cos(math.Pi*radRamp))
+		radDist := math.Hypot(nx*0.78, ny*0.78)
+		radRamp := common.Constrain((1.22-radDist)/1.08, 0.0, 1.0)
+		radEnv := 0.48*radRamp + 0.52*(0.5-0.5*math.Cos(math.Pi*radRamp))
 
-		// Combine corridor and radial envelopes smoothly so:
-		// - Outer corners (|u| ~ 1.2, radDist ~ 1.05): t = 0.00 (pure 3D isometric Necker cubes)
-		// - Wide 5-to-6-tile transition zone: t = 0.12 -> 0.25 -> 0.38 -> 0.52 -> 0.66 -> 0.80
-		// - Central diagonal wave axis (u ~ 0, radDist < 0.35): t = 1.00 * strength (full Escher birds)
-		combined := bandEnv * (0.30 + 0.70*radEnv)
-		norm := common.Constrain((combined-0.05)/0.86, 0.0, 1.0)
-		gentle := 0.62*norm + 0.38*(0.5-0.5*math.Cos(math.Pi*norm))
-		return strength * gentle
+		combined := bandEnv * (0.28 + 0.72*radEnv)
+		norm := common.Constrain((combined-0.06)/0.84, 0.0, 1.0)
+		gentle := 0.55*norm + 0.45*(0.5-0.5*math.Cos(math.Pi*norm))
+		return strength * 1.28 * gentle
 	}
 
 	// Axial honeycomb basis for flat-top regular hexagons (vertex k at angle k * pi / 3):
-	// Center(q, r) = (cx + q * 1.5 * hexR, cy + (r + 0.5 * q) * sqrt(3) * hexR)
+	// During GIF animation (isAnim), shifting (q, r) by (+phase, -2*phase) translates the entire
+	// lattice along the exact -60 deg bird flight vector while preserving (q - r) mod 3 color parity!
 	axialCenter := func(q, r int) render.Point {
 		fq := float64(q)
 		fr := float64(r)
+		if isAnim {
+			fq += phase
+			fr -= 2.0 * phase
+		}
 		return render.Pt(
 			cx+fq*1.5*hexR,
 			cy+(fr+0.5*fq)*sqrt3*hexR,
@@ -251,7 +254,7 @@ func (em *escherMetamorphosis) GenerativeFrame(c *generativeart.Canva, frameIdx,
 	// Windowing the displacement by sin(pi * t) pins t=0 and t=1 to the exact lattice vertices while
 	// preserving 100% identical world coordinates between Edge k of A and Edge (k+3)%6 of B (0.00px gap!).
 	buildSharedEdge := func(center render.Point, verts [6]render.Point, k int, edgeMorphT float64) []render.Point {
-		refPoly := render.BuildIsohedralMorphTile(center, hexR, 0.0, edgeMorphT, 6, samplesPerEdge)
+		refPoly := render.BuildIsohedralMorphTile(center, hexR, 0.0, edgeMorphT*1.25, 6, samplesPerEdge)
 		a := verts[k]
 		b := verts[(k+1)%6]
 		edgePts := make([]render.Point, samplesPerEdge+1)
@@ -261,8 +264,7 @@ func (em *escherMetamorphosis) GenerativeFrame(c *generativeart.Canva, frameIdx,
 			t := float64(i) / float64(samplesPerEdge)
 			chordPt := a.Lerp(b, t)
 			rawPt := refPoly[baseIdx+i]
-			// Symmetric endpoint pin window: sin(pi*(1-t)) == sin(pi*t)
-			win := math.Sin(math.Pi * t)
+			win := math.Pow(math.Sin(math.Pi*t), 0.75)
 			edgePts[i] = chordPt.Add(rawPt.Sub(chordPt).Mul(win))
 		}
 		edgePts[samplesPerEdge] = b

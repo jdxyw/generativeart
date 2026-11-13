@@ -2500,6 +2500,38 @@ lws := arts.NewLorenzWatercolorSilk(8, 20000, 395.0)
 
 ![](../images/lorenzwatercolorsilk.png)
 
+## Escher Day and Night
+
+`Escher Day and Night` synthesizes an M.C. Escher *Day and Night* (1938) diamond checkerboard woodcut print (`埃舍尔《昼与夜》松石赭金菱形梯田至飞雁零缝隙演化`) in a Deep Pine-Teal, Burnished Amber-Ochre, and Cream-Ivory palette where lower terraced farmland fields continuously morph upward into interlocking winged swans.
+
+### parameters
+
+- cols: Number of diamond lattice columns (default `10`).
+- rows: Number of diamond lattice rows (default `10`).
+- morphStrength: Metamorphosis amplitude multiplier (default `1.0`).
+
+```go
+edn := arts.NewEscherDayAndNight(10, 10, 1.0)
+```
+
+![](../images/escherdayandnight.png)
+
+## Escher Impossible Belvedere
+
+`Escher Impossible Belvedere` synthesizes an axis-aligned Square Grid (`symmetry = 4`) M.C. Escher Metamorphosis woodcut print (`埃舍尔正方格四腔藻井至四翼游鱼零缝隙演化`) where outer 3D recessed 4-chambered square architectural coffers continuously morph with a 0.00px zero-gap guarantee into interlocking winged Koi-Rays across the diagonal wave.
+
+### parameters
+
+- cols: Number of square grid columns (default `8`).
+- rows: Number of square grid rows (default `8`).
+- morphStrength: Square-to-creature metamorphosis amplitude multiplier (default `1.0`).
+
+```go
+eib := arts.NewEscherImpossibleBelvedere(8, 8, 1.0)
+```
+
+![](../images/escherimpossiblebelvedere.png)
+
 
 
 

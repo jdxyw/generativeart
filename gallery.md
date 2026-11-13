@@ -8,15 +8,18 @@ This gallery contains standalone `Go` usage examples and rendered outputs for `g
 
 ## 🎞️ Seamless 600×600 HD Looping GIF Animations (`DrawTimelapseFrames` + `ToGIF`)
 
-| Apollonian Gasket (`apolloniangasketfoam`) | Penrose Quasicrystal (`penrosewavefrontloom`) | Muqarnas Dome (`lorenzwatercolorsilk`) | 3D Amethyst Cathedral (`agategeodecrystal`) |
+| Escher Day & Night (`escherdayandnight`) | Escher Path of Life (`escherimpossiblebelvedere`) | Escher Metamorphosis (`eschermetamorphosis`) | Apollonian Gasket (`apolloniangasketfoam`) |
 | :---: | :---: | :---: | :---: |
-| ![Apollonian Gasket Foam Loop](images/apolloniangasketfoam_loop.gif) | ![Penrose Wavefront Loom Loop](images/penrosewavefrontloom_loop.gif) | ![Lorenz Watercolor Silk Loop](images/lorenzwatercolorsilk_loop.gif) | ![Agate Geode Crystal Loop](images/agategeodecrystal_loop.gif) |
-| **3D Fabergé Egg (`fabergeguillocheornament`)** | **Polar Aurora Fold (`auroracurtainfold`)** | **Fidenza Velvet Loom (`fidenzavelvetloom`)** | **Abyssal Medusa (`kuroshiobioluminescence`)** |
-| ![Faberge Guilloche Ornament Loop](images/fabergeguillocheornament_loop.gif) | ![Aurora Curtain Fold Loop](images/auroracurtainfold_loop.gif) | ![Fidenza Velvet Loom Loop](images/fidenzavelvetloom_loop.gif) | ![Kuroshio Bioluminescence Loop](images/kuroshiobioluminescence_loop.gif) |
-| **3D Lorentz Ribbons (`lorentzstrangeribbon`)** | **Solar Eclipse Corona (`coronalmagneticarcade`)** | **3D Hopf Torus Silk (`hopftorussilk`)** | **Volcanic Atoll Terraces (`volcanicatollterraces`)** |
-| ![Lorentz Strange Ribbon Loop](images/lorentzstrangeribbon_loop.gif) | ![Coronal Magnetic Arcade Loop](images/coronalmagneticarcade_loop.gif) | ![Hopf Torus Silk Loop](images/hopftorussilk_loop.gif) | ![Volcanic Atoll Terraces Loop](images/volcanicatollterraces_loop.gif) |
+| ![Escher Day and Night Loop](images/escherdayandnight_loop.gif) | ![Escher Impossible Belvedere Loop](images/escherimpossiblebelvedere_loop.gif) | ![Escher Metamorphosis Loop](images/eschermetamorphosis_loop.gif) | ![Apollonian Gasket Foam Loop](images/apolloniangasketfoam_loop.gif) |
+| **Penrose Quasicrystal (`penrosewavefrontloom`)** | **Muqarnas Dome (`lorenzwatercolorsilk`)** | **3D Amethyst Cathedral (`agategeodecrystal`)** | **3D Fabergé Egg (`fabergeguillocheornament`)** |
+| ![Penrose Wavefront Loom Loop](images/penrosewavefrontloom_loop.gif) | ![Lorenz Watercolor Silk Loop](images/lorenzwatercolorsilk_loop.gif) | ![Agate Geode Crystal Loop](images/agategeodecrystal_loop.gif) | ![Faberge Guilloche Ornament Loop](images/fabergeguillocheornament_loop.gif) |
+| **Polar Aurora Fold (`auroracurtainfold`)** | **Fidenza Velvet Loom (`fidenzavelvetloom`)** | **Abyssal Medusa (`kuroshiobioluminescence`)** | **3D Lorentz Ribbons (`lorentzstrangeribbon`)** |
+| ![Aurora Curtain Fold Loop](images/auroracurtainfold_loop.gif) | ![Fidenza Velvet Loom Loop](images/fidenzavelvetloom_loop.gif) | ![Kuroshio Bioluminescence Loop](images/kuroshiobioluminescence_loop.gif) | ![Lorentz Strange Ribbon Loop](images/lorentzstrangeribbon_loop.gif) |
 
 ```bash
+go run ./cmd/genart render -art escherdayandnight        -w 600 -h 600 -frames 20 -delay 10 -out images/escherdayandnight_loop.gif
+go run ./cmd/genart render -art escherimpossiblebelvedere -w 600 -h 600 -frames 20 -delay 10 -out images/escherimpossiblebelvedere_loop.gif
+go run ./cmd/genart render -art eschermetamorphosis      -w 600 -h 600 -frames 20 -delay 10 -out images/eschermetamorphosis_loop.gif
 go run ./cmd/genart render -art apolloniangasketfoam     -w 600 -h 600 -frames 20 -delay 10 -out images/apolloniangasketfoam_loop.gif
 go run ./cmd/genart render -art penrosewavefrontloom     -w 600 -h 600 -frames 20 -delay 10 -out images/penrosewavefrontloom_loop.gif
 go run ./cmd/genart render -art lorenzwatercolorsilk     -w 600 -h 600 -frames 20 -delay 10 -out images/lorenzwatercolorsilk_loop.gif
@@ -269,6 +272,62 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
   - [Silk Sky](#silk-sky)
   - [Circle Move](#circle-move)
   - [Random Circle](#random-circle)
+
+---
+
+## Wave 29: M.C. Escher Metamorphosis & Conformal Whirlpool Print Duo — Day and Night Farmland-to-Swans & Path of Life Log-Spiral Koi Whirlpool
+
+### Escher Day and Night
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20262902)
+	c.SetBackground(color.RGBA{R: 250, G: 243, B: 227, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewEscherDayAndNight(10, 10, 1.0))
+	c.ToPNG("escherdayandnight.png")
+}
+```
+
+![Escher Day and Night](images/escherdayandnight.png)
+
+### Escher Impossible Belvedere
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20262903)
+	c.SetBackground(color.RGBA{R: 250, G: 243, B: 227, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewEscherImpossibleBelvedere(10, 10, 1.0))
+	c.ToPNG("escherimpossiblebelvedere.png")
+}
+```
+
+![Escher Impossible Belvedere](images/escherimpossiblebelvedere.png)
 
 ---
 
