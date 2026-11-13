@@ -8,15 +8,18 @@ This gallery contains standalone `Go` usage examples and rendered outputs for `g
 
 ## 🎞️ Seamless 600×600 HD Looping GIF Animations (`DrawTimelapseFrames` + `ToGIF`)
 
-| Brazilian Agate Geode (`agategeodecrystal`) | Fabergé Guilloché Star (`fabergeguillocheornament`) | Polar Aurora Fold (`auroracurtainfold`) | Fidenza Velvet Loom (`fidenzavelvetloom`) |
+| Apollonian Gasket (`apolloniangasketfoam`) | Penrose Quasicrystal (`penrosewavefrontloom`) | Muqarnas Dome (`lorenzwatercolorsilk`) | 3D Amethyst Cathedral (`agategeodecrystal`) |
 | :---: | :---: | :---: | :---: |
-| ![Agate Geode Crystal Loop](images/agategeodecrystal_loop.gif) | ![Faberge Guilloche Ornament Loop](images/fabergeguillocheornament_loop.gif) | ![Aurora Curtain Fold Loop](images/auroracurtainfold_loop.gif) | ![Fidenza Velvet Loom Loop](images/fidenzavelvetloom_loop.gif) |
-| **Abyssal Medusa (`kuroshiobioluminescence`)** | **3D Lorentz Ribbons (`lorentzstrangeribbon`)** | **Solar Eclipse Corona (`coronalmagneticarcade`)** | **3D Hopf Torus Silk (`hopftorussilk`)** |
-| ![Kuroshio Bioluminescence Loop](images/kuroshiobioluminescence_loop.gif) | ![Lorentz Strange Ribbon Loop](images/lorentzstrangeribbon_loop.gif) | ![Coronal Magnetic Arcade Loop](images/coronalmagneticarcade_loop.gif) | ![Hopf Torus Silk Loop](images/hopftorussilk_loop.gif) |
-| **Volcanic Atoll Terraces (`volcanicatollterraces`)** | **Peacock Ocelli Plumes (`peacockocelliplumes`)** | **Cloisonné Star-Rose (`byzantinerosemosaic`)** | **Murano Glass Nautilus (`muranoglassnautilus`)** |
-| ![Volcanic Atoll Terraces Loop](images/volcanicatollterraces_loop.gif) | ![Peacock Ocelli Plumes Loop](images/peacockocelliplumes_loop.gif) | ![Byzantine Rose Mosaic Loop](images/byzantinerosemosaic_loop.gif) | ![Murano Glass Nautilus Loop](images/muranoglassnautilus_loop.gif) |
+| ![Apollonian Gasket Foam Loop](images/apolloniangasketfoam_loop.gif) | ![Penrose Wavefront Loom Loop](images/penrosewavefrontloom_loop.gif) | ![Lorenz Watercolor Silk Loop](images/lorenzwatercolorsilk_loop.gif) | ![Agate Geode Crystal Loop](images/agategeodecrystal_loop.gif) |
+| **3D Fabergé Egg (`fabergeguillocheornament`)** | **Polar Aurora Fold (`auroracurtainfold`)** | **Fidenza Velvet Loom (`fidenzavelvetloom`)** | **Abyssal Medusa (`kuroshiobioluminescence`)** |
+| ![Faberge Guilloche Ornament Loop](images/fabergeguillocheornament_loop.gif) | ![Aurora Curtain Fold Loop](images/auroracurtainfold_loop.gif) | ![Fidenza Velvet Loom Loop](images/fidenzavelvetloom_loop.gif) | ![Kuroshio Bioluminescence Loop](images/kuroshiobioluminescence_loop.gif) |
+| **3D Lorentz Ribbons (`lorentzstrangeribbon`)** | **Solar Eclipse Corona (`coronalmagneticarcade`)** | **3D Hopf Torus Silk (`hopftorussilk`)** | **Volcanic Atoll Terraces (`volcanicatollterraces`)** |
+| ![Lorentz Strange Ribbon Loop](images/lorentzstrangeribbon_loop.gif) | ![Coronal Magnetic Arcade Loop](images/coronalmagneticarcade_loop.gif) | ![Hopf Torus Silk Loop](images/hopftorussilk_loop.gif) | ![Volcanic Atoll Terraces Loop](images/volcanicatollterraces_loop.gif) |
 
 ```bash
+go run ./cmd/genart render -art apolloniangasketfoam     -w 600 -h 600 -frames 20 -delay 10 -out images/apolloniangasketfoam_loop.gif
+go run ./cmd/genart render -art penrosewavefrontloom     -w 600 -h 600 -frames 20 -delay 10 -out images/penrosewavefrontloom_loop.gif
+go run ./cmd/genart render -art lorenzwatercolorsilk     -w 600 -h 600 -frames 20 -delay 10 -out images/lorenzwatercolorsilk_loop.gif
 go run ./cmd/genart render -art agategeodecrystal        -w 600 -h 600 -frames 20 -delay 12 -out images/agategeodecrystal_loop.gif
 go run ./cmd/genart render -art fabergeguillocheornament -w 600 -h 600 -frames 20 -delay 12 -out images/fabergeguillocheornament_loop.gif
 go run ./cmd/genart render -art auroracurtainfold        -w 600 -h 600 -frames 20 -delay 12 -out images/auroracurtainfold_loop.gif
@@ -269,7 +272,89 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
 
 ---
 
-## Wave 27: Multi-Paradigm Non-Mœbius Flagship Quartet — Brazilian Agate & Amethyst Geode, Song Dynasty Blue-and-Green Shanshui Scroll, Imperial Fabergé Guilloché Enamel Star & 3D Polar Aurora Borealis Fjord
+## Wave 28: Apollonian, Quasicrystal & Muqarnas Flagship Trio — 3-Level Descartes-Soddy Apollonian Sphere Packing, 10-Fold Penrose P3 Quasicrystal Medallion & 3D Alhambra Muqarnas Honeycomb Dome
+
+### Apollonian Gasket Foam
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20262802)
+	c.SetBackground(color.RGBA{R: 12, G: 16, B: 28, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewApollonianGasketFoam(6, 3, 380.0))
+	c.ToPNG("apolloniangasketfoam.png")
+}
+```
+
+![Apollonian Gasket Foam](images/apolloniangasketfoam.png)
+
+### Penrose Wavefront Loom
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20262803)
+	c.SetBackground(color.RGBA{R: 7, G: 9, B: 16, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewPenroseWavefrontLoom(5, 12, 410.0))
+	c.ToPNG("penrosewavefrontloom.png")
+}
+```
+
+![Penrose Wavefront Loom](images/penrosewavefrontloom.png)
+
+### Lorenz Watercolor Silk
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20262804)
+	c.SetBackground(color.RGBA{R: 10, G: 18, B: 32, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewLorenzWatercolorSilk(8, 20000, 395.0))
+	c.ToPNG("lorenzwatercolorsilk.png")
+}
+```
+
+![Lorenz Watercolor Silk](images/lorenzwatercolorsilk.png)
+
+---
+
+## Wave 27: Multi-Paradigm Non-Mœbius Flagship Trio — 3D Amethyst & Fortification-Agate Cathedral, 3D Imperial Fabergé Guilloché Enamel Egg & 3D Polar Aurora Borealis Fjord
 
 ### Agate Geode Crystal
 

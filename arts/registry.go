@@ -495,6 +495,29 @@ func paramBool(p map[string]interface{}, key string, def bool) bool {
 }
 
 var registry = []ArtDescriptor{
+	// Wave 28: Apollonian, Quasicrystal & Muqarnas Flagship Trio (ApollonianGasketFoam, PenroseWavefrontLoom, LorenzWatercolorSilk)
+	{
+		ID: "apolloniangasketfoam", StructName: "apollonianGasketFoam", Category: "chaos",
+		DefaultBG: color.RGBA{12, 16, 28, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewApollonianGasketFoam(paramInt(p, "depth", 6), paramInt(p, "symmetry", 3), paramFloat(p, "filmNm", 380.0))
+		},
+	},
+	{
+		ID: "penrosewavefrontloom", StructName: "penroseWavefrontLoom", Category: "geom",
+		DefaultBG: color.RGBA{7, 9, 16, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewPenroseWavefrontLoom(paramInt(p, "generations", 5), paramInt(p, "terraces", 12), paramFloat(p, "oxideNm", 410.0))
+		},
+	},
+	{
+		ID: "lorenzwatercolorsilk", StructName: "lorenzWatercolorSilk", Category: "bio",
+		DefaultBG: color.RGBA{10, 18, 32, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewLorenzWatercolorSilk(paramInt(p, "vortices", 8), paramInt(p, "fiberCount", 20000), paramFloat(p, "filmNm", 395.0))
+		},
+	},
+
 	// Wave 27: Multi-Paradigm Flagship Trio (AgateGeodeCrystal, FabergeGuillocheOrnament, AuroraCurtainFold)
 	{
 		ID: "agategeodecrystal", StructName: "agateGeodeCrystal", Category: "geom",

@@ -479,6 +479,8 @@ A comprehensive technical audit across `generativeart.go`, `platform.go`, `poste
    - Added `FidenzaVelvetLoom` (collision-free gilded lacquer flow-beam tapestry on obsidian velvet), `KuroshioBioluminescence` (3D translucent bioluminescent deep-sea Medusa with thin-film bell & trailing tentacles), `LorentzStrangeRibbon` (3D depth-sorted Lorenz butterfly strange-attractor silk ribbon sculpture), and `CoronalMagneticArcade` (3D G-Buffer Total Solar Eclipse diamond ring & coronal magnetic arcade plasma plumes).
 7. **Wave 27 Multi-Paradigm Non-Mœbius Flagship Trio (159 Engines & 48 HD Loop GIFs)**:
    - Added `AgateGeodeCrystal` (3D radiating cathedral cluster of translucent hexagonal amethyst, aquamarine-beryl, and citrine quartz prisms emerging from a Brazilian fortification-agate geode cradle), `FabergeGuillocheOrnament` (3D ray-traced Imperial Fabergé translucent Beer-Lambert guilloché enamel egg on a 24K gold chalice pedestal with orbiting 3D filigree ribbons), and `AuroraCurtainFold` (3D folded Polar Aurora Borealis draperies, Lofoten snow peaks & Arctic fjord lagoon reflection).
+8. **Wave 28 Apollonian, Quasicrystal & Muqarnas Flagship Trio (162 Engines & 51 HD Loop GIFs)**:
+   - Added `ApollonianGasketFoam` (3-level nested Descartes-Soddy Apollonian sphere packing of 600+ 3D Snell-refractive glass & fire-opal spheres), `PenroseWavefrontLoom` (10-fold \(D_{10}\) symmetric Penrose P3 quasicrystal medallion of 3D stepped pyramidal cloisonné rhombi & cabochon pearls), and `LorenzWatercolorSilk` (3D Alhambra & Isfahan *Muqarnas* honeycomb stalactite vault dome with dual-sun horizon-marched soft shadows & Persian cobalt/turquoise/gold tilework).
 
 
 

@@ -2452,6 +2452,54 @@ ac := arts.NewAuroraCurtainFold(4, 180, 1.15)
 
 ![](../images/auroracurtainfold.png)
 
+## Apollonian Gasket Foam
+
+`Apollonian Gasket Foam` synthesizes a 3-level nested Descartes-Soddy Apollonian sphere packing (`笛卡尔-阿波罗尼奥斯三阶嵌套相切球群与欧泊透镜`) with 600+ mutually tangent 3D dielectric glass, fire-opal, cinnabar ruby, celadon jade, and sapphire spheres with Snell lens refraction, cardioid caustics, and 4 corner spandrel medallions.
+
+### parameters
+
+- depth: Recursion depth of Vieta's Descartes Circle Theorem reflections (default `6`).
+- symmetry: Rotational symmetry order of the primary Soddy triad (default `3`).
+- filmNm: Base optical thin-film interference thickness in nanometers (default `380.0`).
+
+```go
+agf := arts.NewApollonianGasketFoam(6, 3, 380.0)
+```
+
+![](../images/apolloniangasketfoam.png)
+
+## Penrose Wavefront Loom
+
+`Penrose Wavefront Loom` synthesizes a 10-fold \(D_{10}\) dihedral symmetric Penrose P3 Quasicrystal medallion (`十重对称彭罗斯准晶三维掐丝珐琅星盘与螺钿镶嵌`) via exact Robinson triangle deflation, with 3D stepped pyramidal diamond vaults, inner golden rhombus filigree, and central mother-of-pearl cabochons inside a graduated 24K gold astrolabe bezel.
+
+### parameters
+
+- generations: Number of golden-ratio Robinson triangle deflation generations (default `5`).
+- terraces: Number of internal guilloché wave steps per rhombus (default `12`).
+- oxideNm: Base thin-film interference wavelength in nanometers (default `410.0`).
+
+```go
+pwl := arts.NewPenroseWavefrontLoom(5, 12, 410.0)
+```
+
+![](../images/penrosewavefrontloom.png)
+
+## Lorenz Watercolor Silk
+
+`Lorenz Watercolor Silk` synthesizes a 3D Alhambra & Isfahan *Muqarnas* Honeycomb Stalactite Vault Dome (`三维阿尔罕布拉宫穆卡纳斯钟乳石蜂巢穹顶与波斯琉璃`) with 14 concentric corbelled tiers of 500+ 3D concave fan-ribbed niches, stalactite pendants, dual-sun horizon-marched soft shadows, 12-tap vault ambient occlusion, and Persian cobalt-lapis, turquoise, cinnabar, alabaster, and 24K gold-leaf tilework.
+
+### parameters
+
+- vortices: Angular symmetry base factor for the central shamsa cupola (default `8`).
+- fiberCount: Detail resolution factor for vault micro-relief (default `20000`).
+- filmNm: Ceramic luster thin-film thickness in nanometers (default `395.0`).
+
+```go
+lws := arts.NewLorenzWatercolorSilk(8, 20000, 395.0)
+```
+
+![](../images/lorenzwatercolorsilk.png)
+
 
 
 
