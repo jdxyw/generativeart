@@ -101,8 +101,8 @@ func (pvd *perlinVelvetDunes) GenerativeFrame(c *generativeart.Canva, frameIdx, 
 	// =========================================================================
 	numStrata := pvd.strata
 	shear := pvd.windShear
-	loopX := 0.14 * math.Cos(phi)
-	loopY := 0.14 * math.Sin(phi)
+	loopX := 0.14 + 0.38*(math.Cos(phi)-1.0)
+	loopY := 0.38 * math.Sin(phi)
 
 	type duneStratum struct {
 		id         int
@@ -204,15 +204,19 @@ func (pvd *perlinVelvetDunes) GenerativeFrame(c *generativeart.Canva, frameIdx, 
 					// Evaluate strata from bottom to top (foreground to background) or top to bottom
 					for sIdx := 0; sIdx < numStrata; sIdx++ {
 						st := &strataList[sIdx]
+						dir := 1.0
+						if sIdx%2 == 1 {
+							dir = -1.0
+						}
 
-						// ErosionFBM2D + Perlin wave crest displacement yCrest(ux)
-						erodedH, sxE, _ := ne.ErosionFBM2D(ux*st.freqX+st.seedOff*0.1+loopX*0.35, st.yCenter*2.2+loopY*0.35, 3, 2.0, 0.5, 1.4*shear)
-						waveS := 0.085*math.Sin(ux*math.Pi*2.2*st.freqX*0.6+st.phaseOff) +
-							0.045*math.Cos(ux*math.Pi*3.6-st.phaseOff*0.7)
+						// ErosionFBM2D + Perlin wave crest displacement yCrest(ux) with full 2pi travelling wave phase phi
+						erodedH, sxE, _ := ne.ErosionFBM2D(ux*st.freqX+st.seedOff*0.1+loopX*0.35*dir, st.yCenter*2.2+loopY*0.35, 3, 2.0, 0.5, 1.4*shear)
+						waveS := 0.085*math.Sin(ux*math.Pi*2.2*st.freqX*0.6+st.phaseOff+dir*phi) +
+							0.045*math.Cos(ux*math.Pi*3.6-st.phaseOff*0.7-dir*phi)
 						yCurve := st.yCenter + (erodedH-0.5)*0.18*shear + waveS
 
 						// Scalloped upper and lower edges of the wind-combed dune ribbon
-						edgeScallop := 0.012 * math.Tanh(3.5*ne.Perlin2D(ux*5.5+st.seedOff, 3.1))
+						edgeScallop := 0.012 * math.Tanh(3.5*ne.Perlin2D(ux*5.5+st.seedOff+0.6*dir*math.Sin(phi), 3.1))
 						dy := uy - (yCurve + edgeScallop)
 						v := dy / st.bandThick // [-1, +1] across the stratum ribbon
 						if v < -1.0 || v > 1.0 {
@@ -220,7 +224,9 @@ func (pvd *perlinVelvetDunes) GenerativeFrame(c *generativeart.Canva, frameIdx, 
 						}
 
 						// Tangent vector (1, dy/dx) and normal vector (-dy/dx, 1) of the wave curve
-						dydx := (0.18*shear*sxE*st.freqX + 0.085*math.Pi*2.2*st.freqX*0.6*math.Cos(ux*math.Pi*2.2*st.freqX*0.6+st.phaseOff))
+						dydx := 0.18*shear*sxE*st.freqX +
+							0.085*math.Pi*2.2*st.freqX*0.6*math.Cos(ux*math.Pi*2.2*st.freqX*0.6+st.phaseOff+dir*phi) -
+							0.045*math.Pi*3.6*math.Sin(ux*math.Pi*3.6-st.phaseOff*0.7-dir*phi)
 						invLen := 1.0 / math.Sqrt(1.0+dydx*dydx)
 						nx, ny := -dydx*invLen, invLen
 

@@ -161,6 +161,9 @@
 	- [Perlin Impasto Swirl](#perlin-impasto-swirl)
 	- [Perlin Plume Tapestry](#perlin-plume-tapestry)
 	- [Perlin Velvet Dunes](#perlin-velvet-dunes)
+	- [Perlin Canyon Arch](#perlin-canyon-arch)
+	- [Perlin Brocade Fan](#perlin-brocade-fan)
+	- [Perlin Braided Ribbons](#perlin-braided-ribbons)
 
 ## CLI Tool (`cmd/genart`) & Exhibition Poster Reference
 
@@ -2586,6 +2589,54 @@ pvd := arts.NewPerlinVelvetDunes(24, 58, 1.35)
 ```
 
 ![](../images/perlinvelvetdunes.png)
+
+## Perlin Canyon Arch
+
+`Perlin Canyon Arch` synthesizes a full-bleed 2×2-supersampled 3D shadow-box paper-cut and gold-leaf Perlin canyon portal (`三维立体剪纸 Perlin 峡谷拱门、三阶金日与碧玉泻湖`) with 6 receding concentric sandstone arch frames opening onto a 3-tier golden sun sanctuary and 9 terraced turquoise, malachite-jade, and Prussian-sapphire lagoon waves.
+
+### parameters
+
+- rings: Total number of layered paper-cut arch and wave strata (default `18`).
+- ripples: Internal paper contour rib frequency (default `14`).
+- warpScale: Perlin wave amplitude multiplier (default `1.35`).
+
+```go
+pca := arts.NewPerlinCanyonArch(18, 14, 1.35)
+```
+
+![](../images/perlincanyonarch.png)
+
+## Perlin Brocade Fan
+
+`Perlin Brocade Fan` synthesizes a full-bleed 3D staggered scalloped Seigaiha and lotus-fan brocade canopy (`极坐标正交 Perlin 织金青海波宝相莲扇浮雕`) parameterized by polar Euclidean normal distance, featuring 24K gold selvedge rims, inner gold pinstripes, 3-band inlaid polychrome silk cross-sections, and deep crescent shadows.
+
+### parameters
+
+- plumes: Number of staggered scalloped fan-arch tiers (default `24`).
+- filaments: Transverse silk warp-filament ridge frequency per tier (default `56`).
+- flareCurl: Perlin FBM undulation multiplier (default `1.35`).
+
+```go
+pbf := arts.NewPerlinBrocadeFan(24, 56, 1.35)
+```
+
+![](../images/perlinbrocadefan.png)
+
+## Perlin Braided Ribbons
+
+`Perlin Braided Ribbons` synthesizes a full-bleed 3D twin-current counter-slanted braided silk and gold tapestry (`双向交织 Perlin 冷暖双流织金锦缎峡谷浮雕`) where $+25^\circ$ warm gold/coral/crimson S-ribbons interleave with $-25^\circ$ cool sapphire/turquoise/jade S-ribbons down the central canyon with 24K gold selvedge rims and deep cross-ribbon shadows.
+
+### parameters
+
+- ribbons: Number of counter-braided S-curve silk ribbons (default `28`).
+- grooves: Transverse silk warp-filament ridge frequency per ribbon (default `56`).
+- braidAmp: Perlin S-curve undulation multiplier (default `1.35`).
+
+```go
+pbr := arts.NewPerlinBraidedRibbons(28, 56, 1.35)
+```
+
+![](../images/perlinbraidedribbons.png)
 
 
 

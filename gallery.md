@@ -8,18 +8,21 @@ This gallery contains standalone `Go` usage examples and rendered outputs for `g
 
 ## 🎞️ Seamless 600×600 HD Looping GIF Animations (`DrawTimelapseFrames` + `ToGIF`)
 
-| Perlin Impasto (`perlinimpastoswirl`) | Perlin Plumes (`perlinplumetapestry`) | Perlin Dunes (`perlinvelvetdunes`) | Escher Day & Night (`escherdayandnight`) |
+| Perlin Canyon Arch (`perlincanyonarch`) | Perlin Brocade Fan (`perlinbrocadefan`) | Perlin Braided Silk (`perlinbraidedribbons`) | Perlin Silk-Brocade (`perlinimpastoswirl`) |
 | :---: | :---: | :---: | :---: |
-| ![Perlin Impasto Swirl Loop](images/perlinimpastoswirl_loop.gif) | ![Perlin Plume Tapestry Loop](images/perlinplumetapestry_loop.gif) | ![Perlin Velvet Dunes Loop](images/perlinvelvetdunes_loop.gif) | ![Escher Day and Night Loop](images/escherdayandnight_loop.gif) |
-| **Escher Path of Life (`escherimpossiblebelvedere`)** | **Escher Metamorphosis (`eschermetamorphosis`)** | **Apollonian Gasket (`apolloniangasketfoam`)** | **Penrose Quasicrystal (`penrosewavefrontloom`)** |
-| ![Escher Impossible Belvedere Loop](images/escherimpossiblebelvedere_loop.gif) | ![Escher Metamorphosis Loop](images/eschermetamorphosis_loop.gif) | ![Apollonian Gasket Foam Loop](images/apolloniangasketfoam_loop.gif) | ![Penrose Wavefront Loom Loop](images/penrosewavefrontloom_loop.gif) |
-| **Muqarnas Dome (`lorenzwatercolorsilk`)** | **3D Amethyst Cathedral (`agategeodecrystal`)** | **3D Fabergé Egg (`fabergeguillocheornament`)** | **Polar Aurora Fold (`auroracurtainfold`)** |
-| ![Lorenz Watercolor Silk Loop](images/lorenzwatercolorsilk_loop.gif) | ![Agate Geode Crystal Loop](images/agategeodecrystal_loop.gif) | ![Faberge Guilloche Ornament Loop](images/fabergeguillocheornament_loop.gif) | ![Aurora Curtain Fold Loop](images/auroracurtainfold_loop.gif) |
+| ![Perlin Canyon Arch Loop](images/perlincanyonarch_loop.gif) | ![Perlin Brocade Fan Loop](images/perlinbrocadefan_loop.gif) | ![Perlin Braided Ribbons Loop](images/perlinbraidedribbons_loop.gif) | ![Perlin Impasto Swirl Loop](images/perlinimpastoswirl_loop.gif) |
+| **Perlin Sun Scroll (`perlinplumetapestry`)** | **Perlin Velvet Dunes (`perlinvelvetdunes`)** | **Escher Day & Night (`escherdayandnight`)** | **Escher Path of Life (`escherimpossiblebelvedere`)** |
+| ![Perlin Plume Tapestry Loop](images/perlinplumetapestry_loop.gif) | ![Perlin Velvet Dunes Loop](images/perlinvelvetdunes_loop.gif) | ![Escher Day and Night Loop](images/escherdayandnight_loop.gif) | ![Escher Impossible Belvedere Loop](images/escherimpossiblebelvedere_loop.gif) |
+| **Escher Metamorphosis (`eschermetamorphosis`)** | **Apollonian Gasket (`apolloniangasketfoam`)** | **Penrose Quasicrystal (`penrosewavefrontloom`)** | **Muqarnas Dome (`lorenzwatercolorsilk`)** |
+| ![Escher Metamorphosis Loop](images/eschermetamorphosis_loop.gif) | ![Apollonian Gasket Foam Loop](images/apolloniangasketfoam_loop.gif) | ![Penrose Wavefront Loom Loop](images/penrosewavefrontloom_loop.gif) | ![Lorenz Watercolor Silk Loop](images/lorenzwatercolorsilk_loop.gif) |
 
 ```bash
-go run ./cmd/genart render -art perlinimpastoswirl       -w 600 -h 600 -frames 20 -delay 12 -out images/perlinimpastoswirl_loop.gif
-go run ./cmd/genart render -art perlinplumetapestry      -w 600 -h 600 -frames 20 -delay 12 -out images/perlinplumetapestry_loop.gif
-go run ./cmd/genart render -art perlinvelvetdunes        -w 600 -h 600 -frames 20 -delay 12 -out images/perlinvelvetdunes_loop.gif
+go run ./cmd/genart render -art perlincanyonarch         -w 600 -h 600 -frames 20 -delay 8  -out images/perlincanyonarch_loop.gif
+go run ./cmd/genart render -art perlinbrocadefan         -w 600 -h 600 -frames 20 -delay 8  -out images/perlinbrocadefan_loop.gif
+go run ./cmd/genart render -art perlinbraidedribbons     -w 600 -h 600 -frames 20 -delay 8  -out images/perlinbraidedribbons_loop.gif
+go run ./cmd/genart render -art perlinimpastoswirl       -w 600 -h 600 -frames 20 -delay 8  -out images/perlinimpastoswirl_loop.gif
+go run ./cmd/genart render -art perlinplumetapestry      -w 600 -h 600 -frames 20 -delay 8  -out images/perlinplumetapestry_loop.gif
+go run ./cmd/genart render -art perlinvelvetdunes        -w 600 -h 600 -frames 20 -delay 7  -out images/perlinvelvetdunes_loop.gif
 go run ./cmd/genart render -art escherdayandnight        -w 600 -h 600 -frames 20 -delay 10 -out images/escherdayandnight_loop.gif
 go run ./cmd/genart render -art escherimpossiblebelvedere -w 600 -h 600 -frames 20 -delay 10 -out images/escherimpossiblebelvedere_loop.gif
 go run ./cmd/genart render -art eschermetamorphosis      -w 600 -h 600 -frames 20 -delay 10 -out images/eschermetamorphosis_loop.gif
@@ -96,6 +99,10 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
 
 ## Table of Contents
 
+- [Wave 31: Perlin 3D Shadow-Box Canyon Portal, Scalloped Lotus-Fan Brocade & Twin-Current Braided Silk Trio](#wave-31-perlin-3d-shadow-box-canyon-portal-scalloped-lotus-fan-brocade--twin-current-braided-silk-trio)
+  - [Perlin Canyon Arch](#perlin-canyon-arch)
+  - [Perlin Brocade Fan](#perlin-brocade-fan)
+  - [Perlin Braided Ribbons](#perlin-braided-ribbons)
 - [Wave 30: Perlin Tactile Combed-Impasto, Iridescent Plume & Velvet Dune Relief Trio — Polychrome Perlin Curl Combed-Impasto Swaths, Domain-Warped Iridescent Plume Tapestry & Erosion-Perlin Velvet Dunes](#wave-30-perlin-tactile-combed-impasto-iridescent-plume--velvet-dune-relief-trio--polychrome-perlin-curl-combed-impasto-swaths-domain-warped-iridescent-plume-tapestry--erosion-perlin-velvet-dunes)
   - [Perlin Impasto Swirl](#perlin-impasto-swirl)
   - [Perlin Plume Tapestry](#perlin-plume-tapestry)
@@ -286,6 +293,88 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
   - [Silk Sky](#silk-sky)
   - [Circle Move](#circle-move)
   - [Random Circle](#random-circle)
+
+---
+
+## Wave 31: Perlin 3D Shadow-Box Canyon Portal, Scalloped Lotus-Fan Brocade & Twin-Current Braided Silk Trio
+
+### Perlin Canyon Arch
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20263101)
+	c.SetBackground(color.RGBA{R: 252, G: 224, B: 142, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewPerlinCanyonArch(18, 14, 1.35))
+	c.ToPNG("perlincanyonarch.png")
+}
+```
+
+![Perlin Canyon Arch](images/perlincanyonarch.png)
+
+### Perlin Brocade Fan
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20263102)
+	c.SetBackground(color.RGBA{R: 12, G: 10, B: 24, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewPerlinBrocadeFan(24, 56, 1.35))
+	c.ToPNG("perlinbrocadefan.png")
+}
+```
+
+![Perlin Brocade Fan](images/perlinbrocadefan.png)
+
+### Perlin Braided Ribbons
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20263103)
+	c.SetBackground(color.RGBA{R: 12, G: 10, B: 24, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewPerlinBraidedRibbons(28, 56, 1.35))
+	c.ToPNG("perlinbraidedribbons.png")
+}
+```
+
+![Perlin Braided Ribbons](images/perlinbraidedribbons.png)
 
 ---
 

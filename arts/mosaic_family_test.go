@@ -113,6 +113,9 @@ func TestMosaicFamilyGenerators(t *testing.T) {
 		{"PerlinImpastoSwirl", NewPerlinImpastoSwirl(24, 48, 1.35)},
 		{"PerlinPlumeTapestry", NewPerlinPlumeTapestry(20, 12, 1.35)},
 		{"PerlinVelvetDunes", NewPerlinVelvetDunes(18, 48, 1.35)},
+		{"PerlinCanyonArch", NewPerlinCanyonArch(18, 14, 1.35)},
+		{"PerlinBrocadeFan", NewPerlinBrocadeFan(20, 48, 1.35)},
+		{"PerlinBraidedRibbons", NewPerlinBraidedRibbons(22, 48, 1.35)},
 	}
 
 	for _, tc := range cases {

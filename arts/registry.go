@@ -495,6 +495,28 @@ func paramBool(p map[string]interface{}, key string, def bool) bool {
 }
 
 var registry = []ArtDescriptor{
+	// Wave 31: Perlin 3D Shadow-Box Canyon Portal, Scalloped Lotus-Fan Brocade & Twin-Current Braided Silk Trio
+	{
+		ID: "perlincanyonarch", StructName: "perlinCanyonArch", Category: "geom",
+		DefaultBG: color.RGBA{252, 224, 142, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewPerlinCanyonArch(paramInt(p, "rings", 18), paramInt(p, "ripples", 14), paramFloat(p, "warpScale", 1.35))
+		},
+	},
+	{
+		ID: "perlinbrocadefan", StructName: "perlinBrocadeFan", Category: "media",
+		DefaultBG: color.RGBA{12, 10, 24, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewPerlinBrocadeFan(paramInt(p, "plumes", 24), paramInt(p, "filaments", 56), paramFloat(p, "flareCurl", 1.35))
+		},
+	},
+	{
+		ID: "perlinbraidedribbons", StructName: "perlinBraidedRibbons", Category: "flow",
+		DefaultBG: color.RGBA{12, 10, 24, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewPerlinBraidedRibbons(paramInt(p, "ribbons", 28), paramInt(p, "grooves", 56), paramFloat(p, "braidAmp", 1.35))
+		},
+	},
 	// Wave 30: Perlin Gilded Silk-Brocade S-Stream, 3D Shadow-Box Paper-Cut Sun Scroll & Velvet Dune Relief Trio
 	{
 		ID: "perlinimpastoswirl", StructName: "perlinImpastoSwirl", Category: "media",
