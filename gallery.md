@@ -8,15 +8,17 @@ This gallery contains standalone `Go` usage examples and rendered outputs for `g
 
 ## 🎞️ Seamless 600×600 HD Looping GIF Animations (`DrawTimelapseFrames` + `ToGIF`)
 
-| Perlin Canyon Arch (`perlincanyonarch`) | Perlin Brocade Fan (`perlinbrocadefan`) | Perlin Braided Silk (`perlinbraidedribbons`) | Perlin Silk-Brocade (`perlinimpastoswirl`) |
+| Perlin Taiji Scroll (`perlinyinyangvortex`) | Perlin Shanshui Canyon (`perlinshanshuiscroll`) | Perlin Canyon Arch (`perlincanyonarch`) | Perlin Brocade Fan (`perlinbrocadefan`) |
 | :---: | :---: | :---: | :---: |
-| ![Perlin Canyon Arch Loop](images/perlincanyonarch_loop.gif) | ![Perlin Brocade Fan Loop](images/perlinbrocadefan_loop.gif) | ![Perlin Braided Ribbons Loop](images/perlinbraidedribbons_loop.gif) | ![Perlin Impasto Swirl Loop](images/perlinimpastoswirl_loop.gif) |
-| **Perlin Sun Scroll (`perlinplumetapestry`)** | **Perlin Velvet Dunes (`perlinvelvetdunes`)** | **Escher Day & Night (`escherdayandnight`)** | **Escher Path of Life (`escherimpossiblebelvedere`)** |
-| ![Perlin Plume Tapestry Loop](images/perlinplumetapestry_loop.gif) | ![Perlin Velvet Dunes Loop](images/perlinvelvetdunes_loop.gif) | ![Escher Day and Night Loop](images/escherdayandnight_loop.gif) | ![Escher Impossible Belvedere Loop](images/escherimpossiblebelvedere_loop.gif) |
-| **Escher Metamorphosis (`eschermetamorphosis`)** | **Apollonian Gasket (`apolloniangasketfoam`)** | **Penrose Quasicrystal (`penrosewavefrontloom`)** | **Muqarnas Dome (`lorenzwatercolorsilk`)** |
-| ![Escher Metamorphosis Loop](images/eschermetamorphosis_loop.gif) | ![Apollonian Gasket Foam Loop](images/apolloniangasketfoam_loop.gif) | ![Penrose Wavefront Loom Loop](images/penrosewavefrontloom_loop.gif) | ![Lorenz Watercolor Silk Loop](images/lorenzwatercolorsilk_loop.gif) |
+| ![Perlin Yin Yang Vortex Loop](images/perlinyinyangvortex_loop.gif) | ![Perlin Shanshui Scroll Loop](images/perlinshanshuiscroll_loop.gif) | ![Perlin Canyon Arch Loop](images/perlincanyonarch_loop.gif) | ![Perlin Brocade Fan Loop](images/perlinbrocadefan_loop.gif) |
+| **Perlin Braided Silk (`perlinbraidedribbons`)** | **Perlin Silk-Brocade (`perlinimpastoswirl`)** | **Perlin Sun Scroll (`perlinplumetapestry`)** | **Perlin Velvet Dunes (`perlinvelvetdunes`)** |
+| ![Perlin Braided Ribbons Loop](images/perlinbraidedribbons_loop.gif) | ![Perlin Impasto Swirl Loop](images/perlinimpastoswirl_loop.gif) | ![Perlin Plume Tapestry Loop](images/perlinplumetapestry_loop.gif) | ![Perlin Velvet Dunes Loop](images/perlinvelvetdunes_loop.gif) |
+| **Escher Day & Night (`escherdayandnight`)** | **Escher Path of Life (`escherimpossiblebelvedere`)** | **Escher Metamorphosis (`eschermetamorphosis`)** | **Apollonian Gasket (`apolloniangasketfoam`)** |
+| ![Escher Day and Night Loop](images/escherdayandnight_loop.gif) | ![Escher Impossible Belvedere Loop](images/escherimpossiblebelvedere_loop.gif) | ![Escher Metamorphosis Loop](images/eschermetamorphosis_loop.gif) | ![Apollonian Gasket Foam Loop](images/apolloniangasketfoam_loop.gif) |
 
 ```bash
+go run ./cmd/genart render -art perlinyinyangvortex      -w 600 -h 600 -frames 20 -delay 8  -out images/perlinyinyangvortex_loop.gif
+go run ./cmd/genart render -art perlinshanshuiscroll     -w 600 -h 600 -frames 20 -delay 8  -out images/perlinshanshuiscroll_loop.gif
 go run ./cmd/genart render -art perlincanyonarch         -w 600 -h 600 -frames 20 -delay 8  -out images/perlincanyonarch_loop.gif
 go run ./cmd/genart render -art perlinbrocadefan         -w 600 -h 600 -frames 20 -delay 8  -out images/perlinbrocadefan_loop.gif
 go run ./cmd/genart render -art perlinbraidedribbons     -w 600 -h 600 -frames 20 -delay 8  -out images/perlinbraidedribbons_loop.gif
@@ -99,6 +101,9 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
 
 ## Table of Contents
 
+- [Wave 32: Perlin Taiji Dual-Sanctuary S-Bridge & Winding Shanshui Canyon Duo](#wave-32-perlin-taiji-dual-sanctuary-s-bridge--winding-shanshui-canyon-duo)
+  - [Perlin Yin Yang Vortex](#perlin-yin-yang-vortex)
+  - [Perlin Shanshui Scroll](#perlin-shanshui-scroll)
 - [Wave 31: Perlin 3D Shadow-Box Canyon Portal, Scalloped Lotus-Fan Brocade & Twin-Current Braided Silk Trio](#wave-31-perlin-3d-shadow-box-canyon-portal-scalloped-lotus-fan-brocade--twin-current-braided-silk-trio)
   - [Perlin Canyon Arch](#perlin-canyon-arch)
   - [Perlin Brocade Fan](#perlin-brocade-fan)
@@ -293,6 +298,62 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
   - [Silk Sky](#silk-sky)
   - [Circle Move](#circle-move)
   - [Random Circle](#random-circle)
+
+---
+
+## Wave 32: Perlin Taiji Dual-Sanctuary S-Bridge & Winding Shanshui Canyon Duo
+
+### Perlin Yin Yang Vortex
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20263201)
+	c.SetBackground(color.RGBA{R: 12, G: 10, B: 24, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewPerlinYinYangVortex(12, 54, 1.35))
+	c.ToPNG("perlinyinyangvortex.png")
+}
+```
+
+![Perlin Yin Yang Vortex](images/perlinyinyangvortex.png)
+
+### Perlin Shanshui Scroll
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20263203)
+	c.SetBackground(color.RGBA{R: 252, G: 224, B: 142, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewPerlinShanshuiScroll(10, 12, 1.35))
+	c.ToPNG("perlinshanshuiscroll.png")
+}
+```
+
+![Perlin Shanshui Scroll](images/perlinshanshuiscroll.png)
 
 ---
 

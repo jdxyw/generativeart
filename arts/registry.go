@@ -495,6 +495,21 @@ func paramBool(p map[string]interface{}, key string, def bool) bool {
 }
 
 var registry = []ArtDescriptor{
+	// Wave 32: Perlin Taiji Dual-Sanctuary S-Bridge & Winding Shanshui Canyon Duo
+	{
+		ID: "perlinyinyangvortex", StructName: "perlinYinYangVortex", Category: "chaos",
+		DefaultBG: color.RGBA{12, 10, 24, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewPerlinYinYangVortex(paramInt(p, "arms", 12), paramInt(p, "grooves", 54), paramFloat(p, "spiralAmp", 1.35))
+		},
+	},
+	{
+		ID: "perlinshanshuiscroll", StructName: "perlinShanshuiScroll", Category: "media",
+		DefaultBG: color.RGBA{252, 224, 142, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewPerlinShanshuiScroll(paramInt(p, "peaks", 10), paramInt(p, "riverSteps", 12), paramFloat(p, "canyonScale", 1.35))
+		},
+	},
 	// Wave 31: Perlin 3D Shadow-Box Canyon Portal, Scalloped Lotus-Fan Brocade & Twin-Current Braided Silk Trio
 	{
 		ID: "perlincanyonarch", StructName: "perlinCanyonArch", Category: "geom",

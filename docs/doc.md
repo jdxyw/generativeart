@@ -164,6 +164,8 @@
 	- [Perlin Canyon Arch](#perlin-canyon-arch)
 	- [Perlin Brocade Fan](#perlin-brocade-fan)
 	- [Perlin Braided Ribbons](#perlin-braided-ribbons)
+	- [Perlin Yin Yang Vortex](#perlin-yin-yang-vortex)
+	- [Perlin Shanshui Scroll](#perlin-shanshui-scroll)
 
 ## CLI Tool (`cmd/genart`) & Exhibition Poster Reference
 
@@ -2637,6 +2639,38 @@ pbr := arts.NewPerlinBraidedRibbons(28, 56, 1.35)
 ```
 
 ![](../images/perlinbraidedribbons.png)
+
+## Perlin Yin Yang Vortex
+
+`Perlin Yin Yang Vortex` synthesizes a full-bleed 2×2-supersampled 3D shadow-box and gilded silk-brocade Taiji Dual-Sanctuary scroll (`三维织金与剪纸太极日月双曜云海 S 桥画卷`) uniting an upper-left 3-tier Solar Sanctuary and lower-right 3-tier Lunar Sanctuary across 9 pyramid-depth-sorted S-bridge silk ribbons.
+
+### parameters
+
+- arms: Number of Taiji S-bridge silk ribbons and vortex rings (default `12`).
+- grooves: Transverse silk warp-filament ridge frequency (default `54`).
+- spiralAmp: Perlin S-curve undulation multiplier (default `1.35`).
+
+```go
+pyy := arts.NewPerlinYinYangVortex(12, 54, 1.35)
+```
+
+![](../images/perlinyinyangvortex.png)
+
+## Perlin Shanshui Scroll
+
+`Perlin Shanshui Scroll` synthesizes a full-bleed 2×2-supersampled 3D shadow-box and gilded silk *Qianli Jiangshan* scroll (`三维织金与剪纸《千里江山》蜿蜒金碧峡谷画卷`) where 10 alternating left- and right-bank Azurite, Malachite, and Cinnabar karst headlands plunge into a winding S-curve golden-turquoise river canyon beneath sunset cloud scrolls.
+
+### parameters
+
+- peaks: Number of alternating left- and right-bank karst mountain headlands (default `10`).
+- riverSteps: Number of terraced river rapid steps (default `12`).
+- canyonScale: Perlin mountain relief amplitude multiplier (default `1.35`).
+
+```go
+pss := arts.NewPerlinShanshuiScroll(10, 12, 1.35)
+```
+
+![](../images/perlinshanshuiscroll.png)
 
 
 
