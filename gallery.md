@@ -8,15 +8,18 @@ This gallery contains standalone `Go` usage examples and rendered outputs for `g
 
 ## 🎞️ Seamless 600×600 HD Looping GIF Animations (`DrawTimelapseFrames` + `ToGIF`)
 
-| Escher Day & Night (`escherdayandnight`) | Escher Path of Life (`escherimpossiblebelvedere`) | Escher Metamorphosis (`eschermetamorphosis`) | Apollonian Gasket (`apolloniangasketfoam`) |
+| Perlin Impasto (`perlinimpastoswirl`) | Perlin Plumes (`perlinplumetapestry`) | Perlin Dunes (`perlinvelvetdunes`) | Escher Day & Night (`escherdayandnight`) |
 | :---: | :---: | :---: | :---: |
-| ![Escher Day and Night Loop](images/escherdayandnight_loop.gif) | ![Escher Impossible Belvedere Loop](images/escherimpossiblebelvedere_loop.gif) | ![Escher Metamorphosis Loop](images/eschermetamorphosis_loop.gif) | ![Apollonian Gasket Foam Loop](images/apolloniangasketfoam_loop.gif) |
-| **Penrose Quasicrystal (`penrosewavefrontloom`)** | **Muqarnas Dome (`lorenzwatercolorsilk`)** | **3D Amethyst Cathedral (`agategeodecrystal`)** | **3D Fabergé Egg (`fabergeguillocheornament`)** |
-| ![Penrose Wavefront Loom Loop](images/penrosewavefrontloom_loop.gif) | ![Lorenz Watercolor Silk Loop](images/lorenzwatercolorsilk_loop.gif) | ![Agate Geode Crystal Loop](images/agategeodecrystal_loop.gif) | ![Faberge Guilloche Ornament Loop](images/fabergeguillocheornament_loop.gif) |
-| **Polar Aurora Fold (`auroracurtainfold`)** | **Fidenza Velvet Loom (`fidenzavelvetloom`)** | **Abyssal Medusa (`kuroshiobioluminescence`)** | **3D Lorentz Ribbons (`lorentzstrangeribbon`)** |
-| ![Aurora Curtain Fold Loop](images/auroracurtainfold_loop.gif) | ![Fidenza Velvet Loom Loop](images/fidenzavelvetloom_loop.gif) | ![Kuroshio Bioluminescence Loop](images/kuroshiobioluminescence_loop.gif) | ![Lorentz Strange Ribbon Loop](images/lorentzstrangeribbon_loop.gif) |
+| ![Perlin Impasto Swirl Loop](images/perlinimpastoswirl_loop.gif) | ![Perlin Plume Tapestry Loop](images/perlinplumetapestry_loop.gif) | ![Perlin Velvet Dunes Loop](images/perlinvelvetdunes_loop.gif) | ![Escher Day and Night Loop](images/escherdayandnight_loop.gif) |
+| **Escher Path of Life (`escherimpossiblebelvedere`)** | **Escher Metamorphosis (`eschermetamorphosis`)** | **Apollonian Gasket (`apolloniangasketfoam`)** | **Penrose Quasicrystal (`penrosewavefrontloom`)** |
+| ![Escher Impossible Belvedere Loop](images/escherimpossiblebelvedere_loop.gif) | ![Escher Metamorphosis Loop](images/eschermetamorphosis_loop.gif) | ![Apollonian Gasket Foam Loop](images/apolloniangasketfoam_loop.gif) | ![Penrose Wavefront Loom Loop](images/penrosewavefrontloom_loop.gif) |
+| **Muqarnas Dome (`lorenzwatercolorsilk`)** | **3D Amethyst Cathedral (`agategeodecrystal`)** | **3D Fabergé Egg (`fabergeguillocheornament`)** | **Polar Aurora Fold (`auroracurtainfold`)** |
+| ![Lorenz Watercolor Silk Loop](images/lorenzwatercolorsilk_loop.gif) | ![Agate Geode Crystal Loop](images/agategeodecrystal_loop.gif) | ![Faberge Guilloche Ornament Loop](images/fabergeguillocheornament_loop.gif) | ![Aurora Curtain Fold Loop](images/auroracurtainfold_loop.gif) |
 
 ```bash
+go run ./cmd/genart render -art perlinimpastoswirl       -w 600 -h 600 -frames 20 -delay 12 -out images/perlinimpastoswirl_loop.gif
+go run ./cmd/genart render -art perlinplumetapestry      -w 600 -h 600 -frames 20 -delay 12 -out images/perlinplumetapestry_loop.gif
+go run ./cmd/genart render -art perlinvelvetdunes        -w 600 -h 600 -frames 20 -delay 12 -out images/perlinvelvetdunes_loop.gif
 go run ./cmd/genart render -art escherdayandnight        -w 600 -h 600 -frames 20 -delay 10 -out images/escherdayandnight_loop.gif
 go run ./cmd/genart render -art escherimpossiblebelvedere -w 600 -h 600 -frames 20 -delay 10 -out images/escherimpossiblebelvedere_loop.gif
 go run ./cmd/genart render -art eschermetamorphosis      -w 600 -h 600 -frames 20 -delay 10 -out images/eschermetamorphosis_loop.gif
@@ -93,6 +96,17 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
 
 ## Table of Contents
 
+- [Wave 30: Perlin Tactile Combed-Impasto, Iridescent Plume & Velvet Dune Relief Trio — Polychrome Perlin Curl Combed-Impasto Swaths, Domain-Warped Iridescent Plume Tapestry & Erosion-Perlin Velvet Dunes](#wave-30-perlin-tactile-combed-impasto-iridescent-plume--velvet-dune-relief-trio--polychrome-perlin-curl-combed-impasto-swaths-domain-warped-iridescent-plume-tapestry--erosion-perlin-velvet-dunes)
+  - [Perlin Impasto Swirl](#perlin-impasto-swirl)
+  - [Perlin Plume Tapestry](#perlin-plume-tapestry)
+  - [Perlin Velvet Dunes](#perlin-velvet-dunes)
+- [Wave 29: M.C. Escher Metamorphosis & Conformal Whirlpool Print Duo — Day and Night Farmland-to-Swans & Path of Life Log-Spiral Koi Whirlpool](#wave-29-mc-escher-metamorphosis--conformal-whirlpool-print-duo--day-and-night-farmland-to-swans--path-of-life-log-spiral-koi-whirlpool)
+  - [Escher Day and Night](#escher-day-and-night)
+  - [Escher Impossible Belvedere](#escher-impossible-belvedere)
+- [Wave 28: Apollonian, Quasicrystal & Muqarnas Flagship Trio — 3-Level Descartes-Soddy Apollonian Sphere Packing, 10-Fold Penrose P3 Quasicrystal Medallion & 3D Alhambra Muqarnas Honeycomb Dome](#wave-28-apollonian-quasicrystal--muqarnas-flagship-trio--3-level-descartes-soddy-apollonian-sphere-packing-10-fold-penrose-p3-quasicrystal-medallion--3d-alhambra-muqarnas-honeycomb-dome)
+  - [Apollonian Gasket Foam](#apollonian-gasket-foam)
+  - [Penrose Wavefront Loom](#penrose-wavefront-loom)
+  - [Lorenz Watercolor Silk](#lorenz-watercolor-silk)
 - [Wave 27: Multi-Paradigm Non-Mœbius Flagship Quartet — Brazilian Agate & Amethyst Geode, Song Dynasty Blue-and-Green Shanshui Scroll, Imperial Fabergé Guilloché Enamel Star & 3D Polar Aurora Borealis Fjord](#wave-27-multi-paradigm-non-mœbius-flagship-quartet--brazilian-agate--amethyst-geode-song-dynasty-blue-and-green-shanshui-scroll-imperial-fabergé-guilloché-enamel-star--3d-polar-aurora-borealis-fjord)
   - [Agate Geode Crystal](#agate-geode-crystal)
   - [Song Blue Green Scroll](#song-blue-green-scroll)
@@ -272,6 +286,88 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
   - [Silk Sky](#silk-sky)
   - [Circle Move](#circle-move)
   - [Random Circle](#random-circle)
+
+---
+
+## Wave 30: Perlin Tactile Combed-Impasto, Iridescent Plume & Velvet Dune Relief Trio — Polychrome Perlin Curl Combed-Impasto Swaths, Domain-Warped Iridescent Plume Tapestry & Erosion-Perlin Velvet Dunes
+
+### Perlin Impasto Swirl
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20263011)
+	c.SetBackground(color.RGBA{R: 18, G: 8, B: 14, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewPerlinImpastoSwirl(28, 58, 1.35))
+	c.ToPNG("perlinimpastoswirl.png")
+}
+```
+
+![Perlin Impasto Swirl](images/perlinimpastoswirl.png)
+
+### Perlin Plume Tapestry
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20263012)
+	c.SetBackground(color.RGBA{R: 252, G: 224, B: 142, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewPerlinPlumeTapestry(22, 12, 1.35))
+	c.ToPNG("perlinplumetapestry.png")
+}
+```
+
+![Perlin Plume Tapestry](images/perlinplumetapestry.png)
+
+### Perlin Velvet Dunes
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20263013)
+	c.SetBackground(color.RGBA{R: 10, G: 6, B: 14, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewPerlinVelvetDunes(24, 58, 1.35))
+	c.ToPNG("perlinvelvetdunes.png")
+}
+```
+
+![Perlin Velvet Dunes](images/perlinvelvetdunes.png)
 
 ---
 

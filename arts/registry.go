@@ -495,6 +495,28 @@ func paramBool(p map[string]interface{}, key string, def bool) bool {
 }
 
 var registry = []ArtDescriptor{
+	// Wave 30: Perlin Gilded Silk-Brocade S-Stream, 3D Shadow-Box Paper-Cut Sun Scroll & Velvet Dune Relief Trio
+	{
+		ID: "perlinimpastoswirl", StructName: "perlinImpastoSwirl", Category: "media",
+		DefaultBG: color.RGBA{18, 8, 14, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewPerlinImpastoSwirl(paramInt(p, "swaths", 28), paramInt(p, "bristles", 58), paramFloat(p, "curlStrength", 1.35))
+		},
+	},
+	{
+		ID: "perlinplumetapestry", StructName: "perlinPlumeTapestry", Category: "bio",
+		DefaultBG: color.RGBA{252, 224, 142, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewPerlinPlumeTapestry(paramInt(p, "plumes", 22), paramInt(p, "barbs", 12), paramFloat(p, "warpScale", 1.35))
+		},
+	},
+	{
+		ID: "perlinvelvetdunes", StructName: "perlinVelvetDunes", Category: "flow",
+		DefaultBG: color.RGBA{10, 6, 14, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewPerlinVelvetDunes(paramInt(p, "strata", 24), paramInt(p, "grooves", 58), paramFloat(p, "windShear", 1.35))
+		},
+	},
 	// Wave 29: M.C. Escher Metamorphosis & Whirlpool Print Duo (EscherDayAndNight, EscherImpossibleBelvedere)
 	{
 		ID: "escherdayandnight", StructName: "escherDayAndNight", Category: "geom",

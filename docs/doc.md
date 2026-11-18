@@ -151,9 +151,16 @@
 	- [Lorentz Strange Ribbon](#lorentz-strange-ribbon)
 	- [Coronal Magnetic Arcade](#coronal-magnetic-arcade)
 	- [Agate Geode Crystal](#agate-geode-crystal)
-	- [Song Blue Green Scroll](#song-blue-green-scroll)
 	- [Faberge Guilloche Ornament](#faberge-guilloche-ornament)
 	- [Aurora Curtain Fold](#aurora-curtain-fold)
+	- [Apollonian Gasket Foam](#apollonian-gasket-foam)
+	- [Penrose Wavefront Loom](#penrose-wavefront-loom)
+	- [Lorenz Watercolor Silk](#lorenz-watercolor-silk)
+	- [Escher Day and Night](#escher-day-and-night)
+	- [Escher Impossible Belvedere](#escher-impossible-belvedere)
+	- [Perlin Impasto Swirl](#perlin-impasto-swirl)
+	- [Perlin Plume Tapestry](#perlin-plume-tapestry)
+	- [Perlin Velvet Dunes](#perlin-velvet-dunes)
 
 ## CLI Tool (`cmd/genart`) & Exhibition Poster Reference
 
@@ -2531,6 +2538,54 @@ eib := arts.NewEscherImpossibleBelvedere(8, 8, 1.0)
 ```
 
 ![](../images/escherimpossiblebelvedere.png)
+
+## Perlin Impasto Swirl
+
+`Perlin Impasto Swirl` synthesizes a full-bleed 3D interweaving diagonal S-curve gilded silk-brocade sash relief (`欧氏正交距离 Perlin 织金三色锦缎对角交织浮雕`) parameterized by exact Euclidean normal distance: 28 continuous edge-to-edge S-bending sashes with 24K gold selvedge rims, inner gold pinstripes, 3-band inlaid polychrome silk cross-sections, fine warp filaments, and deep inter-ribbon cast shadows.
+
+### parameters
+
+- swaths: Number of overlapping continuous S-curve silk-brocade sashes (default `28`).
+- bristles: Transverse silk warp-filament ridge frequency per sash (default `58`).
+- curlStrength: Perlin S-curve undulation and FBM displacement multiplier (default `1.35`).
+
+```go
+pis := arts.NewPerlinImpastoSwirl(28, 58, 1.35)
+```
+
+![](../images/perlinimpastoswirl.png)
+
+## Perlin Plume Tapestry
+
+`Perlin Plume Tapestry` synthesizes a full-bleed 2×2-supersampled 3D shadow-box paper-cut and gold-leaf Perlin scroll (`三维立体剪纸层叠 Perlin 云海苍山与金日倒影画卷`): 6 arching sunset cloud draperies and 11 terraced mountain and ocean-wave strata framing a 3-tier recessed golden sun sanctuary, with multi-step directional drop shadows, archival cotton-paper grain, and burnished 24K gold-leaf cut rims.
+
+### parameters
+
+- plumes: Total number of layered paper-cut cloud and wave strata (default `22`).
+- barbs: Internal paper contour rib frequency (default `12`).
+- warpScale: Perlin wave amplitude multiplier (default `1.35`).
+
+```go
+ppt := arts.NewPerlinPlumeTapestry(22, 12, 1.35)
+```
+
+![](../images/perlinplumetapestry.png)
+
+## Perlin Velvet Dunes
+
+`Perlin Velvet Dunes` synthesizes a full-bleed, horizon-to-horizon 3D wind-combed silk and sandstone dune relief (`梯度抑制 Perlin 侵蚀流金丝绒沙丘与彩陶风纹浮雕`) driven by `ErosionFBM2D` and `FBM2DDeriv`, featuring overlapping undulating strata with hundreds of continuous wind-carved grooves, deep inter-crest cast shadows, and mineral stardust flecks.
+
+### parameters
+
+- strata: Number of overlapping full-width undulating dune strata (default `24`).
+- grooves: Transverse wind-combed micro-groove frequency per stratum (default `58`).
+- windShear: Gradient-damped erosion and wave amplitude multiplier (default `1.35`).
+
+```go
+pvd := arts.NewPerlinVelvetDunes(24, 58, 1.35)
+```
+
+![](../images/perlinvelvetdunes.png)
 
 
 
