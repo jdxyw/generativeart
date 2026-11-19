@@ -495,6 +495,28 @@ func paramBool(p map[string]interface{}, key string, def bool) bool {
 }
 
 var registry = []ArtDescriptor{
+	// Wave 33: 3D Voronoi Kintsugi Geode, Triaxial Over-Under Kagome Silk Weave & Conformal Nautilus Chamber Scroll Trio
+	{
+		ID: "kintsugigeode", StructName: "kintsugiGeode", Category: "geom",
+		DefaultBG: color.RGBA{10, 14, 32, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewKintsugiGeode(paramInt(p, "plates", 24), paramInt(p, "tiers", 4), paramFloat(p, "warpScale", 1.35))
+		},
+	},
+	{
+		ID: "kagomesilkweave", StructName: "kagomeSilkWeave", Category: "media",
+		DefaultBG: color.RGBA{10, 18, 46, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewKagomeSilkWeave(paramInt(p, "bands", 7), paramInt(p, "filaments", 48), paramFloat(p, "waveAmp", 1.25))
+		},
+	},
+	{
+		ID: "nautiluschamberscroll", StructName: "nautilusChamberScroll", Category: "bio",
+		DefaultBG: color.RGBA{12, 18, 42, 255}, DefaultPal: "dunhuang",
+		Build: func(p map[string]interface{}) generativeart.Engine {
+			return NewNautilusChamberScroll(paramInt(p, "chambersPerTurn", 14), paramInt(p, "terraces", 4), paramFloat(p, "spiralTightness", 1.0))
+		},
+	},
 	// Wave 32: Perlin Taiji Dual-Sanctuary S-Bridge & Winding Shanshui Canyon Duo
 	{
 		ID: "perlinyinyangvortex", StructName: "perlinYinYangVortex", Category: "chaos",

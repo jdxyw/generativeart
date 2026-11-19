@@ -166,6 +166,9 @@
 	- [Perlin Braided Ribbons](#perlin-braided-ribbons)
 	- [Perlin Yin Yang Vortex](#perlin-yin-yang-vortex)
 	- [Perlin Shanshui Scroll](#perlin-shanshui-scroll)
+	- [Kintsugi Geode](#kintsugi-geode)
+	- [Kagome Silk Weave](#kagome-silk-weave)
+	- [Nautilus Chamber Scroll](#nautilus-chamber-scroll)
 
 ## CLI Tool (`cmd/genart`) & Exhibition Poster Reference
 
@@ -2671,6 +2674,54 @@ pss := arts.NewPerlinShanshuiScroll(10, 12, 1.35)
 ```
 
 ![](../images/perlinshanshuiscroll.png)
+
+## Kintsugi Geode
+
+`Kintsugi Geode` synthesizes a full-bleed 2×2-supersampled 3D Voronoi Kintsugi and fortification-agate tectonic relief (`三维劳埃德金缮裂谷与四阶堡垒玛瑙板块浮雕`) with 24 Lloyd-relaxed 4-tier stepped agate plates separated by deep obsidian canyons and gleaming 3D cylindrical 24K Kintsugi gold veins.
+
+### parameters
+
+- plates: Number of Lloyd-relaxed Voronoi agate plates (default `24`).
+- tiers: Number of concentric stepped fortification-agate tiers per plate (default `4`).
+- warpScale: Perlin fissure domain-warp multiplier (default `1.35`).
+
+```go
+kg := arts.NewKintsugiGeode(24, 4, 1.35)
+```
+
+![](../images/kintsugigeode.png)
+
+## Kagome Silk Weave
+
+`Kagome Silk Weave` synthesizes a full-bleed true 3D over-under triaxial Kagome (`0°`, `+60°`, `-60°`) gilded silk-brocade lattice (`三维三轴六角笼目真穿插织金竹丝锦缎与嵌宝窗`) where three ribbon families cyclically arch over one axis and under the other around recessed 3-tier cabochon jewel windows.
+
+### parameters
+
+- bands: Lattice frequency of triaxial silk ribbons (default `7`).
+- filaments: Transverse silk warp-filament ridge frequency per ribbon (default `48`).
+- waveAmp: Perlin organic lattice undulation multiplier (default `1.25`).
+
+```go
+ksw := arts.NewKagomeSilkWeave(7, 48, 1.25)
+```
+
+![](../images/kagomesilkweave.png)
+
+## Nautilus Chamber Scroll
+
+`Nautilus Chamber Scroll` synthesizes a branch-cut-free 2×2-supersampled conformal logarithmic-spiral Nautilus shell (`三维全纯黄金螺旋鹦鹉螺四阶珠母腔室与金隔板`) partitioned by 3D 24K gold septa walls into 4-tier recessed mother-of-pearl and thin-film iridescent silk chambers.
+
+### parameters
+
+- chambersPerTurn: Number of concave Nautilus septa chambers per $360^\circ$ spiral revolution (default `14`).
+- terraces: Number of recessed shadow-box nacre tiers per chamber (default `4`).
+- spiralTightness: Logarithmic-spiral radial expansion multiplier (default `1.0`).
+
+```go
+ncs := arts.NewNautilusChamberScroll(14, 4, 1.0)
+```
+
+![](../images/nautiluschamberscroll.png)
 
 
 

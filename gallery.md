@@ -8,15 +8,18 @@ This gallery contains standalone `Go` usage examples and rendered outputs for `g
 
 ## 🎞️ Seamless 600×600 HD Looping GIF Animations (`DrawTimelapseFrames` + `ToGIF`)
 
-| Perlin Taiji Scroll (`perlinyinyangvortex`) | Perlin Shanshui Canyon (`perlinshanshuiscroll`) | Perlin Canyon Arch (`perlincanyonarch`) | Perlin Brocade Fan (`perlinbrocadefan`) |
+| Kintsugi Geode (`kintsugigeode`) | Kagome Silk Weave (`kagomesilkweave`) | Nautilus Chambers (`nautiluschamberscroll`) | Perlin Taiji Scroll (`perlinyinyangvortex`) |
 | :---: | :---: | :---: | :---: |
-| ![Perlin Yin Yang Vortex Loop](images/perlinyinyangvortex_loop.gif) | ![Perlin Shanshui Scroll Loop](images/perlinshanshuiscroll_loop.gif) | ![Perlin Canyon Arch Loop](images/perlincanyonarch_loop.gif) | ![Perlin Brocade Fan Loop](images/perlinbrocadefan_loop.gif) |
-| **Perlin Braided Silk (`perlinbraidedribbons`)** | **Perlin Silk-Brocade (`perlinimpastoswirl`)** | **Perlin Sun Scroll (`perlinplumetapestry`)** | **Perlin Velvet Dunes (`perlinvelvetdunes`)** |
-| ![Perlin Braided Ribbons Loop](images/perlinbraidedribbons_loop.gif) | ![Perlin Impasto Swirl Loop](images/perlinimpastoswirl_loop.gif) | ![Perlin Plume Tapestry Loop](images/perlinplumetapestry_loop.gif) | ![Perlin Velvet Dunes Loop](images/perlinvelvetdunes_loop.gif) |
-| **Escher Day & Night (`escherdayandnight`)** | **Escher Path of Life (`escherimpossiblebelvedere`)** | **Escher Metamorphosis (`eschermetamorphosis`)** | **Apollonian Gasket (`apolloniangasketfoam`)** |
-| ![Escher Day and Night Loop](images/escherdayandnight_loop.gif) | ![Escher Impossible Belvedere Loop](images/escherimpossiblebelvedere_loop.gif) | ![Escher Metamorphosis Loop](images/eschermetamorphosis_loop.gif) | ![Apollonian Gasket Foam Loop](images/apolloniangasketfoam_loop.gif) |
+| ![Kintsugi Geode Loop](images/kintsugigeode_loop.gif) | ![Kagome Silk Weave Loop](images/kagomesilkweave_loop.gif) | ![Nautilus Chamber Scroll Loop](images/nautiluschamberscroll_loop.gif) | ![Perlin Yin Yang Vortex Loop](images/perlinyinyangvortex_loop.gif) |
+| **Perlin Shanshui Canyon (`perlinshanshuiscroll`)** | **Perlin Canyon Arch (`perlincanyonarch`)** | **Perlin Brocade Fan (`perlinbrocadefan`)** | **Perlin Braided Silk (`perlinbraidedribbons`)** |
+| ![Perlin Shanshui Scroll Loop](images/perlinshanshuiscroll_loop.gif) | ![Perlin Canyon Arch Loop](images/perlincanyonarch_loop.gif) | ![Perlin Brocade Fan Loop](images/perlinbrocadefan_loop.gif) | ![Perlin Braided Ribbons Loop](images/perlinbraidedribbons_loop.gif) |
+| **Perlin Silk-Brocade (`perlinimpastoswirl`)** | **Perlin Sun Scroll (`perlinplumetapestry`)** | **Perlin Velvet Dunes (`perlinvelvetdunes`)** | **Escher Day & Night (`escherdayandnight`)** |
+| ![Perlin Impasto Swirl Loop](images/perlinimpastoswirl_loop.gif) | ![Perlin Plume Tapestry Loop](images/perlinplumetapestry_loop.gif) | ![Perlin Velvet Dunes Loop](images/perlinvelvetdunes_loop.gif) | ![Escher Day and Night Loop](images/escherdayandnight_loop.gif) |
 
 ```bash
+go run ./cmd/genart render -art kintsugigeode            -w 600 -h 600 -frames 20 -delay 8  -out images/kintsugigeode_loop.gif
+go run ./cmd/genart render -art kagomesilkweave          -w 600 -h 600 -frames 20 -delay 8  -out images/kagomesilkweave_loop.gif
+go run ./cmd/genart render -art nautiluschamberscroll    -w 600 -h 600 -frames 20 -delay 8  -out images/nautiluschamberscroll_loop.gif
 go run ./cmd/genart render -art perlinyinyangvortex      -w 600 -h 600 -frames 20 -delay 8  -out images/perlinyinyangvortex_loop.gif
 go run ./cmd/genart render -art perlinshanshuiscroll     -w 600 -h 600 -frames 20 -delay 8  -out images/perlinshanshuiscroll_loop.gif
 go run ./cmd/genart render -art perlincanyonarch         -w 600 -h 600 -frames 20 -delay 8  -out images/perlincanyonarch_loop.gif
@@ -101,6 +104,10 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
 
 ## Table of Contents
 
+- [Wave 33: 3D Voronoi Kintsugi Geode, Triaxial Over-Under Kagome Silk Weave & Conformal Nautilus Chamber Scroll Trio](#wave-33-3d-voronoi-kintsugi-geode-triaxial-over-under-kagome-silk-weave--conformal-nautilus-chamber-scroll-trio)
+  - [Kintsugi Geode](#kintsugi-geode)
+  - [Kagome Silk Weave](#kagome-silk-weave)
+  - [Nautilus Chamber Scroll](#nautilus-chamber-scroll)
 - [Wave 32: Perlin Taiji Dual-Sanctuary S-Bridge & Winding Shanshui Canyon Duo](#wave-32-perlin-taiji-dual-sanctuary-s-bridge--winding-shanshui-canyon-duo)
   - [Perlin Yin Yang Vortex](#perlin-yin-yang-vortex)
   - [Perlin Shanshui Scroll](#perlin-shanshui-scroll)
@@ -298,6 +305,88 @@ go run ./cmd/genart poster -art voronoicrystal -grid 2x2 -panel 360 -theme light
   - [Silk Sky](#silk-sky)
   - [Circle Move](#circle-move)
   - [Random Circle](#random-circle)
+
+---
+
+## Wave 33: 3D Voronoi Kintsugi Geode, Triaxial Over-Under Kagome Silk Weave & Conformal Nautilus Chamber Scroll Trio
+
+### Kintsugi Geode
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20263301)
+	c.SetBackground(color.RGBA{R: 10, G: 14, B: 32, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewKintsugiGeode(24, 4, 1.35))
+	c.ToPNG("kintsugigeode.png")
+}
+```
+
+![Kintsugi Geode](images/kintsugigeode.png)
+
+### Kagome Silk Weave
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20263302)
+	c.SetBackground(color.RGBA{R: 10, G: 18, B: 46, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewKagomeSilkWeave(7, 48, 1.25))
+	c.ToPNG("kagomesilkweave.png")
+}
+```
+
+![Kagome Silk Weave](images/kagomesilkweave.png)
+
+### Nautilus Chamber Scroll
+
+```go
+package main
+
+import (
+	"image/color"
+
+	"github.com/jdxyw/generativeart"
+	"github.com/jdxyw/generativeart/arts"
+	"github.com/jdxyw/generativeart/common"
+)
+
+func main() {
+	c := generativeart.NewCanva(600, 600)
+	c.SetSeed(20263303)
+	c.SetBackground(color.RGBA{R: 12, G: 18, B: 42, A: 255})
+	c.FillBackground()
+	c.SetColorSchema(common.Dunhuang)
+	c.Draw(arts.NewNautilusChamberScroll(14, 4, 1.0))
+	c.ToPNG("nautiluschamberscroll.png")
+}
+```
+
+![Nautilus Chamber Scroll](images/nautiluschamberscroll.png)
 
 ---
 

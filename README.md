@@ -4,7 +4,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/jdxyw/generativeart)](https://goreportcard.com/report/github.com/jdxyw/generativeart)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/jdxyw/generativeart/master/LICENSE)
 
-`generativeart` is a pure-`Go` generative art engine and algorithm collection supporting **172 generative art types** across 3D Perlin shadow-box paper-cut scrolls, Taiji dual-sanctuary S-bridges, winding Shanshui river canyons, gilded silk-brocade reliefs & wind-combed dunes (`PerlinYinYangVortex`, `PerlinShanshuiScroll`, `PerlinCanyonArch`, `PerlinBrocadeFan`, `PerlinBraidedRibbons`, `PerlinImpastoSwirl`, `PerlinPlumeTapestry`, `PerlinVelvetDunes`), M.C. Escher isohedral & conformal spiral metamorphosis woodcuts (*Day and Night*, *Path of Life / Whirlpools*, *Metamorphosis*), Descartes-Soddy Apollonian sphere packings, 10-fold Penrose P3 quasicrystal cloisonné medallions, 3D Alhambra Muqarnas honeycomb stalactite domes, Brazilian fortification agate geodes, Imperial Fabergé guilloché enamels, 3D Polar Aurora Borealis draperies, 3D depth-sorted Hopf & Lorenz silk sculptures, 3D laser-cut volcanic reliefs, 3D G-Buffer photonic feather & solar coronal plumes, bioluminescent deep-sea medusae, collision-free Fidenza lacquer looms, cloisonné enamel rose mandalas, flow fields, strange attractors, 3D terrain geomorphology, biological morphogenesis, 3D SDF raymarching, 3D dielectric refraction & caustics, spherical harmonics, general-relativistic gravitational lensing, complex phase portraits, differential topology, non-Euclidean geometry, Jean "Mœbius" Giraud *Ligne Claire* sci-fi printmaking, Piranesi/Dürer/Kepler Weingarten principal-curvature copperplate engraving, quasicrystals, stained-glass mosaics, 3D origami, and traditional printmaking.
+`generativeart` is a pure-`Go` generative art engine and algorithm collection supporting **175 generative art types** across 3D Voronoi Kintsugi fortification-agate plates, true 3D over-under triaxial Kagome silk-brocade weaves, conformal logarithmic-spiral Nautilus chambers, 3D Perlin shadow-box paper-cut scrolls, Taiji dual-sanctuary S-bridges, winding Shanshui river canyons, gilded silk-brocade reliefs & wind-combed dunes (`KintsugiGeode`, `KagomeSilkWeave`, `NautilusChamberScroll`, `PerlinYinYangVortex`, `PerlinShanshuiScroll`, `PerlinCanyonArch`, `PerlinBrocadeFan`, `PerlinBraidedRibbons`, `PerlinImpastoSwirl`, `PerlinPlumeTapestry`, `PerlinVelvetDunes`), M.C. Escher isohedral & conformal spiral metamorphosis woodcuts (*Day and Night*, *Path of Life / Whirlpools*, *Metamorphosis*), Descartes-Soddy Apollonian sphere packings, 10-fold Penrose P3 quasicrystal cloisonné medallions, 3D Alhambra Muqarnas honeycomb stalactite domes, Brazilian fortification agate geodes, Imperial Fabergé guilloché enamels, 3D Polar Aurora Borealis draperies, 3D depth-sorted Hopf & Lorenz silk sculptures, 3D laser-cut volcanic reliefs, 3D G-Buffer photonic feather & solar coronal plumes, bioluminescent deep-sea medusae, collision-free Fidenza lacquer looms, cloisonné enamel rose mandalas, flow fields, strange attractors, 3D terrain geomorphology, biological morphogenesis, 3D SDF raymarching, 3D dielectric refraction & caustics, spherical harmonics, general-relativistic gravitational lensing, complex phase portraits, differential topology, non-Euclidean geometry, Jean "Mœbius" Giraud *Ligne Claire* sci-fi printmaking, Piranesi/Dürer/Kepler Weingarten principal-curvature copperplate engraving, quasicrystals, stained-glass mosaics, 3D origami, and traditional printmaking.
 
 - 🌐 **Live Interactive Web Gallery (GitHub Pages)**: **[https://jdxyw.github.io/generativeart/](https://jdxyw.github.io/generativeart/)**
 - 🖼️ **Full Code & Image Gallery (`gallery.md`)**: **[./gallery.md](./gallery.md)**
@@ -15,27 +15,27 @@
 
 ## Featured Gallery Highlights
 
-> Browse all **172 artworks**, full `Go` source snippets, and rendered previews in **[`gallery.md`](./gallery.md)** or on the **[Interactive GitHub Pages Gallery](https://jdxyw.github.io/generativeart/)**.
+> Browse all **175 artworks**, full `Go` source snippets, and rendered previews in **[`gallery.md`](./gallery.md)** or on the **[Interactive GitHub Pages Gallery](https://jdxyw.github.io/generativeart/)**.
 
-| [Perlin Yin Yang Vortex](./gallery.md#perlin-yin-yang-vortex) | [Perlin Shanshui Scroll](./gallery.md#perlin-shanshui-scroll) | [Perlin Canyon Arch](./gallery.md#perlin-canyon-arch) | [Perlin Brocade Fan](./gallery.md#perlin-brocade-fan) |
+| [Kintsugi Geode](./gallery.md#kintsugi-geode) | [Kagome Silk Weave](./gallery.md#kagome-silk-weave) | [Nautilus Chamber Scroll](./gallery.md#nautilus-chamber-scroll) | [Perlin Yin Yang Vortex](./gallery.md#perlin-yin-yang-vortex) |
 | :---: | :---: | :---: | :---: |
-| ![Perlin Yin Yang Vortex](images/perlinyinyangvortex.png) | ![Perlin Shanshui Scroll](images/perlinshanshuiscroll.png) | ![Perlin Canyon Arch](images/perlincanyonarch.png) | ![Perlin Brocade Fan](images/perlinbrocadefan.png) |
-| **[Perlin Braided Ribbons](./gallery.md#perlin-braided-ribbons)** | **[Perlin Impasto Swirl](./gallery.md#perlin-impasto-swirl)** | **[Perlin Plume Tapestry](./gallery.md#perlin-plume-tapestry)** | **[Perlin Velvet Dunes](./gallery.md#perlin-velvet-dunes)** |
-| ![Perlin Braided Ribbons](images/perlinbraidedribbons.png) | ![Perlin Impasto Swirl](images/perlinimpastoswirl.png) | ![Perlin Plume Tapestry](images/perlinplumetapestry.png) | ![Perlin Velvet Dunes](images/perlinvelvetdunes.png) |
-| **[Escher Day and Night](./gallery.md#escher-day-and-night)** | **[Escher Path of Life Spiral](./gallery.md#escher-impossible-belvedere)** | **[Escher Metamorphosis](./gallery.md#escher-metamorphosis)** | **[Apollonian Gasket Foam](./gallery.md#apollonian-gasket-foam)** |
-| ![Escher Day and Night](images/escherdayandnight.png) | ![Escher Impossible Belvedere](images/escherimpossiblebelvedere.png) | ![Escher Metamorphosis](images/eschermetamorphosis.png) | ![Apollonian Gasket Foam](images/apolloniangasketfoam.png) |
+| ![Kintsugi Geode](images/kintsugigeode.png) | ![Kagome Silk Weave](images/kagomesilkweave.png) | ![Nautilus Chamber Scroll](images/nautiluschamberscroll.png) | ![Perlin Yin Yang Vortex](images/perlinyinyangvortex.png) |
+| **[Perlin Shanshui Scroll](./gallery.md#perlin-shanshui-scroll)** | **[Perlin Canyon Arch](./gallery.md#perlin-canyon-arch)** | **[Perlin Brocade Fan](./gallery.md#perlin-brocade-fan)** | **[Perlin Braided Ribbons](./gallery.md#perlin-braided-ribbons)** |
+| ![Perlin Shanshui Scroll](images/perlinshanshuiscroll.png) | ![Perlin Canyon Arch](images/perlincanyonarch.png) | ![Perlin Brocade Fan](images/perlinbrocadefan.png) | ![Perlin Braided Ribbons](images/perlinbraidedribbons.png) |
+| **[Perlin Impasto Swirl](./gallery.md#perlin-impasto-swirl)** | **[Perlin Plume Tapestry](./gallery.md#perlin-plume-tapestry)** | **[Perlin Velvet Dunes](./gallery.md#perlin-velvet-dunes)** | **[Escher Day and Night](./gallery.md#escher-day-and-night)** |
+| ![Perlin Impasto Swirl](images/perlinimpastoswirl.png) | ![Perlin Plume Tapestry](images/perlinplumetapestry.png) | ![Perlin Velvet Dunes](images/perlinvelvetdunes.png) | ![Escher Day and Night](images/escherdayandnight.png) |
 
-👉 **[View All 172 Artworks & Code Examples in `gallery.md` →](./gallery.md)**
+👉 **[View All 175 Artworks & Code Examples in `gallery.md` →](./gallery.md)**
 
 ### 🎞️ Seamless 600×600 HD Looping Animations (`DrawTimelapseFrames` + `ToGIF`)
 
-| Perlin Taiji Scroll (`perlinyinyangvortex`) | Perlin Shanshui Canyon (`perlinshanshuiscroll`) | Perlin Canyon Arch (`perlincanyonarch`) | Perlin Brocade Fan (`perlinbrocadefan`) |
+| Kintsugi Geode (`kintsugigeode`) | Kagome Silk Weave (`kagomesilkweave`) | Nautilus Chambers (`nautiluschamberscroll`) | Perlin Taiji Scroll (`perlinyinyangvortex`) |
 | :---: | :---: | :---: | :---: |
-| ![Perlin Yin Yang Vortex Loop](images/perlinyinyangvortex_loop.gif) | ![Perlin Shanshui Scroll Loop](images/perlinshanshuiscroll_loop.gif) | ![Perlin Canyon Arch Loop](images/perlincanyonarch_loop.gif) | ![Perlin Brocade Fan Loop](images/perlinbrocadefan_loop.gif) |
-| **Perlin Braided Silk (`perlinbraidedribbons`)** | **Perlin Silk-Brocade (`perlinimpastoswirl`)** | **Perlin Sun Scroll (`perlinplumetapestry`)** | **Perlin Velvet Dunes (`perlinvelvetdunes`)** |
-| ![Perlin Braided Ribbons Loop](images/perlinbraidedribbons_loop.gif) | ![Perlin Impasto Swirl Loop](images/perlinimpastoswirl_loop.gif) | ![Perlin Plume Tapestry Loop](images/perlinplumetapestry_loop.gif) | ![Perlin Velvet Dunes Loop](images/perlinvelvetdunes_loop.gif) |
-| **Escher Day & Night (`escherdayandnight`)** | **Escher Path of Life (`escherimpossiblebelvedere`)** | **Escher Metamorphosis (`eschermetamorphosis`)** | **Apollonian Gasket (`apolloniangasketfoam`)** |
-| ![Escher Day and Night Loop](images/escherdayandnight_loop.gif) | ![Escher Impossible Belvedere Loop](images/escherimpossiblebelvedere_loop.gif) | ![Escher Metamorphosis Loop](images/eschermetamorphosis_loop.gif) | ![Apollonian Gasket Foam Loop](images/apolloniangasketfoam_loop.gif) |
+| ![Kintsugi Geode Loop](images/kintsugigeode_loop.gif) | ![Kagome Silk Weave Loop](images/kagomesilkweave_loop.gif) | ![Nautilus Chamber Scroll Loop](images/nautiluschamberscroll_loop.gif) | ![Perlin Yin Yang Vortex Loop](images/perlinyinyangvortex_loop.gif) |
+| **Perlin Shanshui Canyon (`perlinshanshuiscroll`)** | **Perlin Canyon Arch (`perlincanyonarch`)** | **Perlin Brocade Fan (`perlinbrocadefan`)** | **Perlin Braided Silk (`perlinbraidedribbons`)** |
+| ![Perlin Shanshui Scroll Loop](images/perlinshanshuiscroll_loop.gif) | ![Perlin Canyon Arch Loop](images/perlincanyonarch_loop.gif) | ![Perlin Brocade Fan Loop](images/perlinbrocadefan_loop.gif) | ![Perlin Braided Ribbons Loop](images/perlinbraidedribbons_loop.gif) |
+| **Perlin Silk-Brocade (`perlinimpastoswirl`)** | **Perlin Sun Scroll (`perlinplumetapestry`)** | **Perlin Velvet Dunes (`perlinvelvetdunes`)** | **Escher Day & Night (`escherdayandnight`)** |
+| ![Perlin Impasto Swirl Loop](images/perlinimpastoswirl_loop.gif) | ![Perlin Plume Tapestry Loop](images/perlinplumetapestry_loop.gif) | ![Perlin Velvet Dunes Loop](images/perlinvelvetdunes_loop.gif) | ![Escher Day and Night Loop](images/escherdayandnight_loop.gif) |
 | **Murano Glass Nautilus (`muranoglassnautilus`)** | **Haeckel Radiolaria (`haeckelradiolaria`)** | **Relativistic Lens (`relativisticlens`)** | **Weingarten Torus Knot (`weingartentorusknot`)** |
 | ![Murano Glass Nautilus Loop](images/muranoglassnautilus_loop.gif) | ![Haeckel Radiolaria Loop](images/haeckelradiolaria_loop.gif) | ![Relativistic Lens Loop](images/relativisticlens_loop.gif) | ![Weingarten Torus Knot Loop](images/weingartentorusknot_loop.gif) |
 
@@ -232,9 +232,14 @@ _ = poster.ToPNG("poster_dunhuang.png")
 
 ## Supported Art Types & Constructors
 
-All 172 generators implement `generativeart.Engine` under package `github.com/jdxyw/generativeart/arts` (see [gallery.md](./gallery.md) for visual examples and [docs/doc.md](./docs/doc.md) for parameter details):
+All 175 generators implement `generativeart.Engine` under package `github.com/jdxyw/generativeart/arts` (see [gallery.md](./gallery.md) for visual examples and [docs/doc.md](./docs/doc.md) for parameter details):
 
 ```go
+// Wave 33: 3D Voronoi Kintsugi Geode, Triaxial Over-Under Kagome Silk Weave & Conformal Nautilus Chamber Scroll Trio (KintsugiGeode, KagomeSilkWeave, NautilusChamberScroll)
+NewKintsugiGeode(plates, tiers int, warpScale float64)
+NewKagomeSilkWeave(bands, filaments int, waveAmp float64)
+NewNautilusChamberScroll(chambersPerTurn, terraces int, spiralTightness float64)
+
 // Wave 32: Perlin Taiji Dual-Sanctuary S-Bridge & Winding Shanshui Canyon Duo (PerlinYinYangVortex, PerlinShanshuiScroll)
 NewPerlinYinYangVortex(arms, grooves int, spiralAmp float64)
 NewPerlinShanshuiScroll(peaks, riverSteps int, canyonScale float64)
