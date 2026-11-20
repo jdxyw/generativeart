@@ -489,3 +489,84 @@ func (m *DelaunayVoronoiMesh2D) ExtractMinimumSpanningTree() [][2]int {
 	}
 	return mst
 }
+
+// EuclideanCurvilinearDist converts a 1D graph residual delta = q - f(s) with slope dfds
+// in a rotated coordinate frame (cosT, sinT) into the exact Euclidean perpendicular
+// distance dPerp = delta / sqrt(1 + dfds^2) and the screen-space unit normal (nx, ny).
+// This prevents high-curvature S-bends from pinching transverse bristle grooves or rims.
+func EuclideanCurvilinearDist(delta, dfds, cosT, sinT float64) (dPerp, nx, ny float64) {
+	invArc := 1.0 / math.Sqrt(1.0+dfds*dfds)
+	dPerp = delta * invArc
+	ns := -dfds * invArc
+	nq := invArc
+	nx = ns*cosT - nq*sinT
+	ny = ns*sinT + nq*cosT
+	return dPerp, nx, ny
+}
+
+// EuclideanLevelSetDist converts a 2D scalar level-set residual delta = F(x, y) - c
+// with partial derivatives (dFdx, dFdy) into the exact Euclidean distance dPerp = delta / |grad F|
+// and the unit gradient normal (nx, ny).
+func EuclideanLevelSetDist(delta, dFdx, dFdy, minGrad float64) (dPerp, nx, ny float64) {
+	if minGrad <= 0 {
+		minGrad = 1e-4
+	}
+	g := math.Max(minGrad, math.Hypot(dFdx, dFdy))
+	return delta / g, dFdx / g, dFdy / g
+}
+
+// TriaxialKagomeSample holds the evaluated coordinates and 3D over-under weave elevations
+// at a single point in a Triaxial Hexagonal-Star (Kagome) lattice.
+type TriaxialKagomeSample struct {
+	Q         [3]float64 // Normal coordinates along the 3 hexagonal axes (q_0 + q_1 + q_2 == 1/2)
+	S         [3]float64 // Tangent coordinates along the 3 hexagonal axes
+	BandIndex [3]int     // Nearest integer ribbon index per axis
+	DQ        [3]float64 // Signed cross-ribbon offset dq_a in [-0.5, +0.5] from ribbon center
+	ZWeave    [3]float64 // Exact rock-paper-scissors 3D over-under elevation per axis
+	DzDs      [3]float64 // Longitudinal 3D arch slope dz/ds along each ribbon axis
+	Nx, Ny    [3]float64 // 2D unit normal vector per axis
+	Tx, Ty    [3]float64 // 2D unit tangent vector per axis
+	HexRadius float64    // Normalized radial distance inside the nearest open hexagonal window
+}
+
+// EvalTriaxialKagome evaluates a phase-locked Triaxial Kagome Lattice (N_0 + N_1 + N_2 = 0)
+// shifted by +1/6 period so q_0 + q_1 + q_2 == 1/2 identically, with zero-sum 3-phase
+// orbital translation and Perlin warp [w0, w1, -(w0+w1)].
+func EvalTriaxialKagome(dx, dy, freq, baseAngle, zArchAmp, orbitalAmp, orbitalPhi float64, warps [2]float64) TriaxialKagomeSample {
+	var out TriaxialKagomeSample
+	w3 := [3]float64{warps[0], warps[1], -(warps[0] + warps[1])}
+
+	for a := 0; a < 3; a++ {
+		ang := baseAngle + float64(a)*(2.0*math.Pi/3.0)
+		cosA, sinA := math.Cos(ang), math.Sin(ang)
+		nxA, nyA := -sinA, cosA
+		txA, tyA := cosA, sinA
+		out.Nx[a], out.Ny[a] = nxA, nyA
+		out.Tx[a], out.Ty[a] = txA, tyA
+
+		phaseA := float64(a) * (2.0 * math.Pi / 3.0)
+		orbitalGlide := orbitalAmp * (math.Sin(orbitalPhi+phaseA) - math.Sin(phaseA))
+
+		out.S[a] = (dx*txA + dy*tyA) * freq
+		out.Q[a] = (dx*nxA+dy*nyA)*freq + w3[a] + orbitalGlide + (1.0 / 6.0)
+		kb := int(math.Round(out.Q[a]))
+		out.BandIndex[a] = kb
+		out.DQ[a] = out.Q[a] - float64(kb)
+	}
+
+	var hexDistSq float64
+	for a := 0; a < 3; a++ {
+		pHex := out.Q[a] - 0.5
+		dp := pHex - math.Round(pHex)
+		hexDistSq += dp * dp
+
+		aOver := (a + 1) % 3
+		aUnder := (a + 2) % 3
+		overWave := math.Cos(2.0 * math.Pi * out.Q[aOver])
+		underWave := math.Cos(2.0 * math.Pi * out.Q[aUnder])
+		out.ZWeave[a] = zArchAmp * (overWave - underWave)
+		out.DzDs[a] = (zArchAmp * 2.0 * math.Pi / math.Sqrt(3.0)) * (-math.Sin(2.0*math.Pi*out.Q[aOver]) - math.Sin(2.0*math.Pi*out.Q[aUnder])) * 0.16
+	}
+	out.HexRadius = math.Sqrt(hexDistSq / 1.5)
+	return out
+}

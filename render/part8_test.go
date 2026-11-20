@@ -389,6 +389,68 @@ func TestPhase5SpectralKubelkaMunkWetBleedAndWeingarten3D(t *testing.T) {
 	}
 }
 
+func TestPart11FlowFieldAndShadowBoxEngine(t *testing.T) {
+	// 1. GoldenRatioOklchPalette & PeriodicPolarFBM2DDeriv branch-cut continuity
+	pal := common.GoldenRatioOklchPalette(0.15, 0.22, 0.68, 8)
+	if len(pal) != 8 {
+		t.Fatalf("expected 8 GoldenRatioOklchPalette colors, got %d", len(pal))
+	}
+	ne := common.NewNoiseEngine(202634)
+	vPos, _, dThPos := ne.PeriodicPolarFBM2DDeriv(0.45, math.Pi, 1.1, 1.2, -0.8, 3, 2.0, 0.45)
+	vNeg, _, dThNeg := ne.PeriodicPolarFBM2DDeriv(0.45, -math.Pi, 1.1, 1.2, -0.8, 3, 2.0, 0.45)
+	if math.Abs(vPos-vNeg) > 1e-12 || math.Abs(dThPos-dThNeg) > 1e-12 {
+		t.Fatalf("expected PeriodicPolarFBM2DDeriv to be branch-cut-free at +-pi: %v vs %v", vPos, vNeg)
+	}
+
+	// 2. EuclideanCurvilinearDist & EvalTriaxialKagome invariant q0+q1+q2 == 0.5
+	dPerp, nx, ny := EuclideanCurvilinearDist(0.12, 1.0, 1.0, 0.0)
+	if math.Abs(dPerp-0.12/math.Sqrt2) > 1e-9 || math.Abs(math.Hypot(nx, ny)-1.0) > 1e-9 {
+		t.Fatalf("unexpected EuclideanCurvilinearDist: dPerp=%v, |n|=%v", dPerp, math.Hypot(nx, ny))
+	}
+	kag := EvalTriaxialKagome(0.18, -0.22, 5.2, 0.12, 3.2, 0.28, 1.1, [2]float64{0.04, -0.02})
+	qSum := kag.Q[0] + kag.Q[1] + kag.Q[2]
+	if math.Abs(qSum-0.5) > 1e-12 {
+		t.Fatalf("expected Kagome coordinate sum q0+q1+q2 == 0.5, got %v", qSum)
+	}
+
+	// 3. BristleGrooveLUT & SupersampledShadowBoxGBuffer
+	lut := NewBristleGrooveLUT(ne, 56, 13.7)
+	rh, _, sm, am, gt := lut.Sample(0.25)
+	col, _ := EvalSilkBrocadeBand(0.25, rh, sm, am, gt, 0.6, pal[0], pal[1], pal[2], pal[3], pal[4], true)
+	if col.A != 255 {
+		t.Fatalf("expected opaque silk brocade color")
+	}
+
+	sb := NewSupersampledShadowBoxGBuffer(32, 32)
+	for gy := 0; gy < sb.GH; gy++ {
+		for gx := 0; gx < sb.GW; gx++ {
+			sb.DepositPaperCutLayer(gx, gy, 1, 2.0, 5.0, pal[0], pal[1], 0.65, 0.1, 1.6, 0.01)
+		}
+	}
+	rc := NewCanvas(32, 32)
+	sb.ResolveShadowBoxToCanvas(rc, -0.6, -0.8, 8, 0.55, 0.45, 0.5, 0.5, 0.12)
+
+	// 4. StreamlineFrames, EmitTriangleOrigamiStrip, EmitPerpendicularHatchTicks & RenderLifecycleCometStream
+	pts := []Point{Pt(4, 4), Pt(12, 8), Pt(20, 16), Pt(28, 26)}
+	frames := BuildStreamlineFrames(pts)
+	if len(frames) != 4 || math.Abs(frames[3].U-1.0) > 1e-9 {
+		t.Fatalf("unexpected streamline frames: len=%d, endU=%v", len(frames), frames[len(frames)-1].U)
+	}
+	tris := EmitTriangleOrigamiStrip(frames, func(u float64) float64 { return 3.0 }, 2.5)
+	if len(tris) != 12 {
+		t.Fatalf("expected 12 origami triangles for 3 segments, got %d", len(tris))
+	}
+	ticks := EmitPerpendicularHatchTicks(frames, 4.0, 3.0, nil)
+	if len(ticks) == 0 {
+		t.Fatalf("expected non-empty perpendicular hatch ticks")
+	}
+	rc.RenderLifecycleCometStream(frames, LifecycleCometStyle{
+		RootWidth: 2.5, TipWidth: 0.4,
+		RootColor: pal[0], MidColor: pal[2], TipColor: pal[4],
+		BaseOpacity: 0.85, ShadowOffset: Pt(1, 1), ShadowAlpha: 0.3,
+	})
+}
+
 
 
 

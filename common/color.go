@@ -525,3 +525,54 @@ func GenerateWarmPalette(n int) []color.RGBA {
 	}
 	return res
 }
+
+// GoldenRatioConjugate is the golden ratio conjugate (sqrt(5)-1)/2 ≈ 0.6180339887498949
+// used for low-discrepancy perceptual hue stepping around the Oklch color wheel.
+const GoldenRatioConjugate = 0.6180339887498949
+
+// GoldenRatioOklchColor synthesizes the index-th harmonious color along the perceptual
+// Oklch color wheel starting from seedHue (in [0, 1) turns or radians if > 1), stepping
+// by GoldenRatioConjugate turns per index at the specified perceptual lightness L in [0.15, 0.92]
+// and chroma C in [0.02, 0.32].
+func GoldenRatioOklchColor(seedHue, chroma, lightness float64, index int) color.RGBA {
+	L := Constrain(lightness, 0.12, 0.95)
+	C := Constrain(chroma, 0.0, 0.34)
+	hTurns := math.Mod(seedHue+float64(index)*GoldenRatioConjugate, 1.0)
+	if hTurns < 0 {
+		hTurns += 1.0
+	}
+	hRad := hTurns * 2.0 * math.Pi
+	a := C * math.Cos(hRad)
+	b := C * math.Sin(hRad)
+
+	// Oklab (L, a, b) -> LMS cube roots -> linear sRGB
+	l_ := L + 0.3963377774*a + 0.2158037573*b
+	m_ := L - 0.1055613458*a - 0.0638541728*b
+	s_ := L - 0.0894841775*a - 1.2914855480*b
+
+	l := l_ * l_ * l_
+	m := m_ * m_ * m_
+	s := s_ * s_ * s_
+
+	rLin := +4.0767416621*l - 3.3077115913*m + 0.2309699292*s
+	gLin := -1.2684380046*l + 2.6097574011*m - 0.3413193965*s
+	bLin := -0.0041960863*l - 0.7034186147*m + 1.7076147010*s
+
+	cf := colorful.LinearRgb(Constrain(rLin, 0.0, 1.0), Constrain(gLin, 0.0, 1.0), Constrain(bLin, 0.0, 1.0))
+	return fromColorful(cf, 255)
+}
+
+// GoldenRatioOklchPalette generates count perceptually uniform, high-harmony colors
+// stepped by the Golden Ratio Conjugate in Oklch space with subtle lightness/chroma modulation.
+func GoldenRatioOklchPalette(seedHue, baseChroma, baseLightness float64, count int) []color.RGBA {
+	if count <= 0 {
+		return nil
+	}
+	out := make([]color.RGBA, count)
+	for i := 0; i < count; i++ {
+		lMod := baseLightness + 0.08*math.Sin(float64(i)*1.7)
+		cMod := baseChroma * (0.88 + 0.22*math.Cos(float64(i)*1.3))
+		out[i] = GoldenRatioOklchColor(seedHue, cMod, lMod, i)
+	}
+	return out
+}

@@ -1280,3 +1280,263 @@ func SolveScreenedPoisson2D(nx, ny int, rhs []float64, screeningLambda float64, 
 	}
 	return u
 }
+
+// =============================================================================
+// PART XI: SIGHACK PERLIN FLOW-FIELD LIFECYCLE & GEOMETRIC PRIMITIVE EMITTERS
+// =============================================================================
+
+// StreamlineNode represents a Frenet-Serret frame and lifecycle state along a particle streamline.
+type StreamlineNode struct {
+	Pos       Point   // 2D position (X, Y)
+	Tangent   Point   // Unit tangent vector T = (Tx, Ty)
+	Normal    Point   // Unit normal vector N = (-Ty, Tx)
+	ArcLength float64 // Cumulative arc length in pixels from start of streamline
+	U         float64 // Normalized lifecycle parameter u in [0, 1]
+	Curvature float64 // Signed 2D curvature kappa = d(theta)/ds
+}
+
+// BuildStreamlineFrames computes the Frenet-Serret frame (Tangent, Normal, Curvature)
+// and normalized lifecycle parameter U in [0, 1] for each vertex along a polyline pts.
+func BuildStreamlineFrames(pts []Point) []StreamlineNode {
+	n := len(pts)
+	if n < 2 {
+		return nil
+	}
+	nodes := make([]StreamlineNode, n)
+	totalArc := 0.0
+	for i := 1; i < n; i++ {
+		totalArc += pts[i].Dist(pts[i-1])
+		nodes[i].ArcLength = totalArc
+	}
+	if totalArc < 1e-6 {
+		totalArc = 1.0
+	}
+
+	for i := 0; i < n; i++ {
+		nodes[i].Pos = pts[i]
+		nodes[i].U = nodes[i].ArcLength / totalArc
+
+		var d Point
+		if i == 0 {
+			d = pts[1].Sub(pts[0])
+		} else if i == n-1 {
+			d = pts[n-1].Sub(pts[n-2])
+		} else {
+			d = pts[i+1].Sub(pts[i-1])
+		}
+		t := d.Norm()
+		if t.Len() < 1e-6 {
+			t = Pt(1, 0)
+		}
+		nodes[i].Tangent = t
+		nodes[i].Normal = t.Perp()
+	}
+
+	for i := 0; i < n; i++ {
+		i0 := common.MaxInt(0, i-1)
+		i1 := common.MinInt(n-1, i+1)
+		ds := math.Max(0.5, nodes[i1].ArcLength-nodes[i0].ArcLength)
+		dt := nodes[i1].Tangent.Sub(nodes[i0].Tangent)
+		nodes[i].Curvature = dt.Dot(nodes[i].Normal) / ds
+	}
+	return nodes
+}
+
+// OrigamiTriangleFacet represents a 3D bevel-shaded triangular facet emitted along a streamline
+// (inspired by Sighack Perlin Noise Fields Iteration 25, elevated to 3D folded origami geometry).
+type OrigamiTriangleFacet struct {
+	P0, P1, P2 Point      // 2D projected vertices of the triangle facet
+	Nx, Ny, Nz float64    // Unit 3D surface normal of the inclined origami facet
+	U          float64    // Normalized lifecycle parameter u in [0, 1] at the facet centroid
+	Side       int        // -1 = left slope facet, +1 = right slope facet
+}
+
+// EmitTriangleOrigamiStrip converts a framed streamline into a 3D ridge-creased triangular
+// origami ribbon strip where the central spine rises to height ridgeLift and the left/right
+// facets slope down to the outer ribbon edges at ±halfWidthFn(u).
+func EmitTriangleOrigamiStrip(frames []StreamlineNode, halfWidthFn func(u float64) float64, ridgeLift float64) []OrigamiTriangleFacet {
+	n := len(frames)
+	if n < 2 {
+		return nil
+	}
+	if halfWidthFn == nil {
+		halfWidthFn = func(u float64) float64 { return 8.0 * math.Sin(u*math.Pi) }
+	}
+	if ridgeLift <= 0 {
+		ridgeLift = 4.0
+	}
+
+	facets := make([]OrigamiTriangleFacet, 0, (n-1)*4)
+	for i := 0; i < n-1; i++ {
+		f0 := frames[i]
+		f1 := frames[i+1]
+		w0 := halfWidthFn(f0.U)
+		w1 := halfWidthFn(f1.U)
+		if w0 < 0.25 && w1 < 0.25 {
+			continue
+		}
+
+		c0 := f0.Pos
+		c1 := f1.Pos
+		l0 := c0.Add(f0.Normal.Mul(w0))
+		r0 := c0.Sub(f0.Normal.Mul(w0))
+		l1 := c1.Add(f1.Normal.Mul(w1))
+		r1 := c1.Sub(f1.Normal.Mul(w1))
+
+		uMid := 0.5 * (f0.U + f1.U)
+		avgW := math.Max(1.0, 0.5*(w0+w1))
+		nAvg := f0.Normal.Add(f1.Normal).Norm()
+
+		// Left slope normal tilts outward along +nAvg; right slope normal tilts outward along -nAvg
+		slope := ridgeLift / avgW
+		invLen := 1.0 / math.Sqrt(1.0+slope*slope)
+		nxL, nyL, nzL := nAvg.X*slope*invLen, nAvg.Y*slope*invLen, invLen
+		nxR, nyR, nzR := -nAvg.X*slope*invLen, -nAvg.Y*slope*invLen, invLen
+
+		// Left ridge triangles: (c0, c1, l0) and (c1, l1, l0)
+		facets = append(facets,
+			OrigamiTriangleFacet{P0: c0, P1: c1, P2: l0, Nx: nxL, Ny: nyL, Nz: nzL, U: uMid, Side: -1},
+			OrigamiTriangleFacet{P0: c1, P1: l1, P2: l0, Nx: nxL, Ny: nyL, Nz: nzL, U: uMid, Side: -1},
+			// Right ridge triangles: (c0, r0, c1) and (c1, r0, r1)
+			OrigamiTriangleFacet{P0: c0, P1: r0, P2: c1, Nx: nxR, Ny: nyR, Nz: nzR, U: uMid, Side: +1},
+			OrigamiTriangleFacet{P0: c1, P1: r0, P2: r1, Nx: nxR, Ny: nyR, Nz: nzR, U: uMid, Side: +1},
+		)
+	}
+	return facets
+}
+
+// PerpendicularHatchTick represents a normal/perpendicular engraver tick emitted along a streamline
+// (inspired by Sighack Perlin Noise Fields Iteration 11).
+type PerpendicularHatchTick struct {
+	A, B   Point   // Endpoints of the perpendicular tick segment
+	Center Point   // Midpoint on the streamline
+	U      float64 // Normalized lifecycle parameter u in [0, 1]
+}
+
+// EmitPerpendicularHatchTicks emits evenly-spaced normal/perpendicular hatch ticks at arc-length
+// interval spacingPx along frames, with optional angular twist and length modulation jitterFn(u).
+func EmitPerpendicularHatchTicks(frames []StreamlineNode, spacingPx, halfLenPx float64, jitterFn func(u float64) (angOff, lenScale float64)) []PerpendicularHatchTick {
+	n := len(frames)
+	if n < 2 || spacingPx <= 0.25 || halfLenPx <= 0.1 {
+		return nil
+	}
+	totalArc := frames[n-1].ArcLength
+	if totalArc < spacingPx {
+		return nil
+	}
+
+	var ticks []PerpendicularHatchTick
+	nextArc := 0.5 * spacingPx
+	segIdx := 0
+
+	for nextArc <= totalArc {
+		for segIdx < n-2 && frames[segIdx+1].ArcLength < nextArc {
+			segIdx++
+		}
+		f0 := frames[segIdx]
+		f1 := frames[segIdx+1]
+		segLen := math.Max(1e-5, f1.ArcLength-f0.ArcLength)
+		t := common.Clamp01((nextArc - f0.ArcLength) / segLen)
+
+		pos := f0.Pos.Lerp(f1.Pos, t)
+		u := f0.U + t*(f1.U-f0.U)
+		norm := f0.Normal.Lerp(f1.Normal, t).Norm()
+
+		angOff := 0.0
+		lenScale := 1.0
+		if jitterFn != nil {
+			angOff, lenScale = jitterFn(u)
+		}
+		if angOff != 0 {
+			cosR, sinR := math.Cos(angOff), math.Sin(angOff)
+			norm = Pt(norm.X*cosR-norm.Y*sinR, norm.X*sinR+norm.Y*cosR)
+		}
+		hl := halfLenPx * lenScale
+		if hl > 0.1 {
+			ticks = append(ticks, PerpendicularHatchTick{
+				A:      pos.Sub(norm.Mul(hl)),
+				B:      pos.Add(norm.Mul(hl)),
+				Center: pos,
+				U:      u,
+			})
+		}
+		nextArc += spacingPx
+	}
+	return ticks
+}
+
+// LifecycleCometStyle configures a particle-lifecycle-evolving comet/flame streamline
+// (inspired by Sighack Iterations 8, 9, 13–15: width tapering + saturation-to-incandescent shift).
+type LifecycleCometStyle struct {
+	RootWidth    float64    // Starting stroke half-width at u = 0 (or peak of envelope)
+	TipWidth     float64    // Ending stroke half-width at u = 1
+	RootColor    color.RGBA // Deep high-saturation base pigment at u = 0
+	MidColor     color.RGBA // Luminous mid-lifecycle pigment at u ≈ 0.5
+	TipColor     color.RGBA // Incandescent white/gold tip color as saturation desaturates toward u = 1
+	BaseOpacity  float64    // Peak opacity in [0, 1]
+	ShadowOffset Point      // Optional 3D drop-shadow offset (e.g. Pt(1.5, 1.8))
+	ShadowAlpha  float64    // Drop-shadow opacity
+}
+
+// RenderLifecycleCometStream renders a sub-pixel anti-aliased streamline whose width,
+// opacity, and Oklab chroma/lightness evolve continuously across its lifecycle u in [0, 1].
+func (rc *Canvas) RenderLifecycleCometStream(frames []StreamlineNode, style LifecycleCometStyle) {
+	if rc == nil || len(frames) < 2 {
+		return
+	}
+	n := len(frames)
+	for i := 0; i < n-1; i++ {
+		f0 := frames[i]
+		f1 := frames[i+1]
+		segLen := f1.Pos.Dist(f0.Pos)
+		steps := int(math.Max(1, math.Ceil(segLen*1.5)))
+
+		for s := 0; s < steps; s++ {
+			t := (float64(s) + 0.5) / float64(steps)
+			pos := f0.Pos.Lerp(f1.Pos, t)
+			u := f0.U + t*(f1.U-f0.U)
+
+			// Smooth comet/flame width envelope: swells near root (u ≈ 0.15) and tapers to a fine tail at u = 1
+			headRamp := common.Smoothstep(0.0, 0.14, u)
+			tailTaper := math.Pow(1.0-u, 0.85)
+			rad := (style.TipWidth + (style.RootWidth-style.TipWidth)*tailTaper) * headRamp
+			if rad < 0.25 {
+				continue
+			}
+
+			// Lifecycle color progression: RootColor -> MidColor -> incandescent TipColor
+			var col color.RGBA
+			if u < 0.52 {
+				col = LerpOklab(style.RootColor, style.MidColor, common.Smoothstep(0.0, 0.52, u))
+			} else {
+				col = LerpOklab(style.MidColor, style.TipColor, common.Smoothstep(0.52, 1.0, u))
+			}
+			alpha := style.BaseOpacity * headRamp * (0.25 + 0.75*tailTaper)
+
+			if style.ShadowAlpha > 0 {
+				shCol := color.RGBA{R: 6, G: 8, B: 20, A: 255}
+				rc.splatDisc(pos.X+style.ShadowOffset.X, pos.Y+style.ShadowOffset.Y, rad*1.08, shCol, style.ShadowAlpha*headRamp*tailTaper)
+			}
+			rc.splatDisc(pos.X, pos.Y, rad, col, alpha)
+		}
+	}
+}
+
+func (rc *Canvas) splatDisc(cx, cy, rad float64, col color.RGBA, alpha float64) {
+	if alpha <= 0 || rad <= 0 {
+		return
+	}
+	minX := common.ConstrainInt(int(math.Floor(cx-rad-1)), 0, rc.Width-1)
+	maxX := common.ConstrainInt(int(math.Ceil(cx+rad+1)), 0, rc.Width-1)
+	minY := common.ConstrainInt(int(math.Floor(cy-rad-1)), 0, rc.Height-1)
+	maxY := common.ConstrainInt(int(math.Ceil(cy+rad+1)), 0, rc.Height-1)
+	for py := minY; py <= maxY; py++ {
+		for px := minX; px <= maxX; px++ {
+			d := math.Hypot(float64(px)+0.5-cx, float64(py)+0.5-cy)
+			if d <= rad+0.6 {
+				cov := common.Clamp01(rad + 0.5 - d)
+				rc.BlendPixel(px, py, col, alpha*cov)
+			}
+		}
+	}
+}

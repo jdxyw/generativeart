@@ -620,3 +620,272 @@ func (g *FiberGBuffer) ResolveToCanvasAdvanced(rc *Canvas, cfg GBufferMaterialCo
 		}
 	})
 }
+
+// BristleGrooveLUT precomputes a 512-entry transverse hog-bristle & silk-warp micro-ridge
+// lookup table along v in [-1, +1] for fast O(1) curvilinear ribbon & stratum shading.
+type BristleGrooveLUT struct {
+	Ridge       [512]float64
+	Slope       [512]float64
+	Streak      [512]float64
+	Accent      [512]float64
+	GlintThread [512]float64
+}
+
+// NewBristleGrooveLUT constructs a 512-entry BristleGrooveLUT driven by analytical Perlin2DDeriv.
+func NewBristleGrooveLUT(ne *common.NoiseEngine, bristles int, seedOff float64) *BristleGrooveLUT {
+	if bristles <= 0 {
+		bristles = 56
+	}
+	gFreq := float64(bristles) * 0.58
+	lut := &BristleGrooveLUT{}
+	for k := 0; k < 512; k++ {
+		v := (float64(k)/511.0)*2.0 - 1.0
+		pBand, dBand, _ := ne.Perlin2DDeriv(v*gFreq*0.28+seedOff, 1.9)
+		pMed, dMed, _ := ne.Perlin2DDeriv(v*gFreq*0.75-seedOff*1.3, 4.3)
+		pFine, dFine, _ := ne.Perlin2DDeriv(v*gFreq*1.60+seedOff*2.1, 8.1)
+		wave := math.Sin(v*gFreq*math.Pi + 1.25*pBand)
+		dWave := (gFreq*math.Pi + 1.25*gFreq*0.28*dBand) * math.Cos(v*gFreq*math.Pi+1.25*pBand)
+
+		lut.Ridge[k] = 0.28*pBand + 0.28*pMed + 0.20*pFine + 0.24*wave
+		lut.Slope[k] = common.Constrain(
+			(0.28*gFreq*0.28*dBand+0.28*gFreq*0.75*dMed+0.20*gFreq*1.60*dFine+0.24*dWave)/(gFreq*1.15),
+			-1.45, 1.45,
+		)
+		lut.Streak[k] = common.Clamp01(0.65*(0.5+0.5*ne.Perlin2D(v*4.8+seedOff, 2.7)) + 0.35*(0.5+0.5*pMed))
+		lut.Accent[k] = common.Smoothstep(0.25, 0.78, 0.5+0.5*ne.Perlin2D(v*3.4-seedOff*1.2, 6.3))
+		lut.GlintThread[k] = math.Pow(0.5+0.5*math.Sin(v*gFreq*math.Pi*0.5+2.0*pBand), 6.0) *
+			common.Smoothstep(0.0, 0.55, 0.5+0.5*ne.Perlin2D(v*4.5+seedOff, 5.7))
+	}
+	return lut
+}
+
+// Sample linearly interpolates the BristleGrooveLUT at normalized transverse coordinate v in [-1, +1].
+func (lut *BristleGrooveLUT) Sample(v float64) (ridgeH, dRidge, streakMix, accentMix, glintThread float64) {
+	pos := common.Clamp01((v+1.0)*0.5) * 511.0
+	k0 := common.ConstrainInt(int(math.Floor(pos)), 0, 510)
+	f := pos - float64(k0)
+	ridgeH = lut.Ridge[k0]*(1.0-f) + lut.Ridge[k0+1]*f
+	dRidge = lut.Slope[k0]*(1.0-f) + lut.Slope[k0+1]*f
+	streakMix = lut.Streak[k0]*(1.0-f) + lut.Streak[k0+1]*f
+	accentMix = lut.Accent[k0]*(1.0-f) + lut.Accent[k0+1]*f
+	glintThread = lut.GlintThread[k0]*(1.0-f) + lut.GlintThread[k0+1]*f
+	return
+}
+
+// EvalSilkBrocadeBand shades a 3-band inlaid polychrome silk-brocade cross-section at
+// transverse coordinate v in [-1, +1] with optional 24K gold selvedge rims and inner pinstripes.
+func EvalSilkBrocadeBand(
+	v, ridgeH, streakMix, accentMix, glintThread, crestWave float64,
+	baseCol, streakCol, accentCol, deepCol, glintCol color.RGBA,
+	withGoldSelvedge bool,
+) (pixCol color.RGBA, modRidgeH float64) {
+	absV := math.Abs(v)
+	centerBand := common.Smoothstep(0.41, 0.35, absV)
+	colFlank := LerpOklab(baseCol, accentCol, accentMix*0.35)
+	colCore := LerpOklab(streakCol, glintCol, 0.20+0.35*streakMix)
+	colMid := LerpOklab(colFlank, colCore, centerBand*0.82)
+
+	if ridgeH < 0 {
+		gT := common.Clamp01(-ridgeH * 1.30)
+		pixCol = LerpOklab(colMid, deepCol, gT*0.82)
+	} else {
+		cT := common.Clamp01(ridgeH * 1.15)
+		glintW := common.Clamp01(cT*0.34 + 0.62*glintThread*(0.4+0.6*crestWave))
+		pixCol = LerpOklab(colMid, glintCol, glintW)
+	}
+
+	modRidgeH = ridgeH
+	if withGoldSelvedge {
+		goldSpec := color.RGBA{R: 255, G: 246, B: 204, A: 255}
+		goldBody := color.RGBA{R: 238, G: 182, B: 52, A: 255}
+		pinstripe := math.Exp(-math.Pow((absV-0.38)/0.022, 2.0))
+		selvedge := common.Smoothstep(0.89, 0.95, absV)
+		goldMask := common.Clamp01(math.Max(pinstripe*0.88, selvedge))
+		if goldMask > 0.01 {
+			gCol := LerpOklab(goldBody, goldSpec, common.Clamp01(0.5+0.5*ridgeH))
+			pixCol = LerpOklab(pixCol, gCol, goldMask)
+			modRidgeH = ridgeH*(1.0-goldMask) + 0.55*goldMask
+		}
+	}
+	return pixCol, modRidgeH
+}
+
+// SupersampledShadowBoxGBuffer is a 2x2-supersampled ((2W+1) x (2H+1)) 3D Shadow-Box
+// Paper-Cut & Gold-Leaf Relief G-Buffer supporting multi-core Contact AO, directional
+// cast shadows, cotton-paper ribs, and 24K gold cut rims.
+type SupersampledShadowBoxGBuffer struct {
+	Width    int
+	Height   int
+	GW       int
+	GH       int
+	ZGrid    []float64
+	IDGrid   []int
+	RimGrid  []float64
+	AlbRGrid []float64
+	AlbGGrid []float64
+	AlbBGrid []float64
+}
+
+// NewSupersampledShadowBoxGBuffer allocates a 2x2-supersampled Shadow-Box G-Buffer for a w x h canvas.
+func NewSupersampledShadowBoxGBuffer(w, h int) *SupersampledShadowBoxGBuffer {
+	gw, gh := w*2+1, h*2+1
+	n := gw * gh
+	return &SupersampledShadowBoxGBuffer{
+		Width:    w,
+		Height:   h,
+		GW:       gw,
+		GH:       gh,
+		ZGrid:    make([]float64, n),
+		IDGrid:   make([]int, n),
+		RimGrid:  make([]float64, n),
+		AlbRGrid: make([]float64, n),
+		AlbGGrid: make([]float64, n),
+		AlbBGrid: make([]float64, n),
+	}
+}
+
+// DepositPaperCutLayer writes a 3D paper-cut layer sample at 2x grid coordinate (gx, gy)
+// if zHeight >= current Z, automatically applying cotton-paper contour ribs, 3D edge bevel lift,
+// and a 24K gold-leaf cut rim within rimWidthPx of the cut boundary.
+func (sb *SupersampledShadowBoxGBuffer) DepositPaperCutLayer(
+	gx, gy, layerID int,
+	zHeight, distFromEdgePx float64,
+	baseCol, goldRimCol color.RGBA,
+	ribFreq, ribStrength, rimWidthPx, paperGrain float64,
+) {
+	if sb == nil || gx < 0 || gx >= sb.GW || gy < 0 || gy >= sb.GH {
+		return
+	}
+	idx := gy*sb.GW + gx
+	edgeLift := 0.35 * math.Exp(-math.Max(0, distFromEdgePx)/6.0)
+	zSurf := zHeight + edgeLift
+	if zSurf < sb.ZGrid[idx] {
+		return
+	}
+
+	pCol := baseCol
+	if ribStrength > 0 && ribFreq > 0 {
+		rib := math.Sin(distFromEdgePx * ribFreq)
+		if rib > 0 {
+			pCol = LerpOklab(pCol, color.RGBA{R: 255, G: 246, B: 224, A: 255}, rib*ribStrength)
+		} else {
+			pCol = LerpOklab(pCol, color.RGBA{R: 10, G: 8, B: 22, A: 255}, -rib*ribStrength*0.9)
+		}
+	}
+
+	rimW := 0.0
+	if rimWidthPx > 0 && distFromEdgePx < rimWidthPx {
+		rimW = common.Smoothstep(rimWidthPx, rimWidthPx*0.20, distFromEdgePx)
+	}
+
+	rL, gL, bL, _ := ColorToLinearRGB(pCol)
+	if rimW > 0 {
+		rr, rg, rb, _ := ColorToLinearRGB(goldRimCol)
+		rL = rL*(1.0-rimW*0.80) + rr*rimW*0.80
+		gL = gL*(1.0-rimW*0.80) + rg*rimW*0.80
+		bL = bL*(1.0-rimW*0.80) + rb*rimW*0.80
+	}
+
+	sb.ZGrid[idx] = zSurf
+	sb.IDGrid[idx] = layerID
+	sb.RimGrid[idx] = rimW
+	sb.AlbRGrid[idx] = common.Clamp01(rL + paperGrain)
+	sb.AlbGGrid[idx] = common.Clamp01(gL + paperGrain)
+	sb.AlbBGrid[idx] = common.Clamp01(bL + paperGrain)
+}
+
+// ResolveShadowBoxToCanvas resolves the 2x2-supersampled Shadow-Box G-Buffer into rc
+// with 12-tap Contact AO, multi-step directional cast shadows toward (lightDirX, lightDirY),
+// and optional radial bloom around (focalX, focalY).
+func (sb *SupersampledShadowBoxGBuffer) ResolveShadowBoxToCanvas(
+	rc *Canvas,
+	lightDirX, lightDirY float64,
+	shadowSteps int,
+	aoStrength, castStrength float64,
+	focalX, focalY, focalBloom float64,
+) {
+	if sb == nil || rc == nil {
+		return
+	}
+	w, h := sb.Width, sb.Height
+	gw, gh := sb.GW, sb.GH
+	fw, fh := float64(w), float64(h)
+
+	lLen := math.Hypot(lightDirX, lightDirY)
+	if lLen > 1e-6 {
+		lightDirX, lightDirY = lightDirX/lLen, lightDirY/lLen
+	} else {
+		lightDirX, lightDirY = -0.62, -0.78
+	}
+	if shadowSteps <= 0 {
+		shadowSteps = 12
+	}
+
+	subOffs := [4][2]int{{0, 0}, {1, 0}, {0, 1}, {1, 1}}
+	aoOffsets := [12][2]int{
+		{-3, -3}, {0, -4}, {3, -3}, {-4, 0},
+		{4, 0}, {-3, 3}, {0, 4}, {3, 3},
+		{-8, -6}, {8, -6}, {-6, 8}, {6, 8},
+	}
+
+	parallelRows(w, h, func(startY, endY int) {
+		for y := startY; y < endY; y++ {
+			for x := 0; x < w; x++ {
+				var sumR, sumG, sumB float64
+
+				for _, so := range subOffs {
+					gx := x*2 + so[0]
+					gy := y*2 + so[1]
+					idx := gy*gw + gx
+					z0 := sb.ZGrid[idx]
+					id0 := sb.IDGrid[idx]
+
+					aoSum := 0.0
+					for _, off := range aoOffsets {
+						sx := common.ConstrainInt(gx+off[0], 0, gw-1)
+						sy := common.ConstrainInt(gy+off[1], 0, gh-1)
+						sIdx := sy*gw + sx
+						if sb.IDGrid[sIdx] != id0 && sb.ZGrid[sIdx] > z0 {
+							dz := math.Min(sb.ZGrid[sIdx]-z0, 4.5)
+							aoSum += common.Constrain(dz/3.2, 0.0, 1.0)
+						}
+					}
+					aoShade := 1.0 - (aoSum/12.0)*aoStrength
+
+					castOcc := 0.0
+					for step := 1; step <= shadowSteps; step++ {
+						dist := float64(step) * 1.60
+						sx := common.ConstrainInt(int(math.Round(float64(gx)+lightDirX*dist)), 0, gw-1)
+						sy := common.ConstrainInt(int(math.Round(float64(gy)+lightDirY*dist)), 0, gh-1)
+						sIdx := sy*gw + sx
+						if sb.IDGrid[sIdx] != id0 && sb.ZGrid[sIdx] > z0 {
+							falloff := 1.0 - float64(step-1)/float64(shadowSteps)
+							castOcc = math.Max(castOcc, falloff*castStrength)
+						}
+					}
+					castShade := 1.0 - castOcc
+
+					bloom := 0.0
+					if focalBloom > 0 {
+						ux := (float64(gx) * 0.5) / fw
+						uy := (float64(gy) * 0.5) / fh
+						dFoc := math.Hypot(ux-focalX, (uy-focalY)*(fh/fw))
+						bloom = focalBloom * math.Exp(-(dFoc*dFoc)/0.085)
+					}
+
+					shade := aoShade * castShade
+					rim := sb.RimGrid[idx]
+					rOut := sb.AlbRGrid[idx]*shade + bloom*1.05 + rim*0.15
+					gOut := sb.AlbGGrid[idx]*shade + bloom*0.82 + rim*0.12
+					bOut := sb.AlbBGrid[idx]*shade + bloom*0.42 + rim*0.06
+
+					sumR += common.Clamp01(rOut)
+					sumG += common.Clamp01(gOut)
+					sumB += common.Clamp01(bOut)
+				}
+
+				rc.SetPixelLinear(x, y, sumR*0.25, sumG*0.25, sumB*0.25, 1.0)
+			}
+		}
+	})
+}

@@ -1244,5 +1244,42 @@ func (ne *NoiseEngine) Voronoi3D(x, y, z, jitter float64) Voronoi3DResult {
 	}
 }
 
+// PeriodicPolarFBM2DDeriv evaluates C^infinity branch-cut-free 360°-periodic 2D FBM
+// at polar coordinates (r, theta) by sampling on the circle (rho*cos(theta), rho*sin(theta))
+// where rho = circleRadius + 0.55*r, and returns (val, dVal/dr, dVal/dTheta) via the exact chain rule.
+// Because (cos(theta), sin(theta)) is periodic in theta with period 2*pi, there is zero
+// discontinuity at theta = ±pi.
+func (ne *NoiseEngine) PeriodicPolarFBM2DDeriv(r, theta, circleRadius, seedOffX, seedOffY float64, octaves int, lacunarity, gain float64) (val, dValDr, dValDTheta float64) {
+	if circleRadius <= 0.05 {
+		circleRadius = 1.0
+	}
+	rho := circleRadius + 0.55*r
+	cosTh, sinTh := math.Cos(theta), math.Sin(theta)
+	px := rho*cosTh + seedOffX
+	py := rho*sinTh + seedOffY
+
+	v, dfdx, dfdy := ne.FBM2DDeriv(px, py, octaves, lacunarity, gain)
+	dValDr = 0.55 * (cosTh*dfdx + sinTh*dfdy)
+	dValDTheta = rho * (-sinTh*dfdx + cosTh*dfdy)
+	return v, dValDr, dValDTheta
+}
+
+// PeriodicPolarErosionFBM2D evaluates C^infinity branch-cut-free 360°-periodic gradient-damped
+// ErosionFBM2D at polar coordinates (r, theta) and returns (val, dVal/dr, dVal/dTheta).
+func (ne *NoiseEngine) PeriodicPolarErosionFBM2D(r, theta, circleRadius, seedOffX, seedOffY float64, octaves int, lacunarity, gain, erosionStrength float64) (val, dValDr, dValDTheta float64) {
+	if circleRadius <= 0.05 {
+		circleRadius = 1.0
+	}
+	rho := circleRadius + 0.55*r
+	cosTh, sinTh := math.Cos(theta), math.Sin(theta)
+	px := rho*cosTh + seedOffX
+	py := rho*sinTh + seedOffY
+
+	v, dfdx, dfdy := ne.ErosionFBM2D(px, py, octaves, lacunarity, gain, erosionStrength)
+	dValDr = 0.55 * (cosTh*dfdx + sinTh*dfdy)
+	dValDTheta = rho * (-sinTh*dfdx + cosTh*dfdy)
+	return v, dValDr, dValDTheta
+}
+
 
 
