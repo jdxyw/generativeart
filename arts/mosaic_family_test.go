@@ -135,3 +135,39 @@ func TestMosaicFamilyGenerators(t *testing.T) {
 		})
 	}
 }
+
+func TestCuratedPaletteLibraryAndSwitching(t *testing.T) {
+	names := PaletteNames()
+	if len(names) < 24 {
+		t.Fatalf("expected at least 24 curated palettes, got %d", len(names))
+	}
+	for _, name := range names {
+		pal, ok := PaletteByName(name)
+		if !ok || len(pal) < 5 {
+			t.Fatalf("palette %q invalid or too short: len=%d", name, len(pal))
+		}
+	}
+
+	c1 := generativeart.NewCanva(80, 80)
+	pRuyao, _ := PaletteByName("ruyao")
+	c1.SetColorSchema(pRuyao)
+	c1.Draw(NewPerlinVelvetDunes(14, 36, 1.35))
+
+	c2 := generativeart.NewCanva(80, 80)
+	pUrushi, _ := PaletteByName("urushi")
+	c2.SetColorSchema(pUrushi)
+	c2.Draw(NewPerlinVelvetDunes(14, 36, 1.35))
+
+	img1, img2 := c1.Img(), c2.Img()
+	diffPixels := 0
+	for y := 0; y < 80; y++ {
+		for x := 0; x < 80; x++ {
+			if img1.RGBAAt(x, y) != img2.RGBAAt(x, y) {
+				diffPixels++
+			}
+		}
+	}
+	if diffPixels < 1000 {
+		t.Fatalf("expected ruyao and urushi palettes to produce distinct renders, diffPixels=%d", diffPixels)
+	}
+}

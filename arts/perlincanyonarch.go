@@ -88,7 +88,8 @@ func (pca *perlinCanyonArch) GenerativeFrame(c *generativeart.Canva, frameIdx, t
 		colB     color.RGBA
 	}
 
-	waveCols := [][2]color.RGBA{
+	schema := c.Opts().ColorSchema()
+	waveCols := render.ResolvePalettePairs(schema, common.Dunhuang, [][2]color.RGBA{
 		{{R: 248, G: 188, B: 74, A: 255}, {R: 234, G: 126, B: 52, A: 255}}, // 0: Distant Sunlit Amber Foothill
 		{{R: 228, G: 102, B: 54, A: 255}, {R: 186, G: 52, B: 62, A: 255}},  // 1: Terracotta Coral Ridge
 		{{R: 72, G: 172, B: 142, A: 255}, {R: 34, G: 136, B: 126, A: 255}}, // 2: Celadon Jade Shallows
@@ -98,7 +99,7 @@ func (pca *perlinCanyonArch) GenerativeFrame(c *generativeart.Canva, frameIdx, t
 		{{R: 18, G: 106, B: 148, A: 255}, {R: 14, G: 68, B: 118, A: 255}},  // 6: Deep Azure Current
 		{{R: 14, G: 72, B: 124, A: 255}, {R: 10, G: 42, B: 88, A: 255}},    // 7: Foreground Ultramarine Swell
 		{{R: 10, G: 44, B: 92, A: 255}, {R: 6, G: 22, B: 56, A: 255}},      // 8: Foreground Prussian Abyss
-	}
+	})
 
 	nWaves := len(waveCols)
 	waves := make([]waveLayer, nWaves)
@@ -170,14 +171,14 @@ func (pca *perlinCanyonArch) GenerativeFrame(c *generativeart.Canva, frameIdx, t
 		colB     color.RGBA
 	}
 
-	archCols := [6][2]color.RGBA{
+	archCols := render.ResolvePalettePairs(schema, common.Dunhuang, [][2]color.RGBA{
 		{{R: 250, G: 196, B: 88, A: 255}, {R: 242, G: 142, B: 58, A: 255}}, // 0 (innermost arch): Sunlit Apricot-Gold
 		{{R: 242, G: 136, B: 56, A: 255}, {R: 218, G: 76, B: 52, A: 255}},  // 1: Sunset Tangerine-Coral
 		{{R: 214, G: 64, B: 54, A: 255}, {R: 176, G: 34, B: 60, A: 255}},   // 2: Terracotta Cinnabar
 		{{R: 168, G: 30, B: 64, A: 255}, {R: 122, G: 24, B: 76, A: 255}},   // 3: Alizarin Bordeaux Wine
 		{{R: 112, G: 26, B: 84, A: 255}, {R: 68, G: 24, B: 92, A: 255}},    // 4: Imperial Amethyst Plum
 		{{R: 56, G: 24, B: 86, A: 255}, {R: 24, G: 18, B: 58, A: 255}},     // 5 (outermost foreground): Nocturne Indigo
-	}
+	})
 
 	const nArches = 6
 	arches := make([]canyonArch, nArches)

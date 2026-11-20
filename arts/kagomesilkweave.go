@@ -73,20 +73,21 @@ func (ksw *kagomeSilkWeave) GenerativeFrame(c *generativeart.Canva, frameIdx, to
 	// Axis 0 (0°): Imperial Sunburst Gold, Amber Ochre & Sunset Tangerine
 	// Axis 1 (+60°): Kingfisher Turquoise, Peacock Emerald & Royal Sapphire
 	// Axis 2 (-60°): Cinnabar Vermilion, Alizarin Rose-Ruby & Bordeaux Amethyst
+	schema := c.Opts().ColorSchema()
 	axisGrads := [3]*render.MultiStopGradient{
-		render.NewMultiStopGradient(
+		render.ResolveCyclicGradient(schema, common.Dunhuang,
 			color.RGBA{R: 250, G: 196, B: 54, A: 255},
 			color.RGBA{R: 242, G: 132, B: 46, A: 255},
 			color.RGBA{R: 248, G: 214, B: 96, A: 255},
 			color.RGBA{R: 250, G: 196, B: 54, A: 255},
 		),
-		render.NewMultiStopGradient(
+		render.ResolveCyclicGradient(schema, common.Dunhuang,
 			color.RGBA{R: 20, G: 144, B: 162, A: 255},
 			color.RGBA{R: 38, G: 172, B: 128, A: 255},
 			color.RGBA{R: 22, G: 78, B: 152, A: 255},
 			color.RGBA{R: 20, G: 144, B: 162, A: 255},
 		),
-		render.NewMultiStopGradient(
+		render.ResolveCyclicGradient(schema, common.Dunhuang,
 			color.RGBA{R: 214, G: 44, B: 56, A: 255},
 			color.RGBA{R: 156, G: 28, B: 82, A: 255},
 			color.RGBA{R: 238, G: 96, B: 52, A: 255},

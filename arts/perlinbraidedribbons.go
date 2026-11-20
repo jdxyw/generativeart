@@ -70,7 +70,8 @@ func (pbr *perlinBraidedRibbons) GenerativeFrame(c *generativeart.Canva, frameId
 	// =========================================================================
 	// 1. TWIN COUNTER-FLOWING WARM SUNSET GOLD/CORAL & COOL SAPPHIRE/TEAL PALETTES
 	// =========================================================================
-	warmGrad := render.NewMultiStopGradient(
+	schema := c.Opts().ColorSchema()
+	warmGrad := render.ResolveCyclicGradient(schema, common.Dunhuang,
 		color.RGBA{R: 250, G: 196, B: 56, A: 255}, // Imperial Sunburst Gold
 		color.RGBA{R: 244, G: 122, B: 46, A: 255}, // Sunset Tangerine Ochre
 		color.RGBA{R: 224, G: 58, B: 52, A: 255},  // Cinnabar Vermilion Coral
@@ -79,7 +80,7 @@ func (pbr *perlinBraidedRibbons) GenerativeFrame(c *generativeart.Canva, frameId
 		color.RGBA{R: 250, G: 196, B: 56, A: 255},
 	)
 
-	coolGrad := render.NewMultiStopGradient(
+	coolGrad := render.ResolveCyclicGradient(schema, common.Dunhuang,
 		color.RGBA{R: 16, G: 48, B: 128, A: 255},  // Nocturne Lapis Sapphire
 		color.RGBA{R: 20, G: 108, B: 162, A: 255}, // Royal Cerulean Azure
 		color.RGBA{R: 22, G: 154, B: 158, A: 255}, // Kingfisher Cyan-Turquoise

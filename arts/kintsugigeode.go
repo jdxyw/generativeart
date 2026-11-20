@@ -138,8 +138,8 @@ func (kg *kintsugiGeode) GenerativeFrame(c *generativeart.Canva, frameIdx, total
 		seeds[i].hueBase = math.Mod(0.58*seeds[i].x0+0.48*(1.0-seeds[i].y0)+0.12*float64(i%3)+10.0, 1.0)
 	}
 
-	// Curated Dunhuang & Brazilian Fortification-Agate Palette
-	agateGrad := render.NewMultiStopGradient(
+	// Curated Dunhuang & Brazilian Fortification-Agate Palette (overridable via -palette / c.SetColorSchema)
+	agateGrad := render.ResolveCyclicGradient(c.Opts().ColorSchema(), common.Dunhuang,
 		color.RGBA{R: 16, G: 44, B: 118, A: 255},  // Deep Lapis Sapphire
 		color.RGBA{R: 20, G: 132, B: 158, A: 255}, // Kingfisher Cyan-Turquoise
 		color.RGBA{R: 42, G: 172, B: 128, A: 255}, // Celadon Malachite Jade

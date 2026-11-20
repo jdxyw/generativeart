@@ -239,7 +239,147 @@ var (
 		{R: 0xBD, G: 0xB2, B: 0xFF, A: 0xFF},
 		{R: 0xFF, G: 0xC6, B: 0xFF, A: 0xFF},
 	}
+
+	// Ruyao: Song-Dynasty Ru Ware Celadon (汝窑天青、粉青、月白、冰裂金丝与玛瑙釉)
+	Ruyao = []color.RGBA{
+		{R: 0x18, G: 0x32, B: 0x38, A: 0xFF}, // Deep Kiln Slate
+		{R: 0x36, G: 0x68, B: 0x70, A: 0xFF}, // Old Celadon Glaze
+		{R: 0x5C, G: 0x96, B: 0x9C, A: 0xFF}, // Tianqing Sky-Celadon
+		{R: 0x8E, G: 0xBE, B: 0xBC, A: 0xFF}, // Fenqing Mist-Jade
+		{R: 0xDC, G: 0xEA, B: 0xE4, A: 0xFF}, // Moon-White Porcelain
+		{R: 0xD8, G: 0xAC, B: 0x64, A: 0xFF}, // Sesame-Crack Gold Vein
+		{R: 0x9C, G: 0x58, B: 0x38, A: 0xFF}, // Agate Iron-Foot Amber
+	}
+
+	// Morandi: Giorgio Morandi Still-Life Muted Warm Greys, Chalk Cream, Dusty Rose & Sage
+	Morandi = []color.RGBA{
+		{R: 0x38, G: 0x34, B: 0x32, A: 0xFF}, // Warm Charcoal Umber
+		{R: 0x6E, G: 0x7E, B: 0x8A, A: 0xFF}, // Slate Mist Blue
+		{R: 0x88, G: 0x98, B: 0x84, A: 0xFF}, // Muted Sage Olive
+		{R: 0xB8, G: 0x7E, B: 0x74, A: 0xFF}, // Dusty Terracotta Rose
+		{R: 0xCE, G: 0xA2, B: 0x78, A: 0xFF}, // Warm Siena Ochre
+		{R: 0xE8, G: 0xDF, B: 0xD2, A: 0xFF}, // Bologna Chalk Cream
+	}
+
+	// Urushi: Japanese & Chinese Maki-e Black-and-Gold Lacquerware, Vermilion & Raden Nacre
+	Urushi = []color.RGBA{
+		{R: 0x14, G: 0x0E, B: 0x10, A: 0xFF}, // Ro-iro Mirror Black Lacquer
+		{R: 0x42, G: 0x18, B: 0x16, A: 0xFF}, // Deep Tamarind Lacquer
+		{R: 0xB8, G: 0x24, B: 0x20, A: 0xFF}, // Shu-Urushi Cinnabar Red
+		{R: 0xE2, G: 0x56, B: 0x34, A: 0xFF}, // Coral Vermilion
+		{R: 0xF4, G: 0xBC, B: 0x42, A: 0xFF}, // Maki-e 24K Gold Powder
+		{R: 0xFB, G: 0xE8, B: 0xB2, A: 0xFF}, // Pale Gold Foil
+		{R: 0x48, G: 0xB8, B: 0xAC, A: 0xFF}, // Raden Mother-of-Pearl Inlay
+	}
+
+	// Bauhaus: Weimar Bauhaus (Kandinsky / Mondrian / Albers) Primary Triadic & Parchment
+	Bauhaus = []color.RGBA{
+		{R: 0x1A, G: 0x1D, B: 0x24, A: 0xFF}, // Weimar Typographic Black
+		{R: 0x1C, G: 0x4E, B: 0x9E, A: 0xFF}, // Kandinsky Ultramarine
+		{R: 0x2A, G: 0x8C, B: 0x82, A: 0xFF}, // Dessau Teal Accent
+		{R: 0xD6, G: 0x32, B: 0x28, A: 0xFF}, // Bauhaus Cadmium Red
+		{R: 0xE8, G: 0x7A, B: 0x2E, A: 0xFF}, // Albers Orange
+		{R: 0xF4, G: 0xBC, B: 0x2C, A: 0xFF}, // Weimar Chrome Yellow
+		{R: 0xF4, G: 0xEC, B: 0xDC, A: 0xFF}, // Archival Vellum Cream
+	}
+
+	// Nordic: Arctic Fjord Night, Glacier Ice-Blue, Boreal Pine & Aurora Amber
+	Nordic = []color.RGBA{
+		{R: 0x0D, G: 0x1B, B: 0x2A, A: 0xFF}, // Polar Fjord Night
+		{R: 0x1B, G: 0x49, B: 0x65, A: 0xFF}, // Deep Glacier Navy
+		{R: 0x2D, G: 0x6A, B: 0x4F, A: 0xFF}, // Boreal Spruce Pine
+		{R: 0x5F, G: 0xA8, B: 0xD3, A: 0xFF}, // Arctic Ice-Cyan
+		{R: 0xCA, G: 0xE9, B: 0xFF, A: 0xFF}, // Glacial Frost White
+		{R: 0xE0, G: 0x9F, B: 0x3E, A: 0xFF}, // Lofoten Cabin Amber
+	}
+
+	// Sakura: Kyoto Nocturne Indigo, Wisteria Plum, Crimson Tsubaki, Cherry Blossom & Matcha
+	Sakura = []color.RGBA{
+		{R: 0x1C, G: 0x18, B: 0x30, A: 0xFF}, // Kyoto Night Indigo
+		{R: 0x5C, G: 0x34, B: 0x68, A: 0xFF}, // Twilight Wisteria Plum
+		{R: 0xC4, G: 0x32, B: 0x56, A: 0xFF}, // Crimson Tsubaki Camellia
+		{R: 0xF2, G: 0x9C, B: 0xB2, A: 0xFF}, // Yoshino Sakura Petal
+		{R: 0xFB, G: 0xF0, B: 0xE6, A: 0xFF}, // Warm Washi Silk
+		{R: 0x58, G: 0x8C, B: 0x64, A: 0xFF}, // Uji Matcha Bamboo
+		{R: 0xEC, G: 0xBE, B: 0x56, A: 0xFF}, // Kinpaku Gold Leaf
+	}
+
+	// Persian: Isfahan Royal Mosque Haft-Rangi Glazed Tilework (Lapis, Turquoise, Saffron & Ruby)
+	Persian = []color.RGBA{
+		{R: 0x10, G: 0x26, B: 0x68, A: 0xFF}, // Isfahan Lapis Lazuli
+		{R: 0x1C, G: 0x56, B: 0xB4, A: 0xFF}, // Persian Cobalt Glaze
+		{R: 0x1E, G: 0xA8, B: 0xA8, A: 0xFF}, // Nishapur Turquoise
+		{R: 0xF4, G: 0xBE, B: 0x3C, A: 0xFF}, // Sheikh Lotfollah Dome Gold
+		{R: 0xDF, G: 0x6C, B: 0x32, A: 0xFF}, // Khorasan Saffron Ochre
+		{R: 0xA8, G: 0x20, B: 0x48, A: 0xFF}, // Pomegranate Carmine
+		{R: 0xF6, G: 0xEF, B: 0xE0, A: 0xFF}, // Carved Stucco Ivory
+	}
+
+	// Klimt: Gustav Klimt Vienna Secession Gold-Leaf, Byzantium Plum, Coral & Verdigris
+	Klimt = []color.RGBA{
+		{R: 0x1A, G: 0x14, B: 0x20, A: 0xFF}, // Secession Velvet Black
+		{R: 0x5A, G: 0x24, B: 0x56, A: 0xFF}, // Imperial Byzantium Plum
+		{R: 0xC8, G: 0x36, B: 0x40, A: 0xFF}, // Venetian Ruby-Coral
+		{R: 0xE8, G: 0x8A, B: 0x34, A: 0xFF}, // Burnished Copper-Amber
+		{R: 0xF6, G: 0xC4, B: 0x38, A: 0xFF}, // Vienna 24K Gold Leaf
+		{R: 0xFC, G: 0xE8, B: 0x98, A: 0xFF}, // Pale Champagne Gold
+		{R: 0x2A, G: 0x96, B: 0x7A, A: 0xFF}, // Verdigris Malachite
+	}
+
+	// Monet: Claude Monet Giverny Waterlilies (Pond Indigo, Cerulean, Willow Jade, Lilac & Rose)
+	Monet = []color.RGBA{
+		{R: 0x1E, G: 0x32, B: 0x5C, A: 0xFF}, // Deep Pond Indigo
+		{R: 0x3A, G: 0x76, B: 0xA8, A: 0xFF}, // Giverny Sky Reflection
+		{R: 0x46, G: 0xA4, B: 0x92, A: 0xFF}, // Weeping Willow Emerald
+		{R: 0x8C, G: 0x6C, B: 0xA8, A: 0xFF}, // Morning Mist Wisteria
+		{R: 0xE4, G: 0x92, B: 0xA4, A: 0xFF}, // Nymphaea Waterlily Rose
+		{R: 0xF6, G: 0xD4, B: 0x7A, A: 0xFF}, // Sunlit Pollen Gold
+	}
+
+	// Canyon: Colorado & Petra Slot-Canyon Sandstone, Terracotta, Amber & Desert Oasis Teal
+	Canyon = []color.RGBA{
+		{R: 0x16, G: 0x22, B: 0x38, A: 0xFF}, // Desert Twilight Indigo
+		{R: 0x68, G: 0x26, B: 0x22, A: 0xFF}, // Shadowed Navajo Gorge
+		{R: 0xB8, G: 0x3E, B: 0x2C, A: 0xFF}, // Petra Rose-Red Cliff
+		{R: 0xE2, G: 0x72, B: 0x32, A: 0xFF}, // Antelope Canyon Tangerine
+		{R: 0xF4, G: 0xBA, B: 0x50, A: 0xFF}, // Sunbaked Sandstone Gold
+		{R: 0x28, G: 0x96, B: 0x96, A: 0xFF}, // Havasu Oasis Turquoise
+	}
+
+	// Biolum: Deep-Sea Mariana Bioluminescence (Abyssal Navy, Electric Cyan, Seafoam & Magenta)
+	Biolum = []color.RGBA{
+		{R: 0x06, G: 0x0C, B: 0x22, A: 0xFF}, // Mariana Trench Void
+		{R: 0x12, G: 0x32, B: 0x78, A: 0xFF}, // Hadal Ultramarine
+		{R: 0x14, G: 0xCC, B: 0xD8, A: 0xFF}, // Electric Medusa Cyan
+		{R: 0x28, G: 0xE8, B: 0x9C, A: 0xFF}, // BioluminescentDinoflagellate Green
+		{R: 0xF8, G: 0xCE, B: 0x46, A: 0xFF}, // Nematocyst Amber Spark
+		{R: 0xEC, G: 0x2E, B: 0x86, A: 0xFF}, // Pelagia Neon Rose
+	}
+
+	// Vintage: 18th-Century Naturalist Copperplate & Botanical Folio (Sepia, Vermilion, Verdigris & Vellum)
+	Vintage = []color.RGBA{
+		{R: 0x26, G: 0x1E, B: 0x1A, A: 0xFF}, // Iron-Gall Sepia Ink
+		{R: 0x5C, G: 0x3C, B: 0x28, A: 0xFF}, // Aged Walnut Umber
+		{R: 0xB8, G: 0x46, B: 0x36, A: 0xFF}, // Antique Madder Vermilion
+		{R: 0xD8, G: 0x9C, B: 0x46, A: 0xFF}, // Brass Astrolabe Ochre
+		{R: 0x46, G: 0x7C, B: 0x72, A: 0xFF}, // Oxidized Verdigris Teal
+		{R: 0x2C, G: 0x48, B: 0x64, A: 0xFF}, // Prussian Slate Blue
+		{R: 0xF2, G: 0xE6, B: 0xD0, A: 0xFF}, // Archival Rag Vellum
+	}
 )
+
+// SamePalette reports whether two color slices contain identical RGBA entries.
+func SamePalette(a, b []color.RGBA) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
+}
 
 // ParseHexColor parses color string likes #FFFFFF or #2398EFFF
 func ParseHexColor(s string) (color.RGBA, error) {

@@ -66,7 +66,7 @@ func (ncs *nautilusChamberScroll) GenerativeFrame(c *generativeart.Canva, frameI
 	// =========================================================================
 	// 1. IRIDESCENT NACRE, KINGFISHER, SUNBURST GOLD, CORAL & SAPPHIRE PALETTE
 	// =========================================================================
-	nacreGrad := render.NewMultiStopGradient(
+	nacreGrad := render.ResolveCyclicGradient(c.Opts().ColorSchema(), common.Dunhuang,
 		color.RGBA{R: 252, G: 214, B: 88, A: 255},  // Blazing Solar Gold (Inner Spire)
 		color.RGBA{R: 244, G: 124, B: 52, A: 255},  // Sunset Tangerine Coral
 		color.RGBA{R: 208, G: 44, B: 62, A: 255},   // Alizarin Cinnabar Ruby

@@ -115,11 +115,11 @@ func (d ArtDescriptor) ResolveParams(overrides map[string]interface{}) (map[stri
 }
 
 var categoryHarmoniousPalettes = map[string][]string{
-	"geom":  {"dunhuang", "sunset", "ukiyoe", "oceanic", "cyberpunk", "botanical"},
-	"media": {"dunhuang", "sunset", "ukiyoe", "botanical", "oceanic", "pasteldream"},
-	"chaos": {"inferno", "plasma", "magma", "cyberpunk", "dunhuang", "viridis"},
-	"flow":  {"oceanic", "cyberpunk", "dunhuang", "sunset", "viridis", "plasma"},
-	"bio":   {"botanical", "oceanic", "dunhuang", "viridis", "sunset", "ukiyoe"},
+	"geom":  {"dunhuang", "persian", "ruyao", "urushi", "bauhaus", "klimt", "morandi", "sunset", "ukiyoe", "oceanic"},
+	"media": {"dunhuang", "morandi", "ruyao", "urushi", "klimt", "monet", "sakura", "vintage", "sunset", "ukiyoe"},
+	"chaos": {"dunhuang", "klimt", "urushi", "biolum", "persian", "inferno", "plasma", "magma", "cyberpunk"},
+	"flow":  {"oceanic", "nordic", "ruyao", "monet", "canyon", "dunhuang", "biolum", "sunset", "viridis"},
+	"bio":   {"botanical", "sakura", "monet", "ruyao", "biolum", "oceanic", "dunhuang", "viridis", "sunset"},
 }
 
 // RandomizePalette picks either the descriptor's tuned default palette or a category-harmonious palette.
@@ -377,6 +377,18 @@ var namedPalettes = map[string][]color.RGBA{
 	"botanical":   common.Botanical,
 	"pasteldream": common.PastelDream,
 	"youthful":    common.Youthful,
+	"ruyao":       common.Ruyao,
+	"morandi":     common.Morandi,
+	"urushi":      common.Urushi,
+	"bauhaus":     common.Bauhaus,
+	"nordic":      common.Nordic,
+	"sakura":      common.Sakura,
+	"persian":     common.Persian,
+	"klimt":       common.Klimt,
+	"monet":       common.Monet,
+	"canyon":      common.Canyon,
+	"biolum":      common.Biolum,
+	"vintage":     common.Vintage,
 }
 
 // PaletteByName returns a named color palette and true if found.

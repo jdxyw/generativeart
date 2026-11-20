@@ -73,7 +73,7 @@ func (pvd *perlinVelvetDunes) GenerativeFrame(c *generativeart.Canva, frameIdx, 
 	// Sweeps across the 24 overlapping strata from Nocturne Ultramarine & Peacock
 	// Turquoise in the upper/mid currents to Saffron Gold, Terracotta Coral,
 	// Cinnabar Ruby, and Deep Wine-Burgundy!
-	duneGrad := render.NewMultiStopGradient(
+	duneGrad := render.ResolveCyclicGradient(c.Opts().ColorSchema(), common.Dunhuang,
 		color.RGBA{R: 18, G: 48, B: 122, A: 255},  // Nocturne Lapis Ultramarine
 		color.RGBA{R: 22, G: 136, B: 148, A: 255}, // Oasis Kingfisher Teal
 		color.RGBA{R: 48, G: 164, B: 124, A: 255}, // Celadon Malachite

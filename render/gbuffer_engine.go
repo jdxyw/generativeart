@@ -889,3 +889,53 @@ func (sb *SupersampledShadowBoxGBuffer) ResolveShadowBoxToCanvas(
 		}
 	})
 }
+
+// ResolveCyclicGradient returns a cyclic MultiStopGradient from customSchema when the caller
+// has set a non-default ColorSchema on the canvas (e.g. via -palette <name> or c.SetColorSchema),
+// or falls back to the engine's hand-tuned fallbackStops when customSchema matches defaultRef
+// or common.Youthful.
+func ResolveCyclicGradient(customSchema, defaultRef []color.RGBA, fallbackStops ...color.RGBA) *MultiStopGradient {
+	if len(customSchema) >= 2 && !common.SamePalette(customSchema, defaultRef) && !common.SamePalette(customSchema, common.Youthful) {
+		closed := make([]color.RGBA, len(customSchema)+1)
+		copy(closed, customSchema)
+		closed[len(customSchema)] = customSchema[0]
+		return NewMultiStopGradient(closed...)
+	}
+	return NewMultiStopGradient(fallbackStops...)
+}
+
+// ResolvePalettePairs adapts a slice of [2]color.RGBA layer stops to customSchema when a
+// non-default palette is active on the canvas, or returns fallback unchanged.
+func ResolvePalettePairs(customSchema, defaultRef []color.RGBA, fallback [][2]color.RGBA) [][2]color.RGBA {
+	if len(customSchema) < 2 || common.SamePalette(customSchema, defaultRef) || common.SamePalette(customSchema, common.Youthful) {
+		return fallback
+	}
+	grad := NewMultiStopGradient(customSchema...)
+	n := len(fallback)
+	out := make([][2]color.RGBA, n)
+	for i := 0; i < n; i++ {
+		t0 := float64(i) / math.Max(1.0, float64(n-1))
+		t1 := common.Clamp01(t0 + 0.14)
+		out[i] = [2]color.RGBA{grad.SampleOklab(t0), grad.SampleOklab(t1)}
+	}
+	return out
+}
+
+// ResolvePaletteTriples adapts a slice of [3]color.RGBA layer stops to customSchema when a
+// non-default palette is active on the canvas, or returns fallback unchanged.
+func ResolvePaletteTriples(customSchema, defaultRef []color.RGBA, fallback [][3]color.RGBA) [][3]color.RGBA {
+	if len(customSchema) < 2 || common.SamePalette(customSchema, defaultRef) || common.SamePalette(customSchema, common.Youthful) {
+		return fallback
+	}
+	grad := NewMultiStopGradient(customSchema...)
+	n := len(fallback)
+	out := make([][3]color.RGBA, n)
+	for i := 0; i < n; i++ {
+		tMid := float64(i) / math.Max(1.0, float64(n-1))
+		cMid := grad.SampleOklab(tMid)
+		cPeak := LerpOklab(grad.SampleOklab(common.Clamp01(tMid+0.16)), color.RGBA{R: 252, G: 238, B: 196, A: 255}, 0.35)
+		cBase := LerpOklab(grad.SampleOklab(common.Clamp01(tMid-0.14)), color.RGBA{R: 12, G: 14, B: 28, A: 255}, 0.45)
+		out[i] = [3]color.RGBA{cPeak, cMid, cBase}
+	}
+	return out
+}

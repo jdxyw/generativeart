@@ -105,12 +105,13 @@ func (pss *perlinShanshuiScroll) GenerativeFrame(c *generativeart.Canva, frameId
 		colB     color.RGBA
 	}
 
-	cloudCols := [4][2]color.RGBA{
+	schema := c.Opts().ColorSchema()
+	cloudCols := render.ResolvePalettePairs(schema, common.Dunhuang, [][2]color.RGBA{
 		{{R: 252, G: 210, B: 112, A: 255}, {R: 244, G: 158, B: 62, A: 255}},
 		{{R: 244, G: 142, B: 58, A: 255}, {R: 218, G: 76, B: 52, A: 255}},
 		{{R: 204, G: 52, B: 58, A: 255}, {R: 148, G: 28, B: 72, A: 255}},
 		{{R: 112, G: 26, B: 84, A: 255}, {R: 48, G: 22, B: 78, A: 255}},
-	}
+	})
 	clouds := make([]cloudLayer, 4)
 	cloudY := make([][]float64, 4)
 	for i := 0; i < 4; i++ {
@@ -155,7 +156,7 @@ func (pss *perlinShanshuiScroll) GenerativeFrame(c *generativeart.Canva, frameId
 		colA     color.RGBA
 		colB     color.RGBA
 	}
-	riverCols := [8][2]color.RGBA{
+	riverCols := render.ResolvePalettePairs(schema, common.Dunhuang, [][2]color.RGBA{
 		{{R: 252, G: 214, B: 108, A: 255}, {R: 242, G: 162, B: 64, A: 255}}, // Distant Sunlit Golden Shallows
 		{{R: 88, G: 186, B: 156, A: 255}, {R: 42, G: 152, B: 142, A: 255}},  // Mist Celadon Rapid
 		{{R: 248, G: 196, B: 78, A: 255}, {R: 228, G: 138, B: 52, A: 255}},  // Golden Sun-Reflection Cascade
@@ -164,7 +165,7 @@ func (pss *perlinShanshuiScroll) GenerativeFrame(c *generativeart.Canva, frameId
 		{{R: 244, G: 184, B: 64, A: 255}, {R: 218, G: 118, B: 46, A: 255}},  // Shimmering Gold Ripple Step
 		{{R: 18, G: 108, B: 148, A: 255}, {R: 14, G: 68, B: 118, A: 255}},   // Deep Azure Estuary
 		{{R: 14, G: 72, B: 124, A: 255}, {R: 10, G: 38, B: 84, A: 255}},     // Foreground Sapphire Deep
-	}
+	})
 	rSteps := make([]riverStep, 8)
 	for j := 0; j < 8; j++ {
 		fj := float64(j) / 7.0
@@ -203,7 +204,7 @@ func (pss *perlinShanshuiScroll) GenerativeFrame(c *generativeart.Canva, frameId
 
 	// Song-Dynasty Qinglü Shanshui (千里江山) Mineral Palette:
 	// Distant peaks: Warm Ochre-Gold & Cinnabar Coral -> Midground: Malachite Green & Kingfisher Teal -> Foreground: Azurite Sapphire & Gold
-	headlandCols := [10][3]color.RGBA{
+	headlandCols := render.ResolvePaletteTriples(schema, common.Dunhuang, [][3]color.RGBA{
 		{{R: 248, G: 186, B: 68, A: 255}, {R: 224, G: 106, B: 52, A: 255}, {R: 138, G: 38, B: 64, A: 255}},  // 0 (Left distant): Ochre Gold -> Terracotta
 		{{R: 244, G: 162, B: 62, A: 255}, {R: 198, G: 68, B: 56, A: 255}, {R: 112, G: 32, B: 74, A: 255}},   // 1 (Right distant): Amber -> Cinnabar Ruby
 		{{R: 246, G: 202, B: 84, A: 255}, {R: 54, G: 168, B: 128, A: 255}, {R: 18, G: 84, B: 102, A: 255}},  // 2 (Left mid-far): Gold-Tipped Malachite
@@ -214,7 +215,7 @@ func (pss *perlinShanshuiScroll) GenerativeFrame(c *generativeart.Canva, frameId
 		{{R: 244, G: 178, B: 58, A: 255}, {R: 38, G: 156, B: 124, A: 255}, {R: 12, G: 44, B: 88, A: 255}},   // 7 (Right near): Gilded Celadon-Jade Cliff
 		{{R: 32, G: 118, B: 164, A: 255}, {R: 18, G: 64, B: 128, A: 255}, {R: 10, G: 26, B: 68, A: 255}},    // 8 (Left foreground): Deep Azurite Blue
 		{{R: 28, G: 96, B: 152, A: 255}, {R: 16, G: 48, B: 108, A: 255}, {R: 8, G: 20, B: 54, A: 255}},      // 9 (Right foreground): Nocturne Lapis Cliff
-	}
+	})
 
 	const nHeadlands = 10
 	headlands := make([]karstHeadland, nHeadlands)

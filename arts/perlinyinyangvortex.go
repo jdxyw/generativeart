@@ -77,23 +77,24 @@ func (pyy *perlinYinYangVortex) GenerativeFrame(c *generativeart.Canva, frameIdx
 	const sunX, sunY = 0.23, 0.27
 	const moonX, moonY = 0.77, 0.73
 
-	solarRingCols := [6][2]color.RGBA{
+	schema := c.Opts().ColorSchema()
+	solarRingCols := render.ResolvePalettePairs(schema, common.Dunhuang, [][2]color.RGBA{
 		{{R: 255, G: 222, B: 108, A: 255}, {R: 248, G: 176, B: 58, A: 255}}, // 0: Inner Sunburst Gold
 		{{R: 248, G: 166, B: 54, A: 255}, {R: 238, G: 112, B: 48, A: 255}},  // 1: Sunset Tangerine
 		{{R: 236, G: 102, B: 48, A: 255}, {R: 212, G: 52, B: 52, A: 255}},   // 2: Fiery Coral-Vermilion
 		{{R: 204, G: 44, B: 56, A: 255}, {R: 164, G: 28, B: 66, A: 255}},    // 3: Cinnabar Ruby
 		{{R: 154, G: 26, B: 72, A: 255}, {R: 108, G: 24, B: 84, A: 255}},    // 4: Bordeaux Carmine
 		{{R: 96, G: 26, B: 92, A: 255}, {R: 54, G: 24, B: 88, A: 255}},      // 5: Twilight Amethyst
-	}
+	})
 
-	lunarRingCols := [6][2]color.RGBA{
+	lunarRingCols := render.ResolvePalettePairs(schema, common.Dunhuang, [][2]color.RGBA{
 		{{R: 178, G: 246, B: 238, A: 255}, {R: 58, G: 196, B: 186, A: 255}}, // 0: Inner Seafoam Moon-Jade
 		{{R: 44, G: 178, B: 164, A: 255}, {R: 24, G: 144, B: 158, A: 255}},  // 1: Celadon Turquoise
 		{{R: 22, G: 138, B: 162, A: 255}, {R: 18, G: 102, B: 148, A: 255}},  // 2: Kingfisher Cyan
 		{{R: 18, G: 94, B: 146, A: 255}, {R: 16, G: 62, B: 124, A: 255}},    // 3: Peacock Cerulean
 		{{R: 16, G: 56, B: 118, A: 255}, {R: 14, G: 36, B: 92, A: 255}},     // 4: Royal Ultramarine
 		{{R: 14, G: 32, B: 84, A: 255}, {R: 10, G: 18, B: 54, A: 255}},      // 5: Midnight Prussian Abyss
-	}
+	})
 
 	// 9 Sweeping Taiji S-Wave Ribbons that flow diagonally across the canvas,
 	// curving around the Solar Eye on the upper-left and cradling the Lunar Eye on the lower-right!
@@ -109,7 +110,7 @@ func (pyy *perlinYinYangVortex) GenerativeFrame(c *generativeart.Canva, frameIdx
 		colCore  color.RGBA
 	}
 
-	sRibbonCols := [9][2]color.RGBA{
+	sRibbonCols := render.ResolvePalettePairs(schema, common.Dunhuang, [][2]color.RGBA{
 		{{R: 118, G: 26, B: 82, A: 255}, {R: 212, G: 58, B: 56, A: 255}},   // 0: Bordeaux & Vermilion
 		{{R: 188, G: 38, B: 58, A: 255}, {R: 246, G: 162, B: 54, A: 255}},  // 1: Cinnabar & Amber Gold
 		{{R: 234, G: 96, B: 48, A: 255}, {R: 255, G: 214, B: 92, A: 255}},   // 2: Sunset Coral & Sunburst Gold
@@ -119,7 +120,7 @@ func (pyy *perlinYinYangVortex) GenerativeFrame(c *generativeart.Canva, frameIdx
 		{{R: 18, G: 104, B: 148, A: 255}, {R: 54, G: 188, B: 176, A: 255}},  // 6: Cerulean & Seafoam Aqua
 		{{R: 16, G: 64, B: 126, A: 255}, {R: 24, G: 138, B: 158, A: 255}},   // 7: Ultramarine & Kingfisher
 		{{R: 48, G: 28, B: 98, A: 255}, {R: 18, G: 84, B: 142, A: 255}},     // 8: Royal Indigo & Cobalt
-	}
+	})
 
 	const nRibbons = 9
 	ribbons := make([]taijiRibbon, nRibbons)

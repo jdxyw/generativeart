@@ -70,7 +70,7 @@ func (pbf *perlinBrocadeFan) GenerativeFrame(c *generativeart.Canva, frameIdx, t
 	// =========================================================================
 	// 1. IMPERIAL DUNHUANG & ART-DECO PEACOCK-LOTUS BROCADE PALETTE
 	// =========================================================================
-	fanGrad := render.NewMultiStopGradient(
+	fanGrad := render.ResolveCyclicGradient(c.Opts().ColorSchema(), common.Dunhuang,
 		color.RGBA{R: 16, G: 44, B: 122, A: 255},  // Nocturne Lapis Sapphire
 		color.RGBA{R: 18, G: 134, B: 158, A: 255}, // Kingfisher Cyan-Turquoise
 		color.RGBA{R: 38, G: 170, B: 126, A: 255}, // Peacock Viridian Jade

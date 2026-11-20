@@ -94,18 +94,17 @@ func (ppt *perlinPlumeTapestry) GenerativeFrame(c *generativeart.Canva, frameIdx
 	// Curated Eiko-Ojala / Ukiyo-e / Dunhuang Shadow-Box Palette:
 	// Upper cloud layers progress from warm Apricot-Gold & Coral-Vermilion (deep near the sun)
 	// to Cinnabar-Red & Twilight Bordeaux-Plum at the top canopy.
-	upperCols := [][2]color.RGBA{
+	schema := c.Opts().ColorSchema()
+	upperCols := render.ResolvePalettePairs(schema, common.Dunhuang, [][2]color.RGBA{
 		{{R: 252, G: 212, B: 118, A: 255}, {R: 246, G: 168, B: 68, A: 255}}, // 0: Warm Champagne Apricot
 		{{R: 248, G: 162, B: 64, A: 255}, {R: 238, G: 112, B: 52, A: 255}},  // 1: Sunset Marigold-Tangerine
 		{{R: 238, G: 106, B: 54, A: 255}, {R: 214, G: 58, B: 52, A: 255}},   // 2: Terracotta Vermilion
 		{{R: 208, G: 48, B: 56, A: 255}, {R: 168, G: 30, B: 64, A: 255}},    // 3: Cinnabar Crimson
 		{{R: 158, G: 28, B: 68, A: 255}, {R: 112, G: 24, B: 78, A: 255}},    // 4: Bordeaux Carmine-Wine
 		{{R: 96, G: 26, B: 88, A: 255}, {R: 54, G: 24, B: 82, A: 255}},      // 5: Twilight Imperial Plum
-	}
+	})
 
-	// Lower mountain & wave layers progress from distant Golden-Ochre & Coral ridges
-	// through Celadon-Jade & Kingfisher-Turquoise to deep Cobalt & Prussian Sapphire waves!
-	lowerCols := [][2]color.RGBA{
+	lowerCols := render.ResolvePalettePairs(schema, common.Dunhuang, [][2]color.RGBA{
 		{{R: 248, G: 192, B: 78, A: 255}, {R: 236, G: 138, B: 56, A: 255}},  // 0: Distant Sunlit Amber Ridge
 		{{R: 236, G: 126, B: 54, A: 255}, {R: 204, G: 68, B: 54, A: 255}},   // 1: Warm Terracotta Foothills
 		{{R: 192, G: 58, B: 66, A: 255}, {R: 138, G: 38, B: 82, A: 255}},    // 2: Rose-Cinnabar Escarpment
@@ -117,7 +116,7 @@ func (ppt *perlinPlumeTapestry) GenerativeFrame(c *generativeart.Canva, frameIdx
 		{{R: 16, G: 82, B: 132, A: 255}, {R: 12, G: 48, B: 96, A: 255}},     // 8: Ultramarine Swell
 		{{R: 14, G: 56, B: 108, A: 255}, {R: 10, G: 32, B: 74, A: 255}},     // 9: Prussian Sapphire Trench
 		{{R: 10, G: 38, B: 82, A: 255}, {R: 7, G: 20, B: 52, A: 255}},      // 10: Midnight Abyssal Foreground
-	}
+	})
 
 	goldRim := color.RGBA{R: 255, G: 232, B: 164, A: 255}
 	layers := make([]paperLayer, 0, 17)

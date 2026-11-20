@@ -69,7 +69,7 @@ func (pis *perlinImpastoSwirl) GenerativeFrame(c *generativeart.Canva, frameIdx,
 	// =========================================================================
 	// 1. HIGH-CHROMA STARRY SAPPHIRE, CYAN, CHAMPAGNE GOLD, CORAL & ROSE PALETTE
 	// =========================================================================
-	streamGrad := render.NewMultiStopGradient(
+	streamGrad := render.ResolveCyclicGradient(c.Opts().ColorSchema(), common.Dunhuang,
 		color.RGBA{R: 16, G: 128, B: 162, A: 255}, // Cerulean Kingfisher Cyan
 		color.RGBA{R: 38, G: 172, B: 132, A: 255}, // Luminous Seafoam Emerald
 		color.RGBA{R: 248, G: 192, B: 52, A: 255}, // Imperial Sunburst Gold
